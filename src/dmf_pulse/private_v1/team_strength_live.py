@@ -602,6 +602,7 @@ class TeamStrengthL1ObservationService:
                 "prior_l1_one_shot_consumed": True,
                 "prior_l2_one_shot_consumed": True,
                 "prior_l3_one_shot_consumed": True,
+                "prior_l4_one_shot_consumed": True,
                 "fresh_live_authorization_required": True,
             }
         except TeamStrengthComparisonFailure as failure:

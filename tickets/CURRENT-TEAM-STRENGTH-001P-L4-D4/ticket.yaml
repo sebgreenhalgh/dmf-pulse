@@ -1,0 +1,13 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L4-D4
+status: ACTIVE
+implementation_parent: efbddb9d36261bfa459c6c014a292bb031aa1773
+branch: readiness/CURRENT-TEAM-STRENGTH-001P-L4-D4-baseline-rolling-failure-localisation
+scope: offline comparison-only rolling failure localisation
+historical_l1_consumed: true
+historical_l2_consumed: true
+historical_l3_consumed: true
+historical_l4_consumed: true
+new_live_authority: false
+provider_access: false
+production_activation: false
+required_review: CLEAR_FOR_TEAM_STRENGTH_L5_REAUTHORIZATION_DECISION

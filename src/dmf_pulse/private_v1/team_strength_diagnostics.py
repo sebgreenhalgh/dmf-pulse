@@ -107,6 +107,81 @@ class Stage8Outcome(StrEnum):
     PROJECTED_WITH_PRIOR_FALLBACK = "PROJECTED_WITH_PRIOR_FALLBACK"
 
 
+class RollingPhase(StrEnum):
+    VALIDATE_ROLLING_EXECUTION = "VALIDATE_ROLLING_EXECUTION"
+    VERIFY_ROLLING_INPUTS = "VERIFY_ROLLING_INPUTS"
+    PROJECT_GAMEWEEK_FIXTURES = "PROJECT_GAMEWEEK_FIXTURES"
+    ASSEMBLE_GAMEWEEK_SCENARIOS = "ASSEMBLE_GAMEWEEK_SCENARIOS"
+    CHECK_STAGE9_MC = "CHECK_STAGE9_MC"
+    BUILD_ONE_GW_COMPARATOR_REQUEST = "BUILD_ONE_GW_COMPARATOR_REQUEST"
+    PRECOMPUTE_ONE_GW_TACTICS = "PRECOMPUTE_ONE_GW_TACTICS"
+    SOLVE_ONE_GW_COMPARATOR = "SOLVE_ONE_GW_COMPARATOR"
+    VALIDATE_ONE_GW_RESULT = "VALIDATE_ONE_GW_RESULT"
+    BUILD_THREE_GW_REQUEST = "BUILD_THREE_GW_REQUEST"
+    PRECOMPUTE_THREE_GW_TACTICS = "PRECOMPUTE_THREE_GW_TACTICS"
+    SOLVE_THREE_GW_POLICY = "SOLVE_THREE_GW_POLICY"
+    VALIDATE_THREE_GW_RESULT = "VALIDATE_THREE_GW_RESULT"
+    BUILD_TRANSFER_FRONTIER = "BUILD_TRANSFER_FRONTIER"
+    BUILD_GAMEWEEK_DECISIONS = "BUILD_GAMEWEEK_DECISIONS"
+    BUILD_HORIZON_COMPARISON = "BUILD_HORIZON_COMPARISON"
+    BUILD_ONE_GW_VS_ROLLING_COMPARISON = "BUILD_ONE_GW_VS_ROLLING_COMPARISON"
+    SEAL_ROLLING_DECISION = "SEAL_ROLLING_DECISION"
+    BUILD_ROLLING_REPORT = "BUILD_ROLLING_REPORT"
+    BUILD_STAGE11_WORK = "BUILD_STAGE11_WORK"
+
+
+class RollingFailureClass(StrEnum):
+    TYPED_FAILURE = "TYPED_FAILURE"
+    OPTIMISER_FAILURE = "OPTIMISER_FAILURE"
+    UNEXPECTED_FAILURE = "UNEXPECTED_FAILURE"
+
+
+class RollingOptimiserStatusClass(StrEnum):
+    SUCCESS = "SUCCESS"
+    RESOURCE_LIMIT = "RESOURCE_LIMIT"
+    INFEASIBLE = "INFEASIBLE"
+    BLOCKED = "BLOCKED"
+    ERROR = "ERROR"
+
+
+class RollingOptimiserBackendStatusClass(StrEnum):
+    OPTIMAL = "OPTIMAL"
+    FEASIBLE_NOT_PROVEN_OPTIMAL = "FEASIBLE_NOT_PROVEN_OPTIMAL"
+    TIME_RESOURCE_LIMIT_WITH_INCUMBENT = "TIME_RESOURCE_LIMIT_WITH_INCUMBENT"
+    TIME_RESOURCE_LIMIT_NO_INCUMBENT = "TIME_RESOURCE_LIMIT_NO_INCUMBENT"
+    INFEASIBLE = "INFEASIBLE"
+    UNBOUNDED = "UNBOUNDED"
+    SOLVER_BACKEND_ERROR = "SOLVER_BACKEND_ERROR"
+    INPUT_CAPABILITY_BLOCKED = "INPUT_CAPABILITY_BLOCKED"
+
+
+class RollingInternalCode(StrEnum):
+    STAGE9_GAMEWEEK_INVALID = "STAGE9_GAMEWEEK_INVALID"
+    STAGE9_MC_QUALITY_BLOCKED = "STAGE9_MC_QUALITY_BLOCKED"
+    ROLLING_HORIZON_INCOMPLETE = "ROLLING_HORIZON_INCOMPLETE"
+    ONE_GAMEWEEK_COMPARATOR_BLOCKED = "ONE_GAMEWEEK_COMPARATOR_BLOCKED"
+    MULTI_GAMEWEEK_PRODUCTION_BACKEND_UNAVAILABLE = "MULTI_GAMEWEEK_PRODUCTION_BACKEND_UNAVAILABLE"
+    MULTI_GAMEWEEK_INPUT_INVALID = "MULTI_GAMEWEEK_INPUT_INVALID"
+    MULTI_GAMEWEEK_INFEASIBLE = "MULTI_GAMEWEEK_INFEASIBLE"
+    MULTI_GAMEWEEK_RESOURCE_LIMIT = "MULTI_GAMEWEEK_RESOURCE_LIMIT"
+    OPTIMISER_EMITTED_INVALID_POLICY = "OPTIMISER_EMITTED_INVALID_POLICY"
+    NO_TRANSFER_BASELINE_UNAVAILABLE = "NO_TRANSFER_BASELINE_UNAVAILABLE"
+    MOVE_ATTRIBUTION_INVALID = "MOVE_ATTRIBUTION_INVALID"
+    ROLLING_OPTIMISER_BLOCKED = "ROLLING_OPTIMISER_BLOCKED"
+    ONE_GAMEWEEK_COUNTERFACTUAL_UNAVAILABLE = "ONE_GAMEWEEK_COUNTERFACTUAL_UNAVAILABLE"
+    ROLLING_FRONTIER_UNAVAILABLE = "ROLLING_FRONTIER_UNAVAILABLE"
+    ROLLING_POLICY_INCOMPLETE = "ROLLING_POLICY_INCOMPLETE"
+    ROLLING_FT_TRANSITION_MISMATCH = "ROLLING_FT_TRANSITION_MISMATCH"
+    ROLLING_COMPARATOR_SCENARIO_MISMATCH = "ROLLING_COMPARATOR_SCENARIO_MISMATCH"
+    ROLLING_COMPARATOR_INVALID = "ROLLING_COMPARATOR_INVALID"
+    ROLLING_COMPARATOR_HORIZON_MISMATCH = "ROLLING_COMPARATOR_HORIZON_MISMATCH"
+    ROLLING_COMPARATOR_OBJECTIVE_MISMATCH = "ROLLING_COMPARATOR_OBJECTIVE_MISMATCH"
+    COUNTERFACTUAL_ACTION_MISMATCH = "COUNTERFACTUAL_ACTION_MISMATCH"
+    PRIVATE_V1_FAILURE_UNCLASSIFIED = "PRIVATE_V1_FAILURE_UNCLASSIFIED"
+    OPTIMISER_FAILURE_UNCLASSIFIED = "OPTIMISER_FAILURE_UNCLASSIFIED"
+    ROLLING_UNEXPECTED_FAILURE = "ROLLING_UNEXPECTED_FAILURE"
+
+
 class ComparisonFailureDiagnostic(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
@@ -128,6 +203,15 @@ class ComparisonFailureDiagnostic(BaseModel):
     baseline_stage8_prior_fallback: int = Field(default=0, ge=0, le=380)
     shadow_stage8_prior_fallback: int = Field(default=0, ge=0, le=380)
     control_name: ControlName | None = None
+    rolling_phase: RollingPhase | None = None
+    rolling_gameweek: int | None = Field(default=None, ge=1, le=38)
+    rolling_failure_class: RollingFailureClass | None = None
+    rolling_internal_code: RollingInternalCode | None = None
+    optimiser_status_class: RollingOptimiserStatusClass | None = None
+    optimiser_backend_status_class: RollingOptimiserBackendStatusClass | None = None
+    gameweeks_stage8_complete: int = Field(default=0, ge=0, le=3)
+    gameweeks_stage9_assembled: int = Field(default=0, ge=0, le=3)
+    gameweeks_stage9_mc_passed: int = Field(default=0, ge=0, le=3)
 
     @model_validator(mode="after")
     def consistent_progress(self) -> Self:
@@ -140,6 +224,29 @@ class ComparisonFailureDiagnostic(BaseModel):
             item is not None for item in location
         ):
             raise ValueError("partial Stage-8 location")
+        if self.rolling_phase is None and any(
+            item is not None
+            for item in (
+                self.rolling_gameweek,
+                self.rolling_failure_class,
+                self.rolling_internal_code,
+                self.optimiser_status_class,
+                self.optimiser_backend_status_class,
+            )
+        ):
+            raise ValueError("rolling detail requires rolling phase")
+        if self.rolling_phase is not None and (
+            self.rolling_failure_class is None or self.rolling_internal_code is None
+        ):
+            raise ValueError("rolling phase requires finite failure classification")
+        if (self.optimiser_status_class is None) != (self.optimiser_backend_status_class is None):
+            raise ValueError("partial optimiser status")
+        if not (
+            self.gameweeks_stage9_mc_passed
+            <= self.gameweeks_stage9_assembled
+            <= self.gameweeks_stage8_complete
+        ):
+            raise ValueError("invalid rolling progress")
         return self
 
 
@@ -181,6 +288,15 @@ class ComparisonTrace:
     projected: dict[World, int] = field(default_factory=dict)
     fallback: dict[World, int] = field(default_factory=dict)
     control: ControlName | None = None
+    rolling_phase: RollingPhase | None = None
+    rolling_gameweek: int | None = None
+    rolling_failure_class: RollingFailureClass | None = None
+    rolling_internal_code: RollingInternalCode | None = None
+    optimiser_status_class: RollingOptimiserStatusClass | None = None
+    optimiser_backend_status_class: RollingOptimiserBackendStatusClass | None = None
+    gameweeks_stage8_complete: int = 0
+    gameweeks_stage9_assembled: int = 0
+    gameweeks_stage9_mc_passed: int = 0
 
     @contextmanager
     def activate(self) -> Iterator[None]:
@@ -196,6 +312,15 @@ class ComparisonTrace:
         self.location = None
         self.stage8_outcome = None
         self.stage8_code = None
+        self.rolling_phase = None
+        self.rolling_gameweek = None
+        self.rolling_failure_class = None
+        self.rolling_internal_code = None
+        self.optimiser_status_class = None
+        self.optimiser_backend_status_class = None
+        self.gameweeks_stage8_complete = 0
+        self.gameweeks_stage9_assembled = 0
+        self.gameweeks_stage9_mc_passed = 0
 
     def complete_world(self, world: World) -> None:
         self.completed.add(world)
@@ -209,6 +334,15 @@ class ComparisonTrace:
             ComparisonStage.RUN_LEAGUE_BASELINE_WORLD,
             ComparisonStage.RUN_TEAM_STRENGTH_WORLD,
         }
+        if world_stage and self.rolling_phase is not None and self.rolling_failure_class is None:
+            self.rolling_failure_class = (
+                RollingFailureClass.UNEXPECTED_FAILURE
+                if not isinstance(error, PrivateV1Error)
+                else RollingFailureClass.OPTIMISER_FAILURE
+                if self.rolling_phase in _OPTIMISER_PHASES
+                else RollingFailureClass.TYPED_FAILURE
+            )
+            self.rolling_internal_code = _rolling_code(error, self.rolling_phase)
         outcome = self.stage8_outcome if world_stage else None
         if world_stage:
             if outcome == Stage8Outcome.INPUT_INVALID or code == InternalCode.STAGE8_INPUT_INVALID:
@@ -238,6 +372,17 @@ class ComparisonTrace:
                 control_name=self.control
                 if stage == ComparisonStage.RECONCILE_HARD_CONTROLS
                 else None,
+                rolling_phase=self.rolling_phase if world_stage else None,
+                rolling_gameweek=self.rolling_gameweek if world_stage else None,
+                rolling_failure_class=self.rolling_failure_class if world_stage else None,
+                rolling_internal_code=self.rolling_internal_code if world_stage else None,
+                optimiser_status_class=(self.optimiser_status_class if world_stage else None),
+                optimiser_backend_status_class=(
+                    self.optimiser_backend_status_class if world_stage else None
+                ),
+                gameweeks_stage8_complete=(self.gameweeks_stage8_complete if world_stage else 0),
+                gameweeks_stage9_assembled=(self.gameweeks_stage9_assembled if world_stage else 0),
+                gameweeks_stage9_mc_passed=(self.gameweeks_stage9_mc_passed if world_stage else 0),
             )
         )
 
@@ -258,6 +403,95 @@ def comparison_boundary(stage: ComparisonStage, reason: ComparisonReason) -> Ite
         if trace is None:
             raise
         raise trace.failure(stage, reason, error) from None
+
+
+_OPTIMISER_PHASES = frozenset(
+    {
+        RollingPhase.SOLVE_ONE_GW_COMPARATOR,
+        RollingPhase.VALIDATE_ONE_GW_RESULT,
+        RollingPhase.SOLVE_THREE_GW_POLICY,
+        RollingPhase.VALIDATE_THREE_GW_RESULT,
+    }
+)
+
+
+def _rolling_code(error: Exception, phase: RollingPhase) -> RollingInternalCode:
+    if not isinstance(error, PrivateV1Error):
+        return RollingInternalCode.ROLLING_UNEXPECTED_FAILURE
+    if type(error.code) is str and error.code in RollingInternalCode:
+        return RollingInternalCode(error.code)
+    if phase in _OPTIMISER_PHASES:
+        return RollingInternalCode.OPTIMISER_FAILURE_UNCLASSIFIED
+    return RollingInternalCode.PRIVATE_V1_FAILURE_UNCLASSIFIED
+
+
+@contextmanager
+def rolling_boundary(phase: RollingPhase, *, gameweek: int | None = None) -> Iterator[None]:
+    """Record one rolling phase only while an explicit comparison trace is active."""
+
+    trace = _TRACE.get()
+    if trace is None:
+        yield
+        return
+    trace.rolling_phase = phase
+    trace.rolling_gameweek = gameweek
+    trace.rolling_failure_class = None
+    trace.rolling_internal_code = None
+    try:
+        yield
+    except TeamStrengthComparisonFailure:
+        raise
+    except Exception as error:
+        trace.rolling_failure_class = (
+            RollingFailureClass.UNEXPECTED_FAILURE
+            if not isinstance(error, PrivateV1Error)
+            else RollingFailureClass.OPTIMISER_FAILURE
+            if phase in _OPTIMISER_PHASES
+            else RollingFailureClass.TYPED_FAILURE
+        )
+        trace.rolling_internal_code = _rolling_code(error, phase)
+        raise
+
+
+def note_rolling_progress(kind: Literal["STAGE8", "STAGE9_ASSEMBLED", "STAGE9_MC_PASS"]) -> None:
+    trace = _TRACE.get()
+    if trace is None:
+        return
+    if kind == "STAGE8":
+        trace.gameweeks_stage8_complete += 1
+    elif kind == "STAGE9_ASSEMBLED":
+        trace.gameweeks_stage9_assembled += 1
+    else:
+        trace.gameweeks_stage9_mc_passed += 1
+
+
+def note_rolling_phase(phase: RollingPhase, *, gameweek: int | None = None) -> None:
+    """Mark the finite phase for non-call scaffolding between guarded operations."""
+
+    trace = _TRACE.get()
+    if trace is not None:
+        trace.rolling_phase = phase
+        trace.rolling_gameweek = gameweek
+        trace.rolling_failure_class = None
+        trace.rolling_internal_code = None
+
+
+def note_optimiser_result(*, status: object, backend_status: object) -> None:
+    trace = _TRACE.get()
+    if trace is not None:
+        status_value = getattr(status, "value", None)
+        backend_value = getattr(backend_status, "value", None)
+        trace.optimiser_status_class = (
+            RollingOptimiserStatusClass(status_value)
+            if isinstance(status_value, str) and status_value in RollingOptimiserStatusClass
+            else None
+        )
+        trace.optimiser_backend_status_class = (
+            RollingOptimiserBackendStatusClass(backend_value)
+            if isinstance(backend_value, str)
+            and backend_value in RollingOptimiserBackendStatusClass
+            else None
+        )
 
 
 def note_control_divergence(

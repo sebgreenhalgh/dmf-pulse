@@ -1,5 +1,23 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001P-L4-D4
+
+- Work only from immutable L4 parent `efbddb9d36261bfa459c6c014a292bb031aa1773`
+  in the isolated D4 worktree. This is offline failure-localisation work: no
+  provider access, credentials, retry, fresh live authority, model change, or
+  production activation.
+- Add a comparison-only typed rolling trace covering execution validation,
+  input verification, per-Gameweek Stage 8/9 boundaries, one-GW comparator,
+  three-GW Stage 11, and every post-solve construction boundary. Preserve the
+  ordinary unobserved path and all five accepted 001P numerical decisions.
+- Close all emitted codes through finite allowlists, map unknown optimiser codes
+  to `OPTIMISER_FAILURE_UNCLASSIFIED`, retain only bounded progress/status
+  classes, and prove D1/D2/D3 transport through the real prepared one-command
+  seam with generated offline inputs.
+- Record L1-L4 as consumed with no current live pair. Complete focused and full
+  offline acceptance, manifests, installed-wheel verification, secret scan,
+  independent review, publication, and green exact-SHA CI before handoff.
+
 ## PRIVATE-V1-ONE-COMMAND-001N-R9C-A1
 
 - Immutable parent: D2 `00aa08acc9b67323fd85e0a6cc95d3f0a1a04a25`, in the isolated A1

@@ -1,0 +1,14 @@
+{
+  "branch_mode": true,
+  "combined_changed_paths_percent": 93,
+  "deselected_separately_proven_full_seam_cases": 23,
+  "modules": {
+    "src/dmf_pulse/private_v1/rolling.py": 89,
+    "src/dmf_pulse/private_v1/team_strength_diagnostics.py": 98,
+    "src/dmf_pulse/private_v1/team_strength_live.py": 92,
+    "src/dmf_pulse/private_v1/team_strength_live_authority.py": 100
+  },
+  "passed": 274,
+  "total_branches": 178,
+  "total_statements": 977
+}

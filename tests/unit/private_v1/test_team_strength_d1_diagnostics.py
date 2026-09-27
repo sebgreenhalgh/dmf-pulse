@@ -165,6 +165,18 @@ def test_diagnostic_tamper_and_nonfinite_or_private_fields_fail_closed():
         {"failed_gameweek": 9999999},
         {"failed_fixture_ordinal": -1},
         {"control_name": "private"},
+        {"rolling_phase": "private"},
+        {"rolling_phase": "BUILD_STAGE11_WORK"},
+        {
+            "rolling_phase": "BUILD_STAGE11_WORK",
+            "rolling_failure_class": "UNEXPECTED_FAILURE",
+        },
+        {"rolling_phase": "BUILD_STAGE11_WORK", "rolling_gameweek": 99},
+        {
+            "rolling_phase": "SOLVE_THREE_GW_POLICY",
+            "optimiser_status_class": "SUCCESS",
+        },
+        {"gameweeks_stage8_complete": 0, "gameweeks_stage9_assembled": 1},
         {"baseline_world_completed": True},
         {"failed_gameweek": 1},
         {"provider_body": "private"},
@@ -306,6 +318,7 @@ def test_consumed_authority_blocks_before_any_credentials_or_provider():
     assert result["reason"] == "AUTHORITY_CONSUMED" and result["prior_l1_one_shot_consumed"]
     assert result["prior_l2_one_shot_consumed"]
     assert result["prior_l3_one_shot_consumed"]
+    assert result["prior_l4_one_shot_consumed"]
     assert result["fpl_requests"] == result["odds_requests"] == 0
     assert not result["private_attempt_consumed"] and result["fresh_live_authorization_required"]
 

@@ -72,6 +72,13 @@ from dmf_pulse.private_v1.service import (
     _verify_current_sources,
     _verify_runtime_artifacts,
 )
+from dmf_pulse.private_v1.team_strength_diagnostics import (
+    RollingPhase,
+    note_optimiser_result,
+    note_rolling_phase,
+    note_rolling_progress,
+    rolling_boundary,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -690,65 +697,69 @@ class PrivateV1RollingRecommendationService:
                 )
             )
 
-        try:
-            execution = PrivateV1RollingExecutionInput.model_validate_json(value.model_dump_json())
-        except ValidationError:
-            raise PrivateV1Error(
-                "PRIVATE_ROLLING_EXECUTION_INPUT_INVALID",
-                "private rolling execution input failed validation",
-            ) from None
+        with rolling_boundary(RollingPhase.VALIDATE_ROLLING_EXECUTION):
+            try:
+                execution = PrivateV1RollingExecutionInput.model_validate_json(
+                    value.model_dump_json()
+                )
+            except ValidationError:
+                raise PrivateV1Error(
+                    "PRIVATE_ROLLING_EXECUTION_INPUT_INVALID",
+                    "private rolling execution input failed validation",
+                ) from None
         current = execution.current_execution
-        if self._score_prior_resolver is not None:
-            self._score_prior_resolver.validate_execution(execution)
-        terminal = load_terminal_value_policy()
-        if (
-            execution.terminal_policy_sha256 != terminal.policy_sha256
-            or terminal.enabled
-            or terminal.bank_points_per_tenth != Decimal(0)
-            or terminal.free_transfer_points != Decimal(0)
-            or terminal.liquidation_points_per_tenth != Decimal(0)
-        ):
-            raise PrivateV1Error(
-                "ROLLING_TERMINAL_POLICY_INVALID",
-                "three-GW mode requires the accepted disabled zero terminal policy",
-            )
-        if any(
-            fixture.market_mode == "BLOCKED"
-            for gameweek in execution.future_gameweeks
-            for fixture in gameweek.fixtures
-        ):
-            raise PrivateV1Error(
-                "FUTURE_FIXTURE_INPUT_BLOCKED",
-                "at least one future fixture lacks an accepted current-cutoff projection input",
-            )
-        _verify_current_sources(current)
-        official_fixtures = {
-            item.provider_fixture_id: item for item in current.current_state.fpl_input.fixtures
-        }
-        for future_gameweek in execution.future_gameweeks:
-            for fixture in future_gameweek.fixtures:
-                if fixture.market_evidence is None:
-                    continue
-                official = official_fixtures.get(fixture.official_fpl_fixture_id)
-                if official is None:
-                    raise PrivateV1Error(
-                        "FUTURE_FIXTURE_INPUT_BLOCKED",
-                        "future market evidence lacks its official FPL fixture",
-                    )
-                try:
-                    verify_future_market_evidence(
-                        fixture.market_evidence,
-                        current.current_state,
-                        fixture=official,
-                        canonical_fixture_id=fixture.canonical_fixture_id,
-                    )
-                except IngestionError as exc:
-                    raise PrivateV1Error(
-                        "FUTURE_FIXTURE_INPUT_BLOCKED",
-                        "future market evidence failed exact-source verification",
-                    ) from exc
-        prior = load_packaged_player_prior()
-        _verify_runtime_artifacts(current, prior)
+        with rolling_boundary(RollingPhase.VERIFY_ROLLING_INPUTS):
+            if self._score_prior_resolver is not None:
+                self._score_prior_resolver.validate_execution(execution)
+            terminal = load_terminal_value_policy()
+            if (
+                execution.terminal_policy_sha256 != terminal.policy_sha256
+                or terminal.enabled
+                or terminal.bank_points_per_tenth != Decimal(0)
+                or terminal.free_transfer_points != Decimal(0)
+                or terminal.liquidation_points_per_tenth != Decimal(0)
+            ):
+                raise PrivateV1Error(
+                    "ROLLING_TERMINAL_POLICY_INVALID",
+                    "three-GW mode requires the accepted disabled zero terminal policy",
+                )
+            if any(
+                fixture.market_mode == "BLOCKED"
+                for gameweek in execution.future_gameweeks
+                for fixture in gameweek.fixtures
+            ):
+                raise PrivateV1Error(
+                    "FUTURE_FIXTURE_INPUT_BLOCKED",
+                    "at least one future fixture lacks an accepted current-cutoff projection input",
+                )
+            _verify_current_sources(current)
+            official_fixtures = {
+                item.provider_fixture_id: item for item in current.current_state.fpl_input.fixtures
+            }
+            for future_gameweek in execution.future_gameweeks:
+                for fixture in future_gameweek.fixtures:
+                    if fixture.market_evidence is None:
+                        continue
+                    official = official_fixtures.get(fixture.official_fpl_fixture_id)
+                    if official is None:
+                        raise PrivateV1Error(
+                            "FUTURE_FIXTURE_INPUT_BLOCKED",
+                            "future market evidence lacks its official FPL fixture",
+                        )
+                    try:
+                        verify_future_market_evidence(
+                            fixture.market_evidence,
+                            current.current_state,
+                            fixture=official,
+                            canonical_fixture_id=fixture.canonical_fixture_id,
+                        )
+                    except IngestionError as exc:
+                        raise PrivateV1Error(
+                            "FUTURE_FIXTURE_INPUT_BLOCKED",
+                            "future market evidence failed exact-source verification",
+                        ) from exc
+            prior = load_packaged_player_prior()
+            _verify_runtime_artifacts(current, prior)
         projections: list[GameweekProjectionResult] = []
         fixture_results_by_gameweek = {}
         stage7_contexts_by_gameweek = {}
@@ -761,11 +772,14 @@ class PrivateV1RollingRecommendationService:
                 None,
             )
             started = perf_counter()
-            with active_progress.stage(
-                started=f"GW{gameweek} Stage 8/9 projection...",
-                completed=f"GW{gameweek} Stage 8/9 projection ready",
-                failed=f"GW{gameweek} Stage 8/9 projection",
-                heartbeat=f"GW{gameweek} Stage 8/9 projection still running",
+            with (
+                active_progress.stage(
+                    started=f"GW{gameweek} Stage 8/9 projection...",
+                    completed=f"GW{gameweek} Stage 8/9 projection ready",
+                    failed=f"GW{gameweek} Stage 8/9 projection",
+                    heartbeat=f"GW{gameweek} Stage 8/9 projection still running",
+                ),
+                rolling_boundary(RollingPhase.PROJECT_GAMEWEEK_FIXTURES, gameweek=gameweek),
             ):
                 projected = _project_fixtures(
                     current,
@@ -775,6 +789,7 @@ class PrivateV1RollingRecommendationService:
                     _allocation_profile_resolver=self._allocation_profile_resolver,
                     _score_prior_resolver=self._score_prior_resolver,
                 )
+                note_rolling_progress("STAGE8")
             record(f"stage8_9_gameweek_{gameweek}", started)
             fixture_results, stage7_contexts, stage8_hashes, binding_hashes, fallback = projected
             fixture_results_by_gameweek[gameweek] = fixture_results
@@ -783,10 +798,13 @@ class PrivateV1RollingRecommendationService:
             binding_hashes_by_gameweek[gameweek] = binding_hashes
             fallback_player_ids.update(fallback)
             started = perf_counter()
-            with active_progress.stage(
-                started=f"GW{gameweek} joint scenario assembly...",
-                completed=f"GW{gameweek} joint scenarios ready",
-                failed=f"GW{gameweek} joint scenario assembly",
+            with (
+                active_progress.stage(
+                    started=f"GW{gameweek} joint scenario assembly...",
+                    completed=f"GW{gameweek} joint scenarios ready",
+                    failed=f"GW{gameweek} joint scenario assembly",
+                ),
+                rolling_boundary(RollingPhase.ASSEMBLE_GAMEWEEK_SCENARIOS, gameweek=gameweek),
             ):
                 try:
                     scenario_set = assemble_gameweek(fixture_results)
@@ -799,15 +817,22 @@ class PrivateV1RollingRecommendationService:
                         "STAGE9_GAMEWEEK_INVALID",
                         f"GW{gameweek} Stage-9 Gameweek assembly failed",
                     ) from exc
+                note_rolling_progress("STAGE9_ASSEMBLED")
             record(f"joint_scenario_assembly_gameweek_{gameweek}", started)
-            if current.require_stage9_mc_pass and projection.monte_carlo.stopping_result != "PASS":
-                raise PrivateV1Error(
-                    "STAGE9_MC_QUALITY_BLOCKED",
-                    f"GW{gameweek} Stage-9 Monte Carlo quality gate did not pass",
-                )
+            with rolling_boundary(RollingPhase.CHECK_STAGE9_MC, gameweek=gameweek):
+                if (
+                    current.require_stage9_mc_pass
+                    and projection.monte_carlo.stopping_result != "PASS"
+                ):
+                    raise PrivateV1Error(
+                        "STAGE9_MC_QUALITY_BLOCKED",
+                        f"GW{gameweek} Stage-9 Monte Carlo quality gate did not pass",
+                    )
+                note_rolling_progress("STAGE9_MC_PASS")
             projections.append(projection)
-        if len(projections) != 3:
-            raise PrivateV1Error("ROLLING_HORIZON_INCOMPLETE", "three projections are required")
+        with rolling_boundary(RollingPhase.CHECK_STAGE9_MC):
+            if len(projections) != 3:
+                raise PrivateV1Error("ROLLING_HORIZON_INCOMPLETE", "three projections are required")
         projection_tuple = (projections[0], projections[1], projections[2])
         started = perf_counter()
         with active_progress.stage(
@@ -816,51 +841,68 @@ class PrivateV1RollingRecommendationService:
             failed="actual one-GW comparator",
             heartbeat="Actual one-GW comparator still running",
         ):
-            one_request, one_tactical, _one_candidates, _one_scope = _stage11_request(
-                current, projection_tuple[0]
-            )
-            one_tactical.progress_message = active_progress.message
-            one_tactical.precompute()
-            one_gameweek = optimise_multi_gameweek(one_request, evaluator=one_tactical)
-            if one_gameweek.recommended_plan is None or (
-                one_gameweek.status is not MultiGameweekResultStatus.SUCCESS
-            ):
-                raise PrivateV1Error(
-                    one_gameweek.error_code or "ONE_GAMEWEEK_COMPARATOR_BLOCKED",
-                    "accepted one-GW comparator could not be reproduced",
+            with rolling_boundary(RollingPhase.BUILD_ONE_GW_COMPARATOR_REQUEST):
+                one_request, one_tactical, _one_candidates, _one_scope = _stage11_request(
+                    current, projection_tuple[0]
                 )
+            one_tactical.progress_message = active_progress.message
+            with rolling_boundary(RollingPhase.PRECOMPUTE_ONE_GW_TACTICS):
+                one_tactical.precompute()
+            with rolling_boundary(RollingPhase.SOLVE_ONE_GW_COMPARATOR):
+                one_gameweek = optimise_multi_gameweek(one_request, evaluator=one_tactical)
+                note_optimiser_result(
+                    status=one_gameweek.status,
+                    backend_status=one_gameweek.solver_status.status,
+                )
+            with rolling_boundary(RollingPhase.VALIDATE_ONE_GW_RESULT):
+                if one_gameweek.recommended_plan is None or (
+                    one_gameweek.status is not MultiGameweekResultStatus.SUCCESS
+                ):
+                    raise PrivateV1Error(
+                        one_gameweek.error_code or "ONE_GAMEWEEK_COMPARATOR_BLOCKED",
+                        "accepted one-GW comparator could not be reproduced",
+                    )
         record("one_gameweek_comparator", started)
         started = perf_counter()
-        request, tactical, candidates, scope = _stage11_request(
-            current,
-            projection_tuple[0],
-            future_gameweeks=projection_tuple[1:],
-            protected_incoming_ids=one_gameweek.recommended_plan.current_action.action.transfers_in,
-        )
-        # Both requests use the identical root projection, catalog and tactical policy.
-        # Reuse its squad-only cache while adding the future-node scenario adapter.
-        one_tactical.delegate = tactical.delegate
-        one_tactical.prepared_node = tactical.prepared_node
-        one_tactical.prepared_squads = tactical.prepared_squads
-        tactical = one_tactical
-        tactical.progress_message = active_progress.message
-        active_progress.message(_action_space_disclosure(scope))
+        with rolling_boundary(RollingPhase.BUILD_THREE_GW_REQUEST):
+            request, tactical, candidates, scope = _stage11_request(
+                current,
+                projection_tuple[0],
+                future_gameweeks=projection_tuple[1:],
+                protected_incoming_ids=(
+                    one_gameweek.recommended_plan.current_action.action.transfers_in
+                ),
+            )
+            # Both requests use the identical root projection, catalog and tactical policy.
+            # Reuse its squad-only cache while adding the future-node scenario adapter.
+            one_tactical.delegate = tactical.delegate
+            one_tactical.prepared_node = tactical.prepared_node
+            one_tactical.prepared_squads = tactical.prepared_squads
+            tactical = one_tactical
+            tactical.progress_message = active_progress.message
+            active_progress.message(_action_space_disclosure(scope))
         record("action_generation", started)
         started = perf_counter()
-        with active_progress.stage(
-            started="Three-GW root tactical batch...",
-            completed="Three-GW root tactical batch ready",
-            failed="three-GW root tactical batch",
-            heartbeat="Three-GW root tactical batch still running",
+        with (
+            active_progress.stage(
+                started="Three-GW root tactical batch...",
+                completed="Three-GW root tactical batch ready",
+                failed="three-GW root tactical batch",
+                heartbeat="Three-GW root tactical batch still running",
+            ),
+            rolling_boundary(RollingPhase.PRECOMPUTE_THREE_GW_TACTICS),
         ):
             tactical.precompute()
         record("tactical_batch_evaluation", started)
         started = perf_counter()
-        with active_progress.stage(
-            started="Stage-11 three-GW policy solving...",
-            completed="Stage-11 three-GW policy solving complete",
-            failed="Stage-11 three-GW policy solving",
-            heartbeat="Stage-11 three-GW policy solving still running",
+        with (
+            active_progress.stage(
+                started="Stage-11 three-GW policy solving...",
+                completed="Stage-11 three-GW policy solving complete",
+                failed="Stage-11 three-GW policy solving",
+                heartbeat="Stage-11 three-GW policy solving still running",
+            ),
+            rolling_boundary(RollingPhase.SOLVE_THREE_GW_POLICY),
         ):
             stage11_profile = Stage11SearchProfile(progress=active_progress.message)
             optimiser = optimise_multi_gameweek(
@@ -868,8 +910,13 @@ class PrivateV1RollingRecommendationService:
                 evaluator=tactical,
                 prefer_deterministic_linear=True,
                 profile=stage11_profile,
-                root_action_counterfactual=one_gameweek.recommended_plan.current_action.action,
+                root_action_counterfactual=(one_gameweek.recommended_plan.current_action.action),
             )
+            note_optimiser_result(
+                status=optimiser.status,
+                backend_status=optimiser.solver_status.status,
+            )
+        note_rolling_phase(RollingPhase.VALIDATE_THREE_GW_RESULT)
         record("stage11_policy_solving", started)
         for item in sorted(stage11_profile.nodes.values(), key=lambda value: value.depth):
             tactical_counts = tactical.counters_by_node.get(item.node_id)
@@ -921,82 +968,90 @@ class PrivateV1RollingRecommendationService:
             f"misses={tactical.cache_misses}, batches={tactical.batch_calls}, "
             f"individual_calls={tactical.individual_calls}"
         )
-        if (
-            optimiser.status is not MultiGameweekResultStatus.SUCCESS
-            or optimiser.solver_status.status is not BackendStatus.OPTIMAL
-            or optimiser.recommended_plan is None
-            or optimiser.no_transfer_baseline is None
-            or not isinstance(optimiser.transfer_count_frontier, HorizonTransferCountFrontier)
-        ):
-            raise PrivateV1Error(
-                optimiser.error_code or "ROLLING_OPTIMISER_BLOCKED",
-                "Stage 11 did not return a complete exact three-GW recommendation",
-            )
-        counterfactual = optimiser.root_action_counterfactual_plan
-        if counterfactual is None:
-            raise PrivateV1Error(
-                "ONE_GAMEWEEK_COUNTERFACTUAL_UNAVAILABLE",
-                "exact actual one-GW action continuation is absent",
-            )
-        current_players, _teams = _current_identity_maps(current)
-        element_by_player = {
-            player_id: item.provider_element_id for player_id, item in current_players.items()
-        }
-        scenarios_by_gameweek = {
-            gameweek: projection.scenario_set
-            for gameweek, projection in zip(
-                execution.horizon_gameweeks,
-                projection_tuple,
-                strict=True,
-            )
-        }
-        action_space_disclosure = (
-            _action_space_disclosure(scope)
-            + " Three-Gameweek mode uses declared current-cutoff candidate scope at each "
-            "future node; exactness is only within this bounded action space."
-        )
+        with rolling_boundary(RollingPhase.VALIDATE_THREE_GW_RESULT):
+            if (
+                optimiser.status is not MultiGameweekResultStatus.SUCCESS
+                or optimiser.solver_status.status is not BackendStatus.OPTIMAL
+                or optimiser.recommended_plan is None
+                or optimiser.no_transfer_baseline is None
+                or not isinstance(optimiser.transfer_count_frontier, HorizonTransferCountFrontier)
+            ):
+                raise PrivateV1Error(
+                    optimiser.error_code or "ROLLING_OPTIMISER_BLOCKED",
+                    "Stage 11 did not return a complete exact three-GW recommendation",
+                )
+            counterfactual = optimiser.root_action_counterfactual_plan
+            if counterfactual is None:
+                raise PrivateV1Error(
+                    "ONE_GAMEWEEK_COUNTERFACTUAL_UNAVAILABLE",
+                    "exact actual one-GW action continuation is absent",
+                )
         started = perf_counter()
         baseline = optimiser.no_transfer_baseline
         recommended = optimiser.recommended_plan
-        frontier = _rolling_frontier(
-            optimiser,
-            request=request,
-            baseline=baseline,
-            scenarios_by_gameweek=scenarios_by_gameweek,
-            element_by_player=element_by_player,
-            action_space_disclosure=action_space_disclosure,
-            candidate_policy_sha256=current.candidate_action_policy.semantic_sha256,
-        )
-        decisions = tuple(
-            _build_gameweek_decision(
-                item,
-                execution=execution,
+        with rolling_boundary(RollingPhase.BUILD_TRANSFER_FRONTIER):
+            current_players, _teams = _current_identity_maps(current)
+            element_by_player = {
+                player_id: item.provider_element_id for player_id, item in current_players.items()
+            }
+            scenarios_by_gameweek = {
+                gameweek: projection.scenario_set
+                for gameweek, projection in zip(
+                    execution.horizon_gameweeks,
+                    projection_tuple,
+                    strict=True,
+                )
+            }
+            action_space_disclosure = (
+                _action_space_disclosure(scope)
+                + " Three-Gameweek mode uses declared current-cutoff candidate scope at each "
+                "future node; exactness is only within this bounded action space."
+            )
+            frontier = _rolling_frontier(
+                optimiser,
                 request=request,
-                scenarios=scenarios_by_gameweek[item.gameweek],
-                candidates=candidates,
-                tactical=tactical,
+                baseline=baseline,
+                scenarios_by_gameweek=scenarios_by_gameweek,
                 element_by_player=element_by_player,
-                actionable=index == 0,
+                action_space_disclosure=action_space_disclosure,
+                candidate_policy_sha256=current.candidate_action_policy.semantic_sha256,
             )
-            for index, item in enumerate((recommended.current_action, *recommended.future_policy))
-        )
-        if len(decisions) != 3:
-            raise PrivateV1Error(
-                "ROLLING_POLICY_INCOMPLETE",
-                "recommended rolling policy does not contain three decisions",
+        with rolling_boundary(RollingPhase.BUILD_GAMEWEEK_DECISIONS):
+            decisions = tuple(
+                _build_gameweek_decision(
+                    item,
+                    execution=execution,
+                    request=request,
+                    scenarios=scenarios_by_gameweek[item.gameweek],
+                    candidates=candidates,
+                    tactical=tactical,
+                    element_by_player=element_by_player,
+                    actionable=index == 0,
+                )
+                for index, item in enumerate(
+                    (recommended.current_action, *recommended.future_policy)
+                )
             )
-        horizon_comparison = _horizon_comparison(
-            recommended,
-            baseline,
-            scenarios_by_gameweek=scenarios_by_gameweek,
-        )
-        one_comparison = _one_gameweek_comparison(
-            one_gameweek.recommended_plan,
-            recommended,
-            counterfactual,
-            request=request,
-            element_by_player=element_by_player,
-        )
+            if len(decisions) != 3:
+                raise PrivateV1Error(
+                    "ROLLING_POLICY_INCOMPLETE",
+                    "recommended rolling policy does not contain three decisions",
+                )
+        with rolling_boundary(RollingPhase.BUILD_HORIZON_COMPARISON):
+            horizon_comparison = _horizon_comparison(
+                recommended,
+                baseline,
+                scenarios_by_gameweek=scenarios_by_gameweek,
+            )
+        with rolling_boundary(RollingPhase.BUILD_ONE_GW_VS_ROLLING_COMPARISON):
+            one_comparison = _one_gameweek_comparison(
+                one_gameweek.recommended_plan,
+                recommended,
+                counterfactual,
+                request=request,
+                element_by_player=element_by_player,
+            )
+        note_rolling_phase(RollingPhase.SEAL_ROLLING_DECISION)
         warnings = {
             "NO_CHIP_EXPLICIT",
             "NOT_PRODUCTION_ACTIVE",
@@ -1120,8 +1175,10 @@ class PrivateV1RollingRecommendationService:
             ),
             semantic_sha256="0" * 64,
         )
-        sealed = seal_rolling_decision(provisional)
-        report = render_rolling_report(sealed)
+        with rolling_boundary(RollingPhase.SEAL_ROLLING_DECISION):
+            sealed = seal_rolling_decision(provisional)
+        with rolling_boundary(RollingPhase.BUILD_ROLLING_REPORT):
+            report = render_rolling_report(sealed)
         record("report_and_comparator", started)
         del (
             fixture_results_by_gameweek,
@@ -1130,32 +1187,28 @@ class PrivateV1RollingRecommendationService:
             binding_hashes_by_gameweek,
             fallback_player_ids,
         )
-        stage11_nodes = tuple(stage11_profile.nodes.values())
-        stage11_work_payload = {
-            "exact_accelerator": stage11_profile.exact_accelerator,
-            "node_count": len(stage11_nodes),
-            "cumulative_state_expansions": sum(item.states_solved for item in stage11_nodes),
-            "cumulative_action_combinations": sum(
-                item.action_combinations_considered for item in stage11_nodes
-            ),
-            "cumulative_legal_actions": sum(item.legal_actions_generated for item in stage11_nodes),
-            "cumulative_unique_node_squads": sum(
-                len(item.unique_resulting_squads) for item in stage11_nodes
-            ),
-            "cumulative_tactical_requests": sum(
-                item.tactical_evaluator_calls for item in stage11_nodes
-            ),
-            "memo_hits": stage11_profile.memo_hits,
-            "memo_misses": stage11_profile.memo_misses,
-        }
-        return PrivateV1RollingRunResult(
-            decision=sealed,
-            report=report,
-            gameweek_projections=projection_tuple,
-            optimiser_result=optimiser,
-            optimiser_request=request,
-            one_gameweek_optimiser_result=one_gameweek,
-            stage11_work=PrivateRollingStage11Work(
+        with rolling_boundary(RollingPhase.BUILD_STAGE11_WORK):
+            stage11_nodes = tuple(stage11_profile.nodes.values())
+            stage11_work_payload = {
+                "exact_accelerator": stage11_profile.exact_accelerator,
+                "node_count": len(stage11_nodes),
+                "cumulative_state_expansions": sum(item.states_solved for item in stage11_nodes),
+                "cumulative_action_combinations": sum(
+                    item.action_combinations_considered for item in stage11_nodes
+                ),
+                "cumulative_legal_actions": sum(
+                    item.legal_actions_generated for item in stage11_nodes
+                ),
+                "cumulative_unique_node_squads": sum(
+                    len(item.unique_resulting_squads) for item in stage11_nodes
+                ),
+                "cumulative_tactical_requests": sum(
+                    item.tactical_evaluator_calls for item in stage11_nodes
+                ),
+                "memo_hits": stage11_profile.memo_hits,
+                "memo_misses": stage11_profile.memo_misses,
+            }
+            stage11_work = PrivateRollingStage11Work(
                 exact_accelerator=stage11_profile.exact_accelerator,
                 node_count=len(stage11_nodes),
                 cumulative_state_expansions=sum(item.states_solved for item in stage11_nodes),
@@ -1174,9 +1227,17 @@ class PrivateV1RollingRecommendationService:
                 memo_hits=stage11_profile.memo_hits,
                 memo_misses=stage11_profile.memo_misses,
                 semantic_sha256=canonical_sha256(stage11_work_payload),
-            ),
-            stage_timings=tuple(timings),
-        )
+            )
+            return PrivateV1RollingRunResult(
+                decision=sealed,
+                report=report,
+                gameweek_projections=projection_tuple,
+                optimiser_result=optimiser,
+                optimiser_request=request,
+                one_gameweek_optimiser_result=one_gameweek,
+                stage11_work=stage11_work,
+                stage_timings=tuple(timings),
+            )
 
 
 __all__ = [

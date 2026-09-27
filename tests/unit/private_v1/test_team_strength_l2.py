@@ -1,4 +1,4 @@
-"""L4 exact authority, consumed history, and no provider-capability expansion."""
+"""L1-L4 consumed history and no provider-capability expansion."""
 
 from __future__ import annotations
 
@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+from dmf_pulse.ingestion.odds.config import load_rights_profiles as load_odds_rights
+from dmf_pulse.ingestion.rights import load_rights_profiles as load_fpl_rights
 from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
 
@@ -75,9 +77,12 @@ def blocked(approval: str, attestation: str):
         (L3_APPROVAL, L3_ATTESTATION),
         (L3_APPROVAL, NEW_ATTESTATION),
         (L3_APPROVAL, "wrong"),
+        (L4_APPROVAL, L4_ATTESTATION),
+        (L4_APPROVAL, L3_ATTESTATION),
+        (L4_APPROVAL, "wrong"),
     ],
 )
-def test_historical_l1_l2_l3_are_consumed_before_provider_checks(approval, attestation):
+def test_historical_l1_l2_l3_l4_are_consumed_before_provider_checks(approval, attestation):
     assert authority.L1_APPROVAL == OLD_APPROVAL
     assert authority.L1_ATTESTATION == OLD_ATTESTATION
     assert authority.L2_APPROVAL == NEW_APPROVAL
@@ -85,7 +90,7 @@ def test_historical_l1_l2_l3_are_consumed_before_provider_checks(approval, attes
     assert type(authority.CONSUMED_APPROVALS) is frozenset
     assert authority.L3_APPROVAL == L3_APPROVAL
     assert authority.L3_ATTESTATION == L3_ATTESTATION
-    expected_consumed = frozenset({OLD_APPROVAL, NEW_APPROVAL, L3_APPROVAL})
+    expected_consumed = frozenset({OLD_APPROVAL, NEW_APPROVAL, L3_APPROVAL, L4_APPROVAL})
     assert expected_consumed == authority.CONSUMED_APPROVALS
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_CONSUMED"
 
@@ -103,21 +108,24 @@ def test_no_unknown_l1_l2_l3_or_l4_pair_can_authorize(approval, attestation):
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_exact_l4_pair_and_pinned_rights_pass_before_credentials():
+def test_exact_l4_pair_is_consumed_and_no_current_pair_exists():
     assert (authority.APPROVAL, authority.ATTESTATION) == (L4_APPROVAL, L4_ATTESTATION)
-    assert L4_APPROVAL not in authority.CONSUMED_APPROVALS
-    authority.validate_l1_authority(
-        approval=L4_APPROVAL, attestation=L4_ATTESTATION, checked_at=STAMP
+    assert L4_APPROVAL in authority.CONSUMED_APPROVALS
+    assert authority.CURRENT_APPROVAL is authority.CURRENT_ATTESTATION is None
+    with pytest.raises(authority.ConsumedL1ApprovalError):
+        authority.validate_l1_authority(
+            approval=L4_APPROVAL, attestation=L4_ATTESTATION, checked_at=STAMP
+        )
+    assert (
+        authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == authority.FPL_PROFILE_SHA
     )
     assert (
-        authority.profile_sha(authority.load_fpl_rights()[authority.FPL_PROFILE])
-        == authority.FPL_PROFILE_SHA
-    )
-    assert (
-        authority.profile_sha(authority.load_odds_rights()[authority.ODDS_PROFILE])
+        authority.profile_sha(load_odds_rights()[authority.ODDS_PROFILE])
         == authority.ODDS_PROFILE_SHA
     )
-    assert blocked(L4_APPROVAL, L4_ATTESTATION)["reason"] == "PUBLIC_READINESS_INVALID"
+    result = blocked(L4_APPROVAL, L4_ATTESTATION)
+    assert result["reason"] == "AUTHORITY_CONSUMED"
+    assert result["prior_l4_one_shot_consumed"]
 
 
 @pytest.mark.parametrize(
@@ -125,19 +133,17 @@ def test_exact_l4_pair_and_pinned_rights_pass_before_credentials():
     [(L4_APPROVAL, "wrong"), ("wrong", L4_ATTESTATION)],
 )
 def test_l4_mismatch_fails_closed(approval, attestation):
-    assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
+    expected = "AUTHORITY_CONSUMED" if approval == L4_APPROVAL else "AUTHORITY_INVALID"
+    assert blocked(approval, attestation)["reason"] == expected
 
 
-def test_old_odds_profile_sha_is_rejected(monkeypatch):
-    monkeypatch.setattr(
-        authority,
-        "ODDS_PROFILE_SHA",
-        "8f0c23ee3e451640710892d80b6f02f4a9749265b0eb9e0211dcf8f14869a75d",
+def test_historical_profile_hashes_remain_auditable():
+    assert authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == (
+        authority.FPL_PROFILE_SHA
     )
-    with pytest.raises(ValueError, match="provider purpose"):
-        authority.validate_l1_authority(
-            approval=L4_APPROVAL, attestation=L4_ATTESTATION, checked_at=STAMP
-        )
+    assert authority.profile_sha(load_odds_rights()[authority.ODDS_PROFILE]) == (
+        authority.ODDS_PROFILE_SHA
+    )
 
 
 @pytest.mark.parametrize(
@@ -172,10 +178,8 @@ def test_d3_live_control_flow_is_preserved_except_l4_terminal_identity():
     expected = before.replace(
         "CURRENT_TEAM_STRENGTH_001P_L3", "CURRENT_TEAM_STRENGTH_001P_L4"
     ).replace("CURRENT-TEAM-STRENGTH-001P-L3", "CURRENT-TEAM-STRENGTH-001P-L4")
-    assert (
-        Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
-        == expected
-    )
+    actual = Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
+    assert actual.replace('                "prior_l4_one_shot_consumed": True,\n', "") == expected
 
 
 @pytest.mark.parametrize(
