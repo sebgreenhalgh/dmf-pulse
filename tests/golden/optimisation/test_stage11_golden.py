@@ -58,6 +58,11 @@ def test_adversarial_fixture_matches_frozen_summary(name: str) -> None:
     assert result.status.value == expected["status"]
     assert result.solver_status.status.value == expected["backend_status"]
     assert result.error_code == expected["error_code"]
+    assert (
+        result.solver_status.resource_limit_kind.value
+        if result.solver_status.resource_limit_kind is not None
+        else None
+    ) == expected.get("resource_limit_kind")
     assert result.result_sha256 == expected["result_sha256"]
     assert (
         result.current_action.signature if result.current_action is not None else None

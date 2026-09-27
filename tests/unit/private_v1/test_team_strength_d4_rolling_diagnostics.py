@@ -8,7 +8,13 @@ from pathlib import Path
 
 import pytest
 
-from dmf_pulse.optimisation.multi_gameweek_models import BackendStatus, MultiGameweekResultStatus
+from dmf_pulse.optimisation.multi_gameweek_errors import ResourceLimitKind
+from dmf_pulse.optimisation.multi_gameweek_models import (
+    BackendStatus,
+    MultiGameweekResultStatus,
+    OptimalityGuarantee,
+    SolverDiagnostics,
+)
 from dmf_pulse.private_v1 import one_command, rolling
 from dmf_pulse.private_v1 import team_strength_diagnostics as diagnostics
 from dmf_pulse.private_v1.errors import PrivateV1Error
@@ -246,8 +252,54 @@ def test_ordinary_rolling_boundary_has_no_observer_and_preserves_exception_ident
         raise error
     assert caught.value is error
     diagnostics.note_rolling_progress("STAGE8")
-    diagnostics.note_optimiser_result(status=object(), backend_status=object())
+    diagnostics.note_optimiser_result(status=object(), solver_status=object())
     assert diagnostics._TRACE.get() is None
+
+
+def test_resource_limit_identity_and_safe_counters_reach_terminal_diagnostic():
+    trace = ComparisonTrace()
+    trace.start_world("LEAGUE_BASELINE")
+    solver = SolverDiagnostics(
+        status=BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+        termination_reason="PRIVATE RAW MESSAGE CANARY",
+        optimality_guarantee=OptimalityGuarantee.NONE,
+        state_expansions=101,
+        observed_action_combinations=505,
+        action_candidates=202,
+        policy_candidates=303,
+        pareto_candidates=404,
+        resource_limit_kind=ResourceLimitKind.CUMULATIVE_LEGAL_ACTION_LIMIT,
+        configured_max_actions_per_state=5000,
+        configured_max_state_expansions=25000,
+        configured_max_policy_candidates=250000,
+        configured_max_returned_root_candidates=1000,
+        configured_cumulative_legal_action_limit=524288,
+        cumulative_legal_actions=524289,
+        reachable_layer_state_count=999,
+        configuration_sha256="0" * 64,
+    )
+    with trace.activate():
+        diagnostics.note_rolling_phase(RollingPhase.VALIDATE_THREE_GW_RESULT)
+        diagnostics.note_optimiser_result(
+            status=MultiGameweekResultStatus.RESOURCE_LIMIT,
+            solver_status=solver,
+        )
+        failure = trace.failure(
+            ComparisonStage.RUN_LEAGUE_BASELINE_WORLD,
+            ComparisonReason.BASELINE_WORLD_FAILED,
+            PrivateV1Error("MULTI_GAMEWEEK_RESOURCE_LIMIT", "PRIVATE RAW MESSAGE CANARY"),
+        )
+    result = safe_comparison_failure(failure)
+    assert result["resource_limit_kind"] == "CUMULATIVE_LEGAL_ACTION_LIMIT"
+    assert result["configured_cumulative_legal_action_limit"] == 524288
+    assert result["cumulative_legal_actions"] == 524289
+    assert result["reachable_layer_state_count"] == 999
+    assert result["observed_state_expansions"] == 101
+    assert result["observed_action_combinations"] == 505
+    assert result["observed_action_candidates"] == 202
+    assert result["observed_policy_candidates"] == 303
+    assert result["observed_pareto_candidates"] == 404
+    assert "PRIVATE RAW MESSAGE CANARY" not in json.dumps(result)
 
 
 def test_every_declared_phase_is_wired_into_real_rolling_service_source():
@@ -492,3 +544,69 @@ def test_optimizer_failure_survives_complete_d1_d2_d3_one_command_seam(
     assert result["optimiser_status_class"] == "BLOCKED"
     assert result["optimiser_backend_status_class"] == "INPUT_CAPABILITY_BLOCKED"
     assert "DYNAMIC_PRIVATE" not in json.dumps(result)
+
+
+def test_resource_identity_survives_complete_d1_d2_d3_d4_one_command_seam(
+    captured_full_seam_pipeline,
+    readiness,
+    repository_root,
+    monkeypatch,
+    tmp_path,
+):
+    captured = captured_full_seam_pipeline
+    _patch_captured_preparation(monkeypatch, captured)
+    optimiser_values = list(captured["optimise"])
+    source = optimiser_values[1]
+    resource_status = source.solver_status.model_copy(
+        update={
+            "status": BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+            "termination_reason": "PRIVATE RESOURCE MESSAGE CANARY",
+            "optimality_guarantee": OptimalityGuarantee.NONE,
+            "objective": None,
+            "incumbent": None,
+            "bound": None,
+            "absolute_gap": None,
+            "relative_gap": None,
+            "state_expansions": 101,
+            "observed_action_combinations": 5001,
+            "action_candidates": 202,
+            "policy_candidates": 303,
+            "pareto_candidates": 404,
+            "resource_limit_kind": ResourceLimitKind.PER_STATE_ACTION_COMBINATION_LIMIT,
+            "configured_max_actions_per_state": 5000,
+            "configured_max_state_expansions": 25000,
+            "configured_max_policy_candidates": 250000,
+            "configured_max_returned_root_candidates": 1000,
+            "configured_cumulative_legal_action_limit": 524288,
+            "cumulative_legal_actions": 202,
+            "reachable_layer_state_count": 101,
+        }
+    )
+    optimiser_values[1] = source.model_copy(
+        update={
+            "status": MultiGameweekResultStatus.RESOURCE_LIMIT,
+            "solver_status": resource_status,
+            "recommended_plan": None,
+            "error_code": "MULTI_GAMEWEEK_RESOURCE_LIMIT",
+            "error_message": "PRIVATE RESOURCE MESSAGE CANARY",
+        }
+    )
+
+    def inject(_active):
+        _patch_captured_pipeline(monkeypatch, captured, optimiser_values=optimiser_values)
+
+    result = _full_seam(readiness, repository_root, monkeypatch, tmp_path, inject)
+    assert result["rolling_phase"] == "VALIDATE_THREE_GW_RESULT"
+    assert result["rolling_internal_code"] == "MULTI_GAMEWEEK_RESOURCE_LIMIT"
+    assert result["optimiser_status_class"] == "RESOURCE_LIMIT"
+    assert result["optimiser_backend_status_class"] == "TIME_RESOURCE_LIMIT_NO_INCUMBENT"
+    assert result["resource_limit_kind"] == "PER_STATE_ACTION_COMBINATION_LIMIT"
+    assert result["configured_max_actions_per_state"] == 5000
+    assert result["observed_action_combinations"] == 5001
+    assert result["observed_state_expansions"] == 101
+    assert result["observed_action_candidates"] == 202
+    assert result["observed_policy_candidates"] == 303
+    assert result["observed_pareto_candidates"] == 404
+    assert result["cumulative_legal_actions"] == 202
+    assert result["reachable_layer_state_count"] == 101
+    assert "PRIVATE RESOURCE MESSAGE CANARY" not in json.dumps(result)

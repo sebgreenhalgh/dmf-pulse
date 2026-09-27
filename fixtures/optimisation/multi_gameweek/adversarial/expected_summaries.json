@@ -131,7 +131,8 @@
     "error_code": null,
     "objective": "30",
     "request_sha256": "0eaa0e1fc00fea72cf2042f27dfb9f2771c95a4cf1a6f580fbaa159de031b935",
-    "result_sha256": "bc83e1f9acb496227bbac15be79bd6d42046ffd7c89d64e33f19262aa59f31c8",
+    "resource_limit_kind": "POLICY_GENERATION_LIMIT",
+    "result_sha256": "df70988d005f639afedd146b995bb8cbbe6882a034fff16e3e33402297d2ee58",
     "status": "RESOURCE_LIMIT"
   },
   "retained_selling_profit": {

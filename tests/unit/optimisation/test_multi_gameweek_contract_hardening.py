@@ -19,6 +19,7 @@ from dmf_pulse.optimisation.manager_state import (
     verify_manager_state_hash,
 )
 from dmf_pulse.optimisation.multi_gameweek_artifacts import load_canonical_json
+from dmf_pulse.optimisation.multi_gameweek_errors import ResourceLimitKind
 from dmf_pulse.optimisation.multi_gameweek_models import (
     AlternativeAvailability,
     BackendStatus,
@@ -372,9 +373,67 @@ def test_solver_diagnostics_reject_false_terminal_claims(
         "optimality_guarantee": OptimalityGuarantee.NONE.value,
         "configuration_sha256": "0" * 64,
     }
+    if status in {
+        BackendStatus.TIME_RESOURCE_LIMIT_WITH_INCUMBENT,
+        BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+    }:
+        payload.update(
+            {
+                "resource_limit_kind": "UNKNOWN_RESOURCE_LIMIT",
+                "configured_max_actions_per_state": 1,
+                "configured_max_state_expansions": 1,
+                "configured_max_policy_candidates": 1,
+                "configured_max_returned_root_candidates": 1,
+                "configured_cumulative_legal_action_limit": 1,
+                "observed_action_combinations": 0,
+                "cumulative_legal_actions": 0,
+                "reachable_layer_state_count": 0,
+            }
+        )
     payload.update(update)
     with pytest.raises(ValidationError, match=message):
         SolverDiagnostics.model_validate(payload)
+
+
+def test_resource_diagnostics_require_matching_kind_and_complete_safe_counters() -> None:
+    base = {
+        "status": "TIME_RESOURCE_LIMIT_NO_INCUMBENT",
+        "termination_reason": "not disclosed by D4",
+        "optimality_guarantee": "NONE",
+        "configuration_sha256": "0" * 64,
+    }
+    with pytest.raises(ValidationError, match="finite limit identity"):
+        SolverDiagnostics.model_validate(base)
+    with pytest.raises(ValidationError, match="complete configured counters"):
+        SolverDiagnostics.model_validate(base | {"resource_limit_kind": "UNKNOWN_RESOURCE_LIMIT"})
+    with pytest.raises(ValidationError, match="resource counters require"):
+        SolverDiagnostics.model_validate(
+            {
+                "status": "OPTIMAL",
+                "termination_reason": "complete",
+                "optimality_guarantee": "EXACT_DECLARED_TREE_AND_ACTION_SPACE",
+                "objective": "1",
+                "incumbent": "1",
+                "bound": "1",
+                "absolute_gap": "0",
+                "relative_gap": "0",
+                "configured_max_actions_per_state": 1,
+                "configuration_sha256": "0" * 64,
+            }
+        )
+
+
+def test_resource_limit_taxonomy_is_closed_and_complete() -> None:
+    assert tuple(item.value for item in ResourceLimitKind) == (
+        "PER_STATE_ACTION_COMBINATION_LIMIT",
+        "STATE_EXPANSION_LIMIT",
+        "LAYER_REACHABLE_STATE_LIMIT",
+        "CUMULATIVE_LEGAL_ACTION_LIMIT",
+        "POLICY_GENERATION_LIMIT",
+        "PARETO_FRONTIER_LIMIT",
+        "ROOT_SUMMARY_LIMIT",
+        "UNKNOWN_RESOURCE_LIMIT",
+    )
 
 
 def test_utility_breakdown_requires_exact_component_reconciliation() -> None:

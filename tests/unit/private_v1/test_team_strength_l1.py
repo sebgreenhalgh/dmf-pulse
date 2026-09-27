@@ -87,12 +87,13 @@ def test_invalid_authority_or_input_never_reaches_provider(readiness, changes):
     assert "42" not in json.dumps(result)
 
 
-def test_all_four_historical_purposes_consumed_and_old_a2_runtime_rejected():
+def test_all_five_historical_purposes_consumed_and_old_a2_runtime_rejected():
     for approval, attestation in (
         (authority.L1_APPROVAL, authority.L1_ATTESTATION),
         (authority.L2_APPROVAL, authority.L2_ATTESTATION),
         (authority.L3_APPROVAL, authority.L3_ATTESTATION),
         (authority.L4_APPROVAL, authority.L4_ATTESTATION),
+        (authority.L5_APPROVAL, authority.L5_ATTESTATION),
     ):
         with pytest.raises(authority.ConsumedL1ApprovalError):
             authority.validate_l1_authority(
@@ -109,19 +110,16 @@ def test_all_four_historical_purposes_consumed_and_old_a2_runtime_rejected():
     assert result.fpl_request_attempt_count == result.odds_acquisition_attempt_count == 0
 
 
-def test_current_l5_rights_hashes_are_exact_and_authority_pair_is_accepted():
+def test_l5_rights_hashes_remain_auditable_but_no_live_authority_exists():
     fpl = load_fpl_rights()[authority.FPL_PROFILE]
     odds = load_rights_profiles()[authority.ODDS_PROFILE]
     assert authority.profile_sha(fpl) == authority.FPL_PROFILE_SHA
     assert authority.profile_sha(odds) == authority.ODDS_PROFILE_SHA
-    assert authority.CURRENT_APPROVAL == authority.L5_APPROVAL
-    assert authority.CURRENT_ATTESTATION == authority.L5_ATTESTATION
-    assert (
+    assert authority.CURRENT_APPROVAL is authority.CURRENT_ATTESTATION is None
+    with pytest.raises(authority.ConsumedL1ApprovalError):
         authority.validate_l1_authority(
             approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
         )
-        is None
-    )
 
 
 @pytest.mark.parametrize("checked_at", [STAMP.replace(tzinfo=None), STAMP - timedelta(days=30)])

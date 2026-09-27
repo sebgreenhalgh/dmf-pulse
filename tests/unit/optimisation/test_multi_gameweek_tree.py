@@ -353,11 +353,27 @@ def test_packaged_search_and_terminal_policies_match_reviewable_configs() -> Non
         Path("config/optimisation/multi_gameweek_terminal.yaml")
     )
     assert packaged_search == configured_search
+    assert packaged_search.max_policy_candidates == 250000
+    assert packaged_search.max_cumulative_legal_actions == 524288
+    assert packaged_search.cumulative_legal_action_limit == 524288
+    legacy = packaged_search.model_copy(update={"max_cumulative_legal_actions": None})
+    assert legacy.cumulative_legal_action_limit == legacy.max_policy_candidates
     assert packaged_terminal == configured_terminal
     assert not packaged_terminal.enabled
     assert packaged_terminal.bank_points_per_tenth == Decimal(0)
     assert packaged_terminal.free_transfer_points == Decimal(0)
     assert packaged_terminal.liquidation_points_per_tenth == Decimal(0)
+
+
+def test_current_search_policy_loader_requires_distinct_cumulative_action_cap(tmp_path) -> None:
+    source = Path("config/optimisation/multi_gameweek.yaml").read_text(encoding="utf-8")
+    missing = "\n".join(
+        line for line in source.splitlines() if not line.startswith("max_cumulative_legal_actions:")
+    )
+    path = tmp_path / "missing-cumulative-cap.yaml"
+    path.write_text(missing + "\n", encoding="utf-8")
+    with pytest.raises(InputInvalidError, match="distinct max_cumulative_legal_actions"):
+        load_multi_gameweek_search_policy(path)
 
 
 def test_disabled_terminal_policy_rejects_hidden_nonzero_weight() -> None:

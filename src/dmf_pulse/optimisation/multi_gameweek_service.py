@@ -9,6 +9,7 @@ from dmf_pulse.fpl_points.models import ProjectionMode
 from dmf_pulse.optimisation.multi_gameweek_errors import (
     CapabilityBlockedError,
     MultiGameweekError,
+    ResourceLimitKind,
     ResourceLimitReached,
 )
 from dmf_pulse.optimisation.multi_gameweek_models import (
@@ -118,16 +119,52 @@ def _failure_result(
     code: str,
     message: str,
     counters: object | None = None,
+    resource_limit_kind: ResourceLimitKind | None = None,
 ) -> MultiGameweekOptimisationResult:
     diagnostics = SolverDiagnostics(
         status=backend_status,
         termination_reason=message,
         optimality_guarantee=OptimalityGuarantee.NONE,
         state_expansions=int(getattr(counters, "state_expansions", 0)),
+        observed_action_combinations=(
+            int(getattr(counters, "observed_action_combinations", 0))
+            if resource_limit_kind is not None
+            else None
+        ),
         action_candidates=int(getattr(counters, "action_candidates", 0)),
         policy_candidates=int(getattr(counters, "policy_candidates", 0)),
         pareto_candidates=int(getattr(counters, "pareto_candidates", 0)),
         memo_entries=0,
+        resource_limit_kind=resource_limit_kind,
+        configured_max_actions_per_state=(
+            request.search_policy.max_actions_per_state if resource_limit_kind is not None else None
+        ),
+        configured_max_state_expansions=(
+            request.search_policy.max_state_expansions if resource_limit_kind is not None else None
+        ),
+        configured_max_policy_candidates=(
+            request.search_policy.max_policy_candidates if resource_limit_kind is not None else None
+        ),
+        configured_max_returned_root_candidates=(
+            request.search_policy.max_returned_root_candidates
+            if resource_limit_kind is not None
+            else None
+        ),
+        configured_cumulative_legal_action_limit=(
+            request.search_policy.cumulative_legal_action_limit
+            if resource_limit_kind is not None
+            else None
+        ),
+        cumulative_legal_actions=(
+            int(getattr(counters, "cumulative_legal_actions", 0))
+            if resource_limit_kind is not None
+            else None
+        ),
+        reachable_layer_state_count=(
+            int(getattr(counters, "reachable_layer_state_count", 0))
+            if resource_limit_kind is not None
+            else None
+        ),
         configuration_sha256=_configuration_hash(request),
     )
     value = MultiGameweekOptimisationResult(
@@ -290,7 +327,7 @@ def optimise_multi_gameweek(
     evaluator = evaluator or StaticTacticalEvaluator()
     work_budget = (
         Stage11WorkBudget(
-            request.search_policy.max_policy_candidates,
+            request.search_policy.cumulative_legal_action_limit,
             request.search_policy.max_state_expansions,
         )
         if prefer_deterministic_linear
@@ -330,6 +367,7 @@ def optimise_multi_gameweek(
             code=exc.code,
             message=exc.message,
             counters=exc.counters,
+            resource_limit_kind=exc.kind,
         )
     except MultiGameweekError as exc:
         infeasible = exc.status == "INFEASIBLE"
@@ -421,6 +459,18 @@ def optimise_multi_gameweek(
             )
         else:
             baseline_frontier = solve_frontier(request, evaluator, root_no_transfer_only=True)
+        if not baseline_frontier.complete:
+            return _failure_result(
+                request,
+                status=MultiGameweekResultStatus.RESOURCE_LIMIT,
+                backend_status=BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+                code="MULTI_GAMEWEEK_RESOURCE_LIMIT",
+                message=(
+                    "configured resource limit prevented exact no-transfer baseline exhaustion"
+                ),
+                counters=baseline_frontier.diagnostics,
+                resource_limit_kind=baseline_frontier.diagnostics.resource_limit_kind,
+            )
         baseline_candidate = select_candidate(
             baseline_frontier.candidates,
             mode=ObjectiveMode.EXPECTED,
@@ -434,6 +484,16 @@ def optimise_multi_gameweek(
             assumptions=assumptions,
         )
         validate_plan(request, baseline, evaluator=evaluator)
+    except ResourceLimitReached as exc:
+        return _failure_result(
+            request,
+            status=MultiGameweekResultStatus.RESOURCE_LIMIT,
+            backend_status=BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+            code=exc.code,
+            message=exc.message,
+            counters=exc.counters,
+            resource_limit_kind=exc.kind,
+        )
     except (MultiGameweekError, ValueError) as exc:
         code = exc.code if isinstance(exc, MultiGameweekError) else "BASELINE_REPLAY_INVALID"
         message = exc.message if isinstance(exc, MultiGameweekError) else str(exc)

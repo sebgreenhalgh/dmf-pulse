@@ -852,9 +852,7 @@ class PrivateV1RollingRecommendationService:
                 one_gameweek = optimise_multi_gameweek(one_request, evaluator=one_tactical)
                 note_optimiser_result(
                     status=one_gameweek.status,
-                    backend_status=getattr(
-                        getattr(one_gameweek, "solver_status", None), "status", None
-                    ),
+                    solver_status=getattr(one_gameweek, "solver_status", None),
                 )
             with rolling_boundary(RollingPhase.VALIDATE_ONE_GW_RESULT):
                 if one_gameweek.recommended_plan is None or (
@@ -916,7 +914,7 @@ class PrivateV1RollingRecommendationService:
             )
             note_optimiser_result(
                 status=optimiser.status,
-                backend_status=getattr(getattr(optimiser, "solver_status", None), "status", None),
+                solver_status=getattr(optimiser, "solver_status", None),
             )
         note_rolling_phase(RollingPhase.VALIDATE_THREE_GW_RESULT)
         record("stage11_policy_solving", started)

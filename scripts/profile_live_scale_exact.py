@@ -36,6 +36,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (  # noqa: E402
 )
 from dmf_pulse.optimisation.multi_gameweek_solver import (  # noqa: E402
     Stage11SearchProfile,
+    enumerate_legal_actions,
     solve_frontier,
 )
 from dmf_pulse.optimisation.tactics import ExactTacticalNodeKernel  # noqa: E402
@@ -49,7 +50,7 @@ from tests.unit.private_v1.horizon_oracle_support import (  # noqa: E402
 )
 
 
-def overlapping_fixture():
+def overlapping_fixture(*, extra_per_position: int = 3):
     original = tuple(players())
     additions = tuple(
         CandidatePlayer(
@@ -58,7 +59,7 @@ def overlapping_fixture():
             position=position,
         )
         for position in PlayerPosition
-        for i in range(3)
+        for i in range(extra_per_position)
     )
     catalog = {p.player_id: p for p in (*original, *additions)}
     base = {p.player_id for p in original}
@@ -81,6 +82,54 @@ def overlapping_fixture():
     return catalog, tuple(CandidateSquad(player_ids=ids) for ids in sorted(squads))
 
 
+def _plan_decision_summary(plan):
+    if plan is None:
+        return None
+    decisions = (plan.current_action, *plan.future_policy)
+    return {
+        "plan_kind": plan.plan_kind.value,
+        "selection_score": str(plan.selection_score),
+        "decisions": [
+            {
+                "node_id": decision.node_id,
+                "gameweek": decision.gameweek,
+                "action_signature": decision.action.signature,
+                "expected_points": str(decision.tactical_evaluation.expected_points),
+            }
+            for decision in decisions
+        ],
+        "utility": plan.utility.model_dump(mode="json"),
+        "leaf_utilities": [item.model_dump(mode="json") for item in plan.leaf_utilities],
+    }
+
+
+def _decision_semantics(result):
+    frontier = result.transfer_count_frontier
+    value = {
+        "recommended": _plan_decision_summary(result.recommended_plan),
+        "no_transfer_baseline": _plan_decision_summary(result.no_transfer_baseline),
+        "root_counterfactual": _plan_decision_summary(result.root_action_counterfactual_plan),
+        "transfer_count_frontier": (
+            None
+            if frontier is None
+            else [
+                {
+                    "transfer_count": point.transfer_count,
+                    "immediate_expected_points_before_hit": str(
+                        point.immediate_expected_points_before_hit
+                    ),
+                    "transfer_hit_points": point.transfer_hit_points,
+                    "current_gameweek_objective": str(point.current_gameweek_objective),
+                    "expected_horizon_utility": str(point.expected_horizon_utility),
+                    "plan": _plan_decision_summary(point.plan),
+                }
+                for point in frontier.points
+            ]
+        ),
+    }
+    return {"semantic_sha256": canonical_sha256(value), "value": value}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
@@ -88,6 +137,10 @@ def main():
     parser.add_argument("--scenarios", type=int, default=8)
     parser.add_argument("--mode", choices=("kernel", "search"), default="kernel")
     parser.add_argument("--public-search", action="store_true")
+    parser.add_argument("--public-only", action="store_true")
+    parser.add_argument("--extra-per-position", type=int, default=3)
+    parser.add_argument("--cumulative-legal-action-limit", type=int)
+    parser.add_argument("--summary-only", action="store_true")
     parser.add_argument("--baseline-root", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--no-profile", action="store_true")
@@ -95,7 +148,9 @@ def main():
     args = parser.parse_args()
     if args.limit < 1:
         parser.error("limit must be positive")
-    catalog, family = overlapping_fixture()
+    if args.extra_per_position < 1:
+        parser.error("extra-per-position must be positive")
+    catalog, family = overlapping_fixture(extra_per_position=args.extra_per_position)
     if args.mode == "search":
         base, _, _, _ = oracle_fixture()
         for player in base.candidate_pool:
@@ -116,7 +171,16 @@ def main():
                             for p in sorted(catalog.values(), key=lambda p: p.player_id)
                         ),
                         "search_policy": seal_search_policy(
-                            base.search_policy.model_copy(update={"max_actions_per_state": 17000})
+                            base.search_policy.model_copy(
+                                update={
+                                    "max_actions_per_state": 17000,
+                                    "max_cumulative_legal_actions": (
+                                        args.cumulative_legal_action_limit
+                                        if args.cumulative_legal_action_limit is not None
+                                        else base.search_policy.max_cumulative_legal_actions
+                                    ),
+                                }
+                            )
                         ),
                     }
                 )
@@ -128,29 +192,42 @@ def main():
         evaluator = HorizonPointsEvaluator(points)
         profile = Stage11SearchProfile(progress=lambda message: print(message, flush=True))
         wall, cpu = perf_counter(), process_time()
-        result = solve_frontier(
-            request, evaluator, profile=profile, prefer_deterministic_linear=True
-        )
+        result = None
+        if not args.public_only:
+            result = solve_frontier(
+                request, evaluator, profile=profile, prefer_deterministic_linear=True
+            )
         payload = {
             "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
             "mode": "SEARCH_SHAPE_WITH_SURROGATE_NOT_TACTICAL_TIMING",
             "wall_seconds": perf_counter() - wall,
             "cpu_seconds": process_time() - cpu,
-            "complete": result.complete,
+            "complete": None if result is None else result.complete,
             "profile": profile.as_dict(),
             "tactical_batch_calls": evaluator.batch_calls,
             "unique_tactical_squads": len(evaluator.cache),
-            "request": request.model_dump(mode="json"),
-            "candidates": [
-                TypeAdapter(type(c)).dump_python(c, mode="json") for c in result.candidates
-            ],
-            "squads_by_node": {
+            "extra_per_position": args.extra_per_position,
+            "candidate_pool_size": len(request.candidate_pool),
+            "retained_incoming_count": len(incoming),
+            "peak_memory_bytes": None,
+            "memory_measurement": "UNAVAILABLE_WITHOUT_NEW_RUNTIME_DEPENDENCY",
+            "configured_cumulative_legal_action_limit": (
+                request.search_policy.cumulative_legal_action_limit
+            ),
+        }
+        if not args.summary_only:
+            payload["request"] = request.model_dump(mode="json")
+            payload["candidates"] = (
+                []
+                if result is None
+                else [TypeAdapter(type(c)).dump_python(c, mode="json") for c in result.candidates]
+            )
+            payload["squads_by_node"] = {
                 node.node_id: sorted(
                     squad for node_id, squad in evaluator.cache if node_id == node.node_id
                 )
                 for node in request.scenario_tree.nodes
-            },
-        }
+            }
         if args.public_search:
             from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
 
@@ -158,18 +235,33 @@ def main():
                 progress=lambda message: print(message, flush=True)
             )
             public_wall, public_cpu = perf_counter(), process_time()
+            root = request.scenario_tree.root
+            no_transfer = next(
+                action
+                for action in enumerate_legal_actions(
+                    request.initial_state,
+                    node=root,
+                    candidate_pool=request.candidate_pool,
+                    rules=request.rules,
+                    policy=request.search_policy,
+                )
+                if action.transfer_count == 0
+            )
             public_result = optimise_multi_gameweek(
                 request,
                 evaluator=evaluator,
                 prefer_deterministic_linear=True,
                 profile=public_profile,
+                root_action_counterfactual=no_transfer,
             )
-            assert public_result.status.value == "SUCCESS"
             payload["whole_public_solve"] = {
                 "profile": public_profile.as_dict(),
                 "wall_seconds": perf_counter() - public_wall,
                 "cpu_seconds": process_time() - public_cpu,
-                "result": public_result.model_dump(mode="json"),
+                "status": public_result.status.value,
+                "diagnostics": public_result.solver_status.model_dump(mode="json"),
+                "decision_semantics": _decision_semantics(public_result),
+                "result": (None if args.summary_only else public_result.model_dump(mode="json")),
             }
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(

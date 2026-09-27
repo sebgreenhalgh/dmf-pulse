@@ -1,6 +1,6 @@
-"""Separate public preflight and terminal-only private L5 observation.
+"""Historical public-preflight/private-observation CLI with no current live authority.
 
-Legacy filename retained; L1/L2/L3/L4 are consumed and the exact L5 pair is current.
+Legacy filename retained; L1/L2/L3/L4/L5 are consumed and no L6 authority exists.
 This script has no retry loop, output-file option, normal CLI registration, model
 selector, scenario-count override or player-allocation override.
 """

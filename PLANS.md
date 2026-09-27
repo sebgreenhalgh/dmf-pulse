@@ -1,5 +1,23 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001P-L5-D5
+
+- Work only from immutable L5 parent `c348c3c7f2b26ef929dc0d56fa2dc1dbfd356d7e`
+  in an isolated worktree. This is offline Stage-11 resource diagnosis and exact
+  remediation: no provider access, credentials, retry, L6 authority, private-data
+  reconstruction, model activation, candidate narrowing, or approximate incumbent.
+- Give every reachable exact-search resource origin a closed finite identity and
+  authenticated aggregate counters from solver exception through optimisation result,
+  D4 rolling trace and terminal-safe JSON. Preserve raw-message non-disclosure.
+- Separate cumulative pre-tactical legal-action governance from the semantically
+  different policy-candidate cap. Use the explicit 524,288 current envelope: the
+  generated representative fails at the legacy 250,000 cap, needs 320,610 actions,
+  and 524,288 is the smallest power-of-two boundary above that measured requirement.
+  Preserve the authenticated legacy-v1 interpretation.
+- Prove low-cap failure, remediated/high-cap exact equality, full action-space and
+  successful-decision preservation across Stage 8-11, all five 001P cases and D1-D4.
+  Record L1-L5 consumed, obtain fresh independent review, push, and require exact-SHA CI.
+
 ## CURRENT-TEAM-STRENGTH-001P-L5 Phase A only
 
 - Work only from immutable D4 parent `a513f6c7e865f81b81f70d3f06803c23c4acae00`

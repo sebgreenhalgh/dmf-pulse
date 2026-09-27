@@ -1,7 +1,7 @@
-"""Governed L1-L5 operator experiment, never selected by ordinary dmf pulse.
+"""Historical L1-L5 operator experiment, never selected by ordinary dmf pulse.
 
-L1-L4 are consumed; exactly one L5 pair is current. Legacy L1 names remain for
-offline regression; D1-D4 provide closed diagnostic transport and localisation.
+All five live authorities are consumed. Legacy names remain for offline regression;
+D1-D5 provide closed diagnostic transport, localisation and resource identity.
 
 Only an allowlisted summary escapes. The prepared-context callback completes via
 a private exception carrying that summary, because the inherited callback return
@@ -603,6 +603,7 @@ class TeamStrengthL1ObservationService:
                 "prior_l2_one_shot_consumed": True,
                 "prior_l3_one_shot_consumed": True,
                 "prior_l4_one_shot_consumed": True,
+                "prior_l5_one_shot_consumed": True,
                 "fresh_live_authorization_required": True,
             }
         except TeamStrengthComparisonFailure as failure:

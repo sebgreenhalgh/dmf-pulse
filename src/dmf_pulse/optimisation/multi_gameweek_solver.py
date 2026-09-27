@@ -31,6 +31,7 @@ from dmf_pulse.optimisation.models import (
 from dmf_pulse.optimisation.multi_gameweek_errors import (
     InfeasiblePolicyError,
     InputInvalidError,
+    ResourceLimitKind,
     ResourceLimitReached,
 )
 from dmf_pulse.optimisation.multi_gameweek_models import (
@@ -453,6 +454,7 @@ def enumerate_legal_actions(
     applied_transitions: dict[str, AppliedTransfer] | None = None,
     profile: Stage11NodeProfile | None = None,
     precheck_economics: bool = False,
+    counters: SearchCounters | None = None,
 ) -> tuple[TransferAction, ...]:
     """Enumerate all legal actions; caps fail rather than silently prune."""
 
@@ -507,12 +509,19 @@ def enumerate_legal_actions(
             )
             for position_parts in product(*position_choices):
                 combinations_considered += 1
+                if counters is not None:
+                    counters.observed_action_combinations = max(
+                        counters.observed_action_combinations,
+                        combinations_considered,
+                    )
                 if profile is not None:
                     profile.action_combinations_considered += 1
                 if combinations_considered > policy.max_actions_per_state:
                     raise ResourceLimitReached(
                         "candidate action combinations exceed max_actions_per_state; "
-                        "no incomplete enumeration was labelled optimal"
+                        "no incomplete enumeration was labelled optimal",
+                        kind=ResourceLimitKind.PER_STATE_ACTION_COMBINATION_LIMIT,
+                        counters=counters,
                     )
                 ins = tuple(sorted(player_id for part in position_parts for player_id in part))
                 if precheck_economics:
@@ -797,9 +806,13 @@ class PolicyCandidate:
 @dataclass
 class SearchCounters:
     state_expansions: int = 0
+    observed_action_combinations: int = 0
     action_candidates: int = 0
     policy_candidates: int = 0
     pareto_candidates: int = 0
+    cumulative_legal_actions: int = 0
+    cumulative_legal_action_limit: int = 0
+    reachable_layer_state_count: int = 0
 
 
 @dataclass
@@ -1101,6 +1114,22 @@ def _root_sufficient_candidates(
     return tuple(sorted(retained.values(), key=lambda item: item.tie_key))
 
 
+def _enforce_pareto_frontier_limit(
+    frontier: tuple[PolicyCandidate, ...],
+    *,
+    policy: SearchPolicy,
+    counters: SearchCounters,
+) -> None:
+    """Fail closed if a lossless exact frontier crosses its distinct retained bound."""
+
+    if len(frontier) > policy.max_policy_candidates:
+        raise ResourceLimitReached(
+            "exact Pareto frontier exceeds max_policy_candidates; no unsafe pruning applied",
+            kind=ResourceLimitKind.PARETO_FRONTIER_LIMIT,
+            counters=counters,
+        )
+
+
 @dataclass
 class BoundedExactEnumerator:
     request: MultiGameweekOptimisationRequest
@@ -1165,6 +1194,7 @@ class BoundedExactEnumerator:
             applied_transitions=captured,
             profile=profile,
             precheck_economics=self._capture_prevalidated_transitions(),
+            counters=self.counters,
         )
         if profile is not None:
             profile.action_enumeration_seconds += perf_counter() - started
@@ -1202,7 +1232,11 @@ class BoundedExactEnumerator:
                 )
         except ResourceLimitReached as exc:
             if not candidates:
-                raise ResourceLimitReached(exc.message, counters=self.counters) from exc
+                raise ResourceLimitReached(
+                    exc.message,
+                    kind=exc.kind,
+                    counters=self.counters,
+                ) from exc
             retained = _root_sufficient_candidates(candidates)
             return FrontierResult(
                 candidates=retained,
@@ -1211,6 +1245,7 @@ class BoundedExactEnumerator:
                     status=BackendStatus.TIME_RESOURCE_LIMIT_WITH_INCUMBENT,
                     reason=exc.message,
                     complete=False,
+                    resource_limit_kind=exc.kind,
                 ),
                 complete=False,
             )
@@ -1240,6 +1275,7 @@ class BoundedExactEnumerator:
                         "no unsafe truncation was applied"
                     ),
                     complete=False,
+                    resource_limit_kind=ResourceLimitKind.ROOT_SUMMARY_LIMIT,
                 ),
                 complete=False,
             )
@@ -1261,6 +1297,7 @@ class BoundedExactEnumerator:
         status: BackendStatus,
         reason: str,
         complete: bool,
+        resource_limit_kind: ResourceLimitKind | None = None,
     ) -> SolverDiagnostics:
         best = select_candidate(candidates, mode=ObjectiveMode.EXPECTED)
         return SolverDiagnostics(
@@ -1277,10 +1314,49 @@ class BoundedExactEnumerator:
             absolute_gap=Decimal(0) if complete else None,
             relative_gap=Decimal(0) if complete else None,
             state_expansions=self.counters.state_expansions,
+            observed_action_combinations=(
+                self.counters.observed_action_combinations
+                if resource_limit_kind is not None
+                else None
+            ),
             action_candidates=self.counters.action_candidates,
             policy_candidates=self.counters.policy_candidates,
             pareto_candidates=self.counters.pareto_candidates,
             memo_entries=len(self.memo),
+            resource_limit_kind=resource_limit_kind,
+            configured_max_actions_per_state=(
+                self.request.search_policy.max_actions_per_state
+                if resource_limit_kind is not None
+                else None
+            ),
+            configured_max_state_expansions=(
+                self.request.search_policy.max_state_expansions
+                if resource_limit_kind is not None
+                else None
+            ),
+            configured_max_policy_candidates=(
+                self.request.search_policy.max_policy_candidates
+                if resource_limit_kind is not None
+                else None
+            ),
+            configured_max_returned_root_candidates=(
+                self.request.search_policy.max_returned_root_candidates
+                if resource_limit_kind is not None
+                else None
+            ),
+            configured_cumulative_legal_action_limit=(
+                self.request.search_policy.cumulative_legal_action_limit
+                if resource_limit_kind is not None
+                else None
+            ),
+            cumulative_legal_actions=(
+                self.counters.cumulative_legal_actions if resource_limit_kind is not None else None
+            ),
+            reachable_layer_state_count=(
+                self.counters.reachable_layer_state_count
+                if resource_limit_kind is not None
+                else None
+            ),
             deterministic_tie_key=best.tie_key,
             runtime_ms=None,
             configuration_sha256=_configuration_hash(self.request),
@@ -1301,6 +1377,7 @@ class BoundedExactEnumerator:
         if self.counters.state_expansions >= self.request.search_policy.max_state_expansions:
             raise ResourceLimitReached(
                 "state-expansion cap reached before complete exhaustion",
+                kind=ResourceLimitKind.STATE_EXPANSION_LIMIT,
                 counters=self.counters,
             )
         self.counters.state_expansions += 1
@@ -1320,11 +1397,11 @@ class BoundedExactEnumerator:
             profile.pareto_candidates_retained += len(frontier)
             profile.peak_retained_frontier = max(profile.peak_retained_frontier, len(frontier))
         self.counters.pareto_candidates += len(frontier)
-        if len(frontier) > self.request.search_policy.max_policy_candidates:
-            raise ResourceLimitReached(
-                "exact Pareto frontier exceeds max_policy_candidates; no unsafe pruning applied",
-                counters=self.counters,
-            )
+        _enforce_pareto_frontier_limit(
+            frontier,
+            policy=self.request.search_policy,
+            counters=self.counters,
+        )
         self.memo[key] = frontier
         if profile is not None:
             profile.states_solved += 1
@@ -1473,6 +1550,7 @@ class BoundedExactEnumerator:
         if self.counters.policy_candidates > self.request.search_policy.max_policy_candidates:
             raise ResourceLimitReached(
                 "generated policy count exceeds max_policy_candidates before exact exhaustion",
+                kind=ResourceLimitKind.POLICY_GENERATION_LIMIT,
                 counters=self.counters,
             )
         ordered_decisions = tuple(sorted(decisions, key=lambda item: (item.gameweek, item.node_id)))
@@ -1699,11 +1777,12 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         """
         nodes = tuple(sorted(self.request.scenario_tree.nodes, key=lambda n: n.gameweek))
         budget = self.work_budget or Stage11WorkBudget(
-            self.request.search_policy.max_policy_candidates,
+            self.request.search_policy.cumulative_legal_action_limit,
             self.request.search_policy.max_state_expansions,
         )
         legal_action_limit = min(
-            budget.legal_action_limit, self.request.search_policy.max_policy_candidates
+            budget.legal_action_limit,
+            self.request.search_policy.cumulative_legal_action_limit,
         )
         state_expansion_limit = min(
             budget.state_expansion_limit, self.request.search_policy.max_state_expansions
@@ -1719,6 +1798,7 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
         if self.profile is not None:
             self.profile.exact_accelerator = "R7_TERMINAL_SALE_QUOTIENT_LAYERED_EXACT_V1"
             self.profile.cumulative_legal_action_limit = legal_action_limit
+        self.counters.cumulative_legal_action_limit = legal_action_limit
         self._collecting_layer = True
         try:
             for depth, node in enumerate(nodes):
@@ -1739,15 +1819,15 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                     )
                     self._whole_run_legal_actions += len(actions)
                     budget.legal_actions += len(actions)
+                    self.counters.cumulative_legal_actions = budget.legal_actions
                     # Govern retained transitions and potential tactical work with
-                    # the existing 250,000 STANDARD policy envelope. The measured
-                    # 67,062 and reported live ~68k legal-action shapes fit. Raw
-                    # rejected combinations are tracked, not mistaken for legal
-                    # tactical work; their inherited per-state/state caps remain.
+                    # its distinct current-policy physical-work envelope. Raw rejected
+                    # combinations retain their separate per-state bound.
                     if budget.legal_actions > legal_action_limit:
                         self._prevalidated_transitions.clear()
                         raise ResourceLimitReached(
                             f"cumulative exact legal actions {budget.legal_actions} exceed whole-policy work envelope {legal_action_limit} before tactical evaluation; no scope truncated",
+                            kind=ResourceLimitKind.CUMULATIVE_LEGAL_ACTION_LIMIT,
                             counters=self.counters,
                         )
                     self._layer_actions[key] = actions
@@ -1772,12 +1852,13 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                     node_profile.layer_discovery_cpu_seconds += process_time() - discovery_cpu
                 if depth + 1 < len(nodes):
                     layers.append(next_states)
-                    if (
-                        budget.state_expansions + sum(len(layer) for layer in layers[1:])
-                        > state_expansion_limit
-                    ):
+                    self.counters.reachable_layer_state_count = budget.state_expansions + sum(
+                        len(layer) for layer in layers[1:]
+                    )
+                    if self.counters.reachable_layer_state_count > state_expansion_limit:
                         raise ResourceLimitReached(
                             "reachable layer states exceed state-expansion cap before tactical evaluation",
+                            kind=ResourceLimitKind.LAYER_REACHABLE_STATE_LIMIT,
                             counters=self.counters,
                         )
         finally:

@@ -1,0 +1,465 @@
+{
+  "candidate_pool_size": 31,
+  "complete": null,
+  "configured_cumulative_legal_action_limit": 524288,
+  "cpu_seconds": 0.0,
+  "extra_per_position": 4,
+  "memory_measurement": "UNAVAILABLE_WITHOUT_NEW_RUNTIME_DEPENDENCY",
+  "mode": "SEARCH_SHAPE_WITH_SURROGATE_NOT_TACTICAL_TIMING",
+  "peak_memory_bytes": null,
+  "profile": {
+    "cumulative_action_combinations": 0,
+    "cumulative_legal_action_limit": null,
+    "cumulative_legal_actions": 0,
+    "cumulative_state_expansions": 0,
+    "cumulative_tactical_requests": 0,
+    "cumulative_unique_node_squads": 0,
+    "economically_equivalent_full_states": 0,
+    "exact_accelerator": "GENERIC_EXACT",
+    "fast_path_used": false,
+    "memo_hits": 0,
+    "memo_misses": 0,
+    "nodes": []
+  },
+  "retained_incoming_count": 16,
+  "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "tactical_batch_calls": {
+    "last": 1,
+    "next": 1,
+    "root": 1
+  },
+  "unique_tactical_squads": 0,
+  "wall_seconds": 3.5999983083456755e-06,
+  "whole_public_solve": {
+    "cpu_seconds": 163.375,
+    "decision_semantics": {
+      "semantic_sha256": "f5b3d892d999e399be67c6137726adb54d136ccc73a40699b19f5d1efe5e2f47",
+      "value": {
+        "no_transfer_baseline": {
+          "decisions": [
+            {
+              "action_signature": "NORMAL|->",
+              "expected_points": "123",
+              "gameweek": 1,
+              "node_id": "root"
+            },
+            {
+              "action_signature": "NORMAL|p03,p12->extra-DEF-1,extra-FWD-0",
+              "expected_points": "154",
+              "gameweek": 2,
+              "node_id": "next"
+            },
+            {
+              "action_signature": "NORMAL|p02->extra-DEF-2",
+              "expected_points": "140",
+              "gameweek": 3,
+              "node_id": "last"
+            }
+          ],
+          "leaf_utilities": [
+            {
+              "conservative_utility": "417",
+              "expected_utility": "417",
+              "leaf_node_id": "last",
+              "probability": "1",
+              "terminal_value": {
+                "bank_value": "0",
+                "free_transfer_value": "0",
+                "liquidation_value": "0",
+                "policy_id": "TEST_TERMINAL_BASELINE_V1",
+                "total": "0"
+              },
+              "upside_utility": "417"
+            }
+          ],
+          "plan_kind": "NO_TRANSFER_BASELINE",
+          "selection_score": "417",
+          "utility": {
+            "current_gameweek_contribution": "123",
+            "expected_hit_cost": "0",
+            "expected_horizon_utility": "417",
+            "future_contribution": "294",
+            "objective_total": "417",
+            "terminal_flexibility_contribution": "0"
+          }
+        },
+        "recommended": {
+          "decisions": [
+            {
+              "action_signature": "NORMAL|->",
+              "expected_points": "123",
+              "gameweek": 1,
+              "node_id": "root"
+            },
+            {
+              "action_signature": "NORMAL|p03,p12->extra-DEF-1,extra-FWD-0",
+              "expected_points": "154",
+              "gameweek": 2,
+              "node_id": "next"
+            },
+            {
+              "action_signature": "NORMAL|p02->extra-DEF-2",
+              "expected_points": "140",
+              "gameweek": 3,
+              "node_id": "last"
+            }
+          ],
+          "leaf_utilities": [
+            {
+              "conservative_utility": "417",
+              "expected_utility": "417",
+              "leaf_node_id": "last",
+              "probability": "1",
+              "terminal_value": {
+                "bank_value": "0",
+                "free_transfer_value": "0",
+                "liquidation_value": "0",
+                "policy_id": "TEST_TERMINAL_BASELINE_V1",
+                "total": "0"
+              },
+              "upside_utility": "417"
+            }
+          ],
+          "plan_kind": "RECOMMENDED",
+          "selection_score": "417",
+          "utility": {
+            "current_gameweek_contribution": "123",
+            "expected_hit_cost": "0",
+            "expected_horizon_utility": "417",
+            "future_contribution": "294",
+            "objective_total": "417",
+            "terminal_flexibility_contribution": "0"
+          }
+        },
+        "root_counterfactual": {
+          "decisions": [
+            {
+              "action_signature": "NORMAL|->",
+              "expected_points": "123",
+              "gameweek": 1,
+              "node_id": "root"
+            },
+            {
+              "action_signature": "NORMAL|p03,p12->extra-DEF-1,extra-FWD-0",
+              "expected_points": "154",
+              "gameweek": 2,
+              "node_id": "next"
+            },
+            {
+              "action_signature": "NORMAL|p02->extra-DEF-2",
+              "expected_points": "140",
+              "gameweek": 3,
+              "node_id": "last"
+            }
+          ],
+          "leaf_utilities": [
+            {
+              "conservative_utility": "417",
+              "expected_utility": "417",
+              "leaf_node_id": "last",
+              "probability": "1",
+              "terminal_value": {
+                "bank_value": "0",
+                "free_transfer_value": "0",
+                "liquidation_value": "0",
+                "policy_id": "TEST_TERMINAL_BASELINE_V1",
+                "total": "0"
+              },
+              "upside_utility": "417"
+            }
+          ],
+          "plan_kind": "ROOT_ACTION_COUNTERFACTUAL",
+          "selection_score": "417",
+          "utility": {
+            "current_gameweek_contribution": "123",
+            "expected_hit_cost": "0",
+            "expected_horizon_utility": "417",
+            "future_contribution": "294",
+            "objective_total": "417",
+            "terminal_flexibility_contribution": "0"
+          }
+        },
+        "transfer_count_frontier": [
+          {
+            "current_gameweek_objective": "123",
+            "expected_horizon_utility": "417",
+            "immediate_expected_points_before_hit": "123",
+            "plan": {
+              "decisions": [
+                {
+                  "action_signature": "NORMAL|->",
+                  "expected_points": "123",
+                  "gameweek": 1,
+                  "node_id": "root"
+                },
+                {
+                  "action_signature": "NORMAL|p03,p12->extra-DEF-1,extra-FWD-0",
+                  "expected_points": "154",
+                  "gameweek": 2,
+                  "node_id": "next"
+                },
+                {
+                  "action_signature": "NORMAL|p02->extra-DEF-2",
+                  "expected_points": "140",
+                  "gameweek": 3,
+                  "node_id": "last"
+                }
+              ],
+              "leaf_utilities": [
+                {
+                  "conservative_utility": "417",
+                  "expected_utility": "417",
+                  "leaf_node_id": "last",
+                  "probability": "1",
+                  "terminal_value": {
+                    "bank_value": "0",
+                    "free_transfer_value": "0",
+                    "liquidation_value": "0",
+                    "policy_id": "TEST_TERMINAL_BASELINE_V1",
+                    "total": "0"
+                  },
+                  "upside_utility": "417"
+                }
+              ],
+              "plan_kind": "TRANSFER_COUNT_FRONTIER",
+              "selection_score": "417",
+              "utility": {
+                "current_gameweek_contribution": "123",
+                "expected_hit_cost": "0",
+                "expected_horizon_utility": "417",
+                "future_contribution": "294",
+                "objective_total": "417",
+                "terminal_flexibility_contribution": "0"
+              }
+            },
+            "transfer_count": 0,
+            "transfer_hit_points": 0
+          },
+          {
+            "current_gameweek_objective": "127",
+            "expected_horizon_utility": "416",
+            "immediate_expected_points_before_hit": "127",
+            "plan": {
+              "decisions": [
+                {
+                  "action_signature": "NORMAL|p05->extra-DEF-1",
+                  "expected_points": "127",
+                  "gameweek": 1,
+                  "node_id": "root"
+                },
+                {
+                  "action_signature": "NORMAL|p12->extra-FWD-0",
+                  "expected_points": "144",
+                  "gameweek": 2,
+                  "node_id": "next"
+                },
+                {
+                  "action_signature": "NORMAL|p02->extra-DEF-2",
+                  "expected_points": "145",
+                  "gameweek": 3,
+                  "node_id": "last"
+                }
+              ],
+              "leaf_utilities": [
+                {
+                  "conservative_utility": "416",
+                  "expected_utility": "416",
+                  "leaf_node_id": "last",
+                  "probability": "1",
+                  "terminal_value": {
+                    "bank_value": "0",
+                    "free_transfer_value": "0",
+                    "liquidation_value": "0",
+                    "policy_id": "TEST_TERMINAL_BASELINE_V1",
+                    "total": "0"
+                  },
+                  "upside_utility": "416"
+                }
+              ],
+              "plan_kind": "TRANSFER_COUNT_FRONTIER",
+              "selection_score": "416",
+              "utility": {
+                "current_gameweek_contribution": "127",
+                "expected_hit_cost": "0",
+                "expected_horizon_utility": "416",
+                "future_contribution": "289",
+                "objective_total": "416",
+                "terminal_flexibility_contribution": "0"
+              }
+            },
+            "transfer_count": 1,
+            "transfer_hit_points": 0
+          }
+        ]
+      }
+    },
+    "diagnostics": {
+      "absolute_gap": "0",
+      "action_candidates": 163743,
+      "backend": "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR",
+      "bound": "417",
+      "configuration_sha256": "15fec74eae8f0c2864bb6d952682b86c8a7d5be0a6ccf3ab74ce671e2ef97e08",
+      "deterministic_tie_key": "root:NORMAL|->:8768317fb1c1|next:NORMAL|p03,p12->extra-DEF-1,extra-FWD-0:1f4c93706a9f|last:NORMAL|p02->extra-DEF-2:b203ad9fff2e",
+      "incumbent": "417",
+      "memo_entries": 1622,
+      "objective": "417",
+      "optimality_guarantee": "EXACT_DECLARED_TREE_AND_ACTION_SPACE",
+      "pareto_candidates": 1623,
+      "policy_candidates": 163743,
+      "relative_gap": "0",
+      "runtime_ms": null,
+      "state_expansions": 1622,
+      "status": "OPTIMAL",
+      "termination_reason": "complete bounded policy frontier exhausted"
+    },
+    "profile": {
+      "cumulative_action_combinations": 320610,
+      "cumulative_legal_action_limit": 524288,
+      "cumulative_legal_actions": 320610,
+      "cumulative_state_expansions": 3126,
+      "cumulative_tactical_requests": 327144,
+      "cumulative_unique_node_squads": 20963,
+      "economically_equivalent_full_states": 3348,
+      "exact_accelerator": "R7_TERMINAL_SALE_QUOTIENT_LAYERED_EXACT_V1",
+      "fast_path_used": true,
+      "memo_hits": 6472,
+      "memo_misses": 3124,
+      "nodes": [
+        {
+          "action_combinations_considered": 62,
+          "action_enumeration_seconds": 0.022748300019884482,
+          "actions_by_free_transfers": {
+            "ft=1,transfers=0": 2,
+            "ft=1,transfers=1": 60
+          },
+          "closed_history_only_duplicates": 0,
+          "depth": 0,
+          "economically_equivalent_full_states": 0,
+          "gameweek": 1,
+          "layer_discovery_cpu_seconds": 0.03125,
+          "layer_discovery_seconds": 0.035541499993996695,
+          "layer_solve_cpu_seconds": 0.09375,
+          "layer_solve_seconds": 0.10178019999875687,
+          "legal_actions_generated": 62,
+          "legality_precheck_rejections": 0,
+          "memo_hits": 0,
+          "memo_misses": 0,
+          "node_batch_requests": 2,
+          "node_id": "root",
+          "pareto_candidates_retained": 2,
+          "pareto_seconds": 7.960002403706312e-05,
+          "peak_retained_frontier": 1,
+          "policy_candidates_generated": 62,
+          "states_entered": 2,
+          "states_solved": 2,
+          "tactical_cpu_seconds": 0.0,
+          "tactical_evaluator_calls": 62,
+          "tactical_seconds": 0.001482899853726849,
+          "transfer_count_distribution": {
+            "0": 2,
+            "1": 60
+          },
+          "transition_applications": 62,
+          "transition_seconds": 0.021037000085925683,
+          "unique_current_state_fingerprints": 1,
+          "unique_economic_state_fingerprints": 1,
+          "unique_resulting_active_squads": 61
+        },
+        {
+          "action_combinations_considered": 6410,
+          "action_enumeration_seconds": 2.5474168999353424,
+          "actions_by_free_transfers": {
+            "ft=1,transfers=0": 60,
+            "ft=1,transfers=1": 3348,
+            "ft=2,transfers=0": 2,
+            "ft=2,transfers=1": 120,
+            "ft=2,transfers=2": 2880
+          },
+          "closed_history_only_duplicates": 0,
+          "depth": 1,
+          "economically_equivalent_full_states": 0,
+          "gameweek": 2,
+          "layer_discovery_cpu_seconds": 3.6875,
+          "layer_discovery_seconds": 3.7620014999993145,
+          "layer_solve_cpu_seconds": 5.796875,
+          "layer_solve_seconds": 5.971697200031485,
+          "legal_actions_generated": 6410,
+          "legality_precheck_rejections": 0,
+          "memo_hits": 62,
+          "memo_misses": 62,
+          "node_batch_requests": 2,
+          "node_id": "next",
+          "pareto_candidates_retained": 62,
+          "pareto_seconds": 0.006059300183551386,
+          "peak_retained_frontier": 1,
+          "policy_candidates_generated": 6410,
+          "states_entered": 124,
+          "states_solved": 62,
+          "tactical_cpu_seconds": 0.03125,
+          "tactical_evaluator_calls": 6472,
+          "tactical_seconds": 0.06664410067605786,
+          "transfer_count_distribution": {
+            "0": 62,
+            "1": 3468,
+            "2": 2880
+          },
+          "transition_applications": 6472,
+          "transition_seconds": 2.406416198500665,
+          "unique_current_state_fingerprints": 61,
+          "unique_economic_state_fingerprints": 61,
+          "unique_resulting_active_squads": 1501
+        },
+        {
+          "action_combinations_considered": 314138,
+          "action_enumeration_seconds": 135.75002450111788,
+          "actions_by_free_transfers": {
+            "ft=1,transfers=0": 2940,
+            "ft=1,transfers=1": 152364,
+            "ft=2,transfers=0": 120,
+            "ft=2,transfers=1": 6696,
+            "ft=2,transfers=2": 149016,
+            "ft=3,transfers=0": 2,
+            "ft=3,transfers=1": 120,
+            "ft=3,transfers=2": 2880
+          },
+          "closed_history_only_duplicates": 0,
+          "depth": 2,
+          "economically_equivalent_full_states": 3348,
+          "gameweek": 3,
+          "layer_discovery_cpu_seconds": 133.765625,
+          "layer_discovery_seconds": 137.1797620000434,
+          "layer_solve_cpu_seconds": 19.25,
+          "layer_solve_seconds": 19.679680100030964,
+          "legal_actions_generated": 314138,
+          "legality_precheck_rejections": 0,
+          "memo_hits": 6410,
+          "memo_misses": 3062,
+          "node_batch_requests": 2,
+          "node_id": "last",
+          "pareto_candidates_retained": 3062,
+          "pareto_seconds": 0.2907122011529282,
+          "peak_retained_frontier": 1,
+          "policy_candidates_generated": 314138,
+          "states_entered": 9472,
+          "states_solved": 3062,
+          "tactical_cpu_seconds": 0.375,
+          "tactical_evaluator_calls": 320610,
+          "tactical_seconds": 1.9456640922289807,
+          "transfer_count_distribution": {
+            "0": 3062,
+            "1": 159180,
+            "2": 151896
+          },
+          "transition_applications": 320610,
+          "transition_seconds": 129.92468361696228,
+          "unique_current_state_fingerprints": 4909,
+          "unique_economic_state_fingerprints": 1561,
+          "unique_resulting_active_squads": 19401
+        }
+      ]
+    },
+    "result": null,
+    "status": "SUCCESS",
+    "wall_seconds": 167.49297180000576
+  }
+}

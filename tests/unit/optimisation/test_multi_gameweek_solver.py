@@ -10,6 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from dmf_pulse.optimisation.multi_gameweek_artifacts import load_canonical_json
+from dmf_pulse.optimisation.multi_gameweek_errors import ResourceLimitKind, ResourceLimitReached
 from dmf_pulse.optimisation.multi_gameweek_models import (
     AlternativeAvailability,
     BackendStatus,
@@ -25,6 +26,8 @@ from dmf_pulse.optimisation.multi_gameweek_service import (
     optimise_multi_gameweek,
 )
 from dmf_pulse.optimisation.multi_gameweek_solver import (
+    SearchCounters,
+    _enforce_pareto_frontier_limit,
     apply_transfer_action,
     enumerate_legal_actions,
     make_transfer_action,
@@ -201,6 +204,7 @@ def test_resource_limit_with_complete_incumbent_is_not_reported_optimal() -> Non
     _, result = _result("resource_limit_incumbent")
     assert result.status is MultiGameweekResultStatus.RESOURCE_LIMIT
     assert result.solver_status.status is BackendStatus.TIME_RESOURCE_LIMIT_WITH_INCUMBENT
+    assert result.solver_status.resource_limit_kind is ResourceLimitKind.POLICY_GENERATION_LIMIT
     assert result.solver_status.optimality_guarantee is OptimalityGuarantee.NONE
     assert result.solver_status.incumbent is not None
     assert result.solver_status.bound is None
@@ -225,9 +229,67 @@ def test_resource_limit_without_incumbent_has_no_recommendation() -> None:
     result = optimise_multi_gameweek(limited)
     assert result.status is MultiGameweekResultStatus.RESOURCE_LIMIT
     assert result.solver_status.status is BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT
+    assert (
+        result.solver_status.resource_limit_kind
+        is ResourceLimitKind.PER_STATE_ACTION_COMBINATION_LIMIT
+    )
     assert result.recommended_plan is None
     assert result.current_action is None
     assert result.error_code == "MULTI_GAMEWEEK_RESOURCE_LIMIT"
+    assert result.solver_status.configured_max_actions_per_state == 1
+    assert (
+        result.solver_status.configured_cumulative_legal_action_limit
+        == request.search_policy.cumulative_legal_action_limit
+    )
+
+
+def test_root_summary_limit_returns_incumbent_with_finite_identity() -> None:
+    request = load_canonical_json(ROOT / "simple_one_ft.json", MultiGameweekOptimisationRequest)
+    search = seal_search_policy(
+        request.search_policy.model_copy(
+            update={
+                "max_policy_candidates": 250000,
+                "max_returned_root_candidates": 1,
+                "policy_sha256": "0" * 64,
+            }
+        )
+    )
+    limited = seal_request(
+        request.model_copy(update={"search_policy": search, "request_sha256": "0" * 64})
+    )
+    result = optimise_multi_gameweek(limited)
+    assert result.status is MultiGameweekResultStatus.RESOURCE_LIMIT
+    assert result.recommended_plan is not None
+    assert result.solver_status.resource_limit_kind is ResourceLimitKind.ROOT_SUMMARY_LIMIT
+
+
+def test_generic_state_expansion_limit_has_finite_identity() -> None:
+    request, _ = _result("simple_one_ft")
+    search = seal_search_policy(
+        request.search_policy.model_copy(
+            update={"max_state_expansions": 1, "policy_sha256": "0" * 64}
+        )
+    )
+    limited = seal_request(
+        request.model_copy(update={"search_policy": search, "request_sha256": "0" * 64})
+    )
+    result = optimise_multi_gameweek(limited)
+    assert result.status is MultiGameweekResultStatus.RESOURCE_LIMIT
+    assert result.solver_status.resource_limit_kind is ResourceLimitKind.STATE_EXPANSION_LIMIT
+    assert result.solver_status.state_expansions == 1
+
+
+def test_pareto_frontier_guard_has_finite_identity_and_safe_counters() -> None:
+    request = load_canonical_json(ROOT / "simple_one_ft.json", MultiGameweekOptimisationRequest)
+    counters = SearchCounters(pareto_candidates=2)
+    with pytest.raises(ResourceLimitReached) as caught:
+        _enforce_pareto_frontier_limit(
+            (object(), object()),  # type: ignore[arg-type]
+            policy=request.search_policy.model_copy(update={"max_policy_candidates": 1}),
+            counters=counters,
+        )
+    assert getattr(caught.value, "kind", None) is ResourceLimitKind.PARETO_FRONTIER_LIMIT
+    assert getattr(caught.value, "counters", None) is counters
 
 
 def test_invalid_and_infeasible_statuses_remain_distinct() -> None:

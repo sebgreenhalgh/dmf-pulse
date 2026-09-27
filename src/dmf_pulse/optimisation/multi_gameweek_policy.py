@@ -32,6 +32,10 @@ def load_multi_gameweek_search_policy(path: Path | None = None) -> SearchPolicy:
 
     try:
         raw = _load_policy_mapping(path, "multi_gameweek.yaml")
+        if "max_cumulative_legal_actions" not in raw:
+            raise ValueError(
+                "current policy requires distinct max_cumulative_legal_actions governance"
+            )
         raw["policy_sha256"] = "0" * 64
         return seal_search_policy(SearchPolicy.model_validate(raw))
     except (OSError, RulesValidationError, ValidationError, ValueError) as exc:

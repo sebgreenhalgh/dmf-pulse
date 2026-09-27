@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 
 from dmf_pulse.football_events.market_constraints import MarketFamily
 from dmf_pulse.football_events.service import ScoreDistributionError
+from dmf_pulse.optimisation.multi_gameweek_errors import ResourceLimitKind
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
 
@@ -209,6 +210,45 @@ class ComparisonFailureDiagnostic(BaseModel):
     rolling_internal_code: RollingInternalCode | None = None
     optimiser_status_class: RollingOptimiserStatusClass | None = None
     optimiser_backend_status_class: RollingOptimiserBackendStatusClass | None = None
+    resource_limit_kind: ResourceLimitKind | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_max_actions_per_state: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    configured_max_state_expansions: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    configured_max_policy_candidates: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    configured_max_returned_root_candidates: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    configured_cumulative_legal_action_limit: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_state_expansions: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_action_combinations: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_action_candidates: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_policy_candidates: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_pareto_candidates: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    cumulative_legal_actions: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    reachable_layer_state_count: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
     gameweeks_stage8_complete: int = Field(default=0, ge=0, le=3)
     gameweeks_stage9_assembled: int = Field(default=0, ge=0, le=3)
     gameweeks_stage9_mc_passed: int = Field(default=0, ge=0, le=3)
@@ -232,6 +272,7 @@ class ComparisonFailureDiagnostic(BaseModel):
                 self.rolling_internal_code,
                 self.optimiser_status_class,
                 self.optimiser_backend_status_class,
+                self.resource_limit_kind,
             )
         ):
             raise ValueError("rolling detail requires rolling phase")
@@ -241,6 +282,27 @@ class ComparisonFailureDiagnostic(BaseModel):
             raise ValueError("rolling phase requires finite failure classification")
         if (self.optimiser_status_class is None) != (self.optimiser_backend_status_class is None):
             raise ValueError("partial optimiser status")
+        resource_values = (
+            self.configured_max_actions_per_state,
+            self.configured_max_state_expansions,
+            self.configured_max_policy_candidates,
+            self.configured_max_returned_root_candidates,
+            self.configured_cumulative_legal_action_limit,
+            self.observed_state_expansions,
+            self.observed_action_combinations,
+            self.observed_action_candidates,
+            self.observed_policy_candidates,
+            self.observed_pareto_candidates,
+            self.cumulative_legal_actions,
+            self.reachable_layer_state_count,
+        )
+        if self.resource_limit_kind is None and any(value is not None for value in resource_values):
+            raise ValueError("resource counters require a finite resource-limit identity")
+        if self.resource_limit_kind is not None and (
+            self.optimiser_status_class is not RollingOptimiserStatusClass.RESOURCE_LIMIT
+            or any(value is None for value in resource_values)
+        ):
+            raise ValueError("resource-limit identity requires complete safe counters")
         if not (
             self.gameweeks_stage9_mc_passed
             <= self.gameweeks_stage9_assembled
@@ -294,6 +356,19 @@ class ComparisonTrace:
     rolling_internal_code: RollingInternalCode | None = None
     optimiser_status_class: RollingOptimiserStatusClass | None = None
     optimiser_backend_status_class: RollingOptimiserBackendStatusClass | None = None
+    resource_limit_kind: ResourceLimitKind | None = None
+    configured_max_actions_per_state: int | None = None
+    configured_max_state_expansions: int | None = None
+    configured_max_policy_candidates: int | None = None
+    configured_max_returned_root_candidates: int | None = None
+    configured_cumulative_legal_action_limit: int | None = None
+    observed_state_expansions: int | None = None
+    observed_action_combinations: int | None = None
+    observed_action_candidates: int | None = None
+    observed_policy_candidates: int | None = None
+    observed_pareto_candidates: int | None = None
+    cumulative_legal_actions: int | None = None
+    reachable_layer_state_count: int | None = None
     gameweeks_stage8_complete: int = 0
     gameweeks_stage9_assembled: int = 0
     gameweeks_stage9_mc_passed: int = 0
@@ -318,6 +393,19 @@ class ComparisonTrace:
         self.rolling_internal_code = None
         self.optimiser_status_class = None
         self.optimiser_backend_status_class = None
+        self.resource_limit_kind = None
+        self.configured_max_actions_per_state = None
+        self.configured_max_state_expansions = None
+        self.configured_max_policy_candidates = None
+        self.configured_max_returned_root_candidates = None
+        self.configured_cumulative_legal_action_limit = None
+        self.observed_state_expansions = None
+        self.observed_action_combinations = None
+        self.observed_action_candidates = None
+        self.observed_policy_candidates = None
+        self.observed_pareto_candidates = None
+        self.cumulative_legal_actions = None
+        self.reachable_layer_state_count = None
         self.gameweeks_stage8_complete = 0
         self.gameweeks_stage9_assembled = 0
         self.gameweeks_stage9_mc_passed = 0
@@ -379,6 +467,39 @@ class ComparisonTrace:
                 optimiser_status_class=(self.optimiser_status_class if world_stage else None),
                 optimiser_backend_status_class=(
                     self.optimiser_backend_status_class if world_stage else None
+                ),
+                resource_limit_kind=self.resource_limit_kind if world_stage else None,
+                configured_max_actions_per_state=(
+                    self.configured_max_actions_per_state if world_stage else None
+                ),
+                configured_max_state_expansions=(
+                    self.configured_max_state_expansions if world_stage else None
+                ),
+                configured_max_policy_candidates=(
+                    self.configured_max_policy_candidates if world_stage else None
+                ),
+                configured_max_returned_root_candidates=(
+                    self.configured_max_returned_root_candidates if world_stage else None
+                ),
+                configured_cumulative_legal_action_limit=(
+                    self.configured_cumulative_legal_action_limit if world_stage else None
+                ),
+                observed_state_expansions=(self.observed_state_expansions if world_stage else None),
+                observed_action_combinations=(
+                    self.observed_action_combinations if world_stage else None
+                ),
+                observed_action_candidates=(
+                    self.observed_action_candidates if world_stage else None
+                ),
+                observed_policy_candidates=(
+                    self.observed_policy_candidates if world_stage else None
+                ),
+                observed_pareto_candidates=(
+                    self.observed_pareto_candidates if world_stage else None
+                ),
+                cumulative_legal_actions=(self.cumulative_legal_actions if world_stage else None),
+                reachable_layer_state_count=(
+                    self.reachable_layer_state_count if world_stage else None
                 ),
                 gameweeks_stage8_complete=(self.gameweeks_stage8_complete if world_stage else 0),
                 gameweeks_stage9_assembled=(self.gameweeks_stage9_assembled if world_stage else 0),
@@ -476,10 +597,11 @@ def note_rolling_phase(phase: RollingPhase, *, gameweek: int | None = None) -> N
         trace.rolling_internal_code = None
 
 
-def note_optimiser_result(*, status: object, backend_status: object) -> None:
+def note_optimiser_result(*, status: object, solver_status: object) -> None:
     trace = _TRACE.get()
     if trace is not None:
         status_value = getattr(status, "value", None)
+        backend_status = getattr(solver_status, "status", None)
         backend_value = getattr(backend_status, "value", None)
         trace.optimiser_status_class = (
             RollingOptimiserStatusClass(status_value)
@@ -492,6 +614,41 @@ def note_optimiser_result(*, status: object, backend_status: object) -> None:
             and backend_value in RollingOptimiserBackendStatusClass
             else None
         )
+        if trace.optimiser_status_class is RollingOptimiserStatusClass.RESOURCE_LIMIT:
+            kind = getattr(solver_status, "resource_limit_kind", None)
+            trace.resource_limit_kind = (
+                kind
+                if isinstance(kind, ResourceLimitKind)
+                else ResourceLimitKind.UNKNOWN_RESOURCE_LIMIT
+            )
+            trace.configured_max_actions_per_state = int(
+                getattr(solver_status, "configured_max_actions_per_state", 0) or 0
+            )
+            trace.configured_max_state_expansions = int(
+                getattr(solver_status, "configured_max_state_expansions", 0) or 0
+            )
+            trace.configured_max_policy_candidates = int(
+                getattr(solver_status, "configured_max_policy_candidates", 0) or 0
+            )
+            trace.configured_max_returned_root_candidates = int(
+                getattr(solver_status, "configured_max_returned_root_candidates", 0) or 0
+            )
+            trace.configured_cumulative_legal_action_limit = int(
+                getattr(solver_status, "configured_cumulative_legal_action_limit", 0) or 0
+            )
+            trace.observed_state_expansions = int(getattr(solver_status, "state_expansions", 0))
+            trace.observed_action_combinations = int(
+                getattr(solver_status, "observed_action_combinations", 0)
+            )
+            trace.observed_action_candidates = int(getattr(solver_status, "action_candidates", 0))
+            trace.observed_policy_candidates = int(getattr(solver_status, "policy_candidates", 0))
+            trace.observed_pareto_candidates = int(getattr(solver_status, "pareto_candidates", 0))
+            trace.cumulative_legal_actions = int(
+                getattr(solver_status, "cumulative_legal_actions", 0)
+            )
+            trace.reachable_layer_state_count = int(
+                getattr(solver_status, "reachable_layer_state_count", 0)
+            )
 
 
 def note_control_divergence(

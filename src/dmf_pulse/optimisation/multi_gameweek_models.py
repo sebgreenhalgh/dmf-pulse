@@ -17,6 +17,7 @@ from dmf_pulse.optimisation.models import (
     PositiveInt,
     Sha256,
 )
+from dmf_pulse.optimisation.multi_gameweek_errors import ResourceLimitKind
 
 
 class SellingPriceRule(OptimisationModel):
@@ -251,11 +252,22 @@ class SearchPolicy(OptimisationModel):
     max_actions_per_state: PositiveInt
     max_state_expansions: PositiveInt
     max_policy_candidates: PositiveInt
+    # Legacy v1 artifacts omitted this field and used max_policy_candidates for both
+    # units. Current governed policies must state the distinct physical-work bound.
+    max_cumulative_legal_actions: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     max_returned_root_candidates: PositiveInt
     alternative_expected_sacrifice_points: Decimal = Field(ge=Decimal("0"))
     material_difference_points: Decimal = Field(ge=Decimal("0"))
     deterministic_seed: NonNegativeInt = 0
     policy_sha256: Sha256
+
+    @property
+    def cumulative_legal_action_limit(self) -> int:
+        """Return the explicit current limit or the authenticated legacy-v1 meaning."""
+
+        return self.max_cumulative_legal_actions or self.max_policy_candidates
 
 
 class TerminalValuePolicy(OptimisationModel):
@@ -420,16 +432,67 @@ class SolverDiagnostics(OptimisationModel):
     absolute_gap: Decimal | None = None
     relative_gap: Decimal | None = None
     state_expansions: NonNegativeInt = 0
+    observed_action_combinations: NonNegativeInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     action_candidates: NonNegativeInt = 0
     policy_candidates: NonNegativeInt = 0
     pareto_candidates: NonNegativeInt = 0
     memo_entries: NonNegativeInt = 0
+    resource_limit_kind: ResourceLimitKind | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_max_actions_per_state: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_max_state_expansions: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_max_policy_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_max_returned_root_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_cumulative_legal_action_limit: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    cumulative_legal_actions: NonNegativeInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    reachable_layer_state_count: NonNegativeInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     deterministic_tie_key: StrictStr | None = None
     runtime_ms: NonNegativeInt | None = None
     configuration_sha256: Sha256
 
     @model_validator(mode="after")
     def termination_shape_is_coherent(self) -> SolverDiagnostics:
+        is_resource_limit = self.status in {
+            BackendStatus.TIME_RESOURCE_LIMIT_WITH_INCUMBENT,
+            BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+        }
+        if is_resource_limit != (self.resource_limit_kind is not None):
+            raise ValueError("resource-limit status and finite limit identity disagree")
+        resource_details = (
+            self.configured_max_actions_per_state,
+            self.configured_max_state_expansions,
+            self.configured_max_policy_candidates,
+            self.configured_max_returned_root_candidates,
+            self.configured_cumulative_legal_action_limit,
+            self.observed_action_combinations,
+            self.cumulative_legal_actions,
+            self.reachable_layer_state_count,
+        )
+        if self.resource_limit_kind is None and any(
+            value is not None for value in resource_details
+        ):
+            raise ValueError("resource counters require a finite resource-limit identity")
+        if self.resource_limit_kind is not None and any(
+            value is None for value in resource_details
+        ):
+            raise ValueError("resource-limit identity requires complete configured counters")
         if self.status is BackendStatus.OPTIMAL:
             if (
                 self.optimality_guarantee

@@ -1,0 +1,17 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L5-D5
+status: ACTIVE
+implementation_parent: c348c3c7f2b26ef929dc0d56fa2dc1dbfd356d7e
+branch: readiness/CURRENT-TEAM-STRENGTH-001P-L5-D5-stage11-resource-limit-remediation
+scope: offline Stage-11 resource-limit root-cause hardening and exact remediation
+historical_l1_consumed: true
+historical_l2_consumed: true
+historical_l3_consumed: true
+historical_l4_consumed: true
+historical_l5_consumed: true
+current_live_authority: false
+new_live_authority: false
+provider_access: false
+candidate_scope_change: false
+exactness_weakened: false
+production_activation: false
+required_review: CLEAR_FOR_TEAM_STRENGTH_L6_REAUTHORIZATION_DECISION
