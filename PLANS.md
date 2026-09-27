@@ -1,5 +1,19 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001P-L5 Phase A only
+
+- Work only from immutable D4 parent `a513f6c7e865f81b81f70d3f06803c23c4acae00`
+  in an isolated worktree. Add exactly one current L5 approval/attestation while
+  retaining L1-L4 as permanently consumed and preserving D1-D4 behavior.
+- Update only the narrow Odds approved-purpose metadata, bind its exact semantic
+  hash, and keep the adequate standing FPL and OpenFootball profiles byte-identical.
+- Perform a new public-only immutable OpenFootball acquisition and LIVE_OBSERVED
+  fit. Retain authenticated current readiness without FPL, Odds, credentials, or
+  private-provider access.
+- Complete focused and full offline acceptance, installed-wheel verification,
+  manifests, secret scan, independent review, publication, and exact-SHA CI.
+  Stop before Phase B; the human operator alone may run the one-shot command.
+
 ## CURRENT-TEAM-STRENGTH-001P-L4-D4
 
 - Work only from immutable L4 parent `efbddb9d36261bfa459c6c014a292bb031aa1773`

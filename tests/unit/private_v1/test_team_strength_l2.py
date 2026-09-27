@@ -1,4 +1,4 @@
-"""L1-L4 consumed history and no provider-capability expansion."""
+"""L1-L4 consumed history, exact L5 authority and no capability expansion."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
 
 pytestmark = pytest.mark.unit
-PARENT = "433d7160c0f15588009aff44acc1dd479cb8982d"
+PARENT = "a513f6c7e865f81b81f70d3f06803c23c4acae00"
 STAMP = datetime(2026, 10, 1, tzinfo=UTC)
 OLD_APPROVAL = "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22"
 OLD_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22"
@@ -26,6 +26,8 @@ L3_APPROVAL = "DMF-CTS-001P-L3-LIVE-RIGHTS-2026-09-23"
 L3_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L3#ONE-SHOT-2026-09-23"
 L4_APPROVAL = "DMF-CTS-001P-L4-LIVE-RIGHTS-2026-09-24"
 L4_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L4#ONE-SHOT-2026-09-24"
+L5_APPROVAL = "DMF-CTS-001P-L5-LIVE-RIGHTS-2026-09-27"
+L5_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L5#ONE-SHOT-2026-09-27"
 
 
 def parent_text(path: str) -> str:
@@ -59,7 +61,7 @@ def blocked(approval: str, attestation: str):
     assert result["retry_performed"] is False
     assert result["production_activation"] is False
     assert result["status"] in {
-        "CURRENT_TEAM_STRENGTH_001P_L4_LIVE_EXECUTION_NOT_COMPLETED",
+        "CURRENT_TEAM_STRENGTH_001P_L5_LIVE_EXECUTION_NOT_COMPLETED",
         "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED",
     }
     return result
@@ -104,18 +106,23 @@ def test_historical_l1_l2_l3_l4_are_consumed_before_provider_checks(approval, at
         ("wrong", "wrong"),
     ],
 )
-def test_no_unknown_l1_l2_l3_or_l4_pair_can_authorize(approval, attestation):
+def test_no_unknown_historical_or_current_pair_can_authorize(approval, attestation):
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_exact_l4_pair_is_consumed_and_no_current_pair_exists():
-    assert (authority.APPROVAL, authority.ATTESTATION) == (L4_APPROVAL, L4_ATTESTATION)
+def test_exact_l5_pair_is_current_and_l4_remains_consumed():
+    assert (authority.APPROVAL, authority.ATTESTATION) == (L5_APPROVAL, L5_ATTESTATION)
     assert L4_APPROVAL in authority.CONSUMED_APPROVALS
-    assert authority.CURRENT_APPROVAL is authority.CURRENT_ATTESTATION is None
-    with pytest.raises(authority.ConsumedL1ApprovalError):
+    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
+        L5_APPROVAL,
+        L5_ATTESTATION,
+    )
+    assert (
         authority.validate_l1_authority(
-            approval=L4_APPROVAL, attestation=L4_ATTESTATION, checked_at=STAMP
+            approval=L5_APPROVAL, attestation=L5_ATTESTATION, checked_at=STAMP
         )
+        is None
+    )
     assert (
         authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == authority.FPL_PROFILE_SHA
     )
@@ -137,6 +144,20 @@ def test_l4_mismatch_fails_closed(approval, attestation):
     assert blocked(approval, attestation)["reason"] == expected
 
 
+@pytest.mark.parametrize(
+    "approval,attestation",
+    [
+        (L5_APPROVAL, "wrong"),
+        ("wrong", L5_ATTESTATION),
+        (L5_APPROVAL, L4_ATTESTATION),
+        (L4_APPROVAL, L5_ATTESTATION),
+    ],
+)
+def test_l5_wrong_or_mixed_pairs_fail_closed(approval, attestation):
+    expected = "AUTHORITY_CONSUMED" if approval == L4_APPROVAL else "AUTHORITY_INVALID"
+    assert blocked(approval, attestation)["reason"] == expected
+
+
 def test_historical_profile_hashes_remain_auditable():
     assert authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == (
         authority.FPL_PROFILE_SHA
@@ -146,6 +167,16 @@ def test_historical_profile_hashes_remain_auditable():
     )
 
 
+def test_old_l4_odds_profile_hash_cannot_authorize_l5(monkeypatch):
+    old_l4_sha = "b2e2760be876f10670b1d89c673e0b04c85a233e11a3d269c4d145854c1a89a0"
+    assert old_l4_sha != authority.ODDS_PROFILE_SHA
+    monkeypatch.setattr(authority, "ODDS_PROFILE_SHA", old_l4_sha)
+    with pytest.raises(ValueError, match="exact provider purpose"):
+        authority.validate_l1_authority(
+            approval=L5_APPROVAL, attestation=L5_ATTESTATION, checked_at=STAMP
+        )
+
+
 @pytest.mark.parametrize(
     "path",
     [
@@ -153,7 +184,7 @@ def test_historical_profile_hashes_remain_auditable():
         "config/rights/openfootball_profiles.json",
     ],
 )
-def test_provider_rights_are_byte_identical_to_l3_parent(path):
+def test_provider_rights_are_byte_identical_to_l5_parent(path):
     assert Path(path).read_text(encoding="utf-8") == parent_text(path)
 
 
@@ -170,16 +201,25 @@ def test_only_odds_purpose_metadata_changes_without_capability_expansion():
     }
     assert left["capabilities"] == right["capabilities"]
     assert right["retention_seconds"] == 0
-    assert right["human_approval_id"] == L4_APPROVAL
+    assert right["human_approval_id"] == L5_APPROVAL
 
 
-def test_d3_live_control_flow_is_preserved_except_l4_terminal_identity():
+def test_d1_d2_d3_d4_live_control_flow_is_preserved_except_l5_terminal_identity():
     before = parent_text("src/dmf_pulse/private_v1/team_strength_live.py")
-    expected = before.replace(
-        "CURRENT_TEAM_STRENGTH_001P_L3", "CURRENT_TEAM_STRENGTH_001P_L4"
-    ).replace("CURRENT-TEAM-STRENGTH-001P-L3", "CURRENT-TEAM-STRENGTH-001P-L4")
+    expected = (
+        before.replace(
+            "Historical L1/L2/L3 operator experiment, never selected by ordinary dmf pulse.\n\n"
+            "All three live authorities are consumed. Legacy L1 names and the historical run\n"
+            "identity remain for offline regression only; D3 repairs diagnostic transport.",
+            "Governed L1-L5 operator experiment, never selected by ordinary dmf pulse.\n\n"
+            "L1-L4 are consumed; exactly one L5 pair is current. Legacy L1 names remain for\n"
+            "offline regression; D1-D4 provide closed diagnostic transport and localisation.",
+        )
+        .replace("CURRENT_TEAM_STRENGTH_001P_L4", "CURRENT_TEAM_STRENGTH_001P_L5")
+        .replace("CURRENT-TEAM-STRENGTH-001P-L4", "CURRENT-TEAM-STRENGTH-001P-L5")
+    )
     actual = Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
-    assert actual.replace('                "prior_l4_one_shot_consumed": True,\n', "") == expected
+    assert actual == expected
 
 
 @pytest.mark.parametrize(

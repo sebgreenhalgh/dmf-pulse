@@ -1,6 +1,6 @@
-"""Separate public preflight and terminal-only private L4 observation.
+"""Separate public preflight and terminal-only private L5 observation.
 
-Legacy filename retained; L1/L2/L3 are consumed and the exact L4 pair is current.
+Legacy filename retained; L1/L2/L3/L4 are consumed and the exact L5 pair is current.
 This script has no retry loop, output-file option, normal CLI registration, model
 selector, scenario-count override or player-allocation override.
 """
@@ -30,12 +30,12 @@ from dmf_pulse.private_v1.team_strength_live import (
 
 class _Parser(argparse.ArgumentParser):
     def error(self, message: str) -> Never:
-        self.exit(2, "Invalid L4 operator arguments; use --help.\n")
+        self.exit(2, "Invalid L5 operator arguments; use --help.\n")
 
 
 def parser() -> argparse.ArgumentParser:
     result = _Parser(
-        description="Separate public readiness and one-shot private CTS L4 observation"
+        description="Separate public readiness and one-shot private CTS L5 observation"
     )
     commands = result.add_subparsers(dest="command", required=True, parser_class=_Parser)
     public = commands.add_parser("public-preflight")
@@ -100,7 +100,7 @@ def main() -> int:
     )
     print(json.dumps(json_safe(summary), sort_keys=True))
     return (
-        0 if summary["status"] == "CURRENT_TEAM_STRENGTH_001P_L4_LIVE_OBSERVATION_COMPLETE" else 2
+        0 if summary["status"] == "CURRENT_TEAM_STRENGTH_001P_L5_LIVE_OBSERVATION_COMPLETE" else 2
     )
 
 
