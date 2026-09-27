@@ -6241,9 +6241,9 @@
       "sha256": "813f70322008d6460965c0e71b870f4c0a976d141c25db0207f9dc5af39e37eb"
     },
     {
-      "bytes": 28081,
+      "bytes": 28052,
       "path": "tests/unit/ingestion/test_horizon_probe.py",
-      "sha256": "238a4d6526c8edb50004565999b5a32ce6ac9319a0548817840953b619efd4bd"
+      "sha256": "333534df4233f50c990a4db99d0ca2bcdd2f1052ca04de64bdae3c068c96c4ec"
     },
     {
       "bytes": 8259,

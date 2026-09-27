@@ -36,6 +36,13 @@ Independent verification: 372 focused tests passed in 1211.63 seconds. The revie
 also reconciled the generated capacity artifacts, successful-decision equality,
 authority closure, final acceptance records and disclosure-safe diagnostic seam.
 
+The reviewer separately examined the post-review CI remediation. The inherited
+R8A static guard now excludes the intentionally changed Stage-11 solver while
+retaining the exact Odds parser and client SHA-256 guards. The full horizon-probe
+suite passed 84 tests; focused source-identity tests, Ruff and `git diff --check`
+also passed. This test-only correction changes no provider boundary, solver
+behavior, exactness rule, candidate scope, authority state or activation path.
+
 Verdict:
 
 `CLEAR_FOR_TEAM_STRENGTH_L6_REAUTHORIZATION_DECISION`

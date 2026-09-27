@@ -9,6 +9,9 @@
   79.61 seconds.
 - Focused terminal D1-D4 seam: 2 passed in 178.32 seconds.
 - Independent focused population: 372 passed in 1211.63 seconds.
+- Post-review inherited horizon-probe population: 84 passed in 4.14 seconds;
+  the obsolete R8A optimizer byte-identity guard was narrowed after exact-SHA
+  CI correctly detected that D5 intentionally changes the Stage-11 solver.
 - Refreshed five-case 001P oracle: A/B/C/D/E all PASS; 10/10 world solves
   SUCCESS; provider calls 0.
 - Generated near-envelope proof: legacy 250,000 typed failure at 250,036;
