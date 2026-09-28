@@ -1,4 +1,4 @@
-"""L1-L5 consumed history, no current authority and no capability expansion."""
+"""L1-L5 consumed history, exact L6 authority and no capability expansion."""
 
 from __future__ import annotations
 
@@ -12,11 +12,12 @@ import pytest
 
 from dmf_pulse.ingestion.odds.config import load_rights_profiles as load_odds_rights
 from dmf_pulse.ingestion.rights import load_rights_profiles as load_fpl_rights
+from dmf_pulse.optimisation.multi_gameweek_policy import load_multi_gameweek_search_policy
 from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
 
 pytestmark = pytest.mark.unit
-PARENT = "c348c3c7f2b26ef929dc0d56fa2dc1dbfd356d7e"
+PARENT = "1963282d6c45680b764b423ed6cfb28ddc9f6e7b"
 STAMP = datetime(2026, 10, 1, tzinfo=UTC)
 OLD_APPROVAL = "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22"
 OLD_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22"
@@ -28,6 +29,8 @@ L4_APPROVAL = "DMF-CTS-001P-L4-LIVE-RIGHTS-2026-09-24"
 L4_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L4#ONE-SHOT-2026-09-24"
 L5_APPROVAL = "DMF-CTS-001P-L5-LIVE-RIGHTS-2026-09-27"
 L5_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L5#ONE-SHOT-2026-09-27"
+L6_APPROVAL = "DMF-CTS-001P-L6-LIVE-RIGHTS-2026-09-28"
+L6_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L6#ONE-SHOT-2026-09-28"
 
 
 def parent_text(path: str) -> str:
@@ -61,7 +64,7 @@ def blocked(approval: str, attestation: str):
     assert result["retry_performed"] is False
     assert result["production_activation"] is False
     assert result["status"] in {
-        "CURRENT_TEAM_STRENGTH_001P_L5_LIVE_EXECUTION_NOT_COMPLETED",
+        "CURRENT_TEAM_STRENGTH_001P_L6_LIVE_EXECUTION_NOT_COMPLETED",
         "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED",
     }
     return result
@@ -108,6 +111,7 @@ def test_historical_l1_l2_l3_l4_l5_are_consumed_before_provider_checks(approval,
         ("wrong", NEW_ATTESTATION),
         ("wrong", OLD_ATTESTATION),
         ("wrong", L3_ATTESTATION),
+        ("wrong", L6_ATTESTATION),
         ("wrong", "wrong"),
     ],
 )
@@ -115,14 +119,19 @@ def test_no_unknown_historical_or_current_pair_can_authorize(approval, attestati
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_l5_pair_is_historical_and_no_current_authority_exists():
-    assert (authority.APPROVAL, authority.ATTESTATION) == (L5_APPROVAL, L5_ATTESTATION)
+def test_exact_l6_pair_is_current_and_l5_remains_consumed():
+    assert (authority.APPROVAL, authority.ATTESTATION) == (L6_APPROVAL, L6_ATTESTATION)
     assert {L4_APPROVAL, L5_APPROVAL} <= authority.CONSUMED_APPROVALS
-    assert authority.CURRENT_APPROVAL is authority.CURRENT_ATTESTATION is None
-    with pytest.raises(authority.ConsumedL1ApprovalError):
+    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
+        L6_APPROVAL,
+        L6_ATTESTATION,
+    )
+    assert (
         authority.validate_l1_authority(
-            approval=L5_APPROVAL, attestation=L5_ATTESTATION, checked_at=STAMP
+            approval=L6_APPROVAL, attestation=L6_ATTESTATION, checked_at=STAMP
         )
+        is None
+    )
     assert (
         authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == authority.FPL_PROFILE_SHA
     )
@@ -160,6 +169,20 @@ def test_l5_wrong_or_mixed_pairs_fail_closed(approval, attestation):
     assert blocked(approval, attestation)["reason"] == expected
 
 
+@pytest.mark.parametrize(
+    "approval,attestation",
+    [
+        (L6_APPROVAL, "wrong"),
+        ("wrong", L6_ATTESTATION),
+        (L6_APPROVAL, L5_ATTESTATION),
+        (L5_APPROVAL, L6_ATTESTATION),
+    ],
+)
+def test_l6_wrong_or_mixed_pairs_fail_closed(approval, attestation):
+    expected = "AUTHORITY_CONSUMED" if approval == L5_APPROVAL else "AUTHORITY_INVALID"
+    assert blocked(approval, attestation)["reason"] == expected
+
+
 def test_historical_profile_hashes_remain_auditable():
     assert authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == (
         authority.FPL_PROFILE_SHA
@@ -177,37 +200,56 @@ def test_no_profile_hash_change_can_reactivate_consumed_l5(monkeypatch):
         )
 
 
+def test_prior_l5_odds_profile_hash_cannot_authorize_l6(monkeypatch):
+    old_l5_sha = "34280931d9874c5921791776973acade047df4d588f25a5046a8f842f2dbe388"
+    assert old_l5_sha != authority.ODDS_PROFILE_SHA
+    monkeypatch.setattr(authority, "ODDS_PROFILE_SHA", old_l5_sha)
+    with pytest.raises(ValueError, match="exact provider purpose"):
+        authority.validate_l1_authority(
+            approval=L6_APPROVAL, attestation=L6_ATTESTATION, checked_at=STAMP
+        )
+
+
 @pytest.mark.parametrize(
     "path",
     [
         "config/rights/fpl_profiles.json",
         "config/rights/openfootball_profiles.json",
-        "config/rights/odds_profiles.json",
     ],
 )
-def test_provider_rights_are_byte_identical_to_l5_parent(path):
+def test_fpl_and_openfootball_rights_are_byte_identical_to_d5_parent(path):
     assert Path(path).read_text(encoding="utf-8") == parent_text(path)
 
 
-def test_odds_profile_remains_zero_retention_historical_l5():
+def test_only_odds_purpose_metadata_changes_without_capability_expansion():
+    before = json.loads(parent_text("config/rights/odds_profiles.json"))["profiles"][1]
     after = json.loads(Path("config/rights/odds_profiles.json").read_text(encoding="utf-8"))
-    assert after["profiles"][1]["retention_seconds"] == 0
-    assert after["profiles"][1]["human_approval_id"] == L5_APPROVAL
+    current = after["profiles"][1]
+    changed = {key for key in before if before[key] != current[key]}
+    assert changed == {"approved_at", "approved_purpose", "human_approval_id", "notes"}
+    assert before["capabilities"] == current["capabilities"]
+    assert before["unresolved_rights"] == current["unresolved_rights"]
+    assert before["account_scope"] == current["account_scope"]
+    assert before["geography_scope"] == current["geography_scope"]
+    assert before["terms_source"] == current["terms_source"]
+    assert before["terms_version"] == current["terms_version"]
+    assert current["retention_seconds"] == 0
+    assert current["human_approval_id"] == L6_APPROVAL
 
 
-def test_d1_d2_d3_d4_live_control_flow_is_preserved_except_d5_authority_closure():
+def test_d1_d2_d3_d4_d5_live_control_flow_is_preserved_except_l6_identity():
     before = parent_text("src/dmf_pulse/private_v1/team_strength_live.py")
-    expected = before.replace(
-        "Governed L1-L5 operator experiment, never selected by ordinary dmf pulse.\n\n"
-        "L1-L4 are consumed; exactly one L5 pair is current. Legacy L1 names remain for\n"
-        "offline regression; D1-D4 provide closed diagnostic transport and localisation.",
-        "Historical L1-L5 operator experiment, never selected by ordinary dmf pulse.\n\n"
-        "All five live authorities are consumed. Legacy names remain for offline regression;\n"
-        "D1-D5 provide closed diagnostic transport, localisation and resource identity.",
-    ).replace(
-        '                "prior_l4_one_shot_consumed": True,\n',
-        '                "prior_l4_one_shot_consumed": True,\n'
-        '                "prior_l5_one_shot_consumed": True,\n',
+    expected = (
+        before.replace(
+            "Historical L1-L5 operator experiment, never selected by ordinary dmf pulse.\n\n"
+            "All five live authorities are consumed. Legacy names remain for offline regression;\n"
+            "D1-D5 provide closed diagnostic transport, localisation and resource identity.",
+            "Governed L1-L6 operator experiment, never selected by ordinary dmf pulse.\n\n"
+            "L1-L5 are consumed; exactly one L6 pair is current. Legacy names remain for offline\n"
+            "regression; D1-D5 provide closed diagnostic transport, localisation and resource identity.",
+        )
+        .replace("CURRENT_TEAM_STRENGTH_001P_L5", "CURRENT_TEAM_STRENGTH_001P_L6")
+        .replace("CURRENT-TEAM-STRENGTH-001P-L5", "CURRENT-TEAM-STRENGTH-001P-L6")
     )
     actual = Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
     assert actual == expected
@@ -217,9 +259,20 @@ def test_d1_d2_d3_d4_live_control_flow_is_preserved_except_d5_authority_closure(
     "path",
     [
         "config/models/current_team_strength_governance.json",
+        "config/optimisation/multi_gameweek.yaml",
+        "src/dmf_pulse/optimisation/resources/multi_gameweek.yaml",
+        "src/dmf_pulse/optimisation/multi_gameweek_errors.py",
+        "src/dmf_pulse/optimisation/multi_gameweek_models.py",
+        "src/dmf_pulse/optimisation/multi_gameweek_policy.py",
+        "src/dmf_pulse/optimisation/multi_gameweek_service.py",
+        "src/dmf_pulse/optimisation/multi_gameweek_solver.py",
         "src/dmf_pulse/private_v1/team_strength_comparison.py",
         "src/dmf_pulse/private_v1/team_strength_comparison_models.py",
+        "src/dmf_pulse/private_v1/team_strength_diagnostics.py",
         "src/dmf_pulse/private_v1/team_strength_live_network.py",
+        "src/dmf_pulse/private_v1/prepared_control.py",
+        "src/dmf_pulse/private_v1/rolling.py",
+        "src/dmf_pulse/private_v1/rolling_models.py",
         "src/dmf_pulse/private_v1/service.py",
         "src/dmf_pulse/football_events/score_prior_request.py",
         "src/dmf_pulse/football_events/team_strength_model.py",
@@ -233,4 +286,75 @@ def test_model_decision_and_provider_boundaries_are_parent_identical(path):
 def test_standing_fpl_file_exact_identity():
     assert hashlib.sha256(Path("config/rights/fpl_profiles.json").read_bytes()).hexdigest() == (
         "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d"
+    )
+
+
+def test_standing_fpl_purpose_remains_adequate_without_expansion():
+    profile = load_fpl_rights()[authority.FPL_PROFILE]
+    assert profile.approved_purpose == (
+        "low-volume operator-initiated read-only private recommendation; no production service"
+    )
+    assert profile.retention_seconds == 0
+    assert profile.unresolved_rights == ()
+    assert {key.value: value.value for key, value in profile.capabilities.items()} == {
+        "automated_access": "ALLOW",
+        "backup": "DENY",
+        "cache": "DENY",
+        "derived_storage": "DENY",
+        "manual_import": "DENY",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "DENY",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW",
+    }
+
+
+def test_d5_search_caps_remain_exact():
+    policy = load_multi_gameweek_search_policy()
+    assert policy.max_transfers_per_node == 2
+    assert policy.max_actions_per_state == 5000
+    assert policy.max_state_expansions == 25000
+    assert policy.max_policy_candidates == 250000
+    assert policy.max_cumulative_legal_actions == 524288
+    assert policy.max_returned_root_candidates == 1000
+
+
+def test_l6_generated_near_envelope_exactness_evidence():
+    root = Path("evidence/tickets/CURRENT-TEAM-STRENGTH-001P-L6")
+    low = json.loads((root / "generated-legacy-envelope-failure.json").read_text())
+    current = json.loads((root / "generated-near-envelope-capacity.json").read_text())
+    high = json.loads((root / "generated-high-cap-reference.json").read_text())
+
+    low_solve = low["whole_public_solve"]
+    assert low["configured_cumulative_legal_action_limit"] == 250000
+    assert low_solve["status"] == "RESOURCE_LIMIT"
+    assert low_solve["diagnostics"]["status"] == "TIME_RESOURCE_LIMIT_NO_INCUMBENT"
+    assert low_solve["diagnostics"]["resource_limit_kind"] == ("CUMULATIVE_LEGAL_ACTION_LIMIT")
+    assert low_solve["profile"]["cumulative_legal_actions"] == 250036
+
+    for payload, cap in ((current, 524288), (high, 1048576)):
+        solve = payload["whole_public_solve"]
+        assert payload["configured_cumulative_legal_action_limit"] == cap
+        assert solve["status"] == "SUCCESS"
+        assert solve["profile"]["cumulative_legal_actions"] == 320610
+        assert solve["profile"]["cumulative_state_expansions"] == 3126
+
+    assert (
+        current["whole_public_solve"]["decision_semantics"]
+        == (high["whole_public_solve"]["decision_semantics"])
+    )
+    semantics = current["whole_public_solve"]["decision_semantics"]
+    assert semantics["semantic_sha256"] == (
+        "f5b3d892d999e399be67c6137726adb54d136ccc73a40699b19f5d1efe5e2f47"
+    )
+    assert all(
+        semantics["value"][key] is not None
+        for key in (
+            "recommended",
+            "no_transfer_baseline",
+            "root_counterfactual",
+            "transfer_count_frontier",
+        )
     )
