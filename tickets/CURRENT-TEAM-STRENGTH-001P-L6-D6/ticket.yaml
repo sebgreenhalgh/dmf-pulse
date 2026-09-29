@@ -1,0 +1,9 @@
+ticket: "CURRENT-TEAM-STRENGTH-001P-L6-D6"
+parent_sha: "7ae84993083756aadf13eb01c019ecd7ed0b196f"
+status: "OFFLINE_ACCEPTED_PENDING_EXACT_SHA_CI"
+scope: "CUMULATIVE_LEGAL_ACTION_SCALABILITY"
+network_policy: "ZERO_PROVIDER_ACCESS"
+live_authority: "NONE"
+production_activation: false
+model_status: "SHADOW_NOT_MODEL_INPUT"
+required_review_verdict: "CLEAR_FOR_TEAM_STRENGTH_L7_REAUTHORIZATION_DECISION"

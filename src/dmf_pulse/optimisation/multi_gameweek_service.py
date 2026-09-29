@@ -52,6 +52,7 @@ from dmf_pulse.optimisation.multi_gameweek_solver import (
     build_move_attribution,
     build_plan,
     children_by_parent,
+    deterministic_linear_fast_path_selected,
     information_set_key,
     observe_node,
     root_node,
@@ -164,6 +165,9 @@ def _failure_result(
             int(getattr(counters, "reachable_layer_state_count", 0))
             if resource_limit_kind is not None
             else None
+        ),
+        layer_work=(
+            tuple(getattr(counters, "layer_work", ())) if resource_limit_kind is not None else ()
         ),
         configuration_sha256=_configuration_hash(request),
     )
@@ -325,6 +329,7 @@ def optimise_multi_gameweek(
     """Optimise a policy; expose only its root transition as executable."""
 
     evaluator = evaluator or StaticTacticalEvaluator()
+    deterministic_linear_selected = False
     work_budget = (
         Stage11WorkBudget(
             request.search_policy.cumulative_legal_action_limit,
@@ -335,6 +340,11 @@ def optimise_multi_gameweek(
     )
     try:
         validate_request(request)
+        deterministic_linear_selected = deterministic_linear_fast_path_selected(
+            request,
+            evaluator,
+            preferred=prefer_deterministic_linear,
+        )
         if request.projection_mode is ProjectionMode.PRODUCTION:
             raise CapabilityBlockedError(
                 "MULTI_GAMEWEEK_PRODUCTION_BACKEND_UNAVAILABLE",
@@ -448,39 +458,62 @@ def optimise_multi_gameweek(
     baseline_candidate = None
     baseline = None
     try:
-        if prefer_deterministic_linear:
-            baseline_frontier = solve_frontier(
-                request,
-                evaluator,
-                root_no_transfer_only=True,
-                prefer_deterministic_linear=True,
-                profile=profile,
-                work_budget=work_budget,
+        if frontier.complete and deterministic_linear_selected:
+            # A complete frontier retains each root action's exact best policy for
+            # every objective. Re-running deterministic layered discovery for the
+            # zero-transfer root therefore repeats the same exact subproblem without
+            # adding proof. Keep the generic path byte-compatible with its existing
+            # independently authenticated baseline solve.
+            zero_transfer = tuple(
+                item for item in frontier.candidates if item.root_action.transfer_count == 0
+            )
+            baseline_candidate = select_candidate(
+                zero_transfer,
+                mode=ObjectiveMode.EXPECTED,
+            )
+            baseline_diagnostics = frontier.diagnostics.model_copy(
+                update={
+                    "objective": baseline_candidate.expected_score,
+                    "incumbent": baseline_candidate.expected_score,
+                    "bound": baseline_candidate.expected_score,
+                    "deterministic_tie_key": baseline_candidate.tie_key,
+                }
             )
         else:
-            baseline_frontier = solve_frontier(request, evaluator, root_no_transfer_only=True)
-        if not baseline_frontier.complete:
-            return _failure_result(
-                request,
-                status=MultiGameweekResultStatus.RESOURCE_LIMIT,
-                backend_status=BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
-                code="MULTI_GAMEWEEK_RESOURCE_LIMIT",
-                message=(
-                    "configured resource limit prevented exact no-transfer baseline exhaustion"
-                ),
-                counters=baseline_frontier.diagnostics,
-                resource_limit_kind=baseline_frontier.diagnostics.resource_limit_kind,
+            if prefer_deterministic_linear:
+                baseline_frontier = solve_frontier(
+                    request,
+                    evaluator,
+                    root_no_transfer_only=True,
+                    prefer_deterministic_linear=True,
+                    profile=profile,
+                    work_budget=work_budget,
+                )
+            else:
+                baseline_frontier = solve_frontier(request, evaluator, root_no_transfer_only=True)
+            if not baseline_frontier.complete:
+                return _failure_result(
+                    request,
+                    status=MultiGameweekResultStatus.RESOURCE_LIMIT,
+                    backend_status=BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT,
+                    code="MULTI_GAMEWEEK_RESOURCE_LIMIT",
+                    message=(
+                        "configured resource limit prevented exact no-transfer baseline exhaustion"
+                    ),
+                    counters=baseline_frontier.diagnostics,
+                    resource_limit_kind=baseline_frontier.diagnostics.resource_limit_kind,
+                )
+            baseline_candidate = select_candidate(
+                baseline_frontier.candidates,
+                mode=ObjectiveMode.EXPECTED,
             )
-        baseline_candidate = select_candidate(
-            baseline_frontier.candidates,
-            mode=ObjectiveMode.EXPECTED,
-        )
+            baseline_diagnostics = baseline_frontier.diagnostics
         baseline = build_plan(
             request,
             baseline_candidate,
             plan_kind=PlanKind.NO_TRANSFER_BASELINE,
             objective_mode=ObjectiveMode.EXPECTED,
-            diagnostics=baseline_frontier.diagnostics,
+            diagnostics=baseline_diagnostics,
             assumptions=assumptions,
         )
         validate_plan(request, baseline, evaluator=evaluator)

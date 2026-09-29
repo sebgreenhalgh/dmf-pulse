@@ -421,6 +421,18 @@ class OptimalityGuarantee(StrEnum):
     NONE = "NONE"
 
 
+class Stage11LayerWork(OptimisationModel):
+    """Count-only exact-search work for one ordered horizon layer."""
+
+    depth: NonNegativeInt
+    gameweek: PositiveInt
+    reachable_states: NonNegativeInt
+    unique_economic_states: NonNegativeInt
+    legal_actions_generated: NonNegativeInt
+    action_combinations_considered: NonNegativeInt
+    unique_resulting_squads: NonNegativeInt
+
+
 class SolverDiagnostics(OptimisationModel):
     backend: Literal["BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"] = "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"
     status: BackendStatus
@@ -463,6 +475,7 @@ class SolverDiagnostics(OptimisationModel):
     reachable_layer_state_count: NonNegativeInt | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
+    layer_work: tuple[Stage11LayerWork, ...] = Field(default=(), exclude_if=lambda value: not value)
     deterministic_tie_key: StrictStr | None = None
     runtime_ms: NonNegativeInt | None = None
     configuration_sha256: Sha256
@@ -489,10 +502,16 @@ class SolverDiagnostics(OptimisationModel):
             value is not None for value in resource_details
         ):
             raise ValueError("resource counters require a finite resource-limit identity")
+        if self.resource_limit_kind is None and self.layer_work:
+            raise ValueError("layer work requires a finite resource-limit identity")
         if self.resource_limit_kind is not None and any(
             value is None for value in resource_details
         ):
             raise ValueError("resource-limit identity requires complete configured counters")
+        if tuple(item.depth for item in self.layer_work) != tuple(
+            sorted({item.depth for item in self.layer_work})
+        ):
+            raise ValueError("layer work must have unique increasing depths")
         if self.status is BackendStatus.OPTIMAL:
             if (
                 self.optimality_guarantee

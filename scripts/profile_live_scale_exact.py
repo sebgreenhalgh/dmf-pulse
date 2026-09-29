@@ -31,12 +31,15 @@ from dmf_pulse.optimisation.models import CandidatePlayer, CandidateSquad  # noq
 from dmf_pulse.optimisation.multi_gameweek_models import (  # noqa: E402
     PlayerCatalogEntry,
     PlayerPriceState,
+    TransferActionScope,
     seal_request,
+    seal_scenario_tree,
     seal_search_policy,
 )
 from dmf_pulse.optimisation.multi_gameweek_solver import (  # noqa: E402
     Stage11SearchProfile,
     enumerate_legal_actions,
+    information_set_key,
     solve_frontier,
 )
 from dmf_pulse.optimisation.tactics import ExactTacticalNodeKernel  # noqa: E402
@@ -139,7 +142,10 @@ def main():
     parser.add_argument("--public-search", action="store_true")
     parser.add_argument("--public-only", action="store_true")
     parser.add_argument("--extra-per-position", type=int, default=3)
+    parser.add_argument("--l6-shape", action="store_true")
+    parser.add_argument("--terminal-incoming-count", type=int, default=6)
     parser.add_argument("--cumulative-legal-action-limit", type=int)
+    parser.add_argument("--max-policy-candidates", type=int)
     parser.add_argument("--summary-only", action="store_true")
     parser.add_argument("--baseline-root", type=Path)
     parser.add_argument("--reference", type=Path)
@@ -150,7 +156,10 @@ def main():
         parser.error("limit must be positive")
     if args.extra_per_position < 1:
         parser.error("extra-per-position must be positive")
-    catalog, family = overlapping_fixture(extra_per_position=args.extra_per_position)
+    if not 1 <= args.terminal_incoming_count <= 13:
+        parser.error("terminal-incoming-count must be between 1 and 13")
+    fixture_extras = 4 if args.l6_shape else args.extra_per_position
+    catalog, family = overlapping_fixture(extra_per_position=fixture_extras)
     if args.mode == "search":
         base, _, _, _ = oracle_fixture()
         for player in base.candidate_pool:
@@ -159,7 +168,36 @@ def main():
                     player_id=player.player_id, club_id=player.club_id, position=player.position
                 )
         incoming = tuple(sorted(p for p in catalog if p not in base.initial_state.squad_ids))
+        if args.l6_shape:
+            per_position = {
+                PlayerPosition.GK: 3,
+                PlayerPosition.DEF: 4,
+                PlayerPosition.MID: 3,
+                PlayerPosition.FWD: 3,
+            }
+            incoming = tuple(
+                sorted(
+                    player_id
+                    for position, count in per_position.items()
+                    for player_id in tuple(
+                        sorted(
+                            item.player_id
+                            for item in catalog.values()
+                            if item.position is position
+                            and item.player_id not in base.initial_state.squad_ids
+                        )
+                    )[:count]
+                )
+            )
+            retained = set(base.initial_state.squad_ids) | set(incoming)
+            catalog = {key: value for key, value in catalog.items() if key in retained}
         prices = {p: PlayerPriceState(current_price_tenths=50) for p in catalog}
+        root_maximum_transfers = 2 if args.l6_shape else 1
+        root_action_upper = sum(
+            len(tuple(combinations(base.initial_state.squad_ids, count)))
+            * len(tuple(combinations(incoming, count)))
+            for count in range(root_maximum_transfers + 1)
+        )
         request = with_candidates(
             seal_request(
                 base.model_copy(
@@ -174,6 +212,20 @@ def main():
                             base.search_policy.model_copy(
                                 update={
                                     "max_actions_per_state": 17000,
+                                    "max_returned_root_candidates": (
+                                        8386
+                                        if args.l6_shape
+                                        else base.search_policy.max_returned_root_candidates
+                                    ),
+                                    "max_policy_candidates": (
+                                        args.max_policy_candidates
+                                        if args.max_policy_candidates is not None
+                                        else base.search_policy.max_policy_candidates
+                                    ),
+                                    "transfer_action_scope": TransferActionScope(
+                                        root_maximum_transfers=root_maximum_transfers,
+                                        continuation_mode="FREE_TRANSFERS_ONLY",
+                                    ),
                                     "max_cumulative_legal_actions": (
                                         args.cumulative_legal_action_limit
                                         if args.cumulative_legal_action_limit is not None
@@ -188,6 +240,67 @@ def main():
             incoming,
             prices=prices,
         )
+        terminal_incoming = incoming
+        if args.l6_shape:
+            position_order = (
+                PlayerPosition.GK,
+                PlayerPosition.DEF,
+                PlayerPosition.MID,
+                PlayerPosition.FWD,
+                PlayerPosition.DEF,
+                PlayerPosition.MID,
+                PlayerPosition.FWD,
+                PlayerPosition.GK,
+                PlayerPosition.DEF,
+                PlayerPosition.MID,
+                PlayerPosition.FWD,
+                PlayerPosition.DEF,
+                PlayerPosition.MID,
+            )
+            by_position = {
+                position: iter(
+                    sorted(
+                        item.player_id
+                        for item in catalog.values()
+                        if item.position is position and item.player_id in incoming
+                    )
+                )
+                for position in PlayerPosition
+            }
+            terminal_incoming = tuple(
+                sorted(
+                    next(by_position[position])
+                    for position in position_order[: args.terminal_incoming_count]
+                )
+            )
+            nodes = list(request.scenario_tree.nodes)
+            terminal = nodes[-1].model_copy(update={"allowed_transfer_in_ids": terminal_incoming})
+            terminal = terminal.model_copy(
+                update={
+                    "information_set_key": information_set_key(
+                        terminal,
+                        parent_key=nodes[-2].information_set_key,
+                    )
+                }
+            )
+            nodes[-1] = terminal
+            request = seal_request(
+                request.model_copy(
+                    update={
+                        "scenario_tree": seal_scenario_tree(
+                            request.scenario_tree.model_copy(update={"nodes": tuple(nodes)})
+                        ),
+                        "assumptions": tuple(
+                            sorted(
+                                {
+                                    *request.assumptions,
+                                    "SEALED_NODE_SPECIFIC_CANDIDATE_SCOPE_V1",
+                                }
+                            )
+                        ),
+                    }
+                )
+            )
         points = {gw: {p: (sum(p.encode()) * (gw + 3)) % 17 for p in catalog} for gw in (1, 2, 3)}
         evaluator = HorizonPointsEvaluator(points)
         profile = Stage11SearchProfile(progress=lambda message: print(message, flush=True))
@@ -209,6 +322,14 @@ def main():
             "extra_per_position": args.extra_per_position,
             "candidate_pool_size": len(request.candidate_pool),
             "retained_incoming_count": len(incoming),
+            "terminal_retained_incoming_count": len(terminal_incoming),
+            "root_action_upper": root_action_upper,
+            "effective_max_actions_per_state": request.search_policy.max_actions_per_state,
+            "effective_max_returned_root_candidates": (
+                request.search_policy.max_returned_root_candidates
+            ),
+            "configured_max_policy_candidates": request.search_policy.max_policy_candidates,
+            "stress_case": "L6_SHAPE_13_INCOMING" if args.l6_shape else "GENERAL",
             "peak_memory_bytes": None,
             "memory_measurement": "UNAVAILABLE_WITHOUT_NEW_RUNTIME_DEPENDENCY",
             "configured_cumulative_legal_action_limit": (

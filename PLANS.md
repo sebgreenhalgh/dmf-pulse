@@ -1,5 +1,23 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001P-L6-D6
+
+- Work only from immutable L6 parent `7ae84993083756aadf13eb01c019ecd7ed0b196f`
+  in an isolated worktree. This is an offline exact-search scalability ticket: no
+  provider access, credential inspection, historical-private reconstruction, L7
+  authority, retry, model activation, candidate narrowing or approximation.
+- Add disclosure-safe three-layer exact-work accounting and repository-owned
+  synthetic workloads that meet or dominate the published L6 aggregate shape.
+  Treat 524,297 only as the first cap crossing and measure complete work at the
+  mandated progressive caps before changing policy.
+- Audit the existing continuation/terminal coalescing and any repeated action or
+  transition work. Implement reuse only with a strict decision-equivalence proof;
+  otherwise select the smallest governed cumulative cap with measured operational
+  headroom while preserving every other cap and the 17,000 / 8,386 derived bounds.
+- Prove successful results exactly equal a deliberately high-cap reference, retain
+  D1-D5 diagnostics, close L1-L6 permanently with no L7, then complete full offline
+  acceptance, installed-wheel verification, independent review and exact-SHA CI.
+
 ## CURRENT-TEAM-STRENGTH-001P-L6 Phase A only
 
 - Work only from immutable D5 parent `1963282d6c45680b764b423ed6cfb28ddc9f6e7b`

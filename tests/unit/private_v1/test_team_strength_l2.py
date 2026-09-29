@@ -1,4 +1,4 @@
-"""L1-L5 consumed history, exact L6 authority and no capability expansion."""
+"""L1-L6 consumed history, no current authority and no capability expansion."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from dmf_pulse.private_v1 import team_strength_live_authority as authority
 
 pytestmark = pytest.mark.unit
 PARENT = "1963282d6c45680b764b423ed6cfb28ddc9f6e7b"
+D6_PARENT = "7ae84993083756aadf13eb01c019ecd7ed0b196f"
 STAMP = datetime(2026, 10, 1, tzinfo=UTC)
 OLD_APPROVAL = "DMF-CTS-001P-LIVE-RIGHTS-2026-09-22"
 OLD_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L1#ONE-SHOT-2026-09-22"
@@ -88,9 +89,12 @@ def blocked(approval: str, attestation: str):
         (L5_APPROVAL, L5_ATTESTATION),
         (L5_APPROVAL, L4_ATTESTATION),
         (L5_APPROVAL, "wrong"),
+        (L6_APPROVAL, L6_ATTESTATION),
+        (L6_APPROVAL, L5_ATTESTATION),
+        (L6_APPROVAL, "wrong"),
     ],
 )
-def test_historical_l1_l2_l3_l4_l5_are_consumed_before_provider_checks(approval, attestation):
+def test_historical_l1_through_l6_are_consumed_before_provider_checks(approval, attestation):
     assert authority.L1_APPROVAL == OLD_APPROVAL
     assert authority.L1_ATTESTATION == OLD_ATTESTATION
     assert authority.L2_APPROVAL == NEW_APPROVAL
@@ -99,7 +103,7 @@ def test_historical_l1_l2_l3_l4_l5_are_consumed_before_provider_checks(approval,
     assert authority.L3_APPROVAL == L3_APPROVAL
     assert authority.L3_ATTESTATION == L3_ATTESTATION
     expected_consumed = frozenset(
-        {OLD_APPROVAL, NEW_APPROVAL, L3_APPROVAL, L4_APPROVAL, L5_APPROVAL}
+        {OLD_APPROVAL, NEW_APPROVAL, L3_APPROVAL, L4_APPROVAL, L5_APPROVAL, L6_APPROVAL}
     )
     assert expected_consumed == authority.CONSUMED_APPROVALS
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_CONSUMED"
@@ -119,19 +123,14 @@ def test_no_unknown_historical_or_current_pair_can_authorize(approval, attestati
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_exact_l6_pair_is_current_and_l5_remains_consumed():
+def test_l6_pair_is_historical_and_no_current_authority_exists():
     assert (authority.APPROVAL, authority.ATTESTATION) == (L6_APPROVAL, L6_ATTESTATION)
-    assert {L4_APPROVAL, L5_APPROVAL} <= authority.CONSUMED_APPROVALS
-    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
-        L6_APPROVAL,
-        L6_ATTESTATION,
-    )
-    assert (
+    assert {L4_APPROVAL, L5_APPROVAL, L6_APPROVAL} <= authority.CONSUMED_APPROVALS
+    assert authority.CURRENT_APPROVAL is authority.CURRENT_ATTESTATION is None
+    with pytest.raises(authority.ConsumedL1ApprovalError):
         authority.validate_l1_authority(
             approval=L6_APPROVAL, attestation=L6_ATTESTATION, checked_at=STAMP
         )
-        is None
-    )
     assert (
         authority.profile_sha(load_fpl_rights()[authority.FPL_PROFILE]) == authority.FPL_PROFILE_SHA
     )
@@ -139,9 +138,9 @@ def test_exact_l6_pair_is_current_and_l5_remains_consumed():
         authority.profile_sha(load_odds_rights()[authority.ODDS_PROFILE])
         == authority.ODDS_PROFILE_SHA
     )
-    result = blocked(L5_APPROVAL, L5_ATTESTATION)
+    result = blocked(L6_APPROVAL, L6_ATTESTATION)
     assert result["reason"] == "AUTHORITY_CONSUMED"
-    assert result["prior_l5_one_shot_consumed"]
+    assert result["prior_l6_one_shot_consumed"]
 
 
 @pytest.mark.parametrize(
@@ -179,7 +178,9 @@ def test_l5_wrong_or_mixed_pairs_fail_closed(approval, attestation):
     ],
 )
 def test_l6_wrong_or_mixed_pairs_fail_closed(approval, attestation):
-    expected = "AUTHORITY_CONSUMED" if approval == L5_APPROVAL else "AUTHORITY_INVALID"
+    expected = (
+        "AUTHORITY_CONSUMED" if approval in {L5_APPROVAL, L6_APPROVAL} else "AUTHORITY_INVALID"
+    )
     assert blocked(approval, attestation)["reason"] == expected
 
 
@@ -200,11 +201,9 @@ def test_no_profile_hash_change_can_reactivate_consumed_l5(monkeypatch):
         )
 
 
-def test_prior_l5_odds_profile_hash_cannot_authorize_l6(monkeypatch):
-    old_l5_sha = "34280931d9874c5921791776973acade047df4d588f25a5046a8f842f2dbe388"
-    assert old_l5_sha != authority.ODDS_PROFILE_SHA
-    monkeypatch.setattr(authority, "ODDS_PROFILE_SHA", old_l5_sha)
-    with pytest.raises(ValueError, match="exact provider purpose"):
+def test_no_profile_hash_change_can_reactivate_consumed_l6(monkeypatch):
+    monkeypatch.setattr(authority, "ODDS_PROFILE_SHA", "0" * 64)
+    with pytest.raises(authority.ConsumedL1ApprovalError):
         authority.validate_l1_authority(
             approval=L6_APPROVAL, attestation=L6_ATTESTATION, checked_at=STAMP
         )
@@ -237,19 +236,25 @@ def test_only_odds_purpose_metadata_changes_without_capability_expansion():
     assert current["human_approval_id"] == L6_APPROVAL
 
 
-def test_d1_d2_d3_d4_d5_live_control_flow_is_preserved_except_l6_identity():
-    before = parent_text("src/dmf_pulse/private_v1/team_strength_live.py")
-    expected = (
-        before.replace(
-            "Historical L1-L5 operator experiment, never selected by ordinary dmf pulse.\n\n"
-            "All five live authorities are consumed. Legacy names remain for offline regression;\n"
-            "D1-D5 provide closed diagnostic transport, localisation and resource identity.",
-            "Governed L1-L6 operator experiment, never selected by ordinary dmf pulse.\n\n"
-            "L1-L5 are consumed; exactly one L6 pair is current. Legacy names remain for offline\n"
-            "regression; D1-D5 provide closed diagnostic transport, localisation and resource identity.",
-        )
-        .replace("CURRENT_TEAM_STRENGTH_001P_L5", "CURRENT_TEAM_STRENGTH_001P_L6")
-        .replace("CURRENT-TEAM-STRENGTH-001P-L5", "CURRENT-TEAM-STRENGTH-001P-L6")
+def test_d1_through_d6_live_control_flow_is_preserved_except_authority_closure():
+    before = subprocess.run(
+        ["git", "show", f"{D6_PARENT}:src/dmf_pulse/private_v1/team_strength_live.py"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+        timeout=30,
+    ).stdout
+    expected = before.replace(
+        "Governed L1-L6 operator experiment, never selected by ordinary dmf pulse.\n\n"
+        "L1-L5 are consumed; exactly one L6 pair is current. Legacy names remain for offline\n"
+        "regression; D1-D5 provide closed diagnostic transport, localisation and resource identity.",
+        "Historical L1-L6 operator experiment, never selected by ordinary dmf pulse.\n\n"
+        "All six live authorities are consumed. Legacy names remain for offline regression;\n"
+        "D1-D6 preserve closed diagnostics, localisation and exact resource identities.",
+    ).replace(
+        '                "prior_l5_one_shot_consumed": True,\n',
+        '                "prior_l5_one_shot_consumed": True,\n'
+        '                "prior_l6_one_shot_consumed": True,\n',
     )
     actual = Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
     assert actual == expected
@@ -259,16 +264,10 @@ def test_d1_d2_d3_d4_d5_live_control_flow_is_preserved_except_l6_identity():
     "path",
     [
         "config/models/current_team_strength_governance.json",
-        "config/optimisation/multi_gameweek.yaml",
-        "src/dmf_pulse/optimisation/resources/multi_gameweek.yaml",
         "src/dmf_pulse/optimisation/multi_gameweek_errors.py",
-        "src/dmf_pulse/optimisation/multi_gameweek_models.py",
         "src/dmf_pulse/optimisation/multi_gameweek_policy.py",
-        "src/dmf_pulse/optimisation/multi_gameweek_service.py",
-        "src/dmf_pulse/optimisation/multi_gameweek_solver.py",
         "src/dmf_pulse/private_v1/team_strength_comparison.py",
         "src/dmf_pulse/private_v1/team_strength_comparison_models.py",
-        "src/dmf_pulse/private_v1/team_strength_diagnostics.py",
         "src/dmf_pulse/private_v1/team_strength_live_network.py",
         "src/dmf_pulse/private_v1/prepared_control.py",
         "src/dmf_pulse/private_v1/rolling.py",
@@ -311,14 +310,38 @@ def test_standing_fpl_purpose_remains_adequate_without_expansion():
     }
 
 
-def test_d5_search_caps_remain_exact():
+def test_d6_only_separately_measured_policy_capacity_changes():
     policy = load_multi_gameweek_search_policy()
     assert policy.max_transfers_per_node == 2
     assert policy.max_actions_per_state == 5000
     assert policy.max_state_expansions == 25000
-    assert policy.max_policy_candidates == 250000
-    assert policy.max_cumulative_legal_actions == 524288
+    assert policy.max_policy_candidates == 786432
+    assert policy.max_cumulative_legal_actions == 786432
     assert policy.max_returned_root_candidates == 1000
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "config/optimisation/multi_gameweek.yaml",
+        "src/dmf_pulse/optimisation/resources/multi_gameweek.yaml",
+    ],
+)
+def test_d6_capacity_files_change_only_two_distinct_work_units(path):
+    before = subprocess.run(
+        ["git", "show", f"{D6_PARENT}:{path}"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+        timeout=30,
+    ).stdout
+    expected = before.replace(
+        "max_policy_candidates: 250000", "max_policy_candidates: 786432"
+    ).replace(
+        "max_cumulative_legal_actions: 524288",
+        "max_cumulative_legal_actions: 786432",
+    )
+    assert Path(path).read_text(encoding="utf-8") == expected
 
 
 def test_l6_generated_near_envelope_exactness_evidence():
@@ -358,3 +381,29 @@ def test_l6_generated_near_envelope_exactness_evidence():
             "transfer_count_frontier",
         )
     )
+
+
+def test_d6_l6_shaped_scalability_evidence_and_exactness_oracle():
+    path = Path("evidence/tickets/CURRENT-TEAM-STRENGTH-001P-L6-D6/SCALABILITY-BENCHMARKS.json")
+    evidence = json.loads(path.read_text(encoding="utf-8"))
+    shape = evidence["stress_shape"]
+    assert shape["root_action_upper"] == 8386
+    assert shape["effective_max_actions_per_state"] == 17000
+    assert shape["effective_max_returned_root_candidates"] == 8386
+    assert shape["observed_max_action_combinations"] == 1032
+    assert shape["reachable_non_root_states"] >= 9249
+    parent = evidence["immutable_parent_at_524288"]
+    assert parent["resource_limit_kind"] == "CUMULATIVE_LEGAL_ACTION_LIMIT"
+    assert parent["first_crossing"] > 524288
+    proposed = evidence["proposed_at_786432"]
+    high = evidence["progressive_caps"][-1]
+    assert proposed["cumulative_legal_actions"] == 520651
+    assert proposed["decision_semantic_sha256"] == high["decision_semantic_sha256"]
+    assert [item["cap"] for item in evidence["progressive_caps"]] == [
+        524288,
+        786432,
+        1048576,
+        1572864,
+        2097152,
+    ]
+    assert all(evidence["exactness"].values())

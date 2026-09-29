@@ -1,0 +1,119 @@
+{
+  "schema_version": "current-team-strength-l6-d6-scalability-v1",
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "provider_access": false,
+  "historical_private_rows_reconstructed": false,
+  "stress_shape": {
+    "candidate_pool_size": 28,
+    "retained_root_incoming": 13,
+    "retained_terminal_incoming": 7,
+    "root_action_upper": 8386,
+    "effective_max_actions_per_state": 17000,
+    "effective_max_returned_root_candidates": 8386,
+    "observed_max_action_combinations": 1032,
+    "reachable_non_root_states": 12887
+  },
+  "layer_work": [
+    {
+      "depth": 0,
+      "gameweek": 1,
+      "reachable_states": 1,
+      "unique_economic_states": 1,
+      "legal_actions_generated": 1032,
+      "action_combinations_considered": 1032,
+      "unique_resulting_squads": 1032
+    },
+    {
+      "depth": 1,
+      "gameweek": 2,
+      "reachable_states": 1032,
+      "unique_economic_states": 1032,
+      "legal_actions_generated": 45173,
+      "action_combinations_considered": 45173,
+      "unique_resulting_squads": 10824
+    },
+    {
+      "depth": 2,
+      "gameweek": 3,
+      "reachable_states": 11855,
+      "unique_economic_states": 11855,
+      "legal_actions_generated": 474446,
+      "action_combinations_considered": 474446,
+      "unique_resulting_squads": 64147
+    }
+  ],
+  "immutable_parent_at_524288": {
+    "status": "RESOURCE_LIMIT",
+    "resource_limit_kind": "CUMULATIVE_LEGAL_ACTION_LIMIT",
+    "first_crossing": 524289,
+    "reachable_layer_state_count": 13920,
+    "incumbent": null,
+    "wall_seconds": 352.4799650000059,
+    "cpu_seconds": 347.65625
+  },
+  "immutable_parent_complete_at_786432": {
+    "status": "SUCCESS",
+    "cumulative_legal_actions": 559313,
+    "state_expansions": 13922,
+    "policy_candidates": 520651,
+    "pareto_candidates": 12888,
+    "tactical_requests": 607584,
+    "wall_seconds": 343.4669560000184,
+    "cpu_seconds": 337.171875,
+    "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+  },
+  "proposed_at_786432": {
+    "status": "SUCCESS",
+    "cumulative_legal_actions": 520651,
+    "state_expansions": 12888,
+    "policy_candidates": 520651,
+    "pareto_candidates": 12888,
+    "tactical_requests": 567888,
+    "wall_seconds": 322.2761538999621,
+    "cpu_seconds": 317.15625,
+    "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+  },
+  "progressive_caps": [
+    {
+      "cap": 524288,
+      "status": "SUCCESS_AFTER_REUSE_BUT_INSUFFICIENT_HEADROOM",
+      "complete_actions": 520651,
+      "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+    },
+    {
+      "cap": 786432,
+      "status": "SUCCESS_PROPOSED",
+      "complete_actions": 520651,
+      "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+    },
+    {
+      "cap": 1048576,
+      "status": "SUCCESS",
+      "complete_actions": 520651,
+      "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+    },
+    {
+      "cap": 1572864,
+      "status": "SUCCESS",
+      "complete_actions": 520651,
+      "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+    },
+    {
+      "cap": 2097152,
+      "status": "SUCCESS_HIGH_REFERENCE",
+      "complete_actions": 520651,
+      "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044"
+    }
+  ],
+  "exactness": {
+    "parent_proposed_decisions_equal": true,
+    "all_successful_cap_decisions_equal": true,
+    "recommended_plan_equal": true,
+    "no_transfer_baseline_equal": true,
+    "root_counterfactual_equal": true,
+    "transfer_count_frontier_equal": true
+  },
+  "optimiser_result_sha_comparison": "NOT_APPLICABLE_ACROSS_DISTINCT_AUTHENTICATED_POLICY_AND_WORK_DIAGNOSTICS",
+  "peak_memory_bytes": null,
+  "memory_measurement": "UNAVAILABLE_WITHOUT_APPROVED_NON_PERTURBING_PORTABLE_RSS_MEASUREMENT"
+}

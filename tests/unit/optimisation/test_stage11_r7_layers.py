@@ -26,6 +26,40 @@ def test_one_pending_tactical_batch_per_node_and_complete_generic_equality():
     assert evaluator.batch_calls == {node.node_id: 1 for node in request.scenario_tree.nodes}
 
 
+def test_complete_frontier_reuses_exact_retained_no_transfer_root_family(monkeypatch):
+    from dmf_pulse.optimisation import multi_gameweek_service as service
+    from dmf_pulse.optimisation.multi_gameweek_models import ObjectiveMode
+    from dmf_pulse.optimisation.multi_gameweek_solver import select_candidate
+
+    request, _, _, points = oracle_fixture("budget")
+    original = service.solve_frontier
+    calls: list[bool] = []
+
+    def counted(*args, **kwargs):
+        calls.append(bool(kwargs.get("root_no_transfer_only")))
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(service, "solve_frontier", counted)
+    result = service.optimise_multi_gameweek(
+        request,
+        evaluator=HorizonPointsEvaluator(points),
+        prefer_deterministic_linear=True,
+    )
+    assert result.status.value == "SUCCESS"
+    assert calls == [False]
+    independent = original(
+        request,
+        HorizonPointsEvaluator(points),
+        root_no_transfer_only=True,
+        prefer_deterministic_linear=True,
+    )
+    expected = select_candidate(independent.candidates, mode=ObjectiveMode.EXPECTED)
+    baseline = result.no_transfer_baseline
+    assert baseline is not None
+    assert baseline.current_action == expected.root_decision
+    assert baseline.future_policy == expected.decisions[1:]
+
+
 @pytest.mark.parametrize("limit_field", ["max_cumulative_legal_actions", "max_state_expansions"])
 def test_cumulative_work_limits_fail_before_any_tactical_batch(limit_field):
     request, _, _, points = oracle_fixture("budget")
@@ -42,6 +76,19 @@ def test_cumulative_work_limits_fail_before_any_tactical_batch(limit_field):
     if limit_field == "max_cumulative_legal_actions":
         assert caught.value.counters.cumulative_legal_actions > 1
         assert caught.value.counters.cumulative_legal_action_limit == 1
+        work = caught.value.counters.layer_work
+        assert len(work) == 1
+        assert work[0].reachable_states == work[0].unique_economic_states == 1
+        assert work[0].legal_actions_generated > 1
+        assert set(work[0].model_dump()) == {
+            "depth",
+            "gameweek",
+            "reachable_states",
+            "unique_economic_states",
+            "legal_actions_generated",
+            "action_combinations_considered",
+            "unique_resulting_squads",
+        }
     else:
         assert caught.value.counters.reachable_layer_state_count > 1
     assert not evaluator.batch_calls
@@ -113,15 +160,17 @@ def test_individual_tactical_cpu_counter_counts_work_once_without_changing_value
 
 
 @pytest.mark.parametrize(
-    "field,limit,complete",
+    "field,limit,complete,expected_actions",
     [
-        ("max_cumulative_legal_actions", 4, False),
-        ("max_cumulative_legal_actions", 6, True),
-        ("max_state_expansions", 3, False),
-        ("max_state_expansions", 4, True),
+        ("max_cumulative_legal_actions", 2, False, 3),
+        ("max_cumulative_legal_actions", 3, True, 3),
+        ("max_state_expansions", 1, False, 2),
+        ("max_state_expansions", 2, True, 3),
     ],
 )
-def test_public_solve_budget_and_diagnostics_include_no_transfer_baseline(field, limit, complete):
+def test_public_solve_budget_and_diagnostics_include_no_transfer_baseline(
+    field, limit, complete, expected_actions
+):
     from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
 
     request, _, _, points = oracle_fixture()
@@ -143,10 +192,10 @@ def test_public_solve_budget_and_diagnostics_include_no_transfer_baseline(field,
             if field == "max_cumulative_legal_actions"
             else ResourceLimitKind.LAYER_REACHABLE_STATE_LIMIT
         )
-        assert profile.as_dict()["cumulative_legal_actions"] == 5
+        assert profile.as_dict()["cumulative_legal_actions"] == expected_actions
     else:
         assert result.status.value == "SUCCESS"
-        assert profile.as_dict()["cumulative_legal_actions"] == 6
+        assert profile.as_dict()["cumulative_legal_actions"] == expected_actions
         generic = optimise_multi_gameweek(request, evaluator=HorizonPointsEvaluator(points))
         assert result == generic
 
@@ -263,7 +312,7 @@ def test_pareto_limit_is_structurally_dominated_in_exact_three_gameweek_search(
     assert all(frontier <= generated <= cap for frontier, generated, cap in observed)
 
 
-def test_incomplete_no_transfer_baseline_can_never_produce_exact_success(monkeypatch):
+def test_complete_frontier_never_invokes_legacy_no_transfer_replay(monkeypatch):
     from dmf_pulse.optimisation import multi_gameweek_service as service
     from dmf_pulse.optimisation.multi_gameweek_models import (
         BackendStatus,
@@ -314,12 +363,46 @@ def test_incomplete_no_transfer_baseline_can_never_produce_exact_success(monkeyp
     result = service.optimise_multi_gameweek(
         request,
         evaluator=HorizonPointsEvaluator(points),
+        prefer_deterministic_linear=True,
     )
-    assert result.status is MultiGameweekResultStatus.RESOURCE_LIMIT
-    assert result.solver_status.status is BackendStatus.TIME_RESOURCE_LIMIT_NO_INCUMBENT
-    assert result.solver_status.resource_limit_kind is ResourceLimitKind.ROOT_SUMMARY_LIMIT
-    assert result.recommended_plan is None
-    assert result.no_transfer_baseline is None
+    assert result.status is MultiGameweekResultStatus.SUCCESS
+    assert result.solver_status.status is BackendStatus.OPTIMAL
+    assert result.no_transfer_baseline is not None
+
+
+def test_preferred_but_ineligible_generic_path_retains_authenticated_baseline_replay(
+    monkeypatch,
+):
+    from dmf_pulse.optimisation import multi_gameweek_service as service
+
+    request, _, _, points = oracle_fixture()
+    delegate = HorizonPointsEvaluator(points)
+
+    class GenericOnlyEvaluator:
+        def evaluate(self, *, node, state):
+            return delegate.evaluate(node=node, state=state)
+
+    original = service.solve_frontier
+    calls: list[bool] = []
+
+    def counted(*args, **kwargs):
+        calls.append(bool(kwargs.get("root_no_transfer_only")))
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(service, "solve_frontier", counted)
+    preferred = service.optimise_multi_gameweek(
+        request,
+        evaluator=GenericOnlyEvaluator(),
+        prefer_deterministic_linear=True,
+    )
+    assert calls == [False, True]
+    calls.clear()
+    generic = service.optimise_multi_gameweek(
+        request,
+        evaluator=GenericOnlyEvaluator(),
+    )
+    assert calls == [False, True]
+    assert preferred == generic
 
 
 def test_remediated_legal_work_envelope_is_exactly_equal_to_high_budget_reference(

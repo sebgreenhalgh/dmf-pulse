@@ -51,6 +51,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     ScenarioTreeNode,
     SearchPolicy,
     SolverDiagnostics,
+    Stage11LayerWork,
     TacticalValueRecord,
     TerminalValueBreakdown,
     TransferAction,
@@ -813,6 +814,7 @@ class SearchCounters:
     cumulative_legal_actions: int = 0
     cumulative_legal_action_limit: int = 0
     reachable_layer_state_count: int = 0
+    layer_work: tuple[Stage11LayerWork, ...] = ()
 
 
 @dataclass
@@ -822,6 +824,7 @@ class Stage11NodeProfile:
     node_id: str
     gameweek: int
     depth: int
+    reachable_states: int = 0
     states_entered: int = 0
     states_solved: int = 0
     legal_actions_generated: int = 0
@@ -863,6 +866,7 @@ class Stage11NodeProfile:
             "node_id": self.node_id,
             "gameweek": self.gameweek,
             "depth": self.depth,
+            "reachable_states": self.reachable_states,
             "states_entered": self.states_entered,
             "states_solved": self.states_solved,
             "unique_current_state_fingerprints": len(self.unique_full_state_fingerprints),
@@ -947,6 +951,22 @@ class Stage11SearchProfile:
         return self.nodes.setdefault(
             value.node_id,
             Stage11NodeProfile(node_id=value.node_id, gameweek=value.gameweek, depth=depth),
+        )
+
+    def safe_layer_work(self) -> tuple[Stage11LayerWork, ...]:
+        """Return ordered count-only layer work with no state or action identities."""
+
+        return tuple(
+            Stage11LayerWork(
+                depth=item.depth,
+                gameweek=item.gameweek,
+                reachable_states=item.reachable_states,
+                unique_economic_states=len(item.unique_economic_state_fingerprints),
+                legal_actions_generated=item.legal_actions_generated,
+                action_combinations_considered=item.action_combinations_considered,
+                unique_resulting_squads=len(item.unique_resulting_squads),
+            )
+            for item in sorted(self.nodes.values(), key=lambda value: value.depth)
         )
 
     def as_dict(self) -> dict[str, object]:
@@ -1357,6 +1377,7 @@ class BoundedExactEnumerator:
                 if resource_limit_kind is not None
                 else None
             ),
+            layer_work=(self.counters.layer_work if resource_limit_kind is not None else ()),
             deterministic_tie_key=best.tie_key,
             runtime_ms=None,
             configuration_sha256=_configuration_hash(self.request),
@@ -1643,6 +1664,22 @@ def deterministic_linear_fast_path_eligible(
     )
 
 
+def deterministic_linear_fast_path_selected(
+    request: MultiGameweekOptimisationRequest,
+    evaluator: TacticalEvaluator,
+    *,
+    preferred: bool,
+) -> bool:
+    """Return whether preference resolves to the proven deterministic enumerator."""
+
+    return (
+        preferred
+        and deterministic_linear_fast_path_eligible(request)
+        and isinstance(evaluator, SquadOnlyTacticalEvaluator)
+        and evaluator.squad_only
+    )
+
+
 def terminal_coalescing_eligible(
     request: MultiGameweekOptimisationRequest, node: ScenarioTreeNode
 ) -> bool:
@@ -1805,9 +1842,15 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                 discovery_wall, discovery_cpu = perf_counter(), process_time()
                 squads: set[tuple[str, ...]] = set()
                 next_states: dict[tuple[str, str], ManagerState] = {}
+                node_profile = self._node_profile(node)
+                assert node_profile is not None
+                node_profile.reachable_states = len(layers[depth])
+                node_profile.unique_economic_state_fingerprints.update(
+                    continuation_state_fingerprint(state) for state in layers[depth].values()
+                )
+                if self.profile is not None:
+                    self.counters.layer_work = self.profile.safe_layer_work()
                 for key, state in sorted(layers[depth].items()):
-                    node_profile = self._node_profile(node)
-                    assert node_profile is not None
                     before_combinations = node_profile.action_combinations_considered
                     actions = super()._actions(
                         state,
@@ -1820,6 +1863,8 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                     self._whole_run_legal_actions += len(actions)
                     budget.legal_actions += len(actions)
                     self.counters.cumulative_legal_actions = budget.legal_actions
+                    if self.profile is not None:
+                        self.counters.layer_work = self.profile.safe_layer_work()
                     # Govern retained transitions and potential tactical work with
                     # its distinct current-policy physical-work envelope. Raw rejected
                     # combinations retain their separate per-state bound.
@@ -2022,15 +2067,17 @@ def solve_frontier(
     profile: Stage11SearchProfile | None = None,
     work_budget: Stage11WorkBudget | None = None,
 ) -> FrontierResult:
-    use_fast_path = (
-        prefer_deterministic_linear
-        and deterministic_linear_fast_path_eligible(request)
-        and isinstance(evaluator, SquadOnlyTacticalEvaluator)
-        and evaluator.squad_only
+    use_fast_path = deterministic_linear_fast_path_selected(
+        request,
+        evaluator,
+        preferred=prefer_deterministic_linear,
     )
-    if profile is not None:
-        profile.fast_path_used = use_fast_path
-        profile.exact_accelerator = "R6_RECURSIVE_EXACT" if use_fast_path else "GENERIC_EXACT"
+    active_profile = profile or (Stage11SearchProfile() if use_fast_path else None)
+    if active_profile is not None:
+        active_profile.fast_path_used = use_fast_path
+        active_profile.exact_accelerator = (
+            "R6_RECURSIVE_EXACT" if use_fast_path else "GENERIC_EXACT"
+        )
     enumerator_type = (
         DeterministicLinearExactEnumerator if use_fast_path else BoundedExactEnumerator
     )
@@ -2038,7 +2085,7 @@ def solve_frontier(
         request=request,
         evaluator=evaluator,
         root_no_transfer_only=root_no_transfer_only,
-        profile=profile,
+        profile=active_profile,
     )
     if isinstance(enumerator, DeterministicLinearExactEnumerator):
         enumerator.work_budget = work_budget

@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 from dmf_pulse.football_events.market_constraints import MarketFamily
 from dmf_pulse.football_events.service import ScoreDistributionError
 from dmf_pulse.optimisation.multi_gameweek_errors import ResourceLimitKind
+from dmf_pulse.optimisation.multi_gameweek_models import Stage11LayerWork
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
 
@@ -249,6 +250,9 @@ class ComparisonFailureDiagnostic(BaseModel):
     reachable_layer_state_count: int | None = Field(
         default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
     )
+    layer_work: tuple[Stage11LayerWork, ...] = Field(
+        default=(), max_length=3, exclude_if=lambda value: not value
+    )
     gameweeks_stage8_complete: int = Field(default=0, ge=0, le=3)
     gameweeks_stage9_assembled: int = Field(default=0, ge=0, le=3)
     gameweeks_stage9_mc_passed: int = Field(default=0, ge=0, le=3)
@@ -298,6 +302,8 @@ class ComparisonFailureDiagnostic(BaseModel):
         )
         if self.resource_limit_kind is None and any(value is not None for value in resource_values):
             raise ValueError("resource counters require a finite resource-limit identity")
+        if self.resource_limit_kind is None and self.layer_work:
+            raise ValueError("layer work requires a finite resource-limit identity")
         if self.resource_limit_kind is not None and (
             self.optimiser_status_class is not RollingOptimiserStatusClass.RESOURCE_LIMIT
             or any(value is None for value in resource_values)
@@ -369,6 +375,7 @@ class ComparisonTrace:
     observed_pareto_candidates: int | None = None
     cumulative_legal_actions: int | None = None
     reachable_layer_state_count: int | None = None
+    layer_work: tuple[Stage11LayerWork, ...] = ()
     gameweeks_stage8_complete: int = 0
     gameweeks_stage9_assembled: int = 0
     gameweeks_stage9_mc_passed: int = 0
@@ -406,6 +413,7 @@ class ComparisonTrace:
         self.observed_pareto_candidates = None
         self.cumulative_legal_actions = None
         self.reachable_layer_state_count = None
+        self.layer_work = ()
         self.gameweeks_stage8_complete = 0
         self.gameweeks_stage9_assembled = 0
         self.gameweeks_stage9_mc_passed = 0
@@ -501,6 +509,7 @@ class ComparisonTrace:
                 reachable_layer_state_count=(
                     self.reachable_layer_state_count if world_stage else None
                 ),
+                layer_work=self.layer_work if world_stage else (),
                 gameweeks_stage8_complete=(self.gameweeks_stage8_complete if world_stage else 0),
                 gameweeks_stage9_assembled=(self.gameweeks_stage9_assembled if world_stage else 0),
                 gameweeks_stage9_mc_passed=(self.gameweeks_stage9_mc_passed if world_stage else 0),
@@ -648,6 +657,10 @@ def note_optimiser_result(*, status: object, solver_status: object) -> None:
             )
             trace.reachable_layer_state_count = int(
                 getattr(solver_status, "reachable_layer_state_count", 0)
+            )
+            raw_layer_work = getattr(solver_status, "layer_work", ())
+            trace.layer_work = tuple(
+                item for item in raw_layer_work if isinstance(item, Stage11LayerWork)
             )
 
 

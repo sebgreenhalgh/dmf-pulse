@@ -353,9 +353,9 @@ def test_packaged_search_and_terminal_policies_match_reviewable_configs() -> Non
         Path("config/optimisation/multi_gameweek_terminal.yaml")
     )
     assert packaged_search == configured_search
-    assert packaged_search.max_policy_candidates == 250000
-    assert packaged_search.max_cumulative_legal_actions == 524288
-    assert packaged_search.cumulative_legal_action_limit == 524288
+    assert packaged_search.max_policy_candidates == 786432
+    assert packaged_search.max_cumulative_legal_actions == 786432
+    assert packaged_search.cumulative_legal_action_limit == 786432
     legacy = packaged_search.model_copy(update={"max_cumulative_legal_actions": None})
     assert legacy.cumulative_legal_action_limit == legacy.max_policy_candidates
     assert packaged_terminal == configured_terminal

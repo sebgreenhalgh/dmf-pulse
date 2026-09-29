@@ -14,6 +14,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
     MultiGameweekResultStatus,
     OptimalityGuarantee,
     SolverDiagnostics,
+    Stage11LayerWork,
 )
 from dmf_pulse.private_v1 import one_command, rolling
 from dmf_pulse.private_v1 import team_strength_diagnostics as diagnostics
@@ -276,6 +277,17 @@ def test_resource_limit_identity_and_safe_counters_reach_terminal_diagnostic():
         configured_cumulative_legal_action_limit=524288,
         cumulative_legal_actions=524289,
         reachable_layer_state_count=999,
+        layer_work=(
+            Stage11LayerWork(
+                depth=0,
+                gameweek=7,
+                reachable_states=1,
+                unique_economic_states=1,
+                legal_actions_generated=1032,
+                action_combinations_considered=1032,
+                unique_resulting_squads=800,
+            ),
+        ),
         configuration_sha256="0" * 64,
     )
     with trace.activate():
@@ -299,6 +311,22 @@ def test_resource_limit_identity_and_safe_counters_reach_terminal_diagnostic():
     assert result["observed_action_candidates"] == 202
     assert result["observed_policy_candidates"] == 303
     assert result["observed_pareto_candidates"] == 404
+    assert result["layer_work"] == [
+        {
+            "depth": 0,
+            "gameweek": 7,
+            "reachable_states": 1,
+            "unique_economic_states": 1,
+            "legal_actions_generated": 1032,
+            "action_combinations_considered": 1032,
+            "unique_resulting_squads": 800,
+        }
+    ]
+    safe_text = json.dumps(result)
+    assert all(
+        forbidden not in safe_text
+        for forbidden in ("player_id", "squad_id", "fixture_id", "price", "action_signature")
+    )
     assert "PRIVATE RAW MESSAGE CANARY" not in json.dumps(result)
 
 
