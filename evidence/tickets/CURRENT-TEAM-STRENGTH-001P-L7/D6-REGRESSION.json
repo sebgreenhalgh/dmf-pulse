@@ -1,0 +1,55 @@
+{
+  "candidate_pool_size": 28,
+  "current_cap": 786432,
+  "current_status": "SUCCESS",
+  "decision_semantic_sha256": "33536fdcf68d72ca252f1997b86989f7b96078c5a070363c17502ba7c664a044",
+  "effective_max_actions_per_state": 17000,
+  "effective_max_returned_root_candidates": 8386,
+  "exact_accelerator": "R7_TERMINAL_SALE_QUOTIENT_LAYERED_EXACT_V1",
+  "exactness": {
+    "baseline_equal": true,
+    "decision_equal": true,
+    "recommendation_equal": true,
+    "root_counterfactual_equal": true,
+    "transfer_count_frontier_equal": true
+  },
+  "high_cap": 1048576,
+  "high_cap_status": "SUCCESS",
+  "layer_work": [
+    {
+      "action_combinations_considered": 1032,
+      "depth": 0,
+      "gameweek": 1,
+      "legal_actions_generated": 1032,
+      "reachable_states": 1,
+      "unique_economic_states": 1,
+      "unique_resulting_squads": 1032
+    },
+    {
+      "action_combinations_considered": 45173,
+      "depth": 1,
+      "gameweek": 2,
+      "legal_actions_generated": 45173,
+      "reachable_states": 1032,
+      "unique_economic_states": 1032,
+      "unique_resulting_squads": 10824
+    },
+    {
+      "action_combinations_considered": 474446,
+      "depth": 2,
+      "gameweek": 3,
+      "legal_actions_generated": 474446,
+      "reachable_states": 11855,
+      "unique_economic_states": 11855,
+      "unique_resulting_squads": 64147
+    }
+  ],
+  "max_policy_candidates": 786432,
+  "policy_candidates": 520651,
+  "root_action_upper": 8386,
+  "source": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "state_expansions": 12887,
+  "status": "PASS",
+  "tactical_requests": 567888,
+  "total_cumulative_legal_actions": 520651
+}

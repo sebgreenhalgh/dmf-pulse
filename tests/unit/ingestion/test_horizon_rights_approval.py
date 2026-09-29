@@ -1,4 +1,4 @@
-"""Current L6 metadata; the generic legacy probe check does not ratify purpose."""
+"""Current L7 metadata; the generic legacy probe check does not ratify purpose."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from tests.unit.ingestion.test_horizon_probe import _script
 
 pytestmark = pytest.mark.unit
-APPROVAL = "DMF-CTS-001P-L6-LIVE-RIGHTS-2026-09-28"
-NOW = datetime(2026, 9, 28, 0, 47, tzinfo=UTC)
+APPROVAL = "DMF-CTS-001P-L7-LIVE-RIGHTS-2026-09-29"
+NOW = datetime(2026, 9, 29, 4, 25, tzinfo=UTC)
 _CAPABILITIES = {
     RightsCapability.AUTOMATED_ACCESS: CapabilityValue.ALLOW,
     RightsCapability.BACKUP: CapabilityValue.UNKNOWN,
@@ -86,16 +86,16 @@ def test_current_governed_approval_and_exact_metadata(governed_gate):
     assert profile.account_scope == "Sebastian-owned and authorized private The Odds API account"
     assert profile.geography_scope == "United Kingdom private use"
     assert profile.approved_purpose == (
-        "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L6 live transient two-world "
+        "one private operator-initiated CURRENT-TEAM-STRENGTH-001P-L7 live transient two-world "
         "team-strength decision-materiality observation comparing LEAGUE_BASELINE and "
         "TEAM_STRENGTH_SHADOW using one frozen three-Gameweek information set through the "
-        "existing Stage 8 to Stage 11 pipeline with complete D1, D2, D3, D4 and D5 safe "
-        "failure and resource-limit diagnostics"
+        "existing Stage 8 to Stage 11 pipeline with complete D1, D2, D3, D4, D5 and D6 safe "
+        "diagnostics and exact cumulative-action scalability"
     )
     assert profile.terms_source == "The Odds API Terms and Conditions"
     assert profile.terms_version == "checked-2026-08-31"
     assert profile.checked_at == datetime(2026, 9, 11, 21, 21, 31, tzinfo=UTC)
-    assert profile.approved_at == datetime(2026, 9, 28, 0, 46, 13, tzinfo=UTC)
+    assert profile.approved_at == datetime(2026, 9, 29, 4, 24, 42, tzinfo=UTC)
     assert profile.capabilities == _CAPABILITIES
     assert profile.unresolved_rights == _UNRESOLVED
     assert gate(profile, APPROVAL, True, NOW) is None
@@ -110,6 +110,7 @@ def test_current_governed_approval_and_exact_metadata(governed_gate):
         ("DMF-CTS-001P-L3-LIVE-RIGHTS-2026-09-23", True),
         ("DMF-CTS-001P-L4-LIVE-RIGHTS-2026-09-24", True),
         ("DMF-CTS-001P-L5-LIVE-RIGHTS-2026-09-27", True),
+        ("DMF-CTS-001P-L6-LIVE-RIGHTS-2026-09-28", True),
         (APPROVAL, False),
     ],
 )

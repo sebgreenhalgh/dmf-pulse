@@ -1,7 +1,7 @@
-"""Historical L1-L6 operator experiment, never selected by ordinary dmf pulse.
+"""Governed L1-L7 operator experiment, never selected by ordinary dmf pulse.
 
-All six live authorities are consumed. Legacy names remain for offline regression;
-D1-D6 preserve closed diagnostics, localisation and exact resource identities.
+L1-L6 are consumed; exactly one L7 pair is current. Legacy names remain for offline
+regression; D1-D6 preserve closed diagnostics, localisation and exact resource identities.
 
 Only an allowlisted summary escapes. The prepared-context callback completes via
 a private exception carrying that summary, because the inherited callback return
@@ -270,7 +270,7 @@ class TeamStrengthL1ObservationService:
             "status": "TEAM_STRENGTH_PUBLIC_PREFLIGHT_BLOCKED"
             if stage == L1Stage.ASSESS_TEAM_STRENGTH_SOURCE
             and reason != L1Reason.CREDENTIAL_UNAVAILABLE
-            else "CURRENT_TEAM_STRENGTH_001P_L6_LIVE_EXECUTION_NOT_COMPLETED",
+            else "CURRENT_TEAM_STRENGTH_001P_L7_LIVE_EXECUTION_NOT_COMPLETED",
             "stage": stage.value,
             "reason": reason.value,
             "private_attempt_consumed": gate.consumed if gate else False,
@@ -353,7 +353,7 @@ class TeamStrengthL1ObservationService:
                     row.transfer_count for row in result.signature.by_gameweek[1:]
                 )
             summary.update(
-                status="CURRENT_TEAM_STRENGTH_001P_L6_LIVE_OBSERVATION_COMPLETE",
+                status="CURRENT_TEAM_STRENGTH_001P_L7_LIVE_OBSERVATION_COMPLETE",
                 private_attempt_consumed=gate.consumed,
                 retry_performed=False,
                 approval=APPROVAL,
@@ -589,7 +589,7 @@ class TeamStrengthL1ObservationService:
                     run_at=cutoff,
                     operator_approved_at=started,
                     horizon_gameweeks=3,
-                    run_id="CURRENT-TEAM-STRENGTH-001P-L6",
+                    run_id="CURRENT-TEAM-STRENGTH-001P-L7",
                 )
             )
         except _ObservationComplete as completed:
