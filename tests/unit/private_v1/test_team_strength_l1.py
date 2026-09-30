@@ -112,16 +112,18 @@ def test_all_seven_historical_purposes_consumed_and_old_a2_runtime_rejected():
     assert result.fpl_request_attempt_count == result.odds_acquisition_attempt_count == 0
 
 
-def test_l7_rights_hashes_remain_auditable_but_no_current_authority_exists():
+def test_l8_rights_hashes_and_current_authority_are_exact():
     fpl = load_fpl_rights()[authority.FPL_PROFILE]
     odds = load_rights_profiles()[authority.ODDS_PROFILE]
     assert authority.profile_sha(fpl) == authority.FPL_PROFILE_SHA
     assert authority.profile_sha(odds) == authority.ODDS_PROFILE_SHA
-    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (None, None)
-    with pytest.raises(authority.ConsumedL1ApprovalError):
-        authority.validate_l1_authority(
-            approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
-        )
+    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
+        authority.L8_APPROVAL,
+        authority.L8_ATTESTATION,
+    )
+    authority.validate_l1_authority(
+        approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
+    )
 
 
 @pytest.mark.parametrize("checked_at", [STAMP.replace(tzinfo=None), STAMP - timedelta(days=30)])

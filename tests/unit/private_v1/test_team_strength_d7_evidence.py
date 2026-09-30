@@ -41,9 +41,9 @@ def test_d7_capacity_evidence_is_authenticated_offline_and_complete() -> None:
     )
 
 
-def test_d7_closes_every_historical_live_authority() -> None:
-    assert authority.CURRENT_APPROVAL is None
-    assert authority.CURRENT_ATTESTATION is None
+def test_d7_historical_authorities_remain_closed_under_l8() -> None:
+    assert authority.CURRENT_APPROVAL == authority.L8_APPROVAL
+    assert authority.CURRENT_ATTESTATION == authority.L8_ATTESTATION
     assert (
         frozenset(
             {

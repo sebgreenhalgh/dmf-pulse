@@ -1,5 +1,17 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001P-L8 Phase A
+
+- [x] Verify exact D7 parent and isolate a clean L8 worktree.
+- [x] Bind one L8 approval and narrow Odds purpose; retain consumed L1-L7 and verify unchanged FPL/OpenFootball profiles.
+- [x] Reacquire immutable September 30 OpenFootball source and prepare current public readiness.
+- [x] Rerun D7 complete capacity oracle, inherited regressions, offline quality and installed-wheel gates.
+- [x] Obtain fresh independent pre-publication review.
+- [ ] Publish the exact branch SHA and require exact-SHA CI green (post-commit gate).
+
+The private L8 observation is a later human-operated Phase B. Phase A accesses no
+private provider or credential and leaves team strength shadow only.
+
 ## CURRENT-TEAM-STRENGTH-001P-L7-D7
 
 - Work only from immutable L7 parent `57f578efa168919b63574fa8a3bd4656b6b6d4bf`

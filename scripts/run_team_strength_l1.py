@@ -1,6 +1,6 @@
-"""Historical terminal-only L7 wrapper; all live authorities are consumed.
+"""Separate public preflight and terminal-only private L8 observation.
 
-Legacy filename retained; L1-L7 are consumed and no L8 pair exists.
+Legacy filename retained; L1-L7 are consumed and the exact L8 pair is current.
 This script has no retry loop, output-file option, normal CLI registration, model
 selector, scenario-count override or player-allocation override.
 """
@@ -30,11 +30,13 @@ from dmf_pulse.private_v1.team_strength_live import (
 
 class _Parser(argparse.ArgumentParser):
     def error(self, message: str) -> Never:
-        self.exit(2, "Invalid L7 operator arguments; use --help.\n")
+        self.exit(2, "Invalid L8 operator arguments; use --help.\n")
 
 
 def parser() -> argparse.ArgumentParser:
-    result = _Parser(description="Historical consumed-L7 wrapper; no current live authority")
+    result = _Parser(
+        description="Separate public readiness and one-shot private CTS L8 observation"
+    )
     commands = result.add_subparsers(dest="command", required=True, parser_class=_Parser)
     public = commands.add_parser("public-preflight")
     public.add_argument("--commit", required=True)
@@ -98,7 +100,7 @@ def main() -> int:
     )
     print(json.dumps(json_safe(summary), sort_keys=True))
     return (
-        0 if summary["status"] == "CURRENT_TEAM_STRENGTH_001P_L7_LIVE_OBSERVATION_COMPLETE" else 2
+        0 if summary["status"] == "CURRENT_TEAM_STRENGTH_001P_L8_LIVE_OBSERVATION_COMPLETE" else 2
     )
 
 

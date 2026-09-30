@@ -1,0 +1,9 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001P-L8
+status: PHASE_A_ONLY
+parent: f4585eee4a3ea492b6a535f33fa13183734ab2ac
+branch: readiness/CURRENT-TEAM-STRENGTH-001P-L8-one-shot-live-observation
+approval: DMF-CTS-001P-L8-LIVE-RIGHTS-2026-09-30
+attestation: CURRENT-TEAM-STRENGTH-001P-L8#ONE-SHOT-2026-09-30
+private_live_execution: FORBIDDEN_IN_PHASE_A
+model_status: SHADOW_NOT_MODEL_INPUT
+production_activation: false

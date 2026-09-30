@@ -1,4 +1,4 @@
-"""Offline consumed-L1-L7 and no-L8 smoke in an external wheel."""
+"""Offline consumed-L1-L7 and exact-L8 smoke in an external wheel."""
 
 import json
 import shutil
@@ -25,7 +25,7 @@ socket.create_connection = denied
 socket.getaddrinfo = denied
 socket.socket.connect = denied
 import dmf_pulse
-from dmf_pulse.private_v1.team_strength_live_authority import validate_l1_authority, APPROVAL, ATTESTATION, CURRENT_APPROVAL, CURRENT_ATTESTATION, L1_APPROVAL, L1_ATTESTATION, L2_APPROVAL, L2_ATTESTATION, L3_APPROVAL, L3_ATTESTATION, L4_APPROVAL, L4_ATTESTATION, L5_APPROVAL, L5_ATTESTATION, L6_APPROVAL, L6_ATTESTATION, L7_APPROVAL, L7_ATTESTATION, ConsumedL1ApprovalError
+from dmf_pulse.private_v1.team_strength_live_authority import validate_l1_authority, APPROVAL, ATTESTATION, CURRENT_APPROVAL, CURRENT_ATTESTATION, L1_APPROVAL, L1_ATTESTATION, L2_APPROVAL, L2_ATTESTATION, L3_APPROVAL, L3_ATTESTATION, L4_APPROVAL, L4_ATTESTATION, L5_APPROVAL, L5_ATTESTATION, L6_APPROVAL, L6_ATTESTATION, L7_APPROVAL, L7_ATTESTATION, L8_APPROVAL, L8_ATTESTATION, ConsumedL1ApprovalError
 from dmf_pulse.private_v1.team_strength_diagnostics import ComparisonTrace, ComparisonStage, ComparisonReason, safe_comparison_failure
 from dmf_pulse.private_v1.team_strength_live import L1OperatorRequest, TeamStrengthL1ObservationService
 from dmf_pulse.ingestion.openfootball.team_strength_current import discover_current_resource
@@ -38,8 +38,9 @@ for approval, attestation in ((L1_APPROVAL, L1_ATTESTATION), (L2_APPROVAL, L2_AT
         pass
     else:
         raise AssertionError('consumed approval reusable')
-assert (APPROVAL, ATTESTATION) == (L7_APPROVAL, L7_ATTESTATION)
-assert (CURRENT_APPROVAL, CURRENT_ATTESTATION) == (None, None)
+assert (APPROVAL, ATTESTATION) == (L8_APPROVAL, L8_ATTESTATION)
+assert (CURRENT_APPROVAL, CURRENT_ATTESTATION) == (L8_APPROVAL, L8_ATTESTATION)
+validate_l1_authority(approval=L8_APPROVAL, attestation=L8_ATTESTATION, checked_at=stamp)
 try:
     discover_current_resource('HEAD')
 except ValueError:
@@ -67,7 +68,7 @@ assert result['fpl_requests'] == result['odds_requests'] == 0
 diagnostic = safe_comparison_failure(ComparisonTrace().failure(
     ComparisonStage.SEAL_COMPARISON, ComparisonReason.COMPARISON_SEAL_FAILED, ValueError('private')))
 assert diagnostic['stage'] == 'SEAL_COMPARISON' and 'private' not in json.dumps(diagnostic)
-print(json.dumps({'installed_import': True, 'no_l8_authority': True, 'l1_l2_l3_l4_l5_l6_l7_authorities_consumed': True, 'closed_diagnostic': True, 'mutable_source_rejected': True,
+print(json.dumps({'installed_import': True, 'exact_l8_authority': True, 'l1_l2_l3_l4_l5_l6_l7_authorities_consumed': True, 'closed_diagnostic': True, 'mutable_source_rejected': True,
     'wrong_purpose_blocked_before_providers': True, 'provider_calls': 0, 'production_activation': False}))
 """
 
