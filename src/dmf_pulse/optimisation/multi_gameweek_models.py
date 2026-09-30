@@ -243,7 +243,9 @@ class TransferActionScope(OptimisationModel):
 
 
 class SearchPolicy(OptimisationModel):
-    schema_version: Literal["multi-gameweek-search-policy-v1"] = "multi-gameweek-search-policy-v1"
+    schema_version: Literal[
+        "multi-gameweek-search-policy-v1", "multi-gameweek-search-policy-v2"
+    ] = "multi-gameweek-search-policy-v1"
     backend: Literal["BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"] = "BOUNDED_EXACT_MULTISTAGE_ENUMERATOR"
     max_transfers_per_node: NonNegativeInt
     transfer_action_scope: TransferActionScope | None = Field(
@@ -251,9 +253,18 @@ class SearchPolicy(OptimisationModel):
     )
     max_actions_per_state: PositiveInt
     max_state_expansions: PositiveInt
-    max_policy_candidates: PositiveInt
-    # Legacy v1 artifacts omitted this field and used max_policy_candidates for both
-    # units. Current governed policies must state the distinct physical-work bound.
+    # V1 authenticated policies used one field for two different resource units.
+    # It remains loadable only as the explicit legacy representation. V2 policies
+    # must state separate cumulative-generation and retained-frontier limits.
+    max_policy_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    max_generated_policy_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    max_retained_pareto_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     max_cumulative_legal_actions: PositiveInt | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
@@ -263,11 +274,49 @@ class SearchPolicy(OptimisationModel):
     deterministic_seed: NonNegativeInt = 0
     policy_sha256: Sha256
 
+    @model_validator(mode="after")
+    def policy_generation_limits_are_versioned(self) -> SearchPolicy:
+        explicit = (
+            self.max_generated_policy_candidates,
+            self.max_retained_pareto_candidates,
+        )
+        if self.schema_version == "multi-gameweek-search-policy-v1":
+            if self.max_policy_candidates is None or any(value is not None for value in explicit):
+                raise ValueError("v1 search policy requires only legacy max_policy_candidates")
+        elif self.max_policy_candidates is not None or any(value is None for value in explicit):
+            raise ValueError(
+                "v2 search policy requires distinct generated-policy and retained-Pareto limits"
+            )
+        if (
+            self.schema_version == "multi-gameweek-search-policy-v2"
+            and self.max_cumulative_legal_actions is None
+        ):
+            raise ValueError("v2 search policy requires max_cumulative_legal_actions")
+        return self
+
+    @property
+    def generated_policy_limit(self) -> int:
+        """Return the explicit v2 limit or the authenticated v1 legacy meaning."""
+
+        return self.max_generated_policy_candidates or self._legacy_policy_limit
+
+    @property
+    def retained_pareto_limit(self) -> int:
+        """Return the explicit v2 limit or the authenticated v1 legacy meaning."""
+
+        return self.max_retained_pareto_candidates or self._legacy_policy_limit
+
+    @property
+    def _legacy_policy_limit(self) -> int:
+        if self.max_policy_candidates is None:
+            raise ValueError("legacy policy limit is unavailable for a v2 policy")
+        return self.max_policy_candidates
+
     @property
     def cumulative_legal_action_limit(self) -> int:
         """Return the explicit current limit or the authenticated legacy-v1 meaning."""
 
-        return self.max_cumulative_legal_actions or self.max_policy_candidates
+        return self.max_cumulative_legal_actions or self._legacy_policy_limit
 
 
 class TerminalValuePolicy(OptimisationModel):
@@ -431,6 +480,12 @@ class Stage11LayerWork(OptimisationModel):
     legal_actions_generated: NonNegativeInt
     action_combinations_considered: NonNegativeInt
     unique_resulting_squads: NonNegativeInt
+    generated_policy_candidates: NonNegativeInt = 0
+    retained_pareto_candidates: NonNegativeInt = 0
+    objective_winners_retained: NonNegativeInt = 0
+    strict_pareto_dominance_events: NonNegativeInt = 0
+    tie_equivalence_events: NonNegativeInt = 0
+    peak_temporary_policy_candidates: NonNegativeInt = 0
 
 
 class SolverDiagnostics(OptimisationModel):
@@ -463,6 +518,12 @@ class SolverDiagnostics(OptimisationModel):
     configured_max_policy_candidates: PositiveInt | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
+    configured_max_generated_policy_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    configured_max_retained_pareto_candidates: PositiveInt | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     configured_max_returned_root_candidates: PositiveInt | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
@@ -472,6 +533,8 @@ class SolverDiagnostics(OptimisationModel):
     cumulative_legal_actions: NonNegativeInt | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
+    peak_materialized_policy_candidates: NonNegativeInt = 0
+    peak_retained_pareto_frontier: NonNegativeInt = 0
     reachable_layer_state_count: NonNegativeInt | None = Field(
         default=None, exclude_if=lambda value: value is None
     )
@@ -498,16 +561,37 @@ class SolverDiagnostics(OptimisationModel):
             self.cumulative_legal_actions,
             self.reachable_layer_state_count,
         )
+        split_policy_limits = (
+            self.configured_max_generated_policy_candidates,
+            self.configured_max_retained_pareto_candidates,
+        )
         if self.resource_limit_kind is None and any(
-            value is not None for value in resource_details
+            value is not None for value in (*resource_details, *split_policy_limits)
         ):
             raise ValueError("resource counters require a finite resource-limit identity")
         if self.resource_limit_kind is None and self.layer_work:
             raise ValueError("layer work requires a finite resource-limit identity")
         if self.resource_limit_kind is not None and any(
-            value is None for value in resource_details
+            value is None
+            for value in (
+                self.configured_max_actions_per_state,
+                self.configured_max_state_expansions,
+                self.configured_max_returned_root_candidates,
+                self.configured_cumulative_legal_action_limit,
+                self.observed_action_combinations,
+                self.cumulative_legal_actions,
+                self.reachable_layer_state_count,
+            )
         ):
             raise ValueError("resource-limit identity requires complete configured counters")
+        if self.resource_limit_kind is not None:
+            legacy = self.configured_max_policy_candidates is not None
+            split = all(value is not None for value in split_policy_limits)
+            partial_split = any(value is not None for value in split_policy_limits) and not split
+            if partial_split or legacy == split:
+                raise ValueError(
+                    "resource-limit identity requires exactly one legacy or split policy capacity"
+                )
         if tuple(item.depth for item in self.layer_work) != tuple(
             sorted({item.depth for item in self.layer_work})
         ):

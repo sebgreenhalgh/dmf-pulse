@@ -32,10 +32,21 @@ def load_multi_gameweek_search_policy(path: Path | None = None) -> SearchPolicy:
 
     try:
         raw = _load_policy_mapping(path, "multi_gameweek.yaml")
-        if "max_cumulative_legal_actions" not in raw:
+        required_v2 = {
+            "max_cumulative_legal_actions",
+            "max_generated_policy_candidates",
+            "max_retained_pareto_candidates",
+        }
+        missing = sorted(required_v2 - raw.keys())
+        if missing:
             raise ValueError(
-                "current policy requires distinct max_cumulative_legal_actions governance"
+                "current policy requires distinct v2 physical-work governance: "
+                + ", ".join(missing)
             )
+        if raw.get("schema_version") != "multi-gameweek-search-policy-v2":
+            raise ValueError("current policy must use multi-gameweek-search-policy-v2")
+        if "max_policy_candidates" in raw:
+            raise ValueError("current v2 policy must not retain overloaded max_policy_candidates")
         raw["policy_sha256"] = "0" * 64
         return seal_search_policy(SearchPolicy.model_validate(raw))
     except (OSError, RulesValidationError, ValidationError, ValueError) as exc:

@@ -279,6 +279,25 @@ def test_deterministic_linear_fast_path_matches_generic_oracle_exactly() -> None
     assert fast_evaluator.calls == 0
 
 
+def test_layered_discovery_replays_instead_of_retaining_applied_transitions() -> None:
+    request = _request()
+    expected = BoundedExactEnumerator(request=request, evaluator=_ExactSurrogate()).enumerate()
+    profile = Stage11SearchProfile()
+    enumerator = DeterministicLinearExactEnumerator(
+        request=request,
+        evaluator=_ExactSurrogate(),
+        profile=profile,
+    )
+
+    actual = enumerator.enumerate()
+
+    assert actual.candidates == expected.candidates
+    assert enumerator._prevalidated_transitions == {}
+    assert sum(node.transition_applications for node in profile.nodes.values()) > sum(
+        node.legal_actions_generated for node in profile.nodes.values()
+    )
+
+
 def test_fast_path_request_on_branching_tree_falls_back_to_generic() -> None:
     request = _request(branching=True)
     expected = BoundedExactEnumerator(request=request, evaluator=_ExactSurrogate()).enumerate()
@@ -544,6 +563,7 @@ def _semantic_publication(value):
                 "action_candidates",
                 "policy_candidates",
                 "pareto_candidates",
+                "peak_materialized_policy_candidates",
                 "memo_entries",
             }
         )

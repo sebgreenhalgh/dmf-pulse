@@ -13,9 +13,11 @@ from dmf_pulse.optimisation.multi_gameweek_errors import InputInvalidError
 from dmf_pulse.optimisation.multi_gameweek_models import (
     MultiGameweekResultStatus,
     ScenarioTree,
+    SearchPolicy,
     TerminalValuePolicy,
     seal_request,
     seal_scenario_tree,
+    seal_search_policy,
 )
 from dmf_pulse.optimisation.multi_gameweek_policy import (
     load_multi_gameweek_search_policy,
@@ -353,11 +355,25 @@ def test_packaged_search_and_terminal_policies_match_reviewable_configs() -> Non
         Path("config/optimisation/multi_gameweek_terminal.yaml")
     )
     assert packaged_search == configured_search
-    assert packaged_search.max_policy_candidates == 786432
-    assert packaged_search.max_cumulative_legal_actions == 786432
-    assert packaged_search.cumulative_legal_action_limit == 786432
-    legacy = packaged_search.model_copy(update={"max_cumulative_legal_actions": None})
-    assert legacy.cumulative_legal_action_limit == legacy.max_policy_candidates
+    assert packaged_search.schema_version == "multi-gameweek-search-policy-v2"
+    assert packaged_search.max_policy_candidates is None
+    assert packaged_search.generated_policy_limit == 2097152
+    assert packaged_search.retained_pareto_limit == 786432
+    assert packaged_search.cumulative_legal_action_limit == 2097152
+    legacy_payload = packaged_search.model_dump(mode="python")
+    legacy_payload.update(
+        {
+            "schema_version": "multi-gameweek-search-policy-v1",
+            "max_policy_candidates": 786432,
+            "max_cumulative_legal_actions": None,
+            "policy_sha256": "0" * 64,
+        }
+    )
+    legacy_payload.pop("max_generated_policy_candidates")
+    legacy_payload.pop("max_retained_pareto_candidates")
+    legacy = seal_search_policy(SearchPolicy.model_validate(legacy_payload))
+    assert legacy.generated_policy_limit == legacy.retained_pareto_limit == 786432
+    assert legacy.cumulative_legal_action_limit == 786432
     assert packaged_terminal == configured_terminal
     assert not packaged_terminal.enabled
     assert packaged_terminal.bank_points_per_tenth == Decimal(0)
@@ -372,7 +388,7 @@ def test_current_search_policy_loader_requires_distinct_cumulative_action_cap(tm
     )
     path = tmp_path / "missing-cumulative-cap.yaml"
     path.write_text(missing + "\n", encoding="utf-8")
-    with pytest.raises(InputInvalidError, match="distinct max_cumulative_legal_actions"):
+    with pytest.raises(InputInvalidError, match="distinct v2 physical-work governance"):
         load_multi_gameweek_search_policy(path)
 
 

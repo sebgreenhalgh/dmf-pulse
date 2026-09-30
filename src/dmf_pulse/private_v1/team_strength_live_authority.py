@@ -1,4 +1,4 @@
-"""Consumed L1-L6 history and the exact current L7 one-shot authority.
+"""Permanently consumed L1-L7 history; no current live authority exists.
 
 Legacy function/exception names remain stable; there is no runtime reset/selector.
 """
@@ -29,10 +29,18 @@ L7_APPROVAL = "DMF-CTS-001P-L7-LIVE-RIGHTS-2026-09-29"
 L7_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L7#ONE-SHOT-2026-09-29"
 APPROVAL = L7_APPROVAL
 ATTESTATION = L7_ATTESTATION
-CURRENT_APPROVAL = L7_APPROVAL
-CURRENT_ATTESTATION = L7_ATTESTATION
+CURRENT_APPROVAL: str | None = None
+CURRENT_ATTESTATION: str | None = None
 CONSUMED_APPROVALS = frozenset(
-    {L1_APPROVAL, L2_APPROVAL, L3_APPROVAL, L4_APPROVAL, L5_APPROVAL, L6_APPROVAL}
+    {
+        L1_APPROVAL,
+        L2_APPROVAL,
+        L3_APPROVAL,
+        L4_APPROVAL,
+        L5_APPROVAL,
+        L6_APPROVAL,
+        L7_APPROVAL,
+    }
 )
 FPL_PROFILE = "fpl_official_private_operator_initiated_read_v1"
 ODDS_PROFILE = "the_odds_api_private_analytics_v1"
@@ -62,12 +70,16 @@ def validate_l1_authority(*, approval: str, attestation: str, checked_at: dateti
         raise ValueError("live authority clock must be aware")
     if approval in CONSUMED_APPROVALS:
         raise ConsumedL1ApprovalError("prior live approval consumed; fresh decision required")
-    if approval != CURRENT_APPROVAL or attestation != CURRENT_ATTESTATION:
+    if (
+        CURRENT_APPROVAL is None
+        or approval != CURRENT_APPROVAL
+        or attestation != CURRENT_ATTESTATION
+    ):
         raise ValueError("current team-strength live authority mismatch")
     fpl = load_fpl_rights()[FPL_PROFILE]
     odds = load_odds_rights()[ODDS_PROFILE]
     if profile_sha(fpl) != FPL_PROFILE_SHA or profile_sha(odds) != ODDS_PROFILE_SHA:
-        raise ValueError("L7 exact provider purpose or capability authority differs")
+        raise ValueError("exact provider purpose or capability authority differs")
     if any(row.approved_at is None or row.approved_at > checked_at for row in (fpl, odds)):
-        raise ValueError("L7 provider approval is unavailable at cutoff")
+        raise ValueError("provider approval is unavailable at cutoff")
     require_team_strength_rights()

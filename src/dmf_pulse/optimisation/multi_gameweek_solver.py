@@ -814,6 +814,8 @@ class SearchCounters:
     cumulative_legal_actions: int = 0
     cumulative_legal_action_limit: int = 0
     reachable_layer_state_count: int = 0
+    peak_materialized_policy_candidates: int = 0
+    peak_retained_pareto_frontier: int = 0
     layer_work: tuple[Stage11LayerWork, ...] = ()
 
 
@@ -834,6 +836,10 @@ class Stage11NodeProfile:
     tactical_evaluator_calls: int = 0
     policy_candidates_generated: int = 0
     pareto_candidates_retained: int = 0
+    objective_winners_retained: int = 0
+    strict_pareto_dominance_events: int = 0
+    tie_equivalence_events: int = 0
+    peak_temporary_policy_candidates: int = 0
     memo_hits: int = 0
     memo_misses: int = 0
     action_enumeration_seconds: float = 0.0
@@ -892,6 +898,10 @@ class Stage11NodeProfile:
             "tactical_evaluator_calls": self.tactical_evaluator_calls,
             "policy_candidates_generated": self.policy_candidates_generated,
             "pareto_candidates_retained": self.pareto_candidates_retained,
+            "objective_winners_retained": self.objective_winners_retained,
+            "strict_pareto_dominance_events": self.strict_pareto_dominance_events,
+            "tie_equivalence_events": self.tie_equivalence_events,
+            "peak_temporary_candidate_population": self.peak_temporary_policy_candidates,
             "memo_hits": self.memo_hits,
             "memo_misses": self.memo_misses,
             "action_enumeration_seconds": self.action_enumeration_seconds,
@@ -965,6 +975,12 @@ class Stage11SearchProfile:
                 legal_actions_generated=item.legal_actions_generated,
                 action_combinations_considered=item.action_combinations_considered,
                 unique_resulting_squads=len(item.unique_resulting_squads),
+                generated_policy_candidates=item.policy_candidates_generated,
+                retained_pareto_candidates=item.pareto_candidates_retained,
+                objective_winners_retained=item.objective_winners_retained,
+                strict_pareto_dominance_events=item.strict_pareto_dominance_events,
+                tie_equivalence_events=item.tie_equivalence_events,
+                peak_temporary_policy_candidates=item.peak_temporary_policy_candidates,
             )
             for item in sorted(self.nodes.values(), key=lambda value: value.depth)
         )
@@ -984,6 +1000,24 @@ class Stage11SearchProfile:
             ),
             "cumulative_tactical_requests": sum(
                 n.tactical_evaluator_calls for n in self.nodes.values()
+            ),
+            "cumulative_generated_policy_candidates": sum(
+                n.policy_candidates_generated for n in self.nodes.values()
+            ),
+            "cumulative_retained_pareto_candidates": sum(
+                n.pareto_candidates_retained for n in self.nodes.values()
+            ),
+            "cumulative_objective_winners_retained": sum(
+                n.objective_winners_retained for n in self.nodes.values()
+            ),
+            "cumulative_strict_pareto_dominance_events": sum(
+                n.strict_pareto_dominance_events for n in self.nodes.values()
+            ),
+            "cumulative_tie_equivalence_events": sum(
+                n.tie_equivalence_events for n in self.nodes.values()
+            ),
+            "peak_temporary_policy_candidates": max(
+                (n.peak_temporary_policy_candidates for n in self.nodes.values()), default=0
             ),
             "memo_hits": self.memo_hits,
             "memo_misses": self.memo_misses,
@@ -1043,6 +1077,106 @@ def _pareto_frontier(candidates: list[PolicyCandidate]) -> tuple[PolicyCandidate
             key=lambda value: value.tie_key,
         )
     )
+
+
+def _objective_winner_count(candidates: tuple[PolicyCandidate, ...]) -> int:
+    """Count distinct deterministic winners across every supported objective."""
+
+    return len({select_candidate(candidates, mode=mode).tie_key for mode in ObjectiveMode})
+
+
+@dataclass
+class _ExactParetoAccumulator:
+    """Maintain the exact Pareto set without retaining dominated candidates."""
+
+    _frontier: dict[tuple[Decimal, Decimal, Decimal], PolicyCandidate] = field(default_factory=dict)
+    evaluated: int = 0
+    peak_materialized: int = 0
+    strict_dominance_events: int = 0
+    tie_equivalence_events: int = 0
+
+    def add(self, candidate: PolicyCandidate) -> None:
+        self.evaluated += 1
+        self.peak_materialized = max(self.peak_materialized, len(self._frontier) + 1)
+        score = (
+            candidate.expected_score,
+            candidate.conservative_score,
+            candidate.upside_score,
+        )
+        equal = self._frontier.get(score)
+        if equal is not None:
+            self.tie_equivalence_events += 1
+            if candidate.tie_key < equal.tie_key:
+                self._frontier[score] = candidate
+            return
+        if any(_dominates(item, candidate) for item in self._frontier.values()):
+            self.strict_dominance_events += 1
+            return
+        dominated = tuple(
+            key for key, item in self._frontier.items() if _dominates(candidate, item)
+        )
+        for key in dominated:
+            del self._frontier[key]
+        self.strict_dominance_events += len(dominated)
+        self._frontier[score] = candidate
+
+    def values(self) -> tuple[PolicyCandidate, ...]:
+        return tuple(sorted(self._frontier.values(), key=lambda item: item.tie_key))
+
+    @property
+    def retained_count(self) -> int:
+        return len(self._frontier)
+
+
+@dataclass
+class _RootSufficientAccumulator:
+    """Stream the lossless root summary used by every public result surface."""
+
+    pareto: _ExactParetoAccumulator = field(default_factory=_ExactParetoAccumulator)
+    winners: dict[tuple[str, ObjectiveMode], PolicyCandidate] = field(default_factory=dict)
+    evaluated: int = 0
+    peak_materialized: int = 0
+
+    def add(self, candidate: PolicyCandidate) -> None:
+        self.evaluated += 1
+        retained_before = {
+            id(item) for item in (*self.pareto._frontier.values(), *self.winners.values())
+        }
+        self.peak_materialized = max(
+            self.peak_materialized,
+            len(retained_before | {id(candidate)}),
+        )
+        self.pareto.add(candidate)
+        signature = candidate.root_action.signature
+        metrics: dict[ObjectiveMode, Decimal] = {
+            ObjectiveMode.EXPECTED: candidate.expected_score,
+            ObjectiveMode.CONSERVATIVE: candidate.conservative_score,
+            ObjectiveMode.HIGH_UPSIDE: candidate.upside_score,
+        }
+        for mode, score in metrics.items():
+            key = (signature, mode)
+            incumbent = self.winners.get(key)
+            if incumbent is None:
+                self.winners[key] = candidate
+                continue
+            incumbent_score = {
+                ObjectiveMode.EXPECTED: incumbent.expected_score,
+                ObjectiveMode.CONSERVATIVE: incumbent.conservative_score,
+                ObjectiveMode.HIGH_UPSIDE: incumbent.upside_score,
+            }[mode]
+            if score > incumbent_score or (
+                score == incumbent_score and candidate.tie_key < incumbent.tie_key
+            ):
+                self.winners[key] = candidate
+        retained_after = {
+            id(item) for item in (*self.pareto._frontier.values(), *self.winners.values())
+        }
+        self.peak_materialized = max(self.peak_materialized, len(retained_after))
+
+    def values(self) -> tuple[PolicyCandidate, ...]:
+        retained = {item.tie_key: item for item in self.winners.values()}
+        retained.update({item.tie_key: item for item in self.pareto.values()})
+        return tuple(sorted(retained.values(), key=lambda item: item.tie_key))
 
 
 def select_candidate(
@@ -1142,9 +1276,34 @@ def _enforce_pareto_frontier_limit(
 ) -> None:
     """Fail closed if a lossless exact frontier crosses its distinct retained bound."""
 
-    if len(frontier) > policy.max_policy_candidates:
+    if len(frontier) > policy.retained_pareto_limit:
         raise ResourceLimitReached(
-            "exact Pareto frontier exceeds max_policy_candidates; no unsafe pruning applied",
+            "exact Pareto frontier exceeds max_retained_pareto_candidates; "
+            "no unsafe pruning applied",
+            kind=ResourceLimitKind.PARETO_FRONTIER_LIMIT,
+            counters=counters,
+        )
+
+
+def _enforce_streaming_pareto_limit(
+    accumulator: _ExactParetoAccumulator,
+    *,
+    policy: SearchPolicy,
+    counters: SearchCounters,
+    profile: Stage11SearchProfile | None = None,
+) -> None:
+    """Enforce the retained-frontier physical bound at every streaming step."""
+
+    counters.peak_retained_pareto_frontier = max(
+        counters.peak_retained_pareto_frontier,
+        accumulator.retained_count,
+    )
+    if accumulator.retained_count > policy.retained_pareto_limit:
+        if profile is not None:
+            counters.layer_work = profile.safe_layer_work()
+        raise ResourceLimitReached(
+            "exact streaming Pareto frontier exceeds max_retained_pareto_candidates; "
+            "no unsafe pruning applied",
             kind=ResourceLimitKind.PARETO_FRONTIER_LIMIT,
             counters=counters,
         )
@@ -1236,6 +1395,38 @@ class BoundedExactEnumerator:
         del node_id, state
         return cached
 
+    def _record_policy_retention(
+        self,
+        node: ScenarioTreeNode,
+        accumulator: _RootSufficientAccumulator,
+        retained: tuple[PolicyCandidate, ...],
+    ) -> None:
+        pareto = accumulator.pareto.values()
+        _enforce_pareto_frontier_limit(
+            pareto,
+            policy=self.request.search_policy,
+            counters=self.counters,
+        )
+        self.counters.pareto_candidates += len(pareto)
+        self.counters.peak_materialized_policy_candidates = max(
+            self.counters.peak_materialized_policy_candidates,
+            accumulator.peak_materialized,
+        )
+        profile = self._node_profile(node)
+        if profile is None:
+            return
+        profile.pareto_candidates_retained += len(pareto)
+        profile.objective_winners_retained += len(
+            {candidate.tie_key for candidate in accumulator.winners.values()}
+        )
+        profile.strict_pareto_dominance_events += accumulator.pareto.strict_dominance_events
+        profile.tie_equivalence_events += accumulator.pareto.tie_equivalence_events
+        profile.peak_temporary_policy_candidates = max(
+            profile.peak_temporary_policy_candidates,
+            accumulator.peak_materialized,
+        )
+        profile.peak_retained_frontier = max(profile.peak_retained_frontier, len(pareto))
+
     def enumerate(self) -> FrontierResult:
         root = root_node(self.request.scenario_tree)
         self._record_state(root, self.request.initial_state)
@@ -1244,20 +1435,32 @@ class BoundedExactEnumerator:
             node=root,
             root_no_transfer_only=self.root_no_transfer_only,
         )
-        candidates: list[PolicyCandidate] = []
+        accumulator = _RootSufficientAccumulator()
+        root_profile = self._node_profile(root)
         try:
             for action in actions:
-                candidates.extend(
-                    self._generate_for_action(root.node_id, self.request.initial_state, action)
-                )
+                for candidate in self._generate_for_action(
+                    root.node_id, self.request.initial_state, action
+                ):
+                    started = perf_counter()
+                    accumulator.add(candidate)
+                    _enforce_streaming_pareto_limit(
+                        accumulator.pareto,
+                        policy=self.request.search_policy,
+                        counters=self.counters,
+                        profile=self.profile,
+                    )
+                    if root_profile is not None:
+                        root_profile.pareto_seconds += perf_counter() - started
         except ResourceLimitReached as exc:
-            if not candidates:
+            retained = accumulator.values()
+            if not retained:
                 raise ResourceLimitReached(
                     exc.message,
                     kind=exc.kind,
                     counters=self.counters,
                 ) from exc
-            retained = _root_sufficient_candidates(candidates)
+            self._record_policy_retention(root, accumulator, retained)
             return FrontierResult(
                 candidates=retained,
                 diagnostics=self._diagnostics(
@@ -1269,19 +1472,10 @@ class BoundedExactEnumerator:
                 ),
                 complete=False,
             )
-        if not candidates:
+        retained = accumulator.values()
+        if not retained:
             raise InfeasiblePolicyError("declared tree/action space contains no feasible policy")
-        started = perf_counter()
-        pareto = _pareto_frontier(candidates)
-        root_profile = self._node_profile(root)
-        if root_profile is not None:
-            root_profile.pareto_seconds += perf_counter() - started
-            root_profile.pareto_candidates_retained += len(pareto)
-            root_profile.peak_retained_frontier = max(
-                root_profile.peak_retained_frontier, len(pareto)
-            )
-        self.counters.pareto_candidates += len(pareto)
-        retained = _root_sufficient_candidates(candidates)
+        self._record_policy_retention(root, accumulator, retained)
         if root_profile is not None:
             root_profile.states_solved += 1
         if len(retained) > self.request.search_policy.max_returned_root_candidates:
@@ -1342,6 +1536,8 @@ class BoundedExactEnumerator:
             action_candidates=self.counters.action_candidates,
             policy_candidates=self.counters.policy_candidates,
             pareto_candidates=self.counters.pareto_candidates,
+            peak_materialized_policy_candidates=(self.counters.peak_materialized_policy_candidates),
+            peak_retained_pareto_frontier=self.counters.peak_retained_pareto_frontier,
             memo_entries=len(self.memo),
             resource_limit_kind=resource_limit_kind,
             configured_max_actions_per_state=(
@@ -1356,6 +1552,16 @@ class BoundedExactEnumerator:
             ),
             configured_max_policy_candidates=(
                 self.request.search_policy.max_policy_candidates
+                if resource_limit_kind is not None
+                else None
+            ),
+            configured_max_generated_policy_candidates=(
+                self.request.search_policy.max_generated_policy_candidates
+                if resource_limit_kind is not None
+                else None
+            ),
+            configured_max_retained_pareto_candidates=(
+                self.request.search_policy.max_retained_pareto_candidates
                 if resource_limit_kind is not None
                 else None
             ),
@@ -1406,17 +1612,36 @@ class BoundedExactEnumerator:
             state,
             node=node,
         )
-        generated: list[PolicyCandidate] = []
+        accumulator = _ExactParetoAccumulator()
         for action in actions:
-            generated.extend(self._generate_for_action(node_id, state, action))
-        if not generated:
+            for candidate in self._generate_for_action(node_id, state, action):
+                started = perf_counter()
+                accumulator.add(candidate)
+                _enforce_streaming_pareto_limit(
+                    accumulator,
+                    policy=self.request.search_policy,
+                    counters=self.counters,
+                    profile=self.profile,
+                )
+                if profile is not None:
+                    profile.pareto_seconds += perf_counter() - started
+        frontier = accumulator.values()
+        if not frontier:
             raise InfeasiblePolicyError(f"node {node_id} has no complete contingent policy")
-        started = perf_counter()
-        frontier = _pareto_frontier(generated)
         if profile is not None:
-            profile.pareto_seconds += perf_counter() - started
             profile.pareto_candidates_retained += len(frontier)
+            profile.objective_winners_retained += _objective_winner_count(frontier)
+            profile.strict_pareto_dominance_events += accumulator.strict_dominance_events
+            profile.tie_equivalence_events += accumulator.tie_equivalence_events
+            profile.peak_temporary_policy_candidates = max(
+                profile.peak_temporary_policy_candidates,
+                accumulator.peak_materialized,
+            )
             profile.peak_retained_frontier = max(profile.peak_retained_frontier, len(frontier))
+        self.counters.peak_materialized_policy_candidates = max(
+            self.counters.peak_materialized_policy_candidates,
+            accumulator.peak_materialized,
+        )
         self.counters.pareto_candidates += len(frontier)
         _enforce_pareto_frontier_limit(
             frontier,
@@ -1568,9 +1793,12 @@ class BoundedExactEnumerator:
         profile = self._node_profile(node_map(self.request.scenario_tree)[node_id])
         if profile is not None:
             profile.policy_candidates_generated += 1
-        if self.counters.policy_candidates > self.request.search_policy.max_policy_candidates:
+        if self.counters.policy_candidates > self.request.search_policy.generated_policy_limit:
+            if self.profile is not None:
+                self.counters.layer_work = self.profile.safe_layer_work()
             raise ResourceLimitReached(
-                "generated policy count exceeds max_policy_candidates before exact exhaustion",
+                "generated policy count exceeds max_generated_policy_candidates "
+                "before exact exhaustion",
                 kind=ResourceLimitKind.POLICY_GENERATION_LIMIT,
                 counters=self.counters,
             )
@@ -1808,9 +2036,12 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
     def _prepare_layers(self) -> None:
         """Discover exact reachable states forward; evaluate and solve layers backward.
 
-        Retain already-validated transitions under the inherited whole-policy work
-        envelope, then consume them during backward scoring. Memo hits for another
-        history still replay; no action/frontier is pruned.
+        Retain the complete deterministic legal-action layers under the inherited
+        whole-policy work envelope. Discovery transitions are consumed immediately
+        for squad/next-state construction, then the canonical transition is replayed
+        during backward scoring. This trades exact transition work for bounded memory;
+        no action, state or frontier is pruned. Memo hits for another history still
+        replay.
         """
         nodes = tuple(sorted(self.request.scenario_tree.nodes, key=lambda n: n.gameweek))
         budget = self.work_budget or Stage11WorkBudget(
@@ -1877,9 +2108,9 @@ class DeterministicLinearExactEnumerator(BoundedExactEnumerator):
                         )
                     self._layer_actions[key] = actions
                     for action in actions:
-                        transition = self._prevalidated_transitions[
+                        transition = self._prevalidated_transitions.pop(
                             (state.state_sha256, action.action_id)
-                        ]
+                        )
                         squads.add(transition.state.squad_ids)
                         if depth + 1 < len(nodes):
                             child = nodes[depth + 1]

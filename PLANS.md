@@ -1,5 +1,25 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001P-L7-D7
+
+- Work only from immutable L7 parent `57f578efa168919b63574fa8a3bd4656b6b6d4bf`
+  in an isolated worktree. This is an offline Stage-11 policy-generation capacity
+  ticket: no provider access, credential inspection, L7 retry, L8 authority,
+  candidate narrowing, approximation, team-strength activation, or private-data
+  reconstruction.
+- Separate cumulative generated-policy work from retained exact Pareto-frontier
+  cardinality while preserving authenticated legacy policy compatibility and every
+  D5/D6 finite diagnostic. Preserve the single D6 deterministic fast-path authority
+  and lossless no-transfer baseline reuse.
+- Build repository-owned baseline-like and shifted-shadow-like L7-shaped stresses,
+  measure complete exact work under a 10-million offline-only ceiling, and derive
+  explicit governed generated-policy, retained-frontier, and cumulative-action
+  capacities from measured demand plus documented headroom.
+- Prove every remediation equal to a deliberately high-cap reference across all
+  objectives, frontiers, future policy, baseline, root counterfactual, and semantic
+  decision output. Record L1-L7 consumed, complete full offline acceptance,
+  installed-wheel verification, independent review, publication, and exact-SHA CI.
+
 ## CURRENT-TEAM-STRENGTH-001P-L7 Phase A only
 
 - Work only from immutable D6 parent `fbafe72bba6639c9f6758bd2ccf3a9288876e1a7`

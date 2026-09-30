@@ -1,6 +1,6 @@
-"""Separate public preflight and terminal-only private L7 observation.
+"""Historical terminal-only L7 wrapper; all live authorities are consumed.
 
-Legacy filename retained; L1-L6 are consumed and the exact L7 pair is current.
+Legacy filename retained; L1-L7 are consumed and no L8 pair exists.
 This script has no retry loop, output-file option, normal CLI registration, model
 selector, scenario-count override or player-allocation override.
 """
@@ -34,9 +34,7 @@ class _Parser(argparse.ArgumentParser):
 
 
 def parser() -> argparse.ArgumentParser:
-    result = _Parser(
-        description="Separate public readiness and one-shot private CTS L7 observation"
-    )
+    result = _Parser(description="Historical consumed-L7 wrapper; no current live authority")
     commands = result.add_subparsers(dest="command", required=True, parser_class=_Parser)
     public = commands.add_parser("public-preflight")
     public.add_argument("--commit", required=True)

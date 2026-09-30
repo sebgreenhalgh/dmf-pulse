@@ -320,6 +320,12 @@ def test_resource_limit_identity_and_safe_counters_reach_terminal_diagnostic():
             "legal_actions_generated": 1032,
             "action_combinations_considered": 1032,
             "unique_resulting_squads": 800,
+            "generated_policy_candidates": 0,
+            "retained_pareto_candidates": 0,
+            "objective_winners_retained": 0,
+            "strict_pareto_dominance_events": 0,
+            "tie_equivalence_events": 0,
+            "peak_temporary_policy_candidates": 0,
         }
     ]
     safe_text = json.dumps(result)

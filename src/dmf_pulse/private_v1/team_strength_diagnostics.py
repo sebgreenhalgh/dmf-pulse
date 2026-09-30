@@ -223,6 +223,12 @@ class ComparisonFailureDiagnostic(BaseModel):
     configured_max_policy_candidates: int | None = Field(
         default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
     )
+    configured_max_generated_policy_candidates: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    configured_max_retained_pareto_candidates: int | None = Field(
+        default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
+    )
     configured_max_returned_root_candidates: int | None = Field(
         default=None, ge=1, le=100_000_000, exclude_if=lambda value: value is None
     )
@@ -242,6 +248,12 @@ class ComparisonFailureDiagnostic(BaseModel):
         default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
     )
     observed_pareto_candidates: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_peak_materialized_policy_candidates: int | None = Field(
+        default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
+    )
+    observed_peak_retained_pareto_frontier: int | None = Field(
         default=None, ge=0, le=100_000_000, exclude_if=lambda value: value is None
     )
     cumulative_legal_actions: int | None = Field(
@@ -289,7 +301,6 @@ class ComparisonFailureDiagnostic(BaseModel):
         resource_values = (
             self.configured_max_actions_per_state,
             self.configured_max_state_expansions,
-            self.configured_max_policy_candidates,
             self.configured_max_returned_root_candidates,
             self.configured_cumulative_legal_action_limit,
             self.observed_state_expansions,
@@ -297,10 +308,19 @@ class ComparisonFailureDiagnostic(BaseModel):
             self.observed_action_candidates,
             self.observed_policy_candidates,
             self.observed_pareto_candidates,
+            self.observed_peak_materialized_policy_candidates,
+            self.observed_peak_retained_pareto_frontier,
             self.cumulative_legal_actions,
             self.reachable_layer_state_count,
         )
-        if self.resource_limit_kind is None and any(value is not None for value in resource_values):
+        policy_limits = (
+            self.configured_max_policy_candidates,
+            self.configured_max_generated_policy_candidates,
+            self.configured_max_retained_pareto_candidates,
+        )
+        if self.resource_limit_kind is None and any(
+            value is not None for value in (*resource_values, *policy_limits)
+        ):
             raise ValueError("resource counters require a finite resource-limit identity")
         if self.resource_limit_kind is None and self.layer_work:
             raise ValueError("layer work requires a finite resource-limit identity")
@@ -309,6 +329,14 @@ class ComparisonFailureDiagnostic(BaseModel):
             or any(value is None for value in resource_values)
         ):
             raise ValueError("resource-limit identity requires complete safe counters")
+        if self.resource_limit_kind is not None:
+            legacy = self.configured_max_policy_candidates is not None
+            split = all(value is not None for value in policy_limits[1:])
+            partial_split = any(value is not None for value in policy_limits[1:]) and not split
+            if partial_split or legacy == split:
+                raise ValueError(
+                    "resource-limit identity requires exactly one legacy or split policy capacity"
+                )
         if not (
             self.gameweeks_stage9_mc_passed
             <= self.gameweeks_stage9_assembled
@@ -366,6 +394,8 @@ class ComparisonTrace:
     configured_max_actions_per_state: int | None = None
     configured_max_state_expansions: int | None = None
     configured_max_policy_candidates: int | None = None
+    configured_max_generated_policy_candidates: int | None = None
+    configured_max_retained_pareto_candidates: int | None = None
     configured_max_returned_root_candidates: int | None = None
     configured_cumulative_legal_action_limit: int | None = None
     observed_state_expansions: int | None = None
@@ -373,6 +403,8 @@ class ComparisonTrace:
     observed_action_candidates: int | None = None
     observed_policy_candidates: int | None = None
     observed_pareto_candidates: int | None = None
+    observed_peak_materialized_policy_candidates: int | None = None
+    observed_peak_retained_pareto_frontier: int | None = None
     cumulative_legal_actions: int | None = None
     reachable_layer_state_count: int | None = None
     layer_work: tuple[Stage11LayerWork, ...] = ()
@@ -404,6 +436,8 @@ class ComparisonTrace:
         self.configured_max_actions_per_state = None
         self.configured_max_state_expansions = None
         self.configured_max_policy_candidates = None
+        self.configured_max_generated_policy_candidates = None
+        self.configured_max_retained_pareto_candidates = None
         self.configured_max_returned_root_candidates = None
         self.configured_cumulative_legal_action_limit = None
         self.observed_state_expansions = None
@@ -411,6 +445,8 @@ class ComparisonTrace:
         self.observed_action_candidates = None
         self.observed_policy_candidates = None
         self.observed_pareto_candidates = None
+        self.observed_peak_materialized_policy_candidates = None
+        self.observed_peak_retained_pareto_frontier = None
         self.cumulative_legal_actions = None
         self.reachable_layer_state_count = None
         self.layer_work = ()
@@ -486,6 +522,12 @@ class ComparisonTrace:
                 configured_max_policy_candidates=(
                     self.configured_max_policy_candidates if world_stage else None
                 ),
+                configured_max_generated_policy_candidates=(
+                    self.configured_max_generated_policy_candidates if world_stage else None
+                ),
+                configured_max_retained_pareto_candidates=(
+                    self.configured_max_retained_pareto_candidates if world_stage else None
+                ),
                 configured_max_returned_root_candidates=(
                     self.configured_max_returned_root_candidates if world_stage else None
                 ),
@@ -504,6 +546,12 @@ class ComparisonTrace:
                 ),
                 observed_pareto_candidates=(
                     self.observed_pareto_candidates if world_stage else None
+                ),
+                observed_peak_materialized_policy_candidates=(
+                    self.observed_peak_materialized_policy_candidates if world_stage else None
+                ),
+                observed_peak_retained_pareto_frontier=(
+                    self.observed_peak_retained_pareto_frontier if world_stage else None
                 ),
                 cumulative_legal_actions=(self.cumulative_legal_actions if world_stage else None),
                 reachable_layer_state_count=(
@@ -636,8 +684,16 @@ def note_optimiser_result(*, status: object, solver_status: object) -> None:
             trace.configured_max_state_expansions = int(
                 getattr(solver_status, "configured_max_state_expansions", 0) or 0
             )
-            trace.configured_max_policy_candidates = int(
-                getattr(solver_status, "configured_max_policy_candidates", 0) or 0
+            trace.configured_max_policy_candidates = (
+                int(getattr(solver_status, "configured_max_policy_candidates", 0) or 0) or None
+            )
+            trace.configured_max_generated_policy_candidates = (
+                int(getattr(solver_status, "configured_max_generated_policy_candidates", 0) or 0)
+                or None
+            )
+            trace.configured_max_retained_pareto_candidates = (
+                int(getattr(solver_status, "configured_max_retained_pareto_candidates", 0) or 0)
+                or None
             )
             trace.configured_max_returned_root_candidates = int(
                 getattr(solver_status, "configured_max_returned_root_candidates", 0) or 0
@@ -652,6 +708,12 @@ def note_optimiser_result(*, status: object, solver_status: object) -> None:
             trace.observed_action_candidates = int(getattr(solver_status, "action_candidates", 0))
             trace.observed_policy_candidates = int(getattr(solver_status, "policy_candidates", 0))
             trace.observed_pareto_candidates = int(getattr(solver_status, "pareto_candidates", 0))
+            trace.observed_peak_materialized_policy_candidates = int(
+                getattr(solver_status, "peak_materialized_policy_candidates", 0)
+            )
+            trace.observed_peak_retained_pareto_frontier = int(
+                getattr(solver_status, "peak_retained_pareto_frontier", 0)
+            )
             trace.cumulative_legal_actions = int(
                 getattr(solver_status, "cumulative_legal_actions", 0)
             )

@@ -88,6 +88,12 @@ def test_cumulative_work_limits_fail_before_any_tactical_batch(limit_field):
             "legal_actions_generated",
             "action_combinations_considered",
             "unique_resulting_squads",
+            "generated_policy_candidates",
+            "retained_pareto_candidates",
+            "objective_winners_retained",
+            "strict_pareto_dominance_events",
+            "tie_equivalence_events",
+            "peak_temporary_policy_candidates",
         }
     else:
         assert caught.value.counters.reachable_layer_state_count > 1

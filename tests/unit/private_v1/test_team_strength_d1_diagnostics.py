@@ -319,6 +319,9 @@ def test_consumed_authority_blocks_before_any_credentials_or_provider():
     assert result["prior_l2_one_shot_consumed"]
     assert result["prior_l3_one_shot_consumed"]
     assert result["prior_l4_one_shot_consumed"]
+    assert result["prior_l5_one_shot_consumed"]
+    assert result["prior_l6_one_shot_consumed"]
+    assert result["prior_l7_one_shot_consumed"]
     assert result["fpl_requests"] == result["odds_requests"] == 0
     assert not result["private_attempt_consumed"] and result["fresh_live_authorization_required"]
 

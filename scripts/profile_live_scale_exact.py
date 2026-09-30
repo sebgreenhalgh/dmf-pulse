@@ -31,6 +31,7 @@ from dmf_pulse.optimisation.models import CandidatePlayer, CandidateSquad  # noq
 from dmf_pulse.optimisation.multi_gameweek_models import (  # noqa: E402
     PlayerCatalogEntry,
     PlayerPriceState,
+    SearchPolicy,
     TransferActionScope,
     seal_request,
     seal_scenario_tree,
@@ -51,6 +52,25 @@ from tests.unit.private_v1.horizon_oracle_support import (  # noqa: E402
     oracle_fixture,
     with_candidates,
 )
+
+
+class _StatelessHorizonPointsEvaluator(HorizonPointsEvaluator):
+    """Exact synthetic evaluator without an unbounded profiling-only cache."""
+
+    def evaluate(self, *, node, state):
+        self.calls += 1
+        return self._value(node, state.squad_ids)
+
+    def precompute_node(self, *, node, squads):
+        if squads:
+            self.batch_calls[node.node_id] = self.batch_calls.get(node.node_id, 0) + 1
+
+
+def _profile_squads(profile: Stage11SearchProfile) -> dict[str, list[tuple[str, ...]]]:
+    return {
+        node_id: sorted(node.unique_resulting_squads)
+        for node_id, node in sorted(profile.nodes.items())
+    }
 
 
 def overlapping_fixture(*, extra_per_position: int = 3):
@@ -88,22 +108,13 @@ def overlapping_fixture(*, extra_per_position: int = 3):
 def _plan_decision_summary(plan):
     if plan is None:
         return None
-    decisions = (plan.current_action, *plan.future_policy)
-    return {
-        "plan_kind": plan.plan_kind.value,
-        "selection_score": str(plan.selection_score),
-        "decisions": [
-            {
-                "node_id": decision.node_id,
-                "gameweek": decision.gameweek,
-                "action_signature": decision.action.signature,
-                "expected_points": str(decision.tactical_evaluation.expected_points),
-            }
-            for decision in decisions
-        ],
-        "utility": plan.utility.model_dump(mode="json"),
-        "leaf_utilities": [item.model_dump(mode="json") for item in plan.leaf_utilities],
-    }
+    value = plan.model_dump(mode="json")
+    # These bind the configured resource policy rather than the selected
+    # football decision. Every action, state, economic, tactical, uncertainty,
+    # utility, path and leaf field remains in the authenticated projection.
+    value.pop("solver_status")
+    value.pop("plan_sha256")
+    return value
 
 
 def _decision_semantics(result):
@@ -112,6 +123,16 @@ def _decision_semantics(result):
         "recommended": _plan_decision_summary(result.recommended_plan),
         "no_transfer_baseline": _plan_decision_summary(result.no_transfer_baseline),
         "root_counterfactual": _plan_decision_summary(result.root_action_counterfactual_plan),
+        "conservative_alternative": {
+            "availability": result.conservative_plan.availability.value,
+            "reason": result.conservative_plan.reason,
+            "plan": _plan_decision_summary(result.conservative_plan.plan),
+        },
+        "high_upside_alternative": {
+            "availability": result.high_upside_plan.availability.value,
+            "reason": result.high_upside_plan.reason,
+            "plan": _plan_decision_summary(result.high_upside_plan.plan),
+        },
         "transfer_count_frontier": (
             None
             if frontier is None
@@ -133,6 +154,34 @@ def _decision_semantics(result):
     return {"semantic_sha256": canonical_sha256(value), "value": value}
 
 
+def _resolve_policy_candidate_limits(
+    *,
+    legacy: int | None,
+    generated: int | None,
+    retained: int | None,
+    default_generated: int,
+    default_retained: int,
+) -> tuple[int, int]:
+    """Preserve the legacy flag's two-unit meaning without an ambiguous mix."""
+
+    if legacy is not None and (generated is not None or retained is not None):
+        raise ValueError(
+            "--max-policy-candidates cannot be combined with either split policy limit"
+        )
+    if legacy is not None:
+        if legacy <= 0:
+            raise ValueError("--max-policy-candidates must be positive")
+        return legacy, legacy
+    if generated is not None and generated <= 0:
+        raise ValueError("--max-generated-policy-candidates must be positive")
+    if retained is not None and retained <= 0:
+        raise ValueError("--max-retained-pareto-candidates must be positive")
+    return (
+        generated if generated is not None else default_generated,
+        retained if retained is not None else default_retained,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
@@ -146,6 +195,11 @@ def main():
     parser.add_argument("--terminal-incoming-count", type=int, default=6)
     parser.add_argument("--cumulative-legal-action-limit", type=int)
     parser.add_argument("--max-policy-candidates", type=int)
+    parser.add_argument("--max-generated-policy-candidates", type=int)
+    parser.add_argument("--max-retained-pareto-candidates", type=int)
+    parser.add_argument(
+        "--projection-ordering", choices=("baseline", "shifted-shadow"), default="baseline"
+    )
     parser.add_argument("--summary-only", action="store_true")
     parser.add_argument("--baseline-root", type=Path)
     parser.add_argument("--reference", type=Path)
@@ -158,10 +212,25 @@ def main():
         parser.error("extra-per-position must be positive")
     if not 1 <= args.terminal_incoming_count <= 13:
         parser.error("terminal-incoming-count must be between 1 and 13")
-    fixture_extras = 4 if args.l6_shape else args.extra_per_position
+    # Keep each governed node at the locked 13-player incoming screen while
+    # allowing the later information set to carry a materially different
+    # screen. Five synthetic players per position produce seven replacements
+    # (six overlaps) without inflating the horizon union to an artificial pair
+    # of disjoint screens.
+    fixture_extras = 5 if args.l6_shape else args.extra_per_position
     catalog, family = overlapping_fixture(extra_per_position=fixture_extras)
     if args.mode == "search":
         base, _, _, _ = oracle_fixture()
+        try:
+            generated_policy_limit, retained_pareto_limit = _resolve_policy_candidate_limits(
+                legacy=args.max_policy_candidates,
+                generated=args.max_generated_policy_candidates,
+                retained=args.max_retained_pareto_candidates,
+                default_generated=base.search_policy.generated_policy_limit,
+                default_retained=base.search_policy.retained_pareto_limit,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
         for player in base.candidate_pool:
             if player.player_id in base.initial_state.squad_ids:
                 catalog[player.player_id] = CandidatePlayer(
@@ -189,8 +258,6 @@ def main():
                     )[:count]
                 )
             )
-            retained = set(base.initial_state.squad_ids) | set(incoming)
-            catalog = {key: value for key, value in catalog.items() if key in retained}
         prices = {p: PlayerPriceState(current_price_tenths=50) for p in catalog}
         root_maximum_transfers = 2 if args.l6_shape else 1
         root_action_upper = sum(
@@ -198,6 +265,30 @@ def main():
             * len(tuple(combinations(incoming, count)))
             for count in range(root_maximum_transfers + 1)
         )
+        policy_payload = base.search_policy.model_dump(mode="python")
+        policy_payload.update(
+            {
+                "schema_version": "multi-gameweek-search-policy-v2",
+                "max_actions_per_state": 17000,
+                "max_returned_root_candidates": (
+                    8386 if args.l6_shape else base.search_policy.max_returned_root_candidates
+                ),
+                "max_generated_policy_candidates": generated_policy_limit,
+                "max_retained_pareto_candidates": retained_pareto_limit,
+                "transfer_action_scope": TransferActionScope(
+                    root_maximum_transfers=root_maximum_transfers,
+                    continuation_mode="FREE_TRANSFERS_ONLY",
+                ),
+                "max_cumulative_legal_actions": (
+                    args.cumulative_legal_action_limit
+                    if args.cumulative_legal_action_limit is not None
+                    else base.search_policy.max_cumulative_legal_actions
+                ),
+                "policy_sha256": "0" * 64,
+            }
+        )
+        policy_payload.pop("max_policy_candidates")
+        probe_policy = seal_search_policy(SearchPolicy.model_validate(policy_payload))
         request = with_candidates(
             seal_request(
                 base.model_copy(
@@ -208,32 +299,7 @@ def main():
                             )
                             for p in sorted(catalog.values(), key=lambda p: p.player_id)
                         ),
-                        "search_policy": seal_search_policy(
-                            base.search_policy.model_copy(
-                                update={
-                                    "max_actions_per_state": 17000,
-                                    "max_returned_root_candidates": (
-                                        8386
-                                        if args.l6_shape
-                                        else base.search_policy.max_returned_root_candidates
-                                    ),
-                                    "max_policy_candidates": (
-                                        args.max_policy_candidates
-                                        if args.max_policy_candidates is not None
-                                        else base.search_policy.max_policy_candidates
-                                    ),
-                                    "transfer_action_scope": TransferActionScope(
-                                        root_maximum_transfers=root_maximum_transfers,
-                                        continuation_mode="FREE_TRANSFERS_ONLY",
-                                    ),
-                                    "max_cumulative_legal_actions": (
-                                        args.cumulative_legal_action_limit
-                                        if args.cumulative_legal_action_limit is not None
-                                        else base.search_policy.max_cumulative_legal_actions
-                                    ),
-                                }
-                            )
-                        ),
+                        "search_policy": probe_policy,
                     }
                 )
             ),
@@ -255,14 +321,32 @@ def main():
                 PlayerPosition.MID,
                 PlayerPosition.FWD,
                 PlayerPosition.DEF,
-                PlayerPosition.MID,
+                PlayerPosition.GK,
             )
+            terminal_counts = {
+                PlayerPosition.GK: 3,
+                PlayerPosition.DEF: 4,
+                PlayerPosition.MID: 3,
+                PlayerPosition.FWD: 3,
+            }
+            terminal_pool = {
+                player_id
+                for position, count in terminal_counts.items()
+                for player_id in tuple(
+                    sorted(
+                        item.player_id
+                        for item in catalog.values()
+                        if item.position is position
+                        and item.player_id not in base.initial_state.squad_ids
+                    )
+                )[-count:]
+            }
             by_position = {
                 position: iter(
                     sorted(
                         item.player_id
                         for item in catalog.values()
-                        if item.position is position and item.player_id in incoming
+                        if item.position is position and item.player_id in terminal_pool
                     )
                 )
                 for position in PlayerPosition
@@ -301,8 +385,56 @@ def main():
                     }
                 )
             )
-        points = {gw: {p: (sum(p.encode()) * (gw + 3)) % 17 for p in catalog} for gw in (1, 2, 3)}
-        evaluator = HorizonPointsEvaluator(points)
+        points = {
+            gw: {
+                p: (
+                    (sum(p.encode()) * (gw + 3)) % 17
+                    if args.projection_ordering == "baseline"
+                    else ((997 - sum(p.encode())) * (gw + 5)) % 19
+                )
+                for p in catalog
+            }
+            for gw in (1, 2, 3)
+        }
+
+        class _ShiftedShadowEvaluator(HorizonPointsEvaluator):
+            def _value(self, node, squad_ids):
+                value = super()._value(node, squad_ids)
+                risk = sum(
+                    ((sum(player_id.encode()) * (node.gameweek + 7)) % 5) for player_id in squad_ids
+                )
+                return value.model_copy(
+                    update={
+                        "p10_points": value.expected_points - risk,
+                        "p90_points": value.expected_points + risk,
+                    }
+                )
+
+        class _StatelessShiftedShadowEvaluator(_StatelessHorizonPointsEvaluator):
+            def _value(self, node, squad_ids):
+                value = super()._value(node, squad_ids)
+                risk = sum(
+                    ((sum(player_id.encode()) * (node.gameweek + 7)) % 5) for player_id in squad_ids
+                )
+                return value.model_copy(
+                    update={
+                        "p10_points": value.expected_points - risk,
+                        "p90_points": value.expected_points + risk,
+                    }
+                )
+
+        if args.l6_shape:
+            evaluator = (
+                _StatelessHorizonPointsEvaluator(points)
+                if args.projection_ordering == "baseline"
+                else _StatelessShiftedShadowEvaluator(points)
+            )
+        else:
+            evaluator = (
+                HorizonPointsEvaluator(points)
+                if args.projection_ordering == "baseline"
+                else _ShiftedShadowEvaluator(points)
+            )
         profile = Stage11SearchProfile(progress=lambda message: print(message, flush=True))
         wall, cpu = perf_counter(), process_time()
         result = None
@@ -318,17 +450,40 @@ def main():
             "complete": None if result is None else result.complete,
             "profile": profile.as_dict(),
             "tactical_batch_calls": evaluator.batch_calls,
-            "unique_tactical_squads": len(evaluator.cache),
-            "extra_per_position": args.extra_per_position,
+            "unique_tactical_squads": sum(
+                len(node.unique_resulting_squads) for node in profile.nodes.values()
+            ),
+            "extra_per_position": fixture_extras,
             "candidate_pool_size": len(request.candidate_pool),
+            "fixture_extra_players_per_position": fixture_extras,
             "retained_incoming_count": len(incoming),
             "terminal_retained_incoming_count": len(terminal_incoming),
+            "root_terminal_incoming_overlap": len(set(incoming) & set(terminal_incoming)),
+            "root_incoming_by_position": {
+                position.value: sum(
+                    catalog[player_id].position is position for player_id in incoming
+                )
+                for position in PlayerPosition
+            },
+            "terminal_incoming_by_position": {
+                position.value: sum(
+                    catalog[player_id].position is position for player_id in terminal_incoming
+                )
+                for position in PlayerPosition
+            },
             "root_action_upper": root_action_upper,
             "effective_max_actions_per_state": request.search_policy.max_actions_per_state,
             "effective_max_returned_root_candidates": (
                 request.search_policy.max_returned_root_candidates
             ),
             "configured_max_policy_candidates": request.search_policy.max_policy_candidates,
+            "configured_max_generated_policy_candidates": (
+                request.search_policy.generated_policy_limit
+            ),
+            "configured_max_retained_pareto_candidates": (
+                request.search_policy.retained_pareto_limit
+            ),
+            "projection_ordering": args.projection_ordering,
             "stress_case": "L6_SHAPE_13_INCOMING" if args.l6_shape else "GENERAL",
             "peak_memory_bytes": None,
             "memory_measurement": "UNAVAILABLE_WITHOUT_NEW_RUNTIME_DEPENDENCY",
@@ -343,12 +498,7 @@ def main():
                 if result is None
                 else [TypeAdapter(type(c)).dump_python(c, mode="json") for c in result.candidates]
             )
-            payload["squads_by_node"] = {
-                node.node_id: sorted(
-                    squad for node_id, squad in evaluator.cache if node_id == node.node_id
-                )
-                for node in request.scenario_tree.nodes
-            }
+            payload["squads_by_node"] = _profile_squads(profile)
         if args.public_search:
             from dmf_pulse.optimisation.multi_gameweek_service import optimise_multi_gameweek
 
@@ -384,6 +534,11 @@ def main():
                 "decision_semantics": _decision_semantics(public_result),
                 "result": (None if args.summary_only else public_result.model_dump(mode="json")),
             }
+            payload["unique_tactical_squads"] = sum(
+                len(node.unique_resulting_squads) for node in public_profile.nodes.values()
+            )
+            if not args.summary_only:
+                payload["squads_by_node"] = _profile_squads(public_profile)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"

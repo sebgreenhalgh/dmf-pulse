@@ -135,6 +135,10 @@ def _failure_result(
         action_candidates=int(getattr(counters, "action_candidates", 0)),
         policy_candidates=int(getattr(counters, "policy_candidates", 0)),
         pareto_candidates=int(getattr(counters, "pareto_candidates", 0)),
+        peak_materialized_policy_candidates=int(
+            getattr(counters, "peak_materialized_policy_candidates", 0)
+        ),
+        peak_retained_pareto_frontier=int(getattr(counters, "peak_retained_pareto_frontier", 0)),
         memo_entries=0,
         resource_limit_kind=resource_limit_kind,
         configured_max_actions_per_state=(
@@ -145,6 +149,16 @@ def _failure_result(
         ),
         configured_max_policy_candidates=(
             request.search_policy.max_policy_candidates if resource_limit_kind is not None else None
+        ),
+        configured_max_generated_policy_candidates=(
+            request.search_policy.max_generated_policy_candidates
+            if resource_limit_kind is not None
+            else None
+        ),
+        configured_max_retained_pareto_candidates=(
+            request.search_policy.max_retained_pareto_candidates
+            if resource_limit_kind is not None
+            else None
         ),
         configured_max_returned_root_candidates=(
             request.search_policy.max_returned_root_candidates
