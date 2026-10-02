@@ -2743,7 +2743,7 @@ Isolated worktree preserves unrelated availability work. No provider access, cre
 private persistence, live retry, production activation, PR, merge or tag.
 
 - [x] U.01 permanently consume L1-L8 and clear current authority; publish before implementation.
-- [ ] U.02 covariance audit and joint deterministic parameter draws.
+- [x] U.02 covariance audit and joint deterministic parameter draws.
 - [ ] U.03 coherent score mixture and nested identities.
 - [ ] U.04 shadow Stage-8 integration and predeclared convergence evidence.
 - [ ] U.05 disclosure-safe screen diagnostics (exact 2x2 optional and off by default).

@@ -1,0 +1,12 @@
+{
+  "immutable_parent": "605e404984ace1702d86dc69995cccc7ca7d8160",
+  "sources": {
+    "config/models/current_team_strength_governance.json": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+    "specs/approved/DMFP-10_UNCERTAINTY_SCENARIOS_AND_EARLY_SEASON_POLICY.txt": "5914251e325cd4b57f63413820c5d6a0612f6c33cbf73e7e003624d5faf6cf68",
+    "specs/approved/DMFP-15_BACKTESTING_CALIBRATION_AND_BENCHMARKS.txt": "0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed",
+    "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/football_events/team_strength_model.py": "406339d0519eeaffee0fb305c52f2732c356f079d0e1af8f7ef5f8355623f164",
+    "src/dmf_pulse/football_events/team_strength_numerics.py": "cc82edc6c501802207edcf4545a14b704bc54848edf400b67523be0997ad7d36"
+  }
+}
