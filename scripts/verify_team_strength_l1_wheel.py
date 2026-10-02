@@ -31,7 +31,7 @@ from dmf_pulse.private_v1.team_strength_live import L1OperatorRequest, TeamStren
 from dmf_pulse.ingestion.openfootball.team_strength_current import discover_current_resource
 assert Path(dmf_pulse.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
 stamp = datetime(2026, 10, 1, tzinfo=UTC)
-for approval, attestation in ((L1_APPROVAL, L1_ATTESTATION), (L2_APPROVAL, L2_ATTESTATION), (L3_APPROVAL, L3_ATTESTATION), (L4_APPROVAL, L4_ATTESTATION), (L5_APPROVAL, L5_ATTESTATION), (L6_APPROVAL, L6_ATTESTATION), (L7_APPROVAL, L7_ATTESTATION)):
+for approval, attestation in ((L1_APPROVAL, L1_ATTESTATION), (L2_APPROVAL, L2_ATTESTATION), (L3_APPROVAL, L3_ATTESTATION), (L4_APPROVAL, L4_ATTESTATION), (L5_APPROVAL, L5_ATTESTATION), (L6_APPROVAL, L6_ATTESTATION), (L7_APPROVAL, L7_ATTESTATION), (L8_APPROVAL, L8_ATTESTATION)):
     try:
         validate_l1_authority(approval=approval, attestation=attestation, checked_at=stamp)
     except ConsumedL1ApprovalError:
@@ -39,8 +39,7 @@ for approval, attestation in ((L1_APPROVAL, L1_ATTESTATION), (L2_APPROVAL, L2_AT
     else:
         raise AssertionError('consumed approval reusable')
 assert (APPROVAL, ATTESTATION) == (L8_APPROVAL, L8_ATTESTATION)
-assert (CURRENT_APPROVAL, CURRENT_ATTESTATION) == (L8_APPROVAL, L8_ATTESTATION)
-validate_l1_authority(approval=L8_APPROVAL, attestation=L8_ATTESTATION, checked_at=stamp)
+assert (CURRENT_APPROVAL, CURRENT_ATTESTATION) == (None, None)
 try:
     discover_current_resource('HEAD')
 except ValueError:

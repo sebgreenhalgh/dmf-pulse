@@ -1,4 +1,4 @@
-"""L1-L7 consumed history and one exact L8 authority, without capability expansion."""
+"""L1-L8 consumed history and no current live authority, without capability expansion."""
 
 from __future__ import annotations
 
@@ -119,6 +119,7 @@ def test_historical_l1_through_l7_are_consumed_before_provider_checks(approval, 
             L5_APPROVAL,
             L6_APPROVAL,
             L7_APPROVAL,
+            L8_APPROVAL,
         }
     )
     assert expected_consumed == authority.CONSUMED_APPROVALS
@@ -141,13 +142,10 @@ def test_no_unknown_historical_or_current_pair_can_authorize(approval, attestati
     assert blocked(approval, attestation)["reason"] == "AUTHORITY_INVALID"
 
 
-def test_exact_l8_pair_is_current_and_l7_is_historical_consumed():
+def test_exact_l8_pair_is_historical_consumed_and_no_pair_is_current():
     assert (authority.APPROVAL, authority.ATTESTATION) == (L8_APPROVAL, L8_ATTESTATION)
     assert {L4_APPROVAL, L5_APPROVAL, L6_APPROVAL, L7_APPROVAL} <= (authority.CONSUMED_APPROVALS)
-    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
-        L8_APPROVAL,
-        L8_ATTESTATION,
-    )
+    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (None, None)
     with pytest.raises(authority.ConsumedL1ApprovalError):
         authority.validate_l1_authority(
             approval=L7_APPROVAL, attestation=L7_ATTESTATION, checked_at=STAMP
@@ -162,9 +160,10 @@ def test_exact_l8_pair_is_current_and_l7_is_historical_consumed():
     result = blocked(L7_APPROVAL, L7_ATTESTATION)
     assert result["reason"] == "AUTHORITY_CONSUMED"
     assert not result["private_attempt_consumed"]
-    authority.validate_l1_authority(
-        approval=L8_APPROVAL, attestation=L8_ATTESTATION, checked_at=STAMP
-    )
+    with pytest.raises(authority.ConsumedL1ApprovalError):
+        authority.validate_l1_authority(
+            approval=L8_APPROVAL, attestation=L8_ATTESTATION, checked_at=STAMP
+        )
 
 
 @pytest.mark.parametrize(
@@ -180,7 +179,7 @@ def test_exact_l8_pair_is_current_and_l7_is_historical_consumed():
 def test_l8_wrong_unknown_or_mixed_pairs_fail_before_provider(approval, attestation):
     result = blocked(approval, attestation)
     assert result["reason"] == (
-        "AUTHORITY_CONSUMED" if approval == L7_APPROVAL else "AUTHORITY_INVALID"
+        "AUTHORITY_CONSUMED" if approval in {L7_APPROVAL, L8_APPROVAL} else "AUTHORITY_INVALID"
     )
     assert not result["private_attempt_consumed"]
 
@@ -384,7 +383,7 @@ def test_l8_odds_purpose_only_change_and_prior_sha_rejected(monkeypatch):
     )
     assert prior_sha != authority.ODDS_PROFILE_SHA
     monkeypatch.setattr(authority, "ODDS_PROFILE_SHA", prior_sha)
-    with pytest.raises(ValueError, match="exact provider purpose or capability authority differs"):
+    with pytest.raises(authority.ConsumedL1ApprovalError):
         authority.validate_l1_authority(
             approval=L8_APPROVAL, attestation=L8_ATTESTATION, checked_at=STAMP
         )

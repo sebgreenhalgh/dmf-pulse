@@ -1,0 +1,18 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001U
+status: ACTIVE
+parent: 605e404984ace1702d86dc69995cccc7ca7d8160
+branch: readiness/CURRENT-TEAM-STRENGTH-001U-parameter-uncertainty-prospective-evaluation
+authority_scopes: [A3-data-foundation, A8-events, B1-backtesting, B2-multi-GW]
+model_status: SHADOW_NOT_MODEL_INPUT
+production_activation: false
+private_provider_access: forbidden
+private_persistence: forbidden
+live_authority: none
+checkpoints:
+  - U.01 permanently consume L8 before all provider or credential access
+  - U.02 audit accepted covariance and implement deterministic joint draws
+  - U.03 coherent mixture score prior
+  - U.04 research Stage-8 reconciliation and convergence
+  - U.05 aggregate screen diagnostics; optional cross-screen research only
+  - U.06 public prospective forecasts and proper scoring
+  - U.07 regression, performance, independent review and publication

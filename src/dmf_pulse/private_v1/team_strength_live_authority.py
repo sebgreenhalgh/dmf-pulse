@@ -1,4 +1,4 @@
-"""Consumed L1-L7 history and the exact current L8 one-shot authority.
+"""Permanently consumed L1-L8 history; no current live authority.
 
 Legacy function/exception names remain stable; there is no runtime reset/selector.
 """
@@ -31,8 +31,8 @@ L8_APPROVAL = "DMF-CTS-001P-L8-LIVE-RIGHTS-2026-09-30"
 L8_ATTESTATION = "CURRENT-TEAM-STRENGTH-001P-L8#ONE-SHOT-2026-09-30"
 APPROVAL = L8_APPROVAL
 ATTESTATION = L8_ATTESTATION
-CURRENT_APPROVAL = L8_APPROVAL
-CURRENT_ATTESTATION = L8_ATTESTATION
+CURRENT_APPROVAL: str | None = None
+CURRENT_ATTESTATION: str | None = None
 CONSUMED_APPROVALS = frozenset(
     {
         L1_APPROVAL,
@@ -42,6 +42,7 @@ CONSUMED_APPROVALS = frozenset(
         L5_APPROVAL,
         L6_APPROVAL,
         L7_APPROVAL,
+        L8_APPROVAL,
     }
 )
 FPL_PROFILE = "fpl_official_private_operator_initiated_read_v1"
