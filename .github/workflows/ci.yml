@@ -304,6 +304,12 @@ jobs:
       - name: Performance smoke (without coverage)
         run: uv run pytest -m performance
 
+      - name: Preserve accepted team-strength branch coverage gate
+        run: >-
+          uv run python scripts/verify_team_strength_coverage.py
+          --coverage-json evidence/tickets/GCS-008/coverage.json
+          --summary "${{ runner.temp }}/team-strength-001a-branch-proof.json"
+
       - name: FPL regression and ODD-005 synthetic vertical slice
         run: |
           uv run dmf specs validate
@@ -338,6 +344,8 @@ jobs:
         run: |
           uv run python scripts/verify_odd005_wheel.py
           uv run python scripts/verify_gcs008_wheel.py
+          uv run python scripts/verify_team_strength_u_wheel.py
+          uv run python scripts/verify_team_strength_l1_wheel.py
 
       - name: Validate repository
         run: uv run python scripts/validate_repository.py

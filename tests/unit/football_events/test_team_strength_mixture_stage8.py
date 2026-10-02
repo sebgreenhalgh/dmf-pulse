@@ -11,23 +11,29 @@ from dmf_pulse.football_events.team_strength_mixture_stage8 import (
     ParameterMixtureStage8V1,
     project_parameter_mixture,
 )
+from dmf_pulse.football_events.team_strength_model import TeamStrengthModelArtifactV1
 from dmf_pulse.football_events.team_strength_parameter_draws import (
+    ParameterDrawSetV1,
     ParameterMixtureUnavailable,
     draw_policy,
     joint_parameter_draws,
 )
+from dmf_pulse.ingestion.openfootball.team_strength_data import seal
 from tests.unit.football_events.team_strength_support import synthetic_artifact
 from tests.unit.football_events.test_team_strength_adapter import bundle, stage8_request
 
 
 @pytest.mark.parametrize("market", [False, True])
 def test_mixture_stage8_golden_and_same_constraints(market):
-    artifact = synthetic_artifact()
-    bound = bundle()
+    golden = json.loads(
+        Path("evidence/tickets/CURRENT-TEAM-STRENGTH-001U/STAGE8-GOLDEN.json").read_text()
+    )
+    artifact = TeamStrengthModelArtifactV1.model_validate_json(json.dumps(golden["fit_artifact"]))
+    bound = bundle(artifact=artifact)
     request = stage8_request(bound, market=market)
     before = request.model_dump_json()
     ordinary = ScoreDistributionService().project(request)
-    draws = joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=16))
+    draws = ParameterDrawSetV1.model_validate_json(json.dumps(golden["draw_set"]))
     result = project_parameter_mixture(
         request,
         artifact=artifact,
@@ -90,3 +96,46 @@ def test_unavailable_mixture_is_typed_failure_without_plugin_fallback():
             expected_artifact_sha256=artifact.semantic_sha256,
         )
     assert caught.value.code == "PARAMETER_MIXTURE_UNAVAILABLE"
+
+
+@pytest.mark.parametrize(
+    "field,changed",
+    [
+        ("expected_home_goals", "0.000000"),
+        ("stage8_policy_sha256", "0" * 64),
+        ("parameter_draw_ids", ("0" * 64,)),
+    ],
+)
+def test_rehashed_projection_views_and_lineage_fail(field, changed):
+    artifact = synthetic_artifact()
+    bound = bundle()
+    draws = joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=16))
+    value = project_parameter_mixture(
+        stage8_request(bound, market=False),
+        artifact=artifact,
+        draws=draws,
+        fixture=bound.fixture,
+        expected_artifact_sha256=artifact.semantic_sha256,
+    )
+    fields = {
+        name: getattr(value, name) for name in type(value).model_fields if name != "semantic_sha256"
+    }
+    with pytest.raises(ValueError):
+        seal(type(value), **(fields | {field: changed}))
+
+
+def test_research_projection_rejects_unbound_plugin_reference():
+    artifact = synthetic_artifact()
+    bound = bundle()
+    request = stage8_request(bound, market=False)
+    request = request.model_copy(
+        update={"prior": request.prior.model_copy(update={"home_goal_rate": Decimal("1.000000")})}
+    )
+    with pytest.raises(ParameterMixtureUnavailable, match="bound plug-in"):
+        project_parameter_mixture(
+            request,
+            artifact=artifact,
+            draws=joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=2)),
+            fixture=bound.fixture,
+            expected_artifact_sha256=artifact.semantic_sha256,
+        )

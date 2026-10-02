@@ -27,7 +27,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.479360296875",
+          "lambda_away_plugin_delta": "0.002709296875",
           "lambda_home": "2.023664906250",
+          "lambda_home_plugin_delta": "-0.001302093750",
           "lambda_variance_away": "0.037522085672708740234375000000",
           "lambda_variance_home": "0.068196406556897460937500000000",
           "market_backed": false,
@@ -107,7 +109,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0257052031250",
+            "lambda_home": "-0.0122370312500",
+            "lambda_variance_away": "-0.004433544141885009765625000000",
+            "lambda_variance_home": "0.002541482641979492187500000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000107982548387454575293317900279392700903105376562229447366925",
             "exact_score_max_probability_movement": "0.002131503682",
@@ -263,6 +273,18 @@
                 "-0.005611182822"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0128595380859375000",
+            "lambda_home": "-0.0249638494873046875",
+            "lambda_variance_away": "-0.006651438437244246482849121094",
+            "lambda_variance_home": "-0.01073127213894363163411617279"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -288,7 +310,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.479360296875",
+          "lambda_away_plugin_delta": "0.002709296875",
           "lambda_home": "2.023664906250",
+          "lambda_home_plugin_delta": "-0.001302093750",
           "lambda_variance_away": "0.037522085672708740234375000000",
           "lambda_variance_home": "0.068196406556897460937500000000",
           "market_backed": true,
@@ -368,7 +392,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0257052031250",
+            "lambda_home": "-0.0122370312500",
+            "lambda_variance_away": "-0.004433544141885009765625000000",
+            "lambda_variance_home": "0.002541482641979492187500000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0000759546050634111740852937559858380743413878724234777922626435",
             "exact_score_max_probability_movement": "0.002133183261",
@@ -524,6 +556,18 @@
                 "-0.040452662499"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0128595380859375000",
+            "lambda_home": "-0.0249638494873046875",
+            "lambda_variance_away": "-0.006651438437244246482849121094",
+            "lambda_variance_home": "-0.01073127213894363163411617279"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -549,7 +593,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.517236015625",
+          "lambda_away_plugin_delta": "-0.037808984375",
           "lambda_home": "2.032120203125",
+          "lambda_home_plugin_delta": "-0.007732796875",
           "lambda_variance_away": "0.039096183222421630859375000000",
           "lambda_variance_home": "0.065707823589536865234375000000",
           "market_backed": false,
@@ -629,7 +675,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0216956328125",
+            "lambda_home": "-0.0210531250000",
+            "lambda_variance_away": "-0.002107360015212585449218750000",
+            "lambda_variance_home": "-0.01525673801118359375000000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000223235835272745929337703260858259963946251465744840824679752",
             "exact_score_max_probability_movement": "0.003432775953",
@@ -785,6 +839,18 @@
                 "-0.011360046468"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0527544177246093750",
+            "lambda_home": "-0.0263647182617187500",
+            "lambda_variance_away": "-0.005405573628438184678554534912",
+            "lambda_variance_home": "-0.01180915158178849768638610840"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -810,7 +876,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.517236015625",
+          "lambda_away_plugin_delta": "-0.037808984375",
           "lambda_home": "2.032120203125",
+          "lambda_home_plugin_delta": "-0.007732796875",
           "lambda_variance_away": "0.039096183222421630859375000000",
           "lambda_variance_home": "0.065707823589536865234375000000",
           "market_backed": true,
@@ -890,7 +958,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0216956328125",
+            "lambda_home": "-0.0210531250000",
+            "lambda_variance_away": "-0.002107360015212585449218750000",
+            "lambda_variance_home": "-0.01525673801118359375000000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000103506819945791052213746083044738248670038737540838937641721",
             "exact_score_max_probability_movement": "0.003189547848",
@@ -1046,6 +1122,18 @@
                 "-0.006295351694"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0527544177246093750",
+            "lambda_home": "-0.0263647182617187500",
+            "lambda_variance_away": "-0.005405573628438184678554534912",
+            "lambda_variance_home": "-0.01180915158178849768638610840"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -1071,7 +1159,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.545315671875",
+          "lambda_away_plugin_delta": "0.029151671875",
           "lambda_home": "2.029303781250",
+          "lambda_home_plugin_delta": "0.083478781250",
           "lambda_variance_away": "0.035158620805001708984375000000",
           "lambda_variance_home": "0.091327864987920898437500000000",
           "market_backed": false,
@@ -1151,7 +1241,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0097424609375",
+            "lambda_home": "0.0307840156250",
+            "lambda_variance_away": "0.0004175414004446411132812500000",
+            "lambda_variance_home": "0.01214954286481958007812500000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000647972841544008098402026628400808375364566111902230888704490",
             "exact_score_max_probability_movement": "0.005228257534",
@@ -1307,6 +1405,18 @@
                 "0.009857625646"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0128576722412109375",
+            "lambda_home": "0.0601709532470703125",
+            "lambda_variance_away": "-0.002504512727535278186202049255",
+            "lambda_variance_home": "0.02808347778230314256250858307"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         },
         {
@@ -1332,7 +1442,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.545315671875",
+          "lambda_away_plugin_delta": "0.029151671875",
           "lambda_home": "2.029303781250",
+          "lambda_home_plugin_delta": "0.083478781250",
           "lambda_variance_away": "0.035158620805001708984375000000",
           "lambda_variance_home": "0.091327864987920898437500000000",
           "market_backed": true,
@@ -1412,7 +1524,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0097424609375",
+            "lambda_home": "0.0307840156250",
+            "lambda_variance_away": "0.0004175414004446411132812500000",
+            "lambda_variance_home": "0.01214954286481958007812500000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000355226757989412520164051137865370806860556317827423134772997",
             "exact_score_max_probability_movement": "0.005046227606",
@@ -1568,6 +1688,18 @@
                 "0.005242964284"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0128576722412109375",
+            "lambda_home": "0.0601709532470703125",
+            "lambda_variance_away": "-0.002504512727535278186202049255",
+            "lambda_variance_home": "0.02808347778230314256250858307"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         }
       ],
@@ -1600,7 +1732,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.5050655000000",
+          "lambda_away_plugin_delta": "0.0284145000000",
           "lambda_home": "2.0359019375000",
+          "lambda_home_plugin_delta": "0.0109349375000",
           "lambda_variance_away": "0.041955629814593750000000000000000",
           "lambda_variance_home": "0.065654923914917968750000000000000",
           "market_backed": false,
@@ -1680,7 +1814,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.00502094921875",
+            "lambda_home": "-0.00091480468750",
+            "lambda_variance_away": "0.001828869749018203735351562500",
+            "lambda_variance_home": "-0.01376702712461712646484375000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000182888339248104729095720769897947358400025733079183014163417",
             "exact_score_max_probability_movement": "0.002812053422",
@@ -1836,6 +1978,18 @@
                 "-0.000695605894"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0128456650390625000",
+            "lambda_home": "-0.0127268182373046875",
+            "lambda_variance_away": "-0.002217894295359236717224121094",
+            "lambda_variance_home": "-0.01327275478092312382161617279"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -1861,7 +2015,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.5050655000000",
+          "lambda_away_plugin_delta": "0.0284145000000",
           "lambda_home": "2.0359019375000",
+          "lambda_home_plugin_delta": "0.0109349375000",
           "lambda_variance_away": "0.041955629814593750000000000000000",
           "lambda_variance_home": "0.065654923914917968750000000000000",
           "market_backed": true,
@@ -1941,7 +2097,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.00502094921875",
+            "lambda_home": "-0.00091480468750",
+            "lambda_variance_away": "0.001828869749018203735351562500",
+            "lambda_variance_home": "-0.01376702712461712646484375000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0158876998765543480323900089415795654085063080350871078668242",
             "exact_score_max_probability_movement": "0.056797053232",
@@ -2097,6 +2261,18 @@
                 "-0.000695605894"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0128456650390625000",
+            "lambda_home": "-0.0127268182373046875",
+            "lambda_variance_away": "-0.002217894295359236717224121094",
+            "lambda_variance_home": "-0.01327275478092312382161617279"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -2122,7 +2298,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5389316484375",
+          "lambda_away_plugin_delta": "-0.0161133515625",
           "lambda_home": "2.0531733281250",
+          "lambda_home_plugin_delta": "0.0133203281250",
           "lambda_variance_away": "0.041203543237634216308593750000000",
           "lambda_variance_home": "0.080964561600720458984375000000000",
           "market_backed": false,
@@ -2202,7 +2380,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.00528720703125",
+            "lambda_home": "-0.01111485156250",
+            "lambda_variance_away": "-0.004813065413661300659179687500",
+            "lambda_variance_home": "0.001636777249323059082031250000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000166815647106053562154282553881640254406658951342928597604698",
             "exact_score_max_probability_movement": "0.002609223263",
@@ -2358,6 +2544,18 @@
                 "-0.005037008513"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0310587849121093750",
+            "lambda_home": "-0.0053115932617187500",
+            "lambda_variance_away": "-0.003298213613225599229335784912",
+            "lambda_variance_home": "0.003447586429395096063613891602"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -2383,7 +2581,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5389316484375",
+          "lambda_away_plugin_delta": "-0.0161133515625",
           "lambda_home": "2.0531733281250",
+          "lambda_home_plugin_delta": "0.0133203281250",
           "lambda_variance_away": "0.041203543237634216308593750000000",
           "lambda_variance_home": "0.080964561600720458984375000000000",
           "market_backed": true,
@@ -2463,7 +2663,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.00528720703125",
+            "lambda_home": "-0.01111485156250",
+            "lambda_variance_away": "-0.004813065413661300659179687500",
+            "lambda_variance_home": "0.001636777249323059082031250000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000110827375071754176904335447833136760976672717103552770428781",
             "exact_score_max_probability_movement": "0.002561525856",
@@ -2619,6 +2827,18 @@
                 "-0.002673570404"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0310587849121093750",
+            "lambda_home": "-0.0053115932617187500",
+            "lambda_variance_away": "-0.003298213613225599229335784912",
+            "lambda_variance_home": "0.003447586429395096063613891602"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -2644,7 +2864,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5355732109375",
+          "lambda_away_plugin_delta": "0.0194092109375",
           "lambda_home": "1.9985197656250",
+          "lambda_home_plugin_delta": "0.0526947656250",
           "lambda_variance_away": "0.034741079404557067871093750000000",
           "lambda_variance_home": "0.079178322123101318359375000000000",
           "market_backed": false,
@@ -2724,7 +2946,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00729062890625",
+            "lambda_home": "0.01138533984375",
+            "lambda_variance_away": "0.001077605189298171997070312500",
+            "lambda_variance_home": "0.005965718563825576782226562500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000328365938650680393678660459263598574462314825094995163810133",
             "exact_score_max_probability_movement": "0.003584714066",
@@ -2880,6 +3110,18 @@
                 "0.004185352324"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0031152113037109375",
+            "lambda_home": "0.0293869376220703125",
+            "lambda_variance_away": "-0.002922054127979919299483299255",
+            "lambda_variance_home": "0.01593393491748356248438358307"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         },
         {
@@ -2905,7 +3147,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5355732109375",
+          "lambda_away_plugin_delta": "0.0194092109375",
           "lambda_home": "1.9985197656250",
+          "lambda_home_plugin_delta": "0.0526947656250",
           "lambda_variance_away": "0.034741079404557067871093750000000",
           "lambda_variance_home": "0.079178322123101318359375000000000",
           "market_backed": true,
@@ -2985,7 +3229,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00729062890625",
+            "lambda_home": "0.01138533984375",
+            "lambda_variance_away": "0.001077605189298171997070312500",
+            "lambda_variance_home": "0.005965718563825576782226562500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000203697715220406441985182253336139310126541579904431908637159",
             "exact_score_max_probability_movement": "0.003591407324",
@@ -3141,6 +3393,18 @@
                 "0.002172727976"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0031152113037109375",
+            "lambda_home": "0.0293869376220703125",
+            "lambda_variance_away": "-0.002922054127979919299483299255",
+            "lambda_variance_home": "0.01593393491748356248438358307"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         }
       ],
@@ -3173,7 +3437,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.51008644921875",
+          "lambda_away_plugin_delta": "0.03343544921875",
           "lambda_home": "2.03681674218750",
+          "lambda_home_plugin_delta": "0.01184974218750",
           "lambda_variance_away": "0.040126760065575546264648437500000000",
           "lambda_variance_home": "0.079421951039535095214843750000000000",
           "market_backed": false,
@@ -3253,7 +3519,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.005972271484375",
+            "lambda_home": "-0.001814107421875",
+            "lambda_variance_away": "-0.004220588531078411102294921875",
+            "lambda_variance_home": "0.006615466642200290679931640625"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000232138798261153841182584059416627545718687359648338301617176",
             "exact_score_max_probability_movement": "0.003182916865",
@@ -3409,6 +3683,18 @@
                 "0.000562126173"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0178666142578125000",
+            "lambda_home": "-0.0118120135498046875",
+            "lambda_variance_away": "-0.004046764044377440452575683594",
+            "lambda_variance_home": "0.0004942723436940026432275772095"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -3434,7 +3720,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.51008644921875",
+          "lambda_away_plugin_delta": "0.03343544921875",
           "lambda_home": "2.03681674218750",
+          "lambda_home_plugin_delta": "0.01184974218750",
           "lambda_variance_away": "0.040126760065575546264648437500000000",
           "lambda_variance_home": "0.079421951039535095214843750000000000",
           "market_backed": true,
@@ -3514,7 +3802,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.005972271484375",
+            "lambda_home": "-0.001814107421875",
+            "lambda_variance_away": "-0.004220588531078411102294921875",
+            "lambda_variance_home": "0.006615466642200290679931640625"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000141314595760896871689785610471528880162451620747207518221098",
             "exact_score_max_probability_movement": "0.001925926465",
@@ -3670,6 +3966,18 @@
                 "-0.036945549038"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0178666142578125000",
+            "lambda_home": "-0.0118120135498046875",
+            "lambda_variance_away": "-0.004046764044377440452575683594",
+            "lambda_variance_home": "0.0004942723436940026432275772095"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -3695,7 +4003,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.54421885546875",
+          "lambda_away_plugin_delta": "-0.01082614453125",
           "lambda_home": "2.06428817968750",
+          "lambda_home_plugin_delta": "0.02443517968750",
           "lambda_variance_away": "0.046016608651295516967773437500000000",
           "lambda_variance_home": "0.079327784351397399902343750000000000",
           "market_backed": false,
@@ -3775,7 +4085,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.009563640625000",
+            "lambda_home": "0.007534658203125",
+            "lambda_variance_away": "0.0008864379799166259765625000000",
+            "lambda_variance_home": "0.001142525865569736480712890625"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000185384263184238395462817205430333670787903694561775236214881",
             "exact_score_max_probability_movement": "0.002596061291",
@@ -3931,6 +4249,18 @@
                 "-0.002662009978"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0257715778808593750",
+            "lambda_home": "0.0058032583007812500",
+            "lambda_variance_away": "0.001514851800435701429843902588",
+            "lambda_variance_home": "0.001810809180072036981582641602"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -3956,7 +4286,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.54421885546875",
+          "lambda_away_plugin_delta": "-0.01082614453125",
           "lambda_home": "2.06428817968750",
+          "lambda_home_plugin_delta": "0.02443517968750",
           "lambda_variance_away": "0.046016608651295516967773437500000000",
           "lambda_variance_home": "0.079327784351397399902343750000000000",
           "market_backed": true,
@@ -4036,7 +4368,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.009563640625000",
+            "lambda_home": "0.007534658203125",
+            "lambda_variance_away": "0.0008864379799166259765625000000",
+            "lambda_variance_home": "0.001142525865569736480712890625"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0180548832606545869653015233083173575264924397290498765939636",
             "exact_score_max_probability_movement": "0.060767235562",
@@ -4192,6 +4532,18 @@
                 "0.040077081076"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0257715778808593750",
+            "lambda_home": "0.0058032583007812500",
+            "lambda_variance_away": "0.001514851800435701429843902588",
+            "lambda_variance_home": "0.001810809180072036981582641602"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -4217,7 +4569,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.52828258203125",
+          "lambda_away_plugin_delta": "0.01211858203125",
           "lambda_home": "1.98713442578125",
+          "lambda_home_plugin_delta": "0.04130942578125",
           "lambda_variance_away": "0.033663474215258895874023437500000000",
           "lambda_variance_home": "0.073212603559275741577148437500000000",
           "market_backed": false,
@@ -4297,7 +4651,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.002713052734375",
+            "lambda_home": "0.005985798828125",
+            "lambda_variance_away": "-0.002290001890707317352294921875",
+            "lambda_variance_home": "0.01037483110261217117309570312"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000227483847718211633102559276999719492370289796333204787862043",
             "exact_score_max_probability_movement": "0.002754067687",
@@ -4453,6 +4815,18 @@
                 "0.001772811043"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0041754176025390625",
+            "lambda_home": "0.0180015977783203125",
+            "lambda_variance_away": "-0.003999659317278091296553611755",
+            "lambda_variance_home": "0.009968216353657985702157020569"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         },
         {
@@ -4478,7 +4852,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.52828258203125",
+          "lambda_away_plugin_delta": "0.01211858203125",
           "lambda_home": "1.98713442578125",
+          "lambda_home_plugin_delta": "0.04130942578125",
           "lambda_variance_away": "0.033663474215258895874023437500000000",
           "lambda_variance_home": "0.073212603559275741577148437500000000",
           "market_backed": true,
@@ -4558,7 +4934,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.002713052734375",
+            "lambda_home": "0.005985798828125",
+            "lambda_variance_away": "-0.002290001890707317352294921875",
+            "lambda_variance_home": "0.01037483110261217117309570312"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000152803077472944471218680686334236050145082139143920923475455",
             "exact_score_max_probability_movement": "0.002941933618",
@@ -4714,6 +5098,18 @@
                 "0.000920877743"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0041754176025390625",
+            "lambda_home": "0.0180015977783203125",
+            "lambda_variance_away": "-0.003999659317278091296553611755",
+            "lambda_variance_home": "0.009968216353657985702157020569"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         }
       ],
@@ -4746,7 +5142,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.504114177734375",
+          "lambda_away_plugin_delta": "0.027463177734375",
           "lambda_home": "2.038630849609375",
+          "lambda_home_plugin_delta": "0.013663849609375",
           "lambda_variance_away": "0.044347348596653957366943359375000000000",
           "lambda_variance_home": "0.072806484397334804534912109375000000000",
           "market_backed": false,
@@ -4826,7 +5224,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0068257783203125",
+            "lambda_home": "0.0023337714843750",
+            "lambda_variance_away": "-0.0002131228733535032272338867188",
+            "lambda_variance_home": "-0.004197799824858310699462890625"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000200522108138353042809167711936846579152727974078522344075844",
             "exact_score_max_probability_movement": "0.002981603409",
@@ -4982,6 +5388,18 @@
                 "-0.000037729204"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0118943427734375000",
+            "lambda_home": "-0.0099979061279296875",
+            "lambda_variance_away": "0.0001738244867009706497192382812",
+            "lambda_variance_home": "-0.006121194298506288036704063416"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -5007,7 +5425,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.504114177734375",
+          "lambda_away_plugin_delta": "0.027463177734375",
           "lambda_home": "2.038630849609375",
+          "lambda_home_plugin_delta": "0.013663849609375",
           "lambda_variance_away": "0.044347348596653957366943359375000000000",
           "lambda_variance_home": "0.072806484397334804534912109375000000000",
           "market_backed": true,
@@ -5087,7 +5507,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0068257783203125",
+            "lambda_home": "0.0023337714843750",
+            "lambda_variance_away": "-0.0002131228733535032272338867188",
+            "lambda_variance_home": "-0.004197799824858310699462890625"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000131143358991946092933319381462179918441874432723998901425661",
             "exact_score_max_probability_movement": "0.001941292201",
@@ -5243,6 +5671,18 @@
                 "-0.037326322010"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0118943427734375000",
+            "lambda_home": "-0.0099979061279296875",
+            "lambda_variance_away": "0.0001738244867009706497192382812",
+            "lambda_variance_home": "-0.006121194298506288036704063416"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -5268,7 +5708,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.553782496093750",
+          "lambda_away_plugin_delta": "-0.001262503906250",
           "lambda_home": "2.056753521484375",
+          "lambda_home_plugin_delta": "0.016900521484375",
           "lambda_variance_away": "0.045130170671378890991210937500000000000",
           "lambda_variance_home": "0.078185258485827663421630859375000000000",
           "market_backed": false,
@@ -5348,7 +5790,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0027217802734375",
+            "lambda_home": "-0.0003940361328125",
+            "lambda_variance_away": "-0.0005599694389460973739624023438",
+            "lambda_variance_home": "-0.003348958685192454338073730469"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000153279697053144707744035362338137584849592224388412329681877",
             "exact_score_max_probability_movement": "0.002373644142",
@@ -5504,6 +5954,18 @@
                 "-0.002408980560"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0162079372558593750",
+            "lambda_home": "-0.0017313999023437500",
+            "lambda_variance_away": "0.0006284138205190754532814025879",
+            "lambda_variance_home": "0.0006682833145023005008697509766"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -5529,7 +5991,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.553782496093750",
+          "lambda_away_plugin_delta": "-0.001262503906250",
           "lambda_home": "2.056753521484375",
+          "lambda_home_plugin_delta": "0.016900521484375",
           "lambda_variance_away": "0.045130170671378890991210937500000000000",
           "lambda_variance_home": "0.078185258485827663421630859375000000000",
           "market_backed": true,
@@ -5609,7 +6073,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0027217802734375",
+            "lambda_home": "-0.0003940361328125",
+            "lambda_variance_away": "-0.0005599694389460973739624023438",
+            "lambda_variance_home": "-0.003348958685192454338073730469"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0181834100130414095469643583763885192026604022371752027936021",
             "exact_score_max_probability_movement": "0.060714421764",
@@ -5765,6 +6237,18 @@
                 "0.040330110494"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0162079372558593750",
+            "lambda_home": "-0.0017313999023437500",
+            "lambda_variance_away": "0.0006284138205190754532814025879",
+            "lambda_variance_home": "0.0006682833145023005008697509766"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -5790,7 +6274,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.530995634765625",
+          "lambda_away_plugin_delta": "0.014831634765625",
           "lambda_home": "1.981148626953125",
+          "lambda_home_plugin_delta": "0.035323626953125",
           "lambda_variance_away": "0.035953476105966213226318359375000000000",
           "lambda_variance_home": "0.062837772456663570404052734375000000000",
           "market_backed": false,
@@ -5870,7 +6356,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0109698701171875",
+            "lambda_home": "0.0086320253906250",
+            "lambda_variance_away": "-0.0005338469012407941818237304688",
+            "lambda_variance_home": "0.0003207080824375572204589843750"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000188253510388312396042180170896578799698123435815229577140126",
             "exact_score_max_probability_movement": "0.002541235816",
@@ -6026,6 +6520,18 @@
                 "0.001421000518"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0014623648681640625",
+            "lambda_home": "0.0120157989501953125",
+            "lambda_variance_away": "-0.001709657426570773944258689880",
+            "lambda_variance_home": "-0.0004066147489541854709386825562"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         },
         {
@@ -6051,7 +6557,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.530995634765625",
+          "lambda_away_plugin_delta": "0.014831634765625",
           "lambda_home": "1.981148626953125",
+          "lambda_home_plugin_delta": "0.035323626953125",
           "lambda_variance_away": "0.035953476105966213226318359375000000000",
           "lambda_variance_home": "0.062837772456663570404052734375000000000",
           "market_backed": true,
@@ -6131,7 +6639,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0109698701171875",
+            "lambda_home": "0.0086320253906250",
+            "lambda_variance_away": "-0.0005338469012407941818237304688",
+            "lambda_variance_home": "0.0003207080824375572204589843750"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000128675702094386568093098873786806472108846966612971535293565",
             "exact_score_max_probability_movement": "0.002660784158",
@@ -6287,6 +6803,18 @@
                 "0.000744908068"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0014623648681640625",
+            "lambda_home": "0.0120157989501953125",
+            "lambda_variance_away": "-0.001709657426570773944258689880",
+            "lambda_variance_home": "-0.0004066147489541854709386825562"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         }
       ],
@@ -6319,7 +6847,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.4972883994140625",
+          "lambda_away_plugin_delta": "0.0206373994140625",
           "lambda_home": "2.0362970781250000",
+          "lambda_home_plugin_delta": "0.0113300781250000",
           "lambda_variance_away": "0.044560471470007460594177246093750000000000",
           "lambda_variance_home": "0.077004284222193115234375000000000000000000",
           "market_backed": false,
@@ -6399,7 +6929,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00134038378906250",
+            "lambda_home": "-0.01732990234375000",
+            "lambda_variance_away": "0.001443842611680556297302246094",
+            "lambda_variance_home": "-0.0009879707153240814208984375000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000180309143125231700435302371696854864640613179122830166571743",
             "exact_score_max_probability_movement": "0.002890252127",
@@ -6555,6 +7093,18 @@
                 "-0.000874098054"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0050685644531250000",
+            "lambda_home": "-0.0123316776123046875",
+            "lambda_variance_away": "0.0003869473600544738769531250000",
+            "lambda_variance_home": "-0.001923394473647977337241172791"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -6580,7 +7130,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.4972883994140625",
+          "lambda_away_plugin_delta": "0.0206373994140625",
           "lambda_home": "2.0362970781250000",
+          "lambda_home_plugin_delta": "0.0113300781250000",
           "lambda_variance_away": "0.044560471470007460594177246093750000000000",
           "lambda_variance_home": "0.077004284222193115234375000000000000000000",
           "market_backed": true,
@@ -6660,7 +7212,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00134038378906250",
+            "lambda_home": "-0.01732990234375000",
+            "lambda_variance_away": "0.001443842611680556297302246094",
+            "lambda_variance_home": "-0.0009879707153240814208984375000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0154235908596124062630735321188598917888357318951382780118109",
             "exact_score_max_probability_movement": "0.056567802108",
@@ -6816,6 +7376,18 @@
                 "-0.000874098054"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0050685644531250000",
+            "lambda_home": "-0.0123316776123046875",
+            "lambda_variance_away": "0.0003869473600544738769531250000",
+            "lambda_variance_home": "-0.001923394473647977337241172791"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -6841,7 +7413,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5565042763671875",
+          "lambda_away_plugin_delta": "0.0014592763671875",
           "lambda_home": "2.0571475576171875",
+          "lambda_home_plugin_delta": "0.0172945576171875",
           "lambda_variance_away": "0.045690140110324988365173339843750000000000",
           "lambda_variance_home": "0.081534217171020117759704589843750000000000",
           "market_backed": false,
@@ -6921,7 +7495,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.01511608056640625",
+            "lambda_home": "-0.00113800488281250",
+            "lambda_variance_away": "-0.001554817121281496763229370117",
+            "lambda_variance_home": "0.002653492428383399009704589844"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000162225421637734072571864335380401462223510710116591967907150",
             "exact_score_max_probability_movement": "0.002375766834",
@@ -7077,6 +7659,18 @@
                 "-0.001935951872"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0134861569824218750",
+            "lambda_home": "-0.0013373637695312500",
+            "lambda_variance_away": "0.001188383259465172827243804932",
+            "lambda_variance_home": "0.004017241999694754838943481445"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -7102,7 +7696,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5565042763671875",
+          "lambda_away_plugin_delta": "0.0014592763671875",
           "lambda_home": "2.0571475576171875",
+          "lambda_home_plugin_delta": "0.0172945576171875",
           "lambda_variance_away": "0.045690140110324988365173339843750000000000",
           "lambda_variance_home": "0.081534217171020117759704589843750000000000",
           "market_backed": true,
@@ -7182,7 +7778,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.01511608056640625",
+            "lambda_home": "-0.00113800488281250",
+            "lambda_variance_away": "-0.001554817121281496763229370117",
+            "lambda_variance_home": "0.002653492428383399009704589844"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0182990674568826658200951918168370426434887684092183073343505",
             "exact_score_max_probability_movement": "0.060810875099",
@@ -7338,6 +7942,18 @@
                 "0.040803139182"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0134861569824218750",
+            "lambda_home": "-0.0013373637695312500",
+            "lambda_variance_away": "0.001188383259465172827243804932",
+            "lambda_variance_home": "0.004017241999694754838943481445"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -7363,7 +7979,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5419655048828125",
+          "lambda_away_plugin_delta": "0.0258015048828125",
           "lambda_home": "1.9725166015625000",
+          "lambda_home_plugin_delta": "0.0266916015625000",
           "lambda_variance_away": "0.036487323007207007408142089843750000000000",
           "lambda_variance_home": "0.062517064374226013183593750000000000000000",
           "market_backed": false,
@@ -7443,7 +8061,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00223268798828125",
+            "lambda_home": "0.00029532421875000",
+            "lambda_variance_away": "-0.001157435619114445447921752930",
+            "lambda_variance_home": "-0.001728721592608200073242187500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000191242277269360631892391214099198345132688550555522581921390",
             "exact_score_max_probability_movement": "0.002610808927",
@@ -7599,6 +8225,18 @@
                 "0.001690885542"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0095075052490234375",
+            "lambda_home": "0.0033837735595703125",
+            "lambda_variance_away": "-0.001175810525329979762434959412",
+            "lambda_variance_home": "-0.0007273228313917426913976669312"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         },
         {
@@ -7624,7 +8262,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5419655048828125",
+          "lambda_away_plugin_delta": "0.0258015048828125",
           "lambda_home": "1.9725166015625000",
+          "lambda_home_plugin_delta": "0.0266916015625000",
           "lambda_variance_away": "0.036487323007207007408142089843750000000000",
           "lambda_variance_home": "0.062517064374226013183593750000000000000000",
           "market_backed": true,
@@ -7704,7 +8344,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00223268798828125",
+            "lambda_home": "0.00029532421875000",
+            "lambda_variance_away": "-0.001157435619114445447921752930",
+            "lambda_variance_home": "-0.001728721592608200073242187500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000126531409569976187120346254151565956291769477248263282443749",
             "exact_score_max_probability_movement": "0.002438878271",
@@ -7860,6 +8508,18 @@
                 "0.000899902141"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0095075052490234375",
+            "lambda_home": "0.0033837735595703125",
+            "lambda_variance_away": "-0.001175810525329979762434959412",
+            "lambda_variance_home": "-0.0007273228313917426913976669312"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         }
       ],
@@ -7892,7 +8552,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.49594801562500000",
+          "lambda_away_plugin_delta": "0.01929701562500000",
           "lambda_home": "2.05362698046875000",
+          "lambda_home_plugin_delta": "0.02865998046875000",
           "lambda_variance_away": "0.043116628858326904296875000000000000000000000",
           "lambda_variance_home": "0.077992254937517196655273437500000000000000000",
           "market_backed": false,
@@ -7972,7 +8634,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.002530226806640625",
+            "lambda_home": "0.002467835205078125",
+            "lambda_variance_away": "-0.0009404321739353827834129333496",
+            "lambda_variance_home": "-0.001450082591173371732234954834"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000214179536698349121799038087411743633203903990113929926295000",
             "exact_score_max_probability_movement": "0.002868152188",
@@ -8128,6 +8798,18 @@
                 "0.001092526504"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0037281806640625000",
+            "lambda_home": "0.0049982247314453125",
+            "lambda_variance_away": "-0.001056895251626082420349121094",
+            "lambda_variance_home": "-0.0009354237583238959163427352905"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -8153,7 +8835,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.49594801562500000",
+          "lambda_away_plugin_delta": "0.01929701562500000",
           "lambda_home": "2.05362698046875000",
+          "lambda_home_plugin_delta": "0.02865998046875000",
           "lambda_variance_away": "0.043116628858326904296875000000000000000000000",
           "lambda_variance_home": "0.077992254937517196655273437500000000000000000",
           "market_backed": true,
@@ -8233,7 +8917,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.002530226806640625",
+            "lambda_home": "0.002467835205078125",
+            "lambda_variance_away": "-0.0009404321739353827834129333496",
+            "lambda_variance_home": "-0.001450082591173371732234954834"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000152001025460994778507389831948643710310773897144752966543920",
             "exact_score_max_probability_movement": "0.002480786606",
@@ -8389,6 +9081,18 @@
                 "-0.036699513620"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0037281806640625000",
+            "lambda_home": "0.0049982247314453125",
+            "lambda_variance_away": "-0.001056895251626082420349121094",
+            "lambda_variance_home": "-0.0009354237583238959163427352905"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4922198349609375000",
+            "lambda_home": "2.0486287557373046875",
+            "lambda_variance_away": "0.044173524109952986717224121093750000000000000000000",
+            "lambda_variance_home": "0.078927678695841092571616172790527343750000000000000"
           }
         },
         {
@@ -8414,7 +9118,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.57162035693359375",
+          "lambda_away_plugin_delta": "0.01657535693359375",
           "lambda_home": "2.05828556250000000",
+          "lambda_home_plugin_delta": "0.01843256250000000",
           "lambda_variance_away": "0.047244957231606485128402709960937500000000000",
           "lambda_variance_home": "0.078880724742636718750000000000000000000000000",
           "market_backed": false,
@@ -8494,7 +9200,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.000935975097656250",
+            "lambda_home": "0.000018113281250000",
+            "lambda_variance_away": "0.0006286749047513978481292724609",
+            "lambda_variance_home": "0.0002413551416759185791015625000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000182134418941970265755733387974040627099257238859432228130126",
             "exact_score_max_probability_movement": "0.002661722302",
@@ -8650,6 +9364,18 @@
                 "0.000240221513"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0016299235839843750",
+            "lambda_home": "-0.0001993588867187500",
+            "lambda_variance_away": "0.002743200380746669590473175049",
+            "lambda_variance_home": "0.001363749571311355829238891602"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -8675,7 +9401,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.57162035693359375",
+          "lambda_away_plugin_delta": "0.01657535693359375",
           "lambda_home": "2.05828556250000000",
+          "lambda_home_plugin_delta": "0.01843256250000000",
           "lambda_variance_away": "0.047244957231606485128402709960937500000000000",
           "lambda_variance_home": "0.078880724742636718750000000000000000000000000",
           "market_backed": true,
@@ -8755,7 +9483,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.000935975097656250",
+            "lambda_home": "0.000018113281250000",
+            "lambda_variance_away": "0.0006286749047513978481292724609",
+            "lambda_variance_home": "0.0002413551416759185791015625000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000131947067554093279522183373301684219990849433763259657102933",
             "exact_score_max_probability_movement": "0.001962069850",
@@ -8911,6 +9647,18 @@
                 "0.000152850081"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0016299235839843750",
+            "lambda_home": "-0.0001993588867187500",
+            "lambda_variance_away": "0.002743200380746669590473175049",
+            "lambda_variance_home": "0.001363749571311355829238891602"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5699904333496093750",
+            "lambda_home": "2.0584849213867187500",
+            "lambda_variance_away": "0.044501756850859815537929534912109375000000000000000",
+            "lambda_variance_home": "0.077516975171325362920761108398437500000000000000000"
           }
         },
         {
@@ -8936,7 +9684,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.53973281689453125",
+          "lambda_away_plugin_delta": "0.02356881689453125",
           "lambda_home": "1.97222127734375000",
+          "lambda_home_plugin_delta": "0.02639627734375000",
           "lambda_variance_away": "0.037644758626321452856063842773437500000000000",
           "lambda_variance_home": "0.064245785966834213256835937500000000000000000",
           "market_backed": false,
@@ -9016,7 +9766,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.010611458496093750",
+            "lambda_home": "-0.000270219970703125",
+            "lambda_variance_away": "0.0007865112625021483898162841797",
+            "lambda_variance_home": "0.0007177258535568767189979553223"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000186959898101544286608252344324577505910176382506046226395583",
             "exact_score_max_probability_movement": "0.002589799401",
@@ -9172,6 +9930,18 @@
                 "0.001381342933"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0072748172607421875",
+            "lambda_home": "0.0030884493408203125",
+            "lambda_variance_away": "-0.00001837490621553431451320648193",
+            "lambda_variance_home": "0.001001398761216457381844520569"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         },
         {
@@ -9197,7 +9967,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.53973281689453125",
+          "lambda_away_plugin_delta": "0.02356881689453125",
           "lambda_home": "1.97222127734375000",
+          "lambda_home_plugin_delta": "0.02639627734375000",
           "lambda_variance_away": "0.037644758626321452856063842773437500000000000",
           "lambda_variance_home": "0.064245785966834213256835937500000000000000000",
           "market_backed": true,
@@ -9277,7 +10049,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.010611458496093750",
+            "lambda_home": "-0.000270219970703125",
+            "lambda_variance_away": "0.0007865112625021483898162841797",
+            "lambda_variance_home": "0.0007177258535568767189979553223"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000126548070386234326487792647594711482508126922268999366431603",
             "exact_score_max_probability_movement": "0.002433158069",
@@ -9433,6 +10213,18 @@
                 "0.000748345864"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0072748172607421875",
+            "lambda_home": "0.0030884493408203125",
+            "lambda_variance_away": "-0.00001837490621553431451320648193",
+            "lambda_variance_home": "0.001001398761216457381844520569"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5324579996337890625",
+            "lambda_home": "1.9691328280029296875",
+            "lambda_variance_away": "0.037663133532536987170577049255371093750000000000000",
+            "lambda_variance_home": "0.063244387205617755874991416931152343750000000000000"
           }
         }
       ],
@@ -9465,7 +10257,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.516287484375",
+          "lambda_away_plugin_delta": "0.039636484375",
           "lambda_home": "1.986157750000",
+          "lambda_home_plugin_delta": "-0.038809250000",
           "lambda_variance_away": "0.027093627137218505859375000000",
           "lambda_variance_home": "0.044889699266968750000000000000",
           "market_backed": false,
@@ -9545,7 +10339,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0002566406250",
+            "lambda_home": "-0.0486412578125",
+            "lambda_variance_away": "-0.01033832759463208007812500000",
+            "lambda_variance_home": "-0.01347915138839837646484375000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000273488613749549200951918489966901777668784334358449981282263",
             "exact_score_max_probability_movement": "0.002824981103",
@@ -9701,6 +10503,18 @@
                 "-0.006166337164"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0261531868896484375",
+            "lambda_home": "-0.0615996320800781250",
+            "lambda_variance_away": "-0.01567909715985498391091823578",
+            "lambda_variance_home": "-0.03565965932557984489202499390"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -9726,7 +10540,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.516287484375",
+          "lambda_away_plugin_delta": "0.039636484375",
           "lambda_home": "1.986157750000",
+          "lambda_home_plugin_delta": "-0.038809250000",
           "lambda_variance_away": "0.027093627137218505859375000000",
           "lambda_variance_home": "0.044889699266968750000000000000",
           "market_backed": true,
@@ -9806,7 +10622,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0002566406250",
+            "lambda_home": "-0.0486412578125",
+            "lambda_variance_away": "-0.01033832759463208007812500000",
+            "lambda_variance_home": "-0.01347915138839837646484375000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0000660350769513296072836806077422799724593901420012787124721341",
             "exact_score_max_probability_movement": "0.001669694591",
@@ -9962,6 +10786,18 @@
                 "-0.003774282775"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0261531868896484375",
+            "lambda_home": "-0.0615996320800781250",
+            "lambda_variance_away": "-0.01567909715985498391091823578",
+            "lambda_variance_home": "-0.03565965932557984489202499390"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -9987,7 +10823,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.497056781250",
+          "lambda_away_plugin_delta": "-0.057988218750",
           "lambda_home": "2.068079750000",
+          "lambda_home_plugin_delta": "0.028226750000",
           "lambda_variance_away": "0.035264650680670898437500000000",
           "lambda_variance_home": "0.081385706469250000000000000000",
           "market_backed": false,
@@ -10067,7 +10905,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0514451796875",
+            "lambda_home": "-0.0146645937500",
+            "lambda_variance_away": "-0.006789093790194763183593750000",
+            "lambda_variance_home": "-0.0002596441556162109375000000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000446423383224533122645454563632216830584665147474002237649595",
             "exact_score_max_probability_movement": "0.003658867047",
@@ -10223,6 +11069,18 @@
                 "-0.008208640188"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0721945434570312500",
+            "lambda_home": "0.0105546865234375000",
+            "lambda_variance_away": "-0.01012808209805228018760681152",
+            "lambda_variance_home": "0.007529889299013062477111816406"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -10248,7 +11106,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.497056781250",
+          "lambda_away_plugin_delta": "-0.057988218750",
           "lambda_home": "2.068079750000",
+          "lambda_home_plugin_delta": "0.028226750000",
           "lambda_variance_away": "0.035264650680670898437500000000",
           "lambda_variance_home": "0.081385706469250000000000000000",
           "market_backed": true,
@@ -10328,7 +11188,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0514451796875",
+            "lambda_home": "-0.0146645937500",
+            "lambda_variance_away": "-0.006789093790194763183593750000",
+            "lambda_variance_home": "-0.0002596441556162109375000000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000181354242257978818170889595964419877513350451132542099528374",
             "exact_score_max_probability_movement": "0.003506578630",
@@ -10484,6 +11352,18 @@
                 "-0.004395532763"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0721945434570312500",
+            "lambda_home": "0.0105546865234375000",
+            "lambda_variance_away": "-0.01012808209805228018760681152",
+            "lambda_variance_home": "0.007529889299013062477111816406"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -10509,7 +11389,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.518919953125",
+          "lambda_away_plugin_delta": "0.002755953125",
           "lambda_home": "2.019553015625",
+          "lambda_home_plugin_delta": "0.073728015625",
           "lambda_variance_away": "0.035980512324857177734375000000",
           "lambda_variance_home": "0.052210920403515380859375000000",
           "market_backed": false,
@@ -10589,7 +11471,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0120416640625",
+            "lambda_home": "0.0256180390625",
+            "lambda_variance_away": "-0.004065068896207214355468750000",
+            "lambda_variance_home": "-0.001752141401741882324218750000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000413766466253407079697544590307504406972535784569536456892529",
             "exact_score_max_probability_movement": "0.004021373301",
@@ -10745,6 +11635,18 @@
                 "0.006300666414"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0090878358154296875",
+            "lambda_home": "0.0620564007568359375",
+            "lambda_variance_away": "-0.001793784264037851318717002869",
+            "lambda_variance_home": "-0.009056132574618152961134910583"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         },
         {
@@ -10770,7 +11672,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.518919953125",
+          "lambda_away_plugin_delta": "0.002755953125",
           "lambda_home": "2.019553015625",
+          "lambda_home_plugin_delta": "0.073728015625",
           "lambda_variance_away": "0.035980512324857177734375000000",
           "lambda_variance_home": "0.052210920403515380859375000000",
           "market_backed": true,
@@ -10850,7 +11754,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0120416640625",
+            "lambda_home": "0.0256180390625",
+            "lambda_variance_away": "-0.004065068896207214355468750000",
+            "lambda_variance_home": "-0.001752141401741882324218750000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000193656111607623315401741810615090017654322484787333938693491",
             "exact_score_max_probability_movement": "0.004138861548",
@@ -11006,6 +11918,18 @@
                 "0.002888133661"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0090878358154296875",
+            "lambda_home": "0.0620564007568359375",
+            "lambda_variance_away": "-0.001793784264037851318717002869",
+            "lambda_variance_home": "-0.009056132574618152961134910583"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         }
       ],
@@ -11038,7 +11962,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.5160308437500",
+          "lambda_away_plugin_delta": "0.0393798437500",
           "lambda_home": "2.0347990078125",
+          "lambda_home_plugin_delta": "0.0098320078125",
           "lambda_variance_away": "0.037431954731850585937500000000000",
           "lambda_variance_home": "0.058368850655367126464843750000000",
           "market_backed": false,
@@ -11118,7 +12044,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.01946894140625",
+            "lambda_home": "0.00934360156250",
+            "lambda_variance_away": "-0.004107847541706283569335937500",
+            "lambda_variance_home": "-0.008680317677710021972656250000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000218970186560809946903557948077141810402974515132678881493501",
             "exact_score_max_probability_movement": "0.002901852755",
@@ -11274,6 +12208,18 @@
                 "0.000873454796"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0258965462646484375",
+            "lambda_home": "-0.0129583742675781250",
+            "lambda_variance_away": "-0.005340769565222903832793235779",
+            "lambda_variance_home": "-0.02218050793718146842718124390"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -11299,7 +12245,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.5160308437500",
+          "lambda_away_plugin_delta": "0.0393798437500",
           "lambda_home": "2.0347990078125",
+          "lambda_home_plugin_delta": "0.0098320078125",
           "lambda_variance_away": "0.037431954731850585937500000000000",
           "lambda_variance_home": "0.058368850655367126464843750000000",
           "market_backed": true,
@@ -11379,7 +12327,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.01946894140625",
+            "lambda_home": "0.00934360156250",
+            "lambda_variance_away": "-0.004107847541706283569335937500",
+            "lambda_variance_home": "-0.008680317677710021972656250000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000115640958756959258051768746580985452431869592502056608164639",
             "exact_score_max_probability_movement": "0.001962233738",
@@ -11535,6 +12491,18 @@
                 "0.000148034071"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0258965462646484375",
+            "lambda_home": "-0.0129583742675781250",
+            "lambda_variance_away": "-0.005340769565222903832793235779",
+            "lambda_variance_home": "-0.02218050793718146842718124390"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -11560,7 +12528,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5485019609375",
+          "lambda_away_plugin_delta": "-0.0065430390625",
           "lambda_home": "2.0827443437500",
+          "lambda_home_plugin_delta": "0.0428913437500",
           "lambda_variance_away": "0.042053744470865661621093750000000",
           "lambda_variance_home": "0.081645350624866210937500000000000",
           "market_backed": false,
@@ -11640,7 +12610,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.01034935937500",
+            "lambda_home": "0.02366421484375",
+            "lambda_variance_away": "0.003645464923624511718750000000",
+            "lambda_variance_home": "0.003418002730816421508789062500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000249633286341489666718044583494942792521513821226060722055911",
             "exact_score_max_probability_movement": "0.002618823038",
@@ -11796,6 +12774,18 @@
                 "0.001173481274"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0207493637695312500",
+            "lambda_home": "0.0252192802734375000",
+            "lambda_variance_away": "-0.003338988307857517004013061523",
+            "lambda_variance_home": "0.007789533454629273414611816406"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -11821,7 +12811,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5485019609375",
+          "lambda_away_plugin_delta": "-0.0065430390625",
           "lambda_home": "2.0827443437500",
+          "lambda_home_plugin_delta": "0.0428913437500",
           "lambda_variance_away": "0.042053744470865661621093750000000",
           "lambda_variance_home": "0.081645350624866210937500000000000",
           "market_backed": true,
@@ -11901,7 +12893,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.01034935937500",
+            "lambda_home": "0.02366421484375",
+            "lambda_variance_away": "0.003645464923624511718750000000",
+            "lambda_variance_home": "0.003418002730816421508789062500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000162819899328271485820506259483118782644747103115007252437563",
             "exact_score_max_probability_movement": "0.002638089587",
@@ -12057,6 +13057,18 @@
                 "0.000774857214"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0207493637695312500",
+            "lambda_home": "0.0252192802734375000",
+            "lambda_variance_away": "-0.003338988307857517004013061523",
+            "lambda_variance_home": "0.007789533454629273414611816406"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -12082,7 +13094,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5309616171875",
+          "lambda_away_plugin_delta": "0.0147976171875",
           "lambda_home": "1.9939349765625",
+          "lambda_home_plugin_delta": "0.0481099765625",
           "lambda_variance_away": "0.040045581221064392089843750000000",
           "lambda_variance_home": "0.053963061805257263183593750000000",
           "market_backed": false,
@@ -12162,7 +13176,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.01630631250000",
+            "lambda_home": "0.03440763281250",
+            "lambda_variance_away": "-0.0005866855313369140625000000000",
+            "lambda_variance_home": "-0.006545848526601135253906250000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000247624856312734137523814433143395485533433843463240238976962",
             "exact_score_max_probability_movement": "0.003224145686",
@@ -12318,6 +13340,18 @@
                 "0.004759602367"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0029538282470703125",
+            "lambda_home": "0.0364383616943359375",
+            "lambda_variance_away": "0.002271284632169363036751747131",
+            "lambda_variance_home": "-0.007303991172876270636916160583"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         },
         {
@@ -12343,7 +13377,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5309616171875",
+          "lambda_away_plugin_delta": "0.0147976171875",
           "lambda_home": "1.9939349765625",
+          "lambda_home_plugin_delta": "0.0481099765625",
           "lambda_variance_away": "0.040045581221064392089843750000000",
           "lambda_variance_home": "0.053963061805257263183593750000000",
           "market_backed": true,
@@ -12423,7 +13459,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.01630631250000",
+            "lambda_home": "0.03440763281250",
+            "lambda_variance_away": "-0.0005866855313369140625000000000",
+            "lambda_variance_home": "-0.006545848526601135253906250000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000145524307820281971865851240966861021050661056640026922555423",
             "exact_score_max_probability_movement": "0.003211675435",
@@ -12579,6 +13623,18 @@
                 "0.002261147098"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0029538282470703125",
+            "lambda_home": "0.0364383616943359375",
+            "lambda_variance_away": "0.002271284632169363036751747131",
+            "lambda_variance_home": "-0.007303991172876270636916160583"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         }
       ],
@@ -12611,7 +13667,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.49656190234375",
+          "lambda_away_plugin_delta": "0.01991090234375",
           "lambda_home": "2.02545540625000",
+          "lambda_home_plugin_delta": "0.00048840625000",
           "lambda_variance_away": "0.041539802273556869506835937500000000",
           "lambda_variance_home": "0.067049168333077148437500000000000000",
           "market_backed": false,
@@ -12691,7 +13749,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.005905357421875",
+            "lambda_home": "-0.013932812500000",
+            "lambda_variance_away": "0.003142299728312793731689453125",
+            "lambda_variance_home": "-0.005362233430875000000000000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000144398951464090644881010141869441317557866181860476159737724",
             "exact_score_max_probability_movement": "0.002609386547",
@@ -12847,6 +13913,18 @@
                 "-0.002382339075"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0064276048583984375",
+            "lambda_home": "-0.0223019758300781250",
+            "lambda_variance_away": "-0.001232922023516620263457298279",
+            "lambda_variance_home": "-0.01350019025947144645452499390"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -12872,7 +13950,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.49656190234375",
+          "lambda_away_plugin_delta": "0.01991090234375",
           "lambda_home": "2.02545540625000",
+          "lambda_home_plugin_delta": "0.00048840625000",
           "lambda_variance_away": "0.041539802273556869506835937500000000",
           "lambda_variance_home": "0.067049168333077148437500000000000000",
           "market_backed": true,
@@ -12952,7 +14032,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.005905357421875",
+            "lambda_home": "-0.013932812500000",
+            "lambda_variance_away": "0.003142299728312793731689453125",
+            "lambda_variance_home": "-0.005362233430875000000000000000"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0151038693095226722573603449426901302968394029502699057231745",
             "exact_score_max_probability_movement": "0.056012676429",
@@ -13108,6 +14196,18 @@
                 "0.034670425357"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0064276048583984375",
+            "lambda_home": "-0.0223019758300781250",
+            "lambda_variance_away": "-0.001232922023516620263457298279",
+            "lambda_variance_home": "-0.01350019025947144645452499390"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -13133,7 +14233,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.55885132031250",
+          "lambda_away_plugin_delta": "0.00380632031250",
           "lambda_home": "2.05908012890625",
+          "lambda_home_plugin_delta": "0.01922712890625",
           "lambda_variance_away": "0.038408279547241149902343750000000000",
           "lambda_variance_home": "0.078227347894049789428710937500000000",
           "market_backed": false,
@@ -13213,7 +14315,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.011009488281250",
+            "lambda_home": "-0.001826177734375",
+            "lambda_variance_away": "-0.005573368414995651245117187500",
+            "lambda_variance_home": "0.003390877224305927276611328125"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000145298562351977613910568136382893585078044793913058287578652",
             "exact_score_max_probability_movement": "0.002220182496",
@@ -13369,6 +14479,18 @@
                 "-0.001179052983"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0104000043945312500",
+            "lambda_home": "0.0015550654296875000",
+            "lambda_variance_away": "-0.006984453231482028722763061523",
+            "lambda_variance_home": "0.004371530723812851905822753906"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -13394,7 +14516,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.55885132031250",
+          "lambda_away_plugin_delta": "0.00380632031250",
           "lambda_home": "2.05908012890625",
+          "lambda_home_plugin_delta": "0.01922712890625",
           "lambda_variance_away": "0.038408279547241149902343750000000000",
           "lambda_variance_home": "0.078227347894049789428710937500000000",
           "market_backed": true,
@@ -13474,7 +14598,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.011009488281250",
+            "lambda_home": "-0.001826177734375",
+            "lambda_variance_away": "-0.005573368414995651245117187500",
+            "lambda_variance_home": "0.003390877224305927276611328125"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000110250695382592248026429318374186227780141741771620296653324",
             "exact_score_max_probability_movement": "0.001968732306",
@@ -13630,6 +14762,18 @@
                 "-0.000594234482"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0104000043945312500",
+            "lambda_home": "0.0015550654296875000",
+            "lambda_variance_away": "-0.006984453231482028722763061523",
+            "lambda_variance_home": "0.004371530723812851905822753906"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -13655,7 +14799,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.54726792968750",
+          "lambda_away_plugin_delta": "0.03110392968750",
           "lambda_home": "1.95952734375000",
+          "lambda_home_plugin_delta": "0.01370234375000",
           "lambda_variance_away": "0.040632266752401306152343750000000000",
           "lambda_variance_home": "0.060508910331858398437500000000000000",
           "market_backed": false,
@@ -13735,7 +14881,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.015213986328125",
+            "lambda_home": "0.003231402343750",
+            "lambda_variance_away": "0.001727781701718967437744140625",
+            "lambda_variance_home": "0.003026078744748550415039062500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000190916852654319128349360700845701464821343867830134858160030",
             "exact_score_max_probability_movement": "0.002778707125",
@@ -13891,6 +15045,18 @@
                 "0.002323608257"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0192601407470703125",
+            "lambda_home": "0.0020307288818359375",
+            "lambda_variance_away": "0.002857970163506277099251747131",
+            "lambda_variance_home": "-0.0007581426462751353830099105835"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         },
         {
@@ -13916,7 +15082,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.54726792968750",
+          "lambda_away_plugin_delta": "0.03110392968750",
           "lambda_home": "1.95952734375000",
+          "lambda_home_plugin_delta": "0.01370234375000",
           "lambda_variance_away": "0.040632266752401306152343750000000000",
           "lambda_variance_home": "0.060508910331858398437500000000000000",
           "market_backed": true,
@@ -13996,7 +15164,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.015213986328125",
+            "lambda_home": "0.003231402343750",
+            "lambda_variance_away": "0.001727781701718967437744140625",
+            "lambda_variance_home": "0.003026078744748550415039062500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000112176244668473474583680106327135637323715057638199051727619",
             "exact_score_max_probability_movement": "0.002016055114",
@@ -14152,6 +15328,18 @@
                 "0.001048066876"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0192601407470703125",
+            "lambda_home": "0.0020307288818359375",
+            "lambda_variance_away": "0.002857970163506277099251747131",
+            "lambda_variance_home": "-0.0007581426462751353830099105835"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         }
       ],
@@ -14184,7 +15372,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.490656544921875",
+          "lambda_away_plugin_delta": "0.014005544921875",
           "lambda_home": "2.039388218750000",
+          "lambda_home_plugin_delta": "0.014421218750000",
           "lambda_variance_away": "0.038397502545244075775146484375000000000",
           "lambda_variance_home": "0.072411401763952148437500000000000000000",
           "market_backed": false,
@@ -14264,7 +15454,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0054109873046875",
+            "lambda_home": "-0.0040896542968750",
+            "lambda_variance_away": "-0.001190857678188151359558105469",
+            "lambda_variance_home": "-0.002572976912252437591552734375"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000143361243033921603407412263692509147594784174102888780948423",
             "exact_score_max_probability_movement": "0.002514494921",
@@ -14420,6 +15618,18 @@
                 "-0.001288082446"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0005222474365234375",
+            "lambda_home": "-0.0083691633300781250",
+            "lambda_variance_away": "-0.004375221751829413995146751404",
+            "lambda_variance_home": "-0.008137956828596446454524993896"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -14445,7 +15655,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.490656544921875",
+          "lambda_away_plugin_delta": "0.014005544921875",
           "lambda_home": "2.039388218750000",
+          "lambda_home_plugin_delta": "0.014421218750000",
           "lambda_variance_away": "0.038397502545244075775146484375000000000",
           "lambda_variance_home": "0.072411401763952148437500000000000000000",
           "market_backed": true,
@@ -14525,7 +15737,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0054109873046875",
+            "lambda_home": "-0.0040896542968750",
+            "lambda_variance_away": "-0.001190857678188151359558105469",
+            "lambda_variance_home": "-0.002572976912252437591552734375"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000106753093303262768298385852852896257624382495256590798666848",
             "exact_score_max_probability_movement": "0.001756579958",
@@ -14681,6 +15901,18 @@
                 "-0.000774469100"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0005222474365234375",
+            "lambda_home": "-0.0083691633300781250",
+            "lambda_variance_away": "-0.004375221751829413995146751404",
+            "lambda_variance_home": "-0.008137956828596446454524993896"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -14706,7 +15938,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.569860808593750",
+          "lambda_away_plugin_delta": "0.014815808593750",
           "lambda_home": "2.060906306640625",
+          "lambda_home_plugin_delta": "0.021053306640625",
           "lambda_variance_away": "0.043981647962236801147460937500000000000",
           "lambda_variance_home": "0.074836470669743862152099609375000000000",
           "market_backed": false,
@@ -14786,7 +16020,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0030386894531250",
+            "lambda_home": "-0.0013264892578125",
+            "lambda_variance_away": "0.0003335455345654487609863281250",
+            "lambda_variance_home": "-0.0008064402112330350875854492188"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000168713972685561782564974358608584057973917512595649037556691",
             "exact_score_max_probability_movement": "0.002539351172",
@@ -14942,6 +16184,18 @@
                 "0.000453220622"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0006094838867187500",
+            "lambda_home": "0.0033812431640625000",
+            "lambda_variance_away": "-0.001411084816486377477645874023",
+            "lambda_variance_home": "0.0009806534995069246292114257812"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -14967,7 +16221,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.569860808593750",
+          "lambda_away_plugin_delta": "0.014815808593750",
           "lambda_home": "2.060906306640625",
+          "lambda_home_plugin_delta": "0.021053306640625",
           "lambda_variance_away": "0.043981647962236801147460937500000000000",
           "lambda_variance_home": "0.074836470669743862152099609375000000000",
           "market_backed": true,
@@ -15047,7 +16303,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.0030386894531250",
+            "lambda_home": "-0.0013264892578125",
+            "lambda_variance_away": "0.0003335455345654487609863281250",
+            "lambda_variance_home": "-0.0008064402112330350875854492188"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000121812965256733019548441846138380246539097061220210782021288",
             "exact_score_max_probability_movement": "0.002025289987",
@@ -15203,6 +16467,18 @@
                 "0.000193824828"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0006094838867187500",
+            "lambda_home": "0.0033812431640625000",
+            "lambda_variance_away": "-0.001411084816486377477645874023",
+            "lambda_variance_home": "0.0009806534995069246292114257812"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -15228,7 +16504,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.532053943359375",
+          "lambda_away_plugin_delta": "0.015889943359375",
           "lambda_home": "1.956295941406250",
+          "lambda_home_plugin_delta": "0.010470941406250",
           "lambda_variance_away": "0.038904485050682338714599609375000000000",
           "lambda_variance_home": "0.057482831587109848022460937500000000000",
           "market_backed": false,
@@ -15308,7 +16586,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0019607031250000",
+            "lambda_home": "-0.0112892470703125",
+            "lambda_variance_away": "0.001938367869350280761718750000",
+            "lambda_variance_home": "-0.001714597643302870750427246094"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000118000306875285054709190505872290924651412907753853837679836",
             "exact_score_max_probability_movement": "0.002256996076",
@@ -15464,6 +16750,18 @@
                 "0.000122661621"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0040461544189453125",
+            "lambda_home": "-0.0012006734619140625",
+            "lambda_variance_away": "0.001130188461787309661507606506",
+            "lambda_variance_home": "-0.003784221391023685798048973083"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         },
         {
@@ -15489,7 +16787,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.532053943359375",
+          "lambda_away_plugin_delta": "0.015889943359375",
           "lambda_home": "1.956295941406250",
+          "lambda_home_plugin_delta": "0.010470941406250",
           "lambda_variance_away": "0.038904485050682338714599609375000000000",
           "lambda_variance_home": "0.057482831587109848022460937500000000000",
           "market_backed": true,
@@ -15569,7 +16869,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.0019607031250000",
+            "lambda_home": "-0.0112892470703125",
+            "lambda_variance_away": "0.001938367869350280761718750000",
+            "lambda_variance_home": "-0.001714597643302870750427246094"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0000838301066625969068167071486192716588785549438211542152599101",
             "exact_score_max_probability_movement": "0.001635495887",
@@ -15725,6 +17033,18 @@
                 "-0.000053152744"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0040461544189453125",
+            "lambda_home": "-0.0012006734619140625",
+            "lambda_variance_away": "0.001130188461787309661507606506",
+            "lambda_variance_home": "-0.003784221391023685798048973083"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         }
       ],
@@ -15757,7 +17077,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.4852455576171875",
+          "lambda_away_plugin_delta": "0.0085945576171875",
           "lambda_home": "2.0434778730468750",
+          "lambda_home_plugin_delta": "0.0185108730468750",
           "lambda_variance_away": "0.039588360223432227134704589843750000000000",
           "lambda_variance_home": "0.074984378676204586029052734375000000000000",
           "market_backed": false,
@@ -15837,7 +17159,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.00304790771484375",
+            "lambda_home": "-0.00430631835937500",
+            "lambda_variance_away": "-0.0005995872403644225597381591797",
+            "lambda_variance_home": "-0.005764038627973621368408203125"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000149079159753725100253354125934320030222075447698509746873463",
             "exact_score_max_probability_movement": "0.002444200459",
@@ -15993,6 +17323,18 @@
                 "-0.001340546539"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0048887398681640625",
+            "lambda_home": "-0.0042795090332031250",
+            "lambda_variance_away": "-0.003184364073641262635588645935",
+            "lambda_variance_home": "-0.005564979916344008862972259521"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -16018,7 +17360,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.4852455576171875",
+          "lambda_away_plugin_delta": "0.0085945576171875",
           "lambda_home": "2.0434778730468750",
+          "lambda_home_plugin_delta": "0.0185108730468750",
           "lambda_variance_away": "0.039588360223432227134704589843750000000000",
           "lambda_variance_home": "0.074984378676204586029052734375000000000000",
           "market_backed": true,
@@ -16098,7 +17442,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.00304790771484375",
+            "lambda_home": "-0.00430631835937500",
+            "lambda_variance_away": "-0.0005995872403644225597381591797",
+            "lambda_variance_home": "-0.005764038627973621368408203125"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000114297539039045157014997762385386533532710536244807799356412",
             "exact_score_max_probability_movement": "0.001941459532",
@@ -16254,6 +17606,18 @@
                 "-0.000772435949"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0048887398681640625",
+            "lambda_home": "-0.0042795090332031250",
+            "lambda_variance_away": "-0.003184364073641262635588645935",
+            "lambda_variance_home": "-0.005564979916344008862972259521"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -16279,7 +17643,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5668221191406250",
+          "lambda_away_plugin_delta": "0.0117771191406250",
           "lambda_home": "2.0622327958984375",
+          "lambda_home_plugin_delta": "0.0223797958984375",
           "lambda_variance_away": "0.043648102427671352386474609375000000000000",
           "lambda_variance_home": "0.075642910880976897239685058593750000000000",
           "market_backed": false,
@@ -16359,7 +17725,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00147971142578125",
+            "lambda_home": "-0.00509309179687500",
+            "lambda_variance_away": "-0.001081631776304506063461303711",
+            "lambda_variance_home": "-0.0009312019700397872924804687500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000166699127996621806312444813187748588871833063903654770493284",
             "exact_score_max_probability_movement": "0.002458976253",
@@ -16515,6 +17889,18 @@
                 "0.000294430872"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0024292055664062500",
+            "lambda_home": "0.0047077324218750000",
+            "lambda_variance_away": "-0.001744630351051826238632202148",
+            "lambda_variance_home": "0.001787093710739959716796875000"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -16540,7 +17926,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.5668221191406250",
+          "lambda_away_plugin_delta": "0.0117771191406250",
           "lambda_home": "2.0622327958984375",
+          "lambda_home_plugin_delta": "0.0223797958984375",
           "lambda_variance_away": "0.043648102427671352386474609375000000000000",
           "lambda_variance_home": "0.075642910880976897239685058593750000000000",
           "market_backed": true,
@@ -16620,7 +18008,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00147971142578125",
+            "lambda_home": "-0.00509309179687500",
+            "lambda_variance_away": "-0.001081631776304506063461303711",
+            "lambda_variance_home": "-0.0009312019700397872924804687500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000122459417816103035645297963040040638907338903506743327473036",
             "exact_score_max_probability_movement": "0.002035933945",
@@ -16776,6 +18172,18 @@
                 "0.000138556589"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0024292055664062500",
+            "lambda_home": "0.0047077324218750000",
+            "lambda_variance_away": "-0.001744630351051826238632202148",
+            "lambda_variance_home": "0.001787093710739959716796875000"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -16801,7 +18209,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5340146464843750",
+          "lambda_away_plugin_delta": "0.0178506464843750",
           "lambda_home": "1.9675851884765625",
+          "lambda_home_plugin_delta": "0.0217601884765625",
           "lambda_variance_away": "0.036966117181332057952880859375000000000000",
           "lambda_variance_home": "0.059197429230412718772888183593750000000000",
           "market_backed": false,
@@ -16881,7 +18291,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00428646972656250",
+            "lambda_home": "0.00421366796875000",
+            "lambda_variance_away": "-0.0009711284280038862228393554688",
+            "lambda_variance_home": "0.0003525090905479049682617187500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000144285920420315700339194386070787334097335661000464165233845",
             "exact_score_max_probability_movement": "0.002320059287",
@@ -17037,6 +18455,18 @@
                 "0.001954866372"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0060068575439453125",
+            "lambda_home": "0.0100885736083984375",
+            "lambda_variance_away": "-0.0008081794075629711002111434937",
+            "lambda_variance_home": "-0.002069623747720815047621726990"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         },
         {
@@ -17062,7 +18492,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.5340146464843750",
+          "lambda_away_plugin_delta": "0.0178506464843750",
           "lambda_home": "1.9675851884765625",
+          "lambda_home_plugin_delta": "0.0217601884765625",
           "lambda_variance_away": "0.036966117181332057952880859375000000000000",
           "lambda_variance_home": "0.059197429230412718772888183593750000000000",
           "market_backed": true,
@@ -17142,7 +18574,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.00428646972656250",
+            "lambda_home": "0.00421366796875000",
+            "lambda_variance_away": "-0.0009711284280038862228393554688",
+            "lambda_variance_home": "0.0003525090905479049682617187500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000101743486734824818167855495276013161537644938696188825048859",
             "exact_score_max_probability_movement": "0.002133711554",
@@ -17298,6 +18738,18 @@
                 "0.000956411953"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0060068575439453125",
+            "lambda_home": "0.0100885736083984375",
+            "lambda_variance_away": "-0.0008081794075629711002111434937",
+            "lambda_variance_home": "-0.002069623747720815047621726990"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         }
       ],
@@ -17330,7 +18782,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.48829346533203125",
+          "lambda_away_plugin_delta": "0.01164246533203125",
           "lambda_home": "2.04778419140625000",
+          "lambda_home_plugin_delta": "0.02281719140625000",
           "lambda_variance_away": "0.040187947463796649694442749023437500000000000",
           "lambda_variance_home": "0.080748417304178207397460937500000000000000000",
           "market_backed": false,
@@ -17410,7 +18864,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.002343745605468750",
+            "lambda_home": "-0.000071191650390625",
+            "lambda_variance_away": "-0.002144537384897625207901000977",
+            "lambda_variance_home": "0.0001731539297944222092628479004"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000177563209257675885470154858864868158891879638319436990446598",
             "exact_score_max_probability_movement": "0.002668613110",
@@ -17566,6 +19028,18 @@
                 "-0.000257638058"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0018408321533203125",
+            "lambda_home": "0.0000268093261718750",
+            "lambda_variance_away": "-0.002584776833276840075850486755",
+            "lambda_variance_home": "0.0001990587116296125054359436035"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -17591,7 +19065,9 @@
           },
           "fixture": "00000000-0000-7000-8000-0000000016a9",
           "lambda_away": "1.48829346533203125",
+          "lambda_away_plugin_delta": "0.01164246533203125",
           "lambda_home": "2.04778419140625000",
+          "lambda_home_plugin_delta": "0.02281719140625000",
           "lambda_variance_away": "0.040187947463796649694442749023437500000000000",
           "lambda_variance_home": "0.080748417304178207397460937500000000000000000",
           "market_backed": true,
@@ -17671,7 +19147,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.002343745605468750",
+            "lambda_home": "-0.000071191650390625",
+            "lambda_variance_away": "-0.002144537384897625207901000977",
+            "lambda_variance_home": "0.0001731539297944222092628479004"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.476651",
+          "plugin_lambda_home": "2.024967",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000133742243899604356068382047557003744941020386811479407446601",
             "exact_score_max_probability_movement": "0.002141724823",
@@ -17827,6 +19311,18 @@
                 "-0.000146649659"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0018408321533203125",
+            "lambda_home": "0.0000268093261718750",
+            "lambda_variance_away": "-0.002584776833276840075850486755",
+            "lambda_variance_home": "0.0001990587116296125054359436035"
+          },
+          "reference_moments": {
+            "lambda_away": "1.4901342974853515625",
+            "lambda_home": "2.0477573820800781250",
+            "lambda_variance_away": "0.042772724297073489770293235778808593750000000000000",
+            "lambda_variance_home": "0.080549358592548594892024993896484375000000000000000"
           }
         },
         {
@@ -17852,7 +19348,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.56534240771484375",
+          "lambda_away_plugin_delta": "0.01029740771484375",
           "lambda_home": "2.06732588769531250",
+          "lambda_home_plugin_delta": "0.02747288769531250",
           "lambda_variance_away": "0.044729734203975858449935913085937500000000000",
           "lambda_variance_home": "0.076574112851016684532165527343750000000000000",
           "market_backed": false,
@@ -17932,7 +19430,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.002210800048828125",
+            "lambda_home": "0.009884757568359375",
+            "lambda_variance_away": "0.0002559814884025691151618957520",
+            "lambda_variance_home": "0.003213632169923998415470123291"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000183155732943382237135435945944668694991213226680115014360840",
             "exact_score_max_probability_movement": "0.002450086798",
@@ -18088,6 +19594,18 @@
                 "0.001002114541"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0039089169921875000",
+            "lambda_home": "0.0098008242187500000",
+            "lambda_variance_away": "-0.0006629985747473201751708984375",
+            "lambda_variance_home": "0.002718295680779747009277343750"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -18113,7 +19631,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001767",
           "lambda_away": "1.56534240771484375",
+          "lambda_away_plugin_delta": "0.01029740771484375",
           "lambda_home": "2.06732588769531250",
+          "lambda_home_plugin_delta": "0.02747288769531250",
           "lambda_variance_away": "0.044729734203975858449935913085937500000000000",
           "lambda_variance_home": "0.076574112851016684532165527343750000000000000",
           "market_backed": true,
@@ -18193,7 +19713,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "-0.002210800048828125",
+            "lambda_home": "0.009884757568359375",
+            "lambda_variance_away": "0.0002559814884025691151618957520",
+            "lambda_variance_home": "0.003213632169923998415470123291"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.555045",
+          "plugin_lambda_home": "2.039853",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000134424868674896306816152748062679893079362973766307481581295",
             "exact_score_max_probability_movement": "0.002222567734",
@@ -18349,6 +19877,18 @@
                 "0.000585720794"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "-0.0039089169921875000",
+            "lambda_home": "0.0098008242187500000",
+            "lambda_variance_away": "-0.0006629985747473201751708984375",
+            "lambda_variance_home": "0.002718295680779747009277343750"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5692513247070312500",
+            "lambda_home": "2.0575250634765625000",
+            "lambda_variance_away": "0.045392732778723178625106811523437500000000000000000",
+            "lambda_variance_home": "0.073855817170236937522888183593750000000000000000000"
           }
         },
         {
@@ -18374,7 +19914,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.52972817675781250",
+          "lambda_away_plugin_delta": "0.01356417675781250",
           "lambda_home": "1.96337152050781250",
+          "lambda_home_plugin_delta": "0.01754652050781250",
           "lambda_variance_away": "0.037937245609335944175720214843750000000000000",
           "lambda_variance_home": "0.058844920139864813804626464843750000000000000",
           "market_backed": false,
@@ -18454,7 +19996,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.000095302246093750",
+            "lambda_home": "0.004316064453125000",
+            "lambda_variance_away": "-0.000004643319935906171798706054688",
+            "lambda_variance_home": "-0.001100660866732376098632812500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.000124716677892779873866804292042121598752274125146558110650091",
             "exact_score_max_probability_movement": "0.002214580321",
@@ -18610,6 +20160,18 @@
                 "0.000912837600"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0017203878173828125",
+            "lambda_home": "0.0058749056396484375",
+            "lambda_variance_away": "0.0001629490204409151226282119751",
+            "lambda_variance_home": "-0.002422132838268720015883445740"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         },
         {
@@ -18635,7 +20197,9 @@
           },
           "fixture": "00000000-0000-7000-8000-000000001824",
           "lambda_away": "1.52972817675781250",
+          "lambda_away_plugin_delta": "0.01356417675781250",
           "lambda_home": "1.96337152050781250",
+          "lambda_home_plugin_delta": "0.01754652050781250",
           "lambda_variance_away": "0.037937245609335944175720214843750000000000000",
           "lambda_variance_home": "0.058844920139864813804626464843750000000000000",
           "market_backed": true,
@@ -18715,7 +20279,15 @@
               ]
             ]
           },
+          "next_count_moment_deltas": {
+            "lambda_away": "0.000095302246093750",
+            "lambda_home": "0.004316064453125000",
+            "lambda_variance_away": "-0.000004643319935906171798706054688",
+            "lambda_variance_home": "-0.001100660866732376098632812500"
+          },
           "passes_predeclared_gate": false,
+          "plugin_lambda_away": "1.516164",
+          "plugin_lambda_home": "1.945825",
           "plugin_vs_mixture": {
             "exact_score_jensen_shannon": "0.0000923227197256434105375564931906202360822450334778093042212503",
             "exact_score_max_probability_movement": "0.001919005970",
@@ -18871,6 +20443,18 @@
                 "0.000432417940"
               ]
             ]
+          },
+          "reference_moment_deltas": {
+            "lambda_away": "0.0017203878173828125",
+            "lambda_home": "0.0058749056396484375",
+            "lambda_variance_away": "0.0001629490204409151226282119751",
+            "lambda_variance_home": "-0.002422132838268720015883445740"
+          },
+          "reference_moments": {
+            "lambda_away": "1.5280077889404296875",
+            "lambda_home": "1.9574966148681640625",
+            "lambda_variance_away": "0.037774296588895029053092002868652343750000000000000",
+            "lambda_variance_home": "0.061267052978133533820509910583496093750000000000000"
           }
         }
       ],
@@ -18900,104 +20484,104 @@
     71
   ],
   "selected_operational_draw_count": null,
-  "semantic_sha256": "9e548f191927cada5ff35abe4d48e24bb7c41bfc7c84c0d5c393ea84249e40ab",
+  "semantic_sha256": "65b072d34a43c9acbd263b8014ed5e3a64a0b16249ce1a9ca49b90fac6c4d4ee",
   "timings": [
     {
       "count": 64,
-      "draw_seconds": 0.12087079999037087,
+      "draw_seconds": 0.09514250000938773,
       "seed": 23,
-      "six_stage8_seconds": 2.7127563999965787
+      "six_stage8_seconds": 2.1816252999706194
     },
     {
       "count": 128,
-      "draw_seconds": 0.1567536999937147,
+      "draw_seconds": 0.12804920005146414,
       "seed": 23,
-      "six_stage8_seconds": 4.224849899997935
+      "six_stage8_seconds": 3.510537200025283
     },
     {
       "count": 256,
-      "draw_seconds": 0.23223770002368838,
+      "draw_seconds": 0.18155159999150783,
       "seed": 23,
-      "six_stage8_seconds": 4.79483489994891
+      "six_stage8_seconds": 3.8535903999581933
     },
     {
       "count": 512,
-      "draw_seconds": 0.37148359999991953,
+      "draw_seconds": 0.2924621000420302,
       "seed": 23,
-      "six_stage8_seconds": 5.430813599959947
+      "six_stage8_seconds": 4.296794699970633
     },
     {
       "count": 1024,
-      "draw_seconds": 0.7386151000391692,
+      "draw_seconds": 0.5940232999855652,
       "seed": 23,
-      "six_stage8_seconds": 8.588862300035544
+      "six_stage8_seconds": 6.689878400065936
     },
     {
       "count": 2048,
-      "draw_seconds": 1.3567058000480756,
+      "draw_seconds": 1.0757926000515,
       "seed": 23,
-      "six_stage8_seconds": 8.596279999939725
+      "six_stage8_seconds": 6.804055699962191
     },
     {
       "count": 4096,
-      "draw_seconds": 2.612618100014515,
+      "draw_seconds": 2.063089600065723,
       "seed": 23,
-      "six_stage8_seconds": 16.573862500023097
+      "six_stage8_seconds": 12.73089699994307
     },
     {
       "count": 8192,
-      "draw_seconds": 5.40490989992395,
+      "draw_seconds": 4.083576300065033,
       "seed": 23,
-      "six_stage8_seconds": 29.092341300100088
+      "six_stage8_seconds": 22.652779099997133
     },
     {
       "count": 64,
-      "draw_seconds": 0.12677479989361018,
+      "draw_seconds": 0.10448109998833388,
       "seed": 71,
-      "six_stage8_seconds": 2.5646394999930635
+      "six_stage8_seconds": 1.9426419000374153
     },
     {
       "count": 128,
-      "draw_seconds": 0.15716170007362962,
+      "draw_seconds": 0.1242369000101462,
       "seed": 71,
-      "six_stage8_seconds": 2.8148820999776945
+      "six_stage8_seconds": 2.1817916999571025
     },
     {
       "count": 256,
-      "draw_seconds": 0.2286119000054896,
+      "draw_seconds": 0.17964570003096014,
       "seed": 71,
-      "six_stage8_seconds": 4.5369565999135375
+      "six_stage8_seconds": 3.491914700018242
     },
     {
       "count": 512,
-      "draw_seconds": 0.3842148999683559,
+      "draw_seconds": 0.29988339997362345,
       "seed": 71,
-      "six_stage8_seconds": 4.105281400028616
+      "six_stage8_seconds": 3.1313366000540555
     },
     {
       "count": 1024,
-      "draw_seconds": 0.6726191000780091,
+      "draw_seconds": 0.5380708000157028,
       "seed": 71,
-      "six_stage8_seconds": 5.570726800011471
+      "six_stage8_seconds": 4.3136887000873685
     },
     {
       "count": 2048,
-      "draw_seconds": 1.3752771998988464,
+      "draw_seconds": 1.0895169000141323,
       "seed": 71,
-      "six_stage8_seconds": 8.9697557000909
+      "six_stage8_seconds": 6.797890900052153
     },
     {
       "count": 4096,
-      "draw_seconds": 2.7484082999872044,
+      "draw_seconds": 2.050666499999352,
       "seed": 71,
-      "six_stage8_seconds": 15.618233100045472
+      "six_stage8_seconds": 11.795853900024667
     },
     {
       "count": 8192,
-      "draw_seconds": 5.490985700045712,
+      "draw_seconds": 4.186063700006343,
       "seed": 71,
-      "six_stage8_seconds": 28.457135399919935
+      "six_stage8_seconds": 22.115214299992658
     }
   ],
-  "total_seconds": 185.21021090005524
+  "total_seconds": 143.49837540008593
 }

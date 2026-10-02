@@ -1,0 +1,56 @@
+{
+  "phase": "wheel",
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/verify_team_strength_u_wheel.py"
+      ],
+      "command": "uv run --offline python scripts/verify_team_strength_u_wheel.py",
+      "started_at": "2026-10-02T18:49:03.839086+00:00",
+      "seconds": 36.1466519999085,
+      "exit_code": 0,
+      "timeout_seconds": 900,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-wheel-01.log",
+      "output_sha256": "aa2fd8f53c9e999c0c5980cfec5de97ee187b482d94cb5ff2764b210a451b7d1"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/verify_team_strength_l1_wheel.py"
+      ],
+      "command": "uv run --offline python scripts/verify_team_strength_l1_wheel.py",
+      "started_at": "2026-10-02T18:49:39.986256+00:00",
+      "seconds": 5.686122599989176,
+      "exit_code": 0,
+      "timeout_seconds": 900,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-wheel-02.log",
+      "output_sha256": "6470265ed388b29a14f90cd3578dfe12c28e7f1a17837cd6c8a1507e77bdf2a4"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/verify_team_strength_shadow_wheel.py",
+        "--summary",
+        "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/PLUGIN-WHEEL.json"
+      ],
+      "command": "uv run --offline python scripts/verify_team_strength_shadow_wheel.py --summary evidence/tickets/CURRENT-TEAM-STRENGTH-001U/PLUGIN-WHEEL.json",
+      "started_at": "2026-10-02T18:49:45.672785+00:00",
+      "seconds": 163.25736090005375,
+      "exit_code": 0,
+      "timeout_seconds": 900,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-wheel-03.log",
+      "output_sha256": "704000a2ef9a94b2e38a60d453092fb6ecaeb5a574b3411fb6ce709a433056bb"
+    }
+  ]
+}

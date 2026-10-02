@@ -153,3 +153,51 @@ def test_rehashed_wrong_covariance_and_order_are_rejected():
     )
     with pytest.raises(ValueError, match="ordering"):
         seal(type(artifact.model), **values)
+
+
+def test_libm_roundoff_preserves_authoritative_stored_draws(monkeypatch):
+    from dmf_pulse.football_events import team_strength_parameter_draws as service
+
+    artifact = synthetic_artifact()
+    stored = joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=16))
+    original = service.normal_vector
+    monkeypatch.setattr(
+        service,
+        "normal_vector",
+        lambda *args: tuple(math.nextafter(x, math.inf) for x in original(*args)),
+    )
+    service._validated_draw_json.cache_clear()
+
+    assert service.authenticate_parameter_draws(artifact, stored) == stored
+    assert (
+        service.authenticate_parameter_draws(artifact, stored).semantic_sha256
+        == stored.semantic_sha256
+    )
+    monkeypatch.setattr(
+        service, "normal_vector", lambda *args: tuple(x + 1e-5 for x in original(*args))
+    )
+    service._validated_draw_json.cache_clear()
+    with pytest.raises(ParameterMixtureUnavailable, match="materially"):
+        service.authenticate_parameter_draws(artifact, stored)
+    service._validated_draw_json.cache_clear()
+
+
+@pytest.mark.parametrize(
+    "field,changed",
+    [
+        ("teams", ()),
+        ("parameter_order_sha256", "0" * 64),
+        ("draw_policy_sha256", "0" * 64),
+        ("draws", ()),
+    ],
+)
+def test_rehashed_inconsistent_draw_contract_rejected(field, changed):
+    from dmf_pulse.ingestion.openfootball.team_strength_data import seal
+
+    artifact = synthetic_artifact()
+    value = joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=2))
+    fields = {
+        name: getattr(value, name) for name in type(value).model_fields if name != "semantic_sha256"
+    }
+    with pytest.raises(ValueError):
+        seal(type(value), **(fields | {field: changed}))

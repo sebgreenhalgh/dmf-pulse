@@ -87,7 +87,7 @@ def test_invalid_authority_or_input_never_reaches_provider(readiness, changes):
     assert "42" not in json.dumps(result)
 
 
-def test_all_seven_historical_purposes_consumed_and_old_a2_runtime_rejected():
+def test_all_eight_historical_purposes_consumed_and_old_a2_runtime_rejected():
     for approval, attestation in (
         (authority.L1_APPROVAL, authority.L1_ATTESTATION),
         (authority.L2_APPROVAL, authority.L2_ATTESTATION),
@@ -96,6 +96,7 @@ def test_all_seven_historical_purposes_consumed_and_old_a2_runtime_rejected():
         (authority.L5_APPROVAL, authority.L5_ATTESTATION),
         (authority.L6_APPROVAL, authority.L6_ATTESTATION),
         (authority.L7_APPROVAL, authority.L7_ATTESTATION),
+        (authority.L8_APPROVAL, authority.L8_ATTESTATION),
     ):
         with pytest.raises(authority.ConsumedL1ApprovalError):
             authority.validate_l1_authority(
@@ -112,18 +113,16 @@ def test_all_seven_historical_purposes_consumed_and_old_a2_runtime_rejected():
     assert result.fpl_request_attempt_count == result.odds_acquisition_attempt_count == 0
 
 
-def test_l8_rights_hashes_and_current_authority_are_exact():
+def test_l8_rights_hashes_remain_exact_and_current_authority_is_absent():
     fpl = load_fpl_rights()[authority.FPL_PROFILE]
     odds = load_rights_profiles()[authority.ODDS_PROFILE]
     assert authority.profile_sha(fpl) == authority.FPL_PROFILE_SHA
     assert authority.profile_sha(odds) == authority.ODDS_PROFILE_SHA
-    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
-        authority.L8_APPROVAL,
-        authority.L8_ATTESTATION,
-    )
-    authority.validate_l1_authority(
-        approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
-    )
+    assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (None, None)
+    with pytest.raises(authority.ConsumedL1ApprovalError):
+        authority.validate_l1_authority(
+            approval=authority.APPROVAL, attestation=authority.ATTESTATION, checked_at=STAMP
+        )
 
 
 @pytest.mark.parametrize("checked_at", [STAMP.replace(tzinfo=None), STAMP - timedelta(days=30)])

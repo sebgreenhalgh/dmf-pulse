@@ -1,0 +1,117 @@
+{
+  "phase": "quality",
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "sync",
+        "--all-groups",
+        "--frozen",
+        "--offline"
+      ],
+      "command": "uv sync --all-groups --frozen --offline",
+      "started_at": "2026-10-02T19:10:19.903811+00:00",
+      "seconds": 0.024466200033202767,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-01.log",
+      "output_sha256": "d57cbeb238fb7a50aede5712ad2223644a830fb303053dd5f54b80e87b7225c9"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "command": "uv run --offline ruff format --check .",
+      "started_at": "2026-10-02T19:10:19.928727+00:00",
+      "seconds": 0.07394289993681014,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-02.log",
+      "output_sha256": "33004e2e6c0da7a3819d87800e47c7cc0e6bd3d2abb186bb888eee3fd3686116"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "ruff",
+        "check",
+        "."
+      ],
+      "command": "uv run --offline ruff check .",
+      "started_at": "2026-10-02T19:10:20.003119+00:00",
+      "seconds": 0.06839469994883984,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-03.log",
+      "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "command": "uv run --offline mypy src/dmf_pulse",
+      "started_at": "2026-10-02T19:10:20.071936+00:00",
+      "seconds": 0.31726549996528774,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-04.log",
+      "output_sha256": "94f13688cacdf72dfe8213c3874cccc2166631ba2c8f0314cc3abd7d33d07cfe"
+    },
+    {
+      "argv": [
+        "uv",
+        "build",
+        "--offline"
+      ],
+      "command": "uv build --offline",
+      "started_at": "2026-10-02T19:10:20.389588+00:00",
+      "seconds": 6.672950399923138,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-05.log",
+      "output_sha256": "5ab92d4d490fa8d351e3681a94996bcf6833fffd7c97304012ca12990ae1cc05"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/scan_secrets.py"
+      ],
+      "command": "uv run --offline python scripts/scan_secrets.py",
+      "started_at": "2026-10-02T19:10:27.063260+00:00",
+      "seconds": 14.089465199969709,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-06.log",
+      "output_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "command": "git diff --check",
+      "started_at": "2026-10-02T19:10:41.153168+00:00",
+      "seconds": 0.061911400058306754,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-quality-07.log",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

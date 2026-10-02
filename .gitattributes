@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# Preserve byte-hashed captured stdout/stderr, including native line endings.
+evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-*.log binary
+
 # This installed authority document is copied verbatim; its spaces are content.
 docs/implementation/DMF_PULSE_CODEX_IMPLEMENTATION_PLAYBOOK_v1.txt whitespace=-trailing-space
 evidence/tickets/NRM-006/prior_blockers/PACK_1_0_BLOCKER.md whitespace=-blank-at-eof

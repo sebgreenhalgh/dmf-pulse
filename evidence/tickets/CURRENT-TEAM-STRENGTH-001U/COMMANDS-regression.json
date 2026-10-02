@@ -1,0 +1,44 @@
+{
+  "phase": "regression",
+  "status": "FAIL",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "pytest",
+        "tests/unit/football_events",
+        "tests/unit/fpl_points",
+        "tests/unit/optimisation",
+        "tests/unit/private_v1",
+        "tests/unit/evaluation",
+        "tests/unit/ingestion/openfootball",
+        "tests/integration/football_events",
+        "tests/integration/fpl_points",
+        "tests/integration/optimisation",
+        "tests/integration/evaluation",
+        "tests/property/football_events",
+        "tests/property/fpl_points",
+        "tests/property/optimisation",
+        "tests/property/evaluation",
+        "tests/golden/football_events",
+        "tests/golden/fpl_points",
+        "tests/golden/optimisation",
+        "tests/golden/evaluation",
+        "tests/unit/cli/test_team_strength_cli.py",
+        "tests/unit/ingestion/test_horizon_rights_approval.py",
+        "-m",
+        "not performance and not postgres and not migration",
+        "-q"
+      ],
+      "command": "uv run --offline pytest tests/unit/football_events tests/unit/fpl_points tests/unit/optimisation tests/unit/private_v1 tests/unit/evaluation tests/unit/ingestion/openfootball tests/integration/football_events tests/integration/fpl_points tests/integration/optimisation tests/integration/evaluation tests/property/football_events tests/property/fpl_points tests/property/optimisation tests/property/evaluation tests/golden/football_events tests/golden/fpl_points tests/golden/optimisation tests/golden/evaluation tests/unit/cli/test_team_strength_cli.py tests/unit/ingestion/test_horizon_rights_approval.py -m \"not performance and not postgres and not migration\" -q",
+      "started_at": "2026-10-02T18:01:54.761221+00:00",
+      "seconds": 4046.5943099999567,
+      "exit_code": 1,
+      "timeout_seconds": 7200,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-regression-01.log",
+      "output_sha256": "027473abcebef5e34db7123c7f1518c1056c57d278ffed15f5a8d1d62d119ab7"
+    }
+  ]
+}

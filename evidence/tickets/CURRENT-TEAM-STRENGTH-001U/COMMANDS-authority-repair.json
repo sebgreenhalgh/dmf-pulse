@@ -1,0 +1,23 @@
+{
+  "phase": "authority-repair",
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "pytest",
+        "tests/unit/private_v1/test_team_strength_l1.py",
+        "-q"
+      ],
+      "command": "uv run --offline pytest tests/unit/private_v1/test_team_strength_l1.py -q",
+      "started_at": "2026-10-02T18:51:13.544396+00:00",
+      "seconds": 128.44014329998754,
+      "exit_code": 0,
+      "timeout_seconds": 900,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-authority-repair-01.log",
+      "output_sha256": "039953f77235dc47d045019071055138d9b686354490358401937a9b28849e83"
+    }
+  ]
+}

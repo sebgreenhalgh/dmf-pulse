@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from functools import lru_cache
 
 import pytest
@@ -13,6 +13,7 @@ from dmf_pulse.evaluation.team_strength_prospective import (
     PrivateProspectiveStorageDenied,
     PromotionEvidenceStatus,
     PublicForecastBuildRequestV1,
+    PublicForecastDistribution,
     PublicTeamStrengthForecastV1,
     freeze_public_team_forecasts,
     prospective_calibration,
@@ -189,6 +190,45 @@ def test_private_storage_fails_before_filesystem_access(tmp_path):
     assert tuple(tmp_path.iterdir()) == before
 
 
+@pytest.mark.parametrize("collision", [False, True])
+def test_atomic_forecast_publication_race_is_immutable(tmp_path, monkeypatch, collision):
+    from dmf_pulse.evaluation import team_strength_prospective_store as store
+
+    value = frozen()
+
+    def race(temporary, destination):
+        destination.write_bytes(b"collision" if collision else temporary.read_bytes())
+        raise FileExistsError
+
+    monkeypatch.setattr(store.os, "link", race)
+    if collision:
+        with pytest.raises(ValueError, match="publication collision"):
+            persist_public_forecast(value, artifact_root=tmp_path)
+        with pytest.raises(ValueError, match="identity collision"):
+            persist_public_forecast(value, artifact_root=tmp_path)
+    else:
+        path = persist_public_forecast(value, artifact_root=tmp_path)
+        assert load_public_forecast(path, expected_forecast_sha256=value.semantic_sha256) == value
+        with pytest.raises(ValueError, match="expected immutable"):
+            load_public_forecast(path, expected_forecast_sha256="0" * 64)
+    assert not list(tmp_path.rglob(".public-forecast-*"))
+
+
+@pytest.mark.parametrize("case", ["weight", "multiple_plugin", "duplicate_mixture"])
+def test_invalid_forecast_component_contract_fails(case):
+    value = frozen().forecasts[0].distributions[1]
+    fields = value.model_dump(mode="python")
+    half = value.rates[0].model_copy(update={"draw_weight": Decimal("0.5")})
+    if case == "weight":
+        fields["rates"] = (half,)
+    elif case == "multiple_plugin":
+        fields["rates"] = (half, half.model_copy(update={"parameter_draw_id": "0" * 64}))
+    else:
+        fields |= {"product": "PARAMETER_MIXTURE_TEAM_STRENGTH_SHADOW", "rates": (half, half)}
+    with pytest.raises(ValueError):
+        PublicForecastDistribution.model_validate(fields)
+
+
 @pytest.mark.parametrize(
     "at,played,cutoff",
     [
@@ -275,9 +315,75 @@ def test_frozen_forecast_rejects_rehashed_late_freeze_and_invented_rates():
         seal(type(value), **(fields | {"forecasts": (fixture,)}))
 
 
+def test_forecast_rejects_known_training_target_and_different_source_vintage():
+    value = frozen()
+    fields = {
+        name: getattr(value, name) for name in type(value).model_fields if name != "semantic_sha256"
+    }
+    training_fixture = value.training_dataset.matches[0].observation.fixture
+    trained = value.forecasts[0].model_copy(update={"fixture": training_fixture})
+    with pytest.raises(ValueError, match="already used to fit"):
+        seal(type(value), **(fields | {"forecasts": (trained,)}))
+    with pytest.raises(ValueError, match="bound fitted source vintage"):
+        seal(type(value), **(fields | {"public_schedule": outcome(value)}))
+    with pytest.raises(ValueError, match="post-origin"):
+        seal(type(value), **(fields | {"forecast_origin": STAMP}))
+
+
 def test_promotion_gate_cannot_be_weakened():
     with pytest.raises(ValueError, match="cannot be weakened"):
         PromotionEvidenceStatus(required_evidence=("ONE_GAMEWEEK",))
+
+
+@pytest.mark.parametrize(
+    "metric,changed",
+    [
+        ("exact_score_log_loss", Decimal(-1)),
+        ("goal_rps", Decimal(37)),
+        ("home_clean_sheet_brier", Decimal(-1)),
+        ("home_clean_sheet_brier", Decimal("0.2")),
+        ("home_clean_sheet_calibration_residual", Decimal("0.2")),
+    ],
+)
+def test_rehashed_inconsistent_scores_rejected(metric, changed):
+    value = frozen()
+    report = score_public_team_forecasts(
+        value, outcomes=outcome(value), as_of=datetime(2026, 10, 6, tzinfo=UTC)
+    )
+    fixture, product, pairs = report.scores[0]
+    metrics = dict(pairs) | {metric: changed}
+    fields = {
+        name: getattr(report, name)
+        for name in type(report).model_fields
+        if name != "semantic_sha256"
+    }
+    fields["scores"] = ((fixture, product, tuple(sorted(metrics.items()))), *report.scores[1:])
+    with pytest.raises(ValueError):
+        seal(type(report), **fields)
+
+
+def test_rehashed_inconsistent_multiclass_outcomes_rejected():
+    value = frozen()
+    report = score_public_team_forecasts(
+        value, outcomes=outcome(value), as_of=datetime(2026, 10, 6, tzinfo=UTC)
+    )
+    fixture, product, pairs = report.scores[0]
+    metrics = dict(pairs)
+    for event in ("home_win", "draw", "away_win"):
+        probability = metrics[event + "_probability"]
+        metrics[event + "_outcome"] = Decimal(0)
+        with localcontext() as context:
+            context.prec = 60
+            metrics[event + "_brier"] = probability**2
+            metrics[event + "_calibration_residual"] = probability
+    fields = {
+        name: getattr(report, name)
+        for name in type(report).model_fields
+        if name != "semantic_sha256"
+    }
+    fields["scores"] = ((fixture, product, tuple(sorted(metrics.items()))), *report.scores[1:])
+    with pytest.raises(ValueError, match="1X2"):
+        seal(type(report), **fields)
 
 
 def test_public_cli_freezes_scores_and_fails_safely(tmp_path, monkeypatch):

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import sys
 from decimal import Decimal
 from pathlib import Path
@@ -24,9 +25,12 @@ from dmf_pulse.football_events.team_strength_adapter import fixture_prior_bundle
 from dmf_pulse.football_events.team_strength_mixture_stage8 import (  # noqa: E402
     project_parameter_mixture,
 )
+from dmf_pulse.football_events.team_strength_numerics import reconstruct  # noqa: E402
 from dmf_pulse.football_events.team_strength_parameter_draws import (  # noqa: E402
+    covariance_factor,
     draw_policy,
     joint_parameter_draws,
+    unpack_triangle,
 )
 from tests.unit.football_events.team_strength_support import (  # noqa: E402
     synthetic_artifact,
@@ -41,11 +45,59 @@ EVIDENCE = ROOT / "evidence/tickets/CURRENT-TEAM-STRENGTH-001U"
 COUNTS = (64, 128, 256, 512, 1024, 2048, 4096, 8192)
 
 
+def numerical() -> dict:
+    artifact = synthetic_artifact()
+    n = len(artifact.model.effects)
+    p = len(artifact.model.uncertainty.parameter_order)
+    covariance = unpack_triangle(artifact.model.uncertainty.covariance, p)
+    information = unpack_triangle(artifact.model.uncertainty.information, p)
+    factor = covariance_factor(covariance)
+    draws = joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=2048))
+    report = {
+        "classification": "SYNTHETIC_LOCAL_LAPLACE_GAUSSIAN_RESEARCH_ONLY",
+        "fit_sha256": artifact.semantic_sha256,
+        "draw_set_sha256": draws.semantic_sha256,
+        "draw_policy_sha256": draws.draw_policy_sha256,
+        "dimension": p,
+        "teams": n,
+        "parameter_order": artifact.model.uncertainty.parameter_order,
+        "covariance_sha256": draws.covariance_sha256,
+        "parameter_order_sha256": draws.parameter_order_sha256,
+        "minimum_cholesky_diagonal": min(factor[i][i] for i in range(p)),
+        "covariance_factor_max_absolute_residual": max(
+            abs(math.fsum(factor[i][k] * factor[j][k] for k in range(p)) - covariance[i][j])
+            for i in range(p)
+            for j in range(p)
+        ),
+        "information_covariance_max_identity_residual": max(
+            abs(math.fsum(information[i][k] * covariance[k][j] for k in range(p)) - float(i == j))
+            for i in range(p)
+            for j in range(p)
+        ),
+        "max_draw_identifiability_residual": max(
+            abs(
+                math.fsum(
+                    reconstruct(tuple(float(x) for x in row.free_parameters[start : start + n - 1]))
+                )
+            )
+            for row in draws.draws
+            for start in (2, n + 1)
+        ),
+        "accepted_fit_numerics": artifact.model.numerics.model_dump(mode="json"),
+        "production_active": False,
+    }
+    report["semantic_sha256"] = canonical_sha256(report)
+    return report
+
+
 def golden() -> dict:
     artifact = synthetic_artifact()
     bound = bundle()
     draws = joint_parameter_draws(artifact, policy=draw_policy(seed=23, draw_count=16))
-    result = {}
+    result = {
+        "fit_artifact": artifact.model_dump(mode="json"),
+        "draw_set": draws.model_dump(mode="json"),
+    }
     for market in (False, True):
         output = project_parameter_mixture(
             stage8_request(bound, market=market),
@@ -113,6 +165,14 @@ def convergence() -> dict:
                             "lambda_away": str(mix.weighted_lambda_away),
                             "lambda_variance_home": str(mix.epistemic_lambda_variance_home),
                             "lambda_variance_away": str(mix.epistemic_lambda_variance_away),
+                            "plugin_lambda_home": str(bound.score_prior.home_goal_rate),
+                            "plugin_lambda_away": str(bound.score_prior.away_goal_rate),
+                            "lambda_home_plugin_delta": str(
+                                mix.weighted_lambda_home - bound.score_prior.home_goal_rate
+                            ),
+                            "lambda_away_plugin_delta": str(
+                                mix.weighted_lambda_away - bound.score_prior.away_goal_rate
+                            ),
                             "matrix": matrix,
                             "published_means": (
                                 output.expected_home_goals,
@@ -158,6 +218,33 @@ def convergence() -> dict:
                         **{k: v for k, v in current.items() if k != "matrix"},
                         "reference_deltas": movement.model_dump(mode="json"),
                         "next_count_deltas": next_movement.model_dump(mode="json"),
+                        "reference_moments": {
+                            key: reference[key]
+                            for key in (
+                                "lambda_home",
+                                "lambda_away",
+                                "lambda_variance_home",
+                                "lambda_variance_away",
+                            )
+                        },
+                        "reference_moment_deltas": {
+                            key: str(Decimal(current[key]) - Decimal(reference[key]))
+                            for key in (
+                                "lambda_home",
+                                "lambda_away",
+                                "lambda_variance_home",
+                                "lambda_variance_away",
+                            )
+                        },
+                        "next_count_moment_deltas": {
+                            key: str(Decimal(current[key]) - Decimal(next_cell[key]))
+                            for key in (
+                                "lambda_home",
+                                "lambda_away",
+                                "lambda_variance_home",
+                                "lambda_variance_away",
+                            )
+                        },
                         "passes_predeclared_gate": passed,
                     }
                 )
@@ -198,11 +285,18 @@ def convergence() -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("golden", "convergence"))
+    parser.add_argument("mode", choices=("golden", "convergence", "numerical"))
     arguments = parser.parse_args()
-    payload = golden() if arguments.mode == "golden" else convergence()
-    destination = EVIDENCE / (
-        "STAGE8-GOLDEN.json" if arguments.mode == "golden" else "CONVERGENCE.json"
+    payload = {"golden": golden, "convergence": convergence, "numerical": numerical}[
+        arguments.mode
+    ]()
+    destination = (
+        EVIDENCE
+        / {
+            "golden": "STAGE8-GOLDEN.json",
+            "convergence": "CONVERGENCE.json",
+            "numerical": "NUMERICAL-VALIDATION.json",
+        }[arguments.mode]
     )
     destination.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"

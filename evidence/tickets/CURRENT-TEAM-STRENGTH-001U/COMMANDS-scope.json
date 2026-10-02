@@ -1,0 +1,90 @@
+{
+  "phase": "scope",
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/generate_repository_manifest.py",
+        "--ticket",
+        "PRC-013"
+      ],
+      "command": "uv run --offline python scripts/generate_repository_manifest.py --ticket PRC-013",
+      "started_at": "2026-10-02T19:17:42.699796+00:00",
+      "seconds": 1.1765178000787273,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-scope-01.log",
+      "output_sha256": "6429b1fb26bb0d71f8921126cddcd0139de4198974a8c0d5bab5ff21c914734f"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/generate_repository_manifest.py",
+        "--ticket",
+        "CURRENT-TEAM-STRENGTH-001U"
+      ],
+      "command": "uv run --offline python scripts/generate_repository_manifest.py --ticket CURRENT-TEAM-STRENGTH-001U",
+      "started_at": "2026-10-02T19:17:43.876768+00:00",
+      "seconds": 1.1983410000102594,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-scope-02.log",
+      "output_sha256": "4b19f182059ffd14ddbcbb7152b0b47854dbc15bee87609781895e2ec40f1eee"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/validate_repository.py",
+        "--ticket",
+        "CURRENT-TEAM-STRENGTH-001U"
+      ],
+      "command": "uv run --offline python scripts/validate_repository.py --ticket CURRENT-TEAM-STRENGTH-001U",
+      "started_at": "2026-10-02T19:17:45.075514+00:00",
+      "seconds": 1.7198598000686616,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-scope-03.log",
+      "output_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
+    },
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "python",
+        "scripts/scan_secrets.py"
+      ],
+      "command": "uv run --offline python scripts/scan_secrets.py",
+      "started_at": "2026-10-02T19:17:46.795773+00:00",
+      "seconds": 13.491288700024597,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-scope-04.log",
+      "output_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "command": "git diff --check",
+      "started_at": "2026-10-02T19:18:00.287559+00:00",
+      "seconds": 0.062212000018917024,
+      "exit_code": 0,
+      "timeout_seconds": 300,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-scope-05.log",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

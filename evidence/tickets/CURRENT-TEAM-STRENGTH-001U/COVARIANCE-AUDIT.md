@@ -41,3 +41,19 @@ Serialized lower triangles are symmetric by construction. Generic matrix tests
 allow relative/absolute 1e-12 asymmetry normalization only; material asymmetry or
 non-PSD matrices fail. Zero-scale is an explicit research ablation, never an
 automatic uncertain-coordinate replacement. No attack, defence or lambda is clipped.
+
+Portability hardening preserves the immutable stored draw values and semantic
+hash. Authentication rederives the joint construction with all lineage, policies,
+IDs and weights exact, allowing regenerated free coordinates only within eight
+binary64 ULPs of max(1, absolute target coordinate). This narrowly covers platform
+libm roundoff; material changes fail. The stored artifact is never rewritten or
+rounded to match a different platform. A one-ULP libm perturbation regression
+passes, a 1e-5 perturbation fails, and Linux CI additionally exercises the frozen
+Windows fit/draw inputs through the installed wheel. Existing market/prior-only
+golden output hashes were retained when adding those immutable synthetic inputs.
+
+NUMERICAL-VALIDATION.json records the 41-club/82-coordinate synthetic example:
+H*C identity residual 1.993e-15, L*L' covariance residual 6.939e-18, minimum
+Cholesky diagonal 0.04007177 and maximum draw identifiability residual 2.603e-17.
+The separate 2026/27 benchmark has 42 clubs/84 coordinates. Both derive dimension
+and ordering from their own authenticated accepted artifact.

@@ -1,0 +1,33 @@
+{
+  "phase": "focus",
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "pytest",
+        "tests/unit/evaluation/test_team_strength_mixture_analysis.py",
+        "tests/unit/football_events/test_team_strength_parameter_draws.py",
+        "tests/unit/football_events/test_team_strength_mixture.py",
+        "tests/unit/football_events/test_team_strength_mixture_stage8.py",
+        "tests/unit/evaluation/test_team_strength_prospective.py",
+        "tests/unit/private_v1/test_team_strength_screen_metrics.py",
+        "tests/unit/private_v1/test_team_strength_u_closure.py",
+        "-q",
+        "--cov=dmf_pulse",
+        "--cov-branch",
+        "--cov-report=json:review_pack/u-coverage.json",
+        "--cov-fail-under=0"
+      ],
+      "command": "uv run --offline pytest tests/unit/evaluation/test_team_strength_mixture_analysis.py tests/unit/football_events/test_team_strength_parameter_draws.py tests/unit/football_events/test_team_strength_mixture.py tests/unit/football_events/test_team_strength_mixture_stage8.py tests/unit/evaluation/test_team_strength_prospective.py tests/unit/private_v1/test_team_strength_screen_metrics.py tests/unit/private_v1/test_team_strength_u_closure.py -q --cov=dmf_pulse --cov-branch --cov-report=json:review_pack/u-coverage.json --cov-fail-under=0",
+      "started_at": "2026-10-02T18:28:40.412400+00:00",
+      "seconds": 240.93160140002146,
+      "exit_code": 0,
+      "timeout_seconds": 900,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-focus-01.log",
+      "output_sha256": "69da30b5f2f47e03d5a630917512e00a020b2d3afa29beb0eebf87bf6c8e19ac"
+    }
+  ]
+}

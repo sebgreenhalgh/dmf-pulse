@@ -1,0 +1,24 @@
+{
+  "phase": "repair",
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "run",
+        "--offline",
+        "pytest",
+        "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+        "tests/unit/private_v1/test_team_strength_d7_evidence.py",
+        "-q"
+      ],
+      "command": "uv run --offline pytest tests/unit/private_v1/test_team_strength_shadow_cases.py tests/unit/private_v1/test_team_strength_d7_evidence.py -q",
+      "started_at": "2026-10-02T18:30:16.762502+00:00",
+      "seconds": 437.35263510001823,
+      "exit_code": 0,
+      "timeout_seconds": 2400,
+      "output_path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-repair-01.log",
+      "output_sha256": "77ac0060851a8c85af978cd0415dd5e656065b596c4b169fafd1efef219da96a"
+    }
+  ]
+}

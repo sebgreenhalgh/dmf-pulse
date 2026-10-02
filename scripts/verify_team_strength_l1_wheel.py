@@ -1,4 +1,4 @@
-"""Offline consumed-L1-L7 and exact-L8 smoke in an external wheel."""
+"""Offline consumed L1-L8 and no-current-authority smoke in an external wheel."""
 
 import json
 import shutil
@@ -64,10 +64,14 @@ result = TeamStrengthL1ObservationService(clock=lambda: stamp).run(
     L1OperatorRequest(42, 'a'*40, 'unknown-approval', 'wrong', '0'*64), None)
 assert result['reason'] == 'AUTHORITY_INVALID' and not result['private_attempt_consumed']
 assert result['fpl_requests'] == result['odds_requests'] == 0
+result = TeamStrengthL1ObservationService(clock=lambda: stamp).run(
+    L1OperatorRequest(42, 'a'*40, L8_APPROVAL, L8_ATTESTATION, '0'*64), None)
+assert result['reason'] == 'AUTHORITY_CONSUMED' and not result['private_attempt_consumed']
+assert result['fpl_requests'] == result['odds_requests'] == 0
 diagnostic = safe_comparison_failure(ComparisonTrace().failure(
     ComparisonStage.SEAL_COMPARISON, ComparisonReason.COMPARISON_SEAL_FAILED, ValueError('private')))
 assert diagnostic['stage'] == 'SEAL_COMPARISON' and 'private' not in json.dumps(diagnostic)
-print(json.dumps({'installed_import': True, 'exact_l8_authority': True, 'l1_l2_l3_l4_l5_l6_l7_authorities_consumed': True, 'closed_diagnostic': True, 'mutable_source_rejected': True,
+print(json.dumps({'installed_import': True, 'no_current_live_authority': True, 'l1_through_l8_authorities_consumed': True, 'closed_diagnostic': True, 'mutable_source_rejected': True,
     'wrong_purpose_blocked_before_providers': True, 'provider_calls': 0, 'production_activation': False}))
 """
 

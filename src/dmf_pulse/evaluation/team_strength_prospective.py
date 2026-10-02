@@ -410,11 +410,52 @@ class PublicProspectiveScoreV1(SealedEvidence):
             metrics = dict(pairs)
             if len(metrics) != len(pairs) or set(metrics) != expected:
                 raise ValueError("public score metric contract differs")
-            for event in CALIBRATION_EVENTS:
-                if not 0 <= metrics[event + "_probability"] <= 1 or metrics[
-                    event + "_outcome"
-                ] not in (0, 1):
-                    raise ValueError("invalid calibration probability/outcome")
+            with localcontext() as context:
+                context.prec = 60
+                tolerance = Decimal("1e-50")  # Serialization roundoff, not a scoring policy.
+                if (
+                    any(
+                        metrics[name] < 0
+                        for name in ("exact_score_log_loss", "team_count_log_loss", "goal_rps")
+                    )
+                    or metrics["goal_rps"] > SUPPORT_MAX
+                ):
+                    raise ValueError("invalid proper-score bounds")
+                for event in CALIBRATION_EVENTS:
+                    probability, outcome = (
+                        metrics[event + "_probability"],
+                        metrics[event + "_outcome"],
+                    )
+                    if not 0 <= probability <= 1 or outcome not in (0, 1):
+                        raise ValueError("invalid calibration probability/outcome")
+                    brier, residual = (
+                        metrics[event + "_brier"],
+                        metrics[event + "_calibration_residual"],
+                    )
+                    if (
+                        not 0 <= brier <= 1
+                        or abs(brier - (probability - outcome) ** 2) > tolerance
+                        or abs(residual - (probability - outcome)) > tolerance
+                    ):
+                        raise ValueError("inconsistent Brier/calibration residual")
+                if (
+                    abs(
+                        sum(
+                            (
+                                metrics[event + "_probability"]
+                                for event in ("home_win", "draw", "away_win")
+                            ),
+                            Decimal(0),
+                        )
+                        - 1
+                    )
+                    > tolerance
+                    or sum(
+                        metrics[event + "_outcome"] for event in ("home_win", "draw", "away_win")
+                    )
+                    != 1
+                ):
+                    raise ValueError("inconsistent 1X2 simplex/outcomes")
         return self
 
 

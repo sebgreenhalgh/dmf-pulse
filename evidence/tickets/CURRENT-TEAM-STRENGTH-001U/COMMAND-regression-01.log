@@ -1,0 +1,476 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 54%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+.................................F.......F.............................. [ 64%]
+........................................................................ [ 67%]
+............................FFFFF....................................... [ 70%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 97%]
+.............................................                            [100%]
+================================== FAILURES ===================================
+____________ test_d7_historical_authorities_remain_closed_under_l8 ____________
+
+    def test_d7_historical_authorities_remain_closed_under_001u() -> None:
+>       assert authority.CURRENT_APPROVAL is None
+E       AssertionError: assert None == 'DMF-CTS-001P-L8-LIVE-RIGHTS-2026-09-30'
+E        +  where None = authority.CURRENT_APPROVAL
+E        +  and   'DMF-CTS-001P-L8-LIVE-RIGHTS-2026-09-30' = authority.L8_APPROVAL
+
+tests\unit\private_v1\test_team_strength_d7_evidence.py:45: AssertionError
+____________ test_l8_rights_hashes_and_current_authority_are_exact ____________
+
+    def test_l8_rights_hashes_and_current_authority_are_exact():
+        fpl = load_fpl_rights()[authority.FPL_PROFILE]
+        odds = load_rights_profiles()[authority.ODDS_PROFILE]
+        assert authority.profile_sha(fpl) == authority.FPL_PROFILE_SHA
+        assert authority.profile_sha(odds) == authority.ODDS_PROFILE_SHA
+>       assert (authority.CURRENT_APPROVAL, authority.CURRENT_ATTESTATION) == (
+            authority.L8_APPROVAL,
+            authority.L8_ATTESTATION,
+        )
+E       AssertionError: assert (None, None) == ('DMF-CTS-001...T-2026-09-30')
+E         
+E         At index 0 diff: None != 'DMF-CTS-001P-L8-LIVE-RIGHTS-2026-09-30'
+E         Use -v to get more diff
+
+tests\unit\private_v1\test_team_strength_l1.py:120: AssertionError
+__________________ test_locked_real_canonical_case[A_ROBUST] __________________
+
+frozen_model_preparation = (_PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=..., information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc)), Decimal('64775.58500005398'))
+case = Case(name='A_ROBUST', source_variant=2, seed=4, screen=False, classification='PLAYER_PROJECTION_MATERIAL_BUT_DECISION_ROBUST', utility_delta=Decimal('-1'), moved_rows=23)
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DDC4D70670>
+
+    @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
+    def test_locked_real_canonical_case(frozen_model_preparation, case, repository_root, monkeypatch):
+        from dmf_pulse.private_v1.rolling import PrivateV1RollingRecommendationService
+    
+        runs = {}
+        original = PrivateV1RollingRecommendationService.run
+    
+        def observed(self, execution, **kwargs):
+            value = original(self, execution, **kwargs)
+            runs[self._score_prior_resolver is not None] = value
+            return value
+    
+        monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", observed)
+        prepared, elapsed = frozen_model_preparation
+        prepared = case_prepared(prepared, case)
+        dataset, artifact = synthetic_strength(case.source_variant)
+        preparation = prepare_team_strength_shadow(
+            prepared.rolling_execution,
+            artifact=artifact,
+            expected_artifact_sha256=artifact.semantic_sha256,
+            fixture_registry=dataset.fixture_registry,
+        )
+        # Exercise world-order isolation in a real acceptance case as well.
+        order = (
+            ("TEAM_STRENGTH_SHADOW", "LEAGUE_BASELINE")
+            if case.name == "A_ROBUST"
+            else ("LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW")
+        )
+        result = run_team_strength_shadow_comparison(
+            prepared, preparation, preparation_ms=elapsed, _world_order=order
+        )
+        assert isinstance(result, TeamStrengthComparisonRun)
+        assert_case(case, result.comparison)
+>       assert_parent_success(
+            repository_root, prepared, preparation, (runs[False], runs[True]), result.comparison
+        )
+
+tests\unit\private_v1\test_team_strength_shadow_cases.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+prepared = _PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=d..._odds_api_private_analytics_v1', information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc))
+preparation = TeamStrengthShadowPreparation(semantic_sha256='ee96f9ac6d3a4e755b186b5847c7db9e493e823df4b5a22d29a603d7597f3f9d', stat...ce_assessment=None, status='SHADOW_NOT_MODEL_INPUT', warning='PLUGIN_SHADOW_ONLY'))), status='SHADOW_NOT_MODEL_INPUT'))
+runs = (PrivateV1RollingRunResult(decision=PrivateV1RollingDecision(continuation_maximum_transfers=1, continuation_transfer_m...74929993320256')), PrivateRollingStageTiming(stage='report_and_comparator', elapsed_ms=Decimal('212.6066000200808')))))
+current = TeamStrengthDecisionComparison(semantic_sha256='a22fe28bc91f66fa8069708ac41250a75cec29ad6124f5bb5a6929f6e619edac', sch...dom_draw_disclosure='SAME_SEEDS_NAMESPACES_AND_DRAW_INDICES;OUTCOMES_AND_BRANCH_DEPENDENT_DRAW_CONSUMPTION_MAY_DIFFER')
+
+    from dmf_pulse.private_v1 import team_strength_comparison as implementation
+    
+    source = parent_source(repository_root, "src/dmf_pulse/private_v1/team_strength_comparison.py")
+    module = ModuleType("_d1_immutable_parent_comparison")
+    sys.modules[module.__name__] = module
+    try:
+        exec(compile(source, "<immutable-parent-comparison>", "exec"), module.__dict__)
+        original = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        # Explicit human authorization: only work-budget identity/containing hashes change.
+        for old, new in zip(original.worlds, current.worlds, strict=True):
+            assert old.signature == new.signature
+            assert dict(old.controls)["work_budget"] != dict(new.controls)["work_budget"]
+            assert {k: v for k, v in old.controls if k != "work_budget"} == {
+                k: v for k, v in new.controls if k != "work_budget"
+            }
+        module._controls = implementation._controls
+        authorized = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        assert authorized == current
+        assert original.comparison == current.comparison
+        assert original.player_movements == current.player_movements
+        assert original.fixtures == current.fixtures
+        proxy = SimpleNamespace(
+>           comparison=current,
+            timings=SimpleNamespace(model_dump=lambda **kwargs: {}),
+            screen_metrics=implementation._run_screen_metrics(*runs),
+        )
+E       AssertionError
+
+tests\unit\private_v1\team_strength_d1_parent_support.py:44: AssertionError
+___________________ test_locked_real_canonical_case[B_ROOT] ___________________
+
+frozen_model_preparation = (_PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=..., information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc)), Decimal('64775.58500005398'))
+case = Case(name='B_ROOT', source_variant=0, seed=1, screen=False, classification='TEAM_STRENGTH_ROOT_ACTION_MATERIAL', utility_delta=Decimal('-5'), moved_rows=68)
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DDE9B52660>
+
+    @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
+    def test_locked_real_canonical_case(frozen_model_preparation, case, repository_root, monkeypatch):
+        from dmf_pulse.private_v1.rolling import PrivateV1RollingRecommendationService
+    
+        runs = {}
+        original = PrivateV1RollingRecommendationService.run
+    
+        def observed(self, execution, **kwargs):
+            value = original(self, execution, **kwargs)
+            runs[self._score_prior_resolver is not None] = value
+            return value
+    
+        monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", observed)
+        prepared, elapsed = frozen_model_preparation
+        prepared = case_prepared(prepared, case)
+        dataset, artifact = synthetic_strength(case.source_variant)
+        preparation = prepare_team_strength_shadow(
+            prepared.rolling_execution,
+            artifact=artifact,
+            expected_artifact_sha256=artifact.semantic_sha256,
+            fixture_registry=dataset.fixture_registry,
+        )
+        # Exercise world-order isolation in a real acceptance case as well.
+        order = (
+            ("TEAM_STRENGTH_SHADOW", "LEAGUE_BASELINE")
+            if case.name == "A_ROBUST"
+            else ("LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW")
+        )
+        result = run_team_strength_shadow_comparison(
+            prepared, preparation, preparation_ms=elapsed, _world_order=order
+        )
+        assert isinstance(result, TeamStrengthComparisonRun)
+        assert_case(case, result.comparison)
+>       assert_parent_success(
+            repository_root, prepared, preparation, (runs[False], runs[True]), result.comparison
+        )
+
+tests\unit\private_v1\test_team_strength_shadow_cases.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+prepared = _PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=d..._odds_api_private_analytics_v1', information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc))
+preparation = TeamStrengthShadowPreparation(semantic_sha256='7487294068dbdab569c1ad151d4a57c01ee18046ec165140b2e8e1d133077921', stat...ce_assessment=None, status='SHADOW_NOT_MODEL_INPUT', warning='PLUGIN_SHADOW_ONLY'))), status='SHADOW_NOT_MODEL_INPUT'))
+runs = (PrivateV1RollingRunResult(decision=PrivateV1RollingDecision(continuation_maximum_transfers=1, continuation_transfer_m...0050002839416')), PrivateRollingStageTiming(stage='report_and_comparator', elapsed_ms=Decimal('212.69000007305294')))))
+current = TeamStrengthDecisionComparison(semantic_sha256='a8361b296ab40b0a6a6eba33dfbf83b9aa8aeaa71425d7815dfe9622c1bdc344', sch...dom_draw_disclosure='SAME_SEEDS_NAMESPACES_AND_DRAW_INDICES;OUTCOMES_AND_BRANCH_DEPENDENT_DRAW_CONSUMPTION_MAY_DIFFER')
+
+    from dmf_pulse.private_v1 import team_strength_comparison as implementation
+    
+    source = parent_source(repository_root, "src/dmf_pulse/private_v1/team_strength_comparison.py")
+    module = ModuleType("_d1_immutable_parent_comparison")
+    sys.modules[module.__name__] = module
+    try:
+        exec(compile(source, "<immutable-parent-comparison>", "exec"), module.__dict__)
+        original = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        # Explicit human authorization: only work-budget identity/containing hashes change.
+        for old, new in zip(original.worlds, current.worlds, strict=True):
+            assert old.signature == new.signature
+            assert dict(old.controls)["work_budget"] != dict(new.controls)["work_budget"]
+            assert {k: v for k, v in old.controls if k != "work_budget"} == {
+                k: v for k, v in new.controls if k != "work_budget"
+            }
+        module._controls = implementation._controls
+        authorized = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        assert authorized == current
+        assert original.comparison == current.comparison
+        assert original.player_movements == current.player_movements
+        assert original.fixtures == current.fixtures
+        proxy = SimpleNamespace(
+>           comparison=current,
+            timings=SimpleNamespace(model_dump=lambda **kwargs: {}),
+            screen_metrics=implementation._run_screen_metrics(*runs),
+        )
+E       AssertionError
+
+tests\unit\private_v1\team_strength_d1_parent_support.py:44: AssertionError
+_______________ test_locked_real_canonical_case[C_CONTINUATION] _______________
+
+frozen_model_preparation = (_PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=..., information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc)), Decimal('64775.58500005398'))
+case = Case(name='C_CONTINUATION', source_variant=0, seed=3, screen=False, classification='ROOT_ACTION_ROBUST_CONTINUATION_SENSITIVE', utility_delta=Decimal('21'), moved_rows=55)
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DDC93B1CC0>
+
+    @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
+    def test_locked_real_canonical_case(frozen_model_preparation, case, repository_root, monkeypatch):
+        from dmf_pulse.private_v1.rolling import PrivateV1RollingRecommendationService
+    
+        runs = {}
+        original = PrivateV1RollingRecommendationService.run
+    
+        def observed(self, execution, **kwargs):
+            value = original(self, execution, **kwargs)
+            runs[self._score_prior_resolver is not None] = value
+            return value
+    
+        monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", observed)
+        prepared, elapsed = frozen_model_preparation
+        prepared = case_prepared(prepared, case)
+        dataset, artifact = synthetic_strength(case.source_variant)
+        preparation = prepare_team_strength_shadow(
+            prepared.rolling_execution,
+            artifact=artifact,
+            expected_artifact_sha256=artifact.semantic_sha256,
+            fixture_registry=dataset.fixture_registry,
+        )
+        # Exercise world-order isolation in a real acceptance case as well.
+        order = (
+            ("TEAM_STRENGTH_SHADOW", "LEAGUE_BASELINE")
+            if case.name == "A_ROBUST"
+            else ("LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW")
+        )
+        result = run_team_strength_shadow_comparison(
+            prepared, preparation, preparation_ms=elapsed, _world_order=order
+        )
+        assert isinstance(result, TeamStrengthComparisonRun)
+        assert_case(case, result.comparison)
+>       assert_parent_success(
+            repository_root, prepared, preparation, (runs[False], runs[True]), result.comparison
+        )
+
+tests\unit\private_v1\test_team_strength_shadow_cases.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+prepared = _PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=d..._odds_api_private_analytics_v1', information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc))
+preparation = TeamStrengthShadowPreparation(semantic_sha256='cc3f3883831512551c02f3f8988e9ec4de4915cc9da789aab9685276264f9d4a', stat...ce_assessment=None, status='SHADOW_NOT_MODEL_INPUT', warning='PLUGIN_SHADOW_ONLY'))), status='SHADOW_NOT_MODEL_INPUT'))
+runs = (PrivateV1RollingRunResult(decision=PrivateV1RollingDecision(continuation_maximum_transfers=1, continuation_transfer_m...4299997314811')), PrivateRollingStageTiming(stage='report_and_comparator', elapsed_ms=Decimal('211.98220003861934')))))
+current = TeamStrengthDecisionComparison(semantic_sha256='4301b75f0e691f90e7cd1f930b3e8ae4a532f99fa9a5165ac3ed2484d75a7300', sch...dom_draw_disclosure='SAME_SEEDS_NAMESPACES_AND_DRAW_INDICES;OUTCOMES_AND_BRANCH_DEPENDENT_DRAW_CONSUMPTION_MAY_DIFFER')
+
+    from dmf_pulse.private_v1 import team_strength_comparison as implementation
+    
+    source = parent_source(repository_root, "src/dmf_pulse/private_v1/team_strength_comparison.py")
+    module = ModuleType("_d1_immutable_parent_comparison")
+    sys.modules[module.__name__] = module
+    try:
+        exec(compile(source, "<immutable-parent-comparison>", "exec"), module.__dict__)
+        original = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        # Explicit human authorization: only work-budget identity/containing hashes change.
+        for old, new in zip(original.worlds, current.worlds, strict=True):
+            assert old.signature == new.signature
+            assert dict(old.controls)["work_budget"] != dict(new.controls)["work_budget"]
+            assert {k: v for k, v in old.controls if k != "work_budget"} == {
+                k: v for k, v in new.controls if k != "work_budget"
+            }
+        module._controls = implementation._controls
+        authorized = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        assert authorized == current
+        assert original.comparison == current.comparison
+        assert original.player_movements == current.player_movements
+        assert original.fixtures == current.fixtures
+        proxy = SimpleNamespace(
+>           comparison=current,
+            timings=SimpleNamespace(model_dump=lambda **kwargs: {}),
+            screen_metrics=implementation._run_screen_metrics(*runs),
+        )
+E       AssertionError
+
+tests\unit\private_v1\team_strength_d1_parent_support.py:44: AssertionError
+_________________ test_locked_real_canonical_case[D_TACTICS] __________________
+
+frozen_model_preparation = (_PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=..., information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc)), Decimal('64775.58500005398'))
+case = Case(name='D_TACTICS', source_variant=0, seed=2, screen=False, classification='ROOT_ACTION_ROBUST_TACTICS_SENSITIVE', utility_delta=Decimal('52'), moved_rows=126)
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DDE7ACDFD0>
+
+    @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
+    def test_locked_real_canonical_case(frozen_model_preparation, case, repository_root, monkeypatch):
+        from dmf_pulse.private_v1.rolling import PrivateV1RollingRecommendationService
+    
+        runs = {}
+        original = PrivateV1RollingRecommendationService.run
+    
+        def observed(self, execution, **kwargs):
+            value = original(self, execution, **kwargs)
+            runs[self._score_prior_resolver is not None] = value
+            return value
+    
+        monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", observed)
+        prepared, elapsed = frozen_model_preparation
+        prepared = case_prepared(prepared, case)
+        dataset, artifact = synthetic_strength(case.source_variant)
+        preparation = prepare_team_strength_shadow(
+            prepared.rolling_execution,
+            artifact=artifact,
+            expected_artifact_sha256=artifact.semantic_sha256,
+            fixture_registry=dataset.fixture_registry,
+        )
+        # Exercise world-order isolation in a real acceptance case as well.
+        order = (
+            ("TEAM_STRENGTH_SHADOW", "LEAGUE_BASELINE")
+            if case.name == "A_ROBUST"
+            else ("LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW")
+        )
+        result = run_team_strength_shadow_comparison(
+            prepared, preparation, preparation_ms=elapsed, _world_order=order
+        )
+        assert isinstance(result, TeamStrengthComparisonRun)
+        assert_case(case, result.comparison)
+>       assert_parent_success(
+            repository_root, prepared, preparation, (runs[False], runs[True]), result.comparison
+        )
+
+tests\unit\private_v1\test_team_strength_shadow_cases.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+prepared = _PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=d..._odds_api_private_analytics_v1', information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc))
+preparation = TeamStrengthShadowPreparation(semantic_sha256='6cf501dd51f41c5c9bb0ca8fa6e736e0c677d551a2e33e5731eb00d047209121', stat...ce_assessment=None, status='SHADOW_NOT_MODEL_INPUT', warning='PLUGIN_SHADOW_ONLY'))), status='SHADOW_NOT_MODEL_INPUT'))
+runs = (PrivateV1RollingRunResult(decision=PrivateV1RollingDecision(continuation_maximum_transfers=1, continuation_transfer_m...2560005690902')), PrivateRollingStageTiming(stage='report_and_comparator', elapsed_ms=Decimal('203.92580004408956')))))
+current = TeamStrengthDecisionComparison(semantic_sha256='c4b78454848102e94011622a96a9125a301a6bb8adaf4a5c3383daafce795354', sch...dom_draw_disclosure='SAME_SEEDS_NAMESPACES_AND_DRAW_INDICES;OUTCOMES_AND_BRANCH_DEPENDENT_DRAW_CONSUMPTION_MAY_DIFFER')
+
+    from dmf_pulse.private_v1 import team_strength_comparison as implementation
+    
+    source = parent_source(repository_root, "src/dmf_pulse/private_v1/team_strength_comparison.py")
+    module = ModuleType("_d1_immutable_parent_comparison")
+    sys.modules[module.__name__] = module
+    try:
+        exec(compile(source, "<immutable-parent-comparison>", "exec"), module.__dict__)
+        original = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        # Explicit human authorization: only work-budget identity/containing hashes change.
+        for old, new in zip(original.worlds, current.worlds, strict=True):
+            assert old.signature == new.signature
+            assert dict(old.controls)["work_budget"] != dict(new.controls)["work_budget"]
+            assert {k: v for k, v in old.controls if k != "work_budget"} == {
+                k: v for k, v in new.controls if k != "work_budget"
+            }
+        module._controls = implementation._controls
+        authorized = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        assert authorized == current
+        assert original.comparison == current.comparison
+        assert original.player_movements == current.player_movements
+        assert original.fixtures == current.fixtures
+        proxy = SimpleNamespace(
+>           comparison=current,
+            timings=SimpleNamespace(model_dump=lambda **kwargs: {}),
+            screen_metrics=implementation._run_screen_metrics(*runs),
+        )
+E       AssertionError
+
+tests\unit\private_v1\team_strength_d1_parent_support.py:44: AssertionError
+__________________ test_locked_real_canonical_case[E_SCREEN] __________________
+
+frozen_model_preparation = (_PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=..., information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc)), Decimal('64775.58500005398'))
+case = Case(name='E_SCREEN', source_variant=0, seed=2, screen=True, classification='CANDIDATE_SCREEN_CONFOUNDED', utility_delta=Decimal('50'), moved_rows=126)
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DDDA4C5DA0>
+
+    @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
+    def test_locked_real_canonical_case(frozen_model_preparation, case, repository_root, monkeypatch):
+        from dmf_pulse.private_v1.rolling import PrivateV1RollingRecommendationService
+    
+        runs = {}
+        original = PrivateV1RollingRecommendationService.run
+    
+        def observed(self, execution, **kwargs):
+            value = original(self, execution, **kwargs)
+            runs[self._score_prior_resolver is not None] = value
+            return value
+    
+        monkeypatch.setattr(PrivateV1RollingRecommendationService, "run", observed)
+        prepared, elapsed = frozen_model_preparation
+        prepared = case_prepared(prepared, case)
+        dataset, artifact = synthetic_strength(case.source_variant)
+        preparation = prepare_team_strength_shadow(
+            prepared.rolling_execution,
+            artifact=artifact,
+            expected_artifact_sha256=artifact.semantic_sha256,
+            fixture_registry=dataset.fixture_registry,
+        )
+        # Exercise world-order isolation in a real acceptance case as well.
+        order = (
+            ("TEAM_STRENGTH_SHADOW", "LEAGUE_BASELINE")
+            if case.name == "A_ROBUST"
+            else ("LEAGUE_BASELINE", "TEAM_STRENGTH_SHADOW")
+        )
+        result = run_team_strength_shadow_comparison(
+            prepared, preparation, preparation_ms=elapsed, _world_order=order
+        )
+        assert isinstance(result, TeamStrengthComparisonRun)
+        assert_case(case, result.comparison)
+>       assert_parent_success(
+            repository_root, prepared, preparation, (runs[False], runs[True]), result.comparison
+        )
+
+tests\unit\private_v1\test_team_strength_shadow_cases.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/001U-worktree')
+prepared = _PrivateV1PreparedRollingContext(snapshot=DirectFplSnapshot(captured_at=datetime.datetime(2026, 10, 1, 0, 30, tzinfo=d..._odds_api_private_analytics_v1', information_cutoff=datetime.datetime(2026, 10, 1, 2, 0, tzinfo=datetime.timezone.utc))
+preparation = TeamStrengthShadowPreparation(semantic_sha256='cb712c3f42094ee98ff5550468ddef27c39bf636d9d50ad6dc4593a45b4f83f4', stat...ce_assessment=None, status='SHADOW_NOT_MODEL_INPUT', warning='PLUGIN_SHADOW_ONLY'))), status='SHADOW_NOT_MODEL_INPUT'))
+runs = (PrivateV1RollingRunResult(decision=PrivateV1RollingDecision(continuation_maximum_transfers=2, continuation_transfer_m...1550002582371')), PrivateRollingStageTiming(stage='report_and_comparator', elapsed_ms=Decimal('211.32640005089343')))))
+current = TeamStrengthDecisionComparison(semantic_sha256='7b717fe10d91ae0f47b282ca7c3ee575151c41ee9c2c4ac34633d0a4ea18cb86', sch...dom_draw_disclosure='SAME_SEEDS_NAMESPACES_AND_DRAW_INDICES;OUTCOMES_AND_BRANCH_DEPENDENT_DRAW_CONSUMPTION_MAY_DIFFER')
+
+    from dmf_pulse.private_v1 import team_strength_comparison as implementation
+    
+    source = parent_source(repository_root, "src/dmf_pulse/private_v1/team_strength_comparison.py")
+    module = ModuleType("_d1_immutable_parent_comparison")
+    sys.modules[module.__name__] = module
+    try:
+        exec(compile(source, "<immutable-parent-comparison>", "exec"), module.__dict__)
+        original = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        # Explicit human authorization: only work-budget identity/containing hashes change.
+        for old, new in zip(original.worlds, current.worlds, strict=True):
+            assert old.signature == new.signature
+            assert dict(old.controls)["work_budget"] != dict(new.controls)["work_budget"]
+            assert {k: v for k, v in old.controls if k != "work_budget"} == {
+                k: v for k, v in new.controls if k != "work_budget"
+            }
+        module._controls = implementation._controls
+        authorized = module._compare_runs(prepared, preparation.shadow_input, *runs)
+        assert authorized == current
+        assert original.comparison == current.comparison
+        assert original.player_movements == current.player_movements
+        assert original.fixtures == current.fixtures
+        proxy = SimpleNamespace(
+>           comparison=current,
+            timings=SimpleNamespace(model_dump=lambda **kwargs: {}),
+            screen_metrics=implementation._run_screen_metrics(*runs),
+        )
+E       AssertionError
+
+tests\unit\private_v1\team_strength_d1_parent_support.py:44: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/private_v1/test_team_strength_d7_evidence.py::test_d7_historical_authorities_remain_closed_under_l8
+FAILED tests/unit/private_v1/test_team_strength_l1.py::test_l8_rights_hashes_and_current_authority_are_exact
+FAILED tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[A_ROBUST]
+FAILED tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[B_ROOT]
+FAILED tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[C_CONTINUATION]
+FAILED tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[D_TACTICS]
+FAILED tests/unit/private_v1/test_team_strength_shadow_cases.py::test_locked_real_canonical_case[E_SCREEN]
+7 failed, 2126 passed, 1 deselected in 4042.59s (1:07:22)

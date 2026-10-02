@@ -1,0 +1,152 @@
+{
+  "classification": "SYNTHETIC_OFFLINE_CPU_SINGLE_PROCESS",
+  "draw_generation": [
+    {
+      "draw_count": 64,
+      "seconds": 0.10143220005556941
+    },
+    {
+      "draw_count": 128,
+      "seconds": 0.13977960008196533
+    },
+    {
+      "draw_count": 256,
+      "seconds": 0.19368559995200485
+    },
+    {
+      "draw_count": 512,
+      "seconds": 0.32160949998069555
+    },
+    {
+      "draw_count": 1024,
+      "seconds": 0.8623830999713391
+    },
+    {
+      "draw_count": 2048,
+      "seconds": 1.0860529000638053
+    }
+  ],
+  "fit_sha256": "d4d40274f75be47d9b80146b11b7899db2bba945dc5a13a5296b4799bccead91",
+  "full_season_mixture_generation": [
+    {
+      "artifact_identity_collection_sha256": "2542d0e4a1633355c5a5ebf096a3ad5dbbe56820622c90d30a3a4d171642eb01",
+      "draw_count": 64,
+      "fixtures": 380,
+      "seconds": 8.842792300041765
+    },
+    {
+      "artifact_identity_collection_sha256": "804e400f13612290b8d9d44f8d270f1d046dd0cf2ddbf485f131ec3abcee0941",
+      "draw_count": 128,
+      "fixtures": 380,
+      "seconds": 15.433106200071052
+    }
+  ],
+  "measurement_conditions": "LOCAL_REGRESSION_RUNNING_CONCURRENTLY_NO_IDLE_MACHINE_CLAIM",
+  "memory": {
+    "draw_count": 2048,
+    "fixtures": 1,
+    "method": "TRACEMALLOC_PYTHON_ALLOCATIONS_NOT_PROCESS_RSS",
+    "peak_bytes": 100182141,
+    "setup_and_preexisting_caches_excluded": true
+  },
+  "operational_draw_count": null,
+  "parameter_dimension": 84,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "private_live_runtime_claim": "NOT_MEASURED",
+  "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "production_active": false,
+  "prospective": {
+    "draw_count": 64,
+    "fixtures": 1,
+    "freeze_seconds": 3.5592993000755087,
+    "products": 3,
+    "score_seconds": 2.0820569000206888,
+    "score_sha256": "1c20832a623b33e25e5ef1994a2f853357ed071f5c65d268cbc405ac29d2f283"
+  },
+  "python": "3.13.5",
+  "schema_version": "team-strength-u-performance-v1",
+  "semantic_sha256": "5fb85c0890f8cca8510f1ecae789d1098ff4848ecdc097cf0f0015a896c26f7e",
+  "setup_fit_seconds": 10.26363159995526,
+  "source_sha256s": {
+    "scripts/benchmark_team_strength_u.py": "f9740953c12f099589a9395eedcf438a08da7eb6322abb78c3cd09d7398eb6bf",
+    "src/dmf_pulse/evaluation/team_strength_prospective.py": "969024da204a6382d211f5f70c7877e1714c8fb0bd098a5c1b08bcafc9f96fe1",
+    "src/dmf_pulse/football_events/team_strength_mixture.py": "5a492d3fdc7aaee74e935af17cd45d316342231f2ee8505782e5a0af6472e095",
+    "src/dmf_pulse/football_events/team_strength_mixture_stage8.py": "472bc2998716441527228d2f6b472efb328ad0cc5a4155783b0bd717b860178b",
+    "src/dmf_pulse/football_events/team_strength_parameter_draws.py": "0bfbe387ebe292c5167ce170a1271011c7ec7904c8fdae0be08a85a6e92421d0"
+  },
+  "stage11_solves": 0,
+  "stage8_single_fixture": [
+    {
+      "draw_count": 64,
+      "market_backed": false,
+      "mixture_seconds": 0.18126039998605847,
+      "plugin_seconds": 0.0069327999372035265
+    },
+    {
+      "draw_count": 64,
+      "market_backed": true,
+      "mixture_seconds": 0.34277849993668497,
+      "plugin_seconds": 0.3021681000245735
+    },
+    {
+      "draw_count": 128,
+      "market_backed": false,
+      "mixture_seconds": 0.21833089995197952,
+      "plugin_seconds": 0.00540050002746284
+    },
+    {
+      "draw_count": 128,
+      "market_backed": true,
+      "mixture_seconds": 0.3033428000053391,
+      "plugin_seconds": 0.2494987000245601
+    },
+    {
+      "draw_count": 256,
+      "market_backed": false,
+      "mixture_seconds": 0.4873735000146553,
+      "plugin_seconds": 0.005592599976807833
+    },
+    {
+      "draw_count": 256,
+      "market_backed": true,
+      "mixture_seconds": 0.3570196999935433,
+      "plugin_seconds": 0.2383842000272125
+    },
+    {
+      "draw_count": 512,
+      "market_backed": false,
+      "mixture_seconds": 0.5828835999127477,
+      "plugin_seconds": 0.005322500015608966
+    },
+    {
+      "draw_count": 512,
+      "market_backed": true,
+      "mixture_seconds": 0.5099149000598118,
+      "plugin_seconds": 0.24557869997806847
+    },
+    {
+      "draw_count": 1024,
+      "market_backed": false,
+      "mixture_seconds": 1.2764547999249771,
+      "plugin_seconds": 0.005310900043696165
+    },
+    {
+      "draw_count": 1024,
+      "market_backed": true,
+      "mixture_seconds": 0.6235822000307962,
+      "plugin_seconds": 0.24261920002754778
+    },
+    {
+      "draw_count": 2048,
+      "market_backed": false,
+      "mixture_seconds": 2.4941118999850005,
+      "plugin_seconds": 0.005911999964155257
+    },
+    {
+      "draw_count": 2048,
+      "market_backed": true,
+      "mixture_seconds": 2.2336222999729216,
+      "plugin_seconds": 0.2402318000094965
+    }
+  ]
+}

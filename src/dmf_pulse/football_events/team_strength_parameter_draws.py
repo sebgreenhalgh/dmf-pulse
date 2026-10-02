@@ -35,6 +35,7 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import (
 
 SYMMETRY_TOLERANCE = 1e-12
 INVERSE_TOLERANCE = 1e-8
+DRAW_REDERIVATION_ULPS = 8
 
 
 class ParameterMixtureUnavailable(StrengthEvidenceError):
@@ -259,8 +260,24 @@ def _validated_draw_json(artifact_json: str, draws_json: str) -> ParameterDrawSe
     artifact = TeamStrengthModelArtifactV1.model_validate_json(artifact_json)
     draws = ParameterDrawSetV1.model_validate_json(draws_json)
     expected = joint_parameter_draws(artifact, policy=draws.policy)
-    if draws != expected:
+    # Persisted authoritative values retain their identity across binary64 libm
+    # implementations. Only regenerated coordinates may differ by roundoff;
+    # covariance, policies, IDs, weights and all other lineage remain exact.
+    if draws.model_dump(exclude={"draws", "semantic_sha256"}) != expected.model_dump(
+        exclude={"draws", "semantic_sha256"}
+    ):
         raise ParameterMixtureUnavailable("draws differ from joint artifact-bound construction")
+    for stored, regenerated in zip(draws.draws, expected.draws, strict=True):
+        if stored.model_dump(exclude={"free_parameters"}) != regenerated.model_dump(
+            exclude={"free_parameters"}
+        ):
+            raise ParameterMixtureUnavailable("draw identities/weights differ from construction")
+        for actual, target in zip(stored.free_parameters, regenerated.free_parameters, strict=True):
+            allowance = DRAW_REDERIVATION_ULPS * math.ulp(max(1.0, abs(float(target))))
+            if abs(float(actual) - float(target)) > allowance:
+                raise ParameterMixtureUnavailable(
+                    "draw coordinates differ materially from construction"
+                )
     return draws
 
 

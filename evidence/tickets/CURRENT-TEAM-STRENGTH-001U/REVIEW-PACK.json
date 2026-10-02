@@ -1,0 +1,10 @@
+{
+  "archive": {
+    "bytes": 221365,
+    "path": "review_pack/CURRENT-TEAM-STRENGTH-001U.zip",
+    "sha256": "9dc369cc1d8e2c168733e271ba81f4ebad1d20c9ebdfeea3d9b9734876a78a37"
+  },
+  "files": 25,
+  "status": "PASS",
+  "uncompressed_source_bytes": 1137566
+}

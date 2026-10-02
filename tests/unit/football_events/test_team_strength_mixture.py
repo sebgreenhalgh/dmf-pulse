@@ -13,9 +13,11 @@ from dmf_pulse.football_events.team_strength_mixture import (
     build_parameter_mixture,
 )
 from dmf_pulse.football_events.team_strength_parameter_draws import (
+    ParameterMixtureUnavailable,
     draw_policy,
     joint_parameter_draws,
 )
+from dmf_pulse.ingestion.openfootball.team_strength_data import seal
 from tests.unit.football_events.team_strength_support import synthetic_artifact, synthetic_dataset
 
 
@@ -104,3 +106,29 @@ def test_wrong_expected_fit_fails_closed():
             as_of=artifact.usable_at,
             expected_artifact_sha256="0" * 64,
         )
+
+
+@pytest.mark.parametrize("scale", [Decimal(100), Decimal(1000000)])
+def test_extreme_valid_joint_worlds_fail_without_lambda_clipping(scale):
+    artifact, draws, fixtures = inputs(count=2, scale=scale)
+    with pytest.raises(ParameterMixtureUnavailable, match="no clipping"):
+        mixture(artifact, draws, fixtures[0])
+
+
+@pytest.mark.parametrize(
+    "field,changed",
+    [
+        ("weighted_lambda_home", Decimal("1.000000")),
+        ("epistemic_lambda_variance_away", Decimal(0)),
+        ("total_predictive_variance_home", Decimal(1)),
+        ("home_truncation_mean_error", Decimal("0.1")),
+    ],
+)
+def test_rehashed_false_mixture_moments_fail(field, changed):
+    artifact, draws, fixtures = inputs()
+    value = mixture(artifact, draws, fixtures[0])
+    fields = {
+        name: getattr(value, name) for name in type(value).model_fields if name != "semantic_sha256"
+    }
+    with pytest.raises(ValueError):
+        seal(type(value), **(fields | {field: changed}))
