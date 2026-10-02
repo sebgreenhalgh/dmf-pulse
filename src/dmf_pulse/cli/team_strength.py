@@ -10,17 +10,92 @@ from typing import Annotated, Any
 
 import typer
 
+from dmf_pulse.evaluation.team_strength_prospective import (
+    PromotionEvidenceStatus,
+    PublicForecastBuildRequestV1,
+    freeze_public_forecast_request,
+    score_public_team_forecasts,
+)
+from dmf_pulse.evaluation.team_strength_prospective_store import (
+    load_public_forecast,
+    persist_public_forecast,
+)
 from dmf_pulse.evaluation.team_strength_replay import run_reconstructed_replay
 from dmf_pulse.football_events.team_strength_model import fit_team_strength
 from dmf_pulse.football_events.team_strength_numerics import StrengthFitError
 from dmf_pulse.football_events.team_strength_store import persist_team_strength
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.openfootball.team_strength_corpus import load_reconstructed_corpus
-from dmf_pulse.ingestion.openfootball.team_strength_data import build_dataset
+from dmf_pulse.ingestion.openfootball.team_strength_data import ParsedSnapshot, build_dataset
 
 team_strength_app = typer.Typer(
     help="Offline reconstructed team-strength research; shadow only, never ordinary recommendations."
 )
+
+
+@team_strength_app.command("prospective-freeze")
+def prospective_freeze_command(
+    request: Annotated[
+        Path, typer.Option("--request", help="Strict public OpenFootball forecast request JSON.")
+    ],
+    retained_artifact_root: Annotated[
+        Path,
+        typer.Option(
+            "--retained-artifact-root",
+            help="Explicit private directory for permitted public-team evidence.",
+        ),
+    ],
+) -> None:
+    def operation() -> dict[str, Any]:
+        value = PublicForecastBuildRequestV1.model_validate_json(request.read_bytes())
+        forecast = freeze_public_forecast_request(value)
+        persist_public_forecast(forecast, artifact_root=retained_artifact_root)
+        return {
+            "status": forecast.status,
+            "forecast_sha256": forecast.semantic_sha256,
+            "dataset_mode": forecast.dataset_mode,
+            "forecast_origin": forecast.forecast_origin.isoformat(),
+            "fixture_count": len(forecast.forecasts),
+            "production_active": False,
+            "private_storage": "PRIVATE_PROSPECTIVE_STORAGE_NOT_AUTHORIZED",
+        }
+
+    _emit(operation)
+
+
+@team_strength_app.command("prospective-score")
+def prospective_score_command(
+    forecast: Annotated[Path, typer.Option("--forecast")],
+    forecast_sha256: Annotated[str, typer.Option("--forecast-sha256")],
+    outcomes: Annotated[
+        Path,
+        typer.Option(
+            "--outcomes", help="Authenticated public OpenFootball parsed outcome snapshot JSON."
+        ),
+    ],
+) -> None:
+    def operation() -> dict[str, Any]:
+        value = load_public_forecast(forecast, expected_forecast_sha256=forecast_sha256)
+        result = score_public_team_forecasts(
+            value,
+            outcomes=ParsedSnapshot.model_validate_json(outcomes.read_bytes()),
+            as_of=datetime.now(UTC),
+        )
+        return {
+            "status": "PUBLIC_TEAM_STRENGTH_PROSPECTIVE_SCORED",
+            "score_sha256": result.semantic_sha256,
+            "forecast_sha256": result.forecast_sha256,
+            "dataset_mode": result.dataset_mode,
+            "scores": result.model_dump(mode="json")["scores"],
+            "production_active": False,
+        }
+
+    _emit(operation)
+
+
+@team_strength_app.command("promotion-status")
+def promotion_status_command() -> None:
+    _emit(lambda: PromotionEvidenceStatus().model_dump(mode="json"))
 
 
 def _emit(operation: Callable[[], dict[str, Any]]) -> None:

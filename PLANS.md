@@ -2747,5 +2747,5 @@ private persistence, live retry, production activation, PR, merge or tag.
 - [x] U.03 coherent score mixture and nested identities.
 - [x] U.04 shadow Stage-8 integration and predeclared convergence evidence.
 - [x] U.05 disclosure-safe screen diagnostics (exact 2x2 optional and off by default).
-- [ ] U.06 immutable public prospective evaluation with temporal and rights gates.
+- [x] U.06 immutable public prospective evaluation with temporal and rights gates.
 - [ ] U.07 regressions, measured performance, independent review and exact-SHA CI.
