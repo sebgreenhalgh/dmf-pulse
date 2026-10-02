@@ -1,0 +1,12 @@
+{
+  "False": {
+    "expected_away_goals": "1.499695",
+    "expected_home_goals": "1.942485",
+    "semantic_sha256": "7e382a087f74526fd6e8d224cf23366b2c795c7663d8e60c2b8243220b5f45c5"
+  },
+  "True": {
+    "expected_away_goals": "1.263441",
+    "expected_home_goals": "1.726802",
+    "semantic_sha256": "c9105cf376416584b75b36474a52bf91d88862372d4cc7d22ac45082a106727a"
+  }
+}
