@@ -58,6 +58,10 @@ from dmf_pulse.private_v1.team_strength_diagnostics import (
     comparison_boundary,
     note_control_divergence,
 )
+from dmf_pulse.private_v1.team_strength_screen_metrics import (
+    ScreenComparisonMetrics,
+    screen_metrics,
+)
 from dmf_pulse.private_v1.team_strength_shadow_inputs import (
     TeamStrengthShadowInput,
     TeamStrengthShadowPreparation,
@@ -70,6 +74,7 @@ from dmf_pulse.private_v1.team_strength_shadow_inputs import (
 class TeamStrengthComparisonRun:
     comparison: TeamStrengthDecisionComparison
     timings: ComparisonTimings
+    screen_metrics: ScreenComparisonMetrics
 
 
 def _input_work_budget_control(
@@ -493,6 +498,7 @@ def _run_comparison(
         total = Decimal(str((perf_counter() - started) * 1000))
         return TeamStrengthComparisonRun(
             comparison=comparison,
+            screen_metrics=_run_screen_metrics(baseline, alternative),
             timings=ComparisonTimings(
                 preparation_ms=preparation_ms,
                 baseline_projection_ms=projection_times[0],
@@ -514,13 +520,8 @@ def safe_team_strength_summary(run: TeamStrengthComparisonRun) -> dict[str, obje
         worlds.append(
             {
                 "world": result.world,
-                "root_transfers": tuple(
-                    (row.player_out_id, row.player_in_id) for row in root.transfers
-                ),
                 "root_transfer_count": root.transfer_count,
                 "root_hit": root.hit_points,
-                "captain": root.tactics.captain,
-                "vice": root.tactics.vice_captain,
                 "xi_sha256": canonical_sha256(root.tactics.starting_xi),
                 "utility": str(signature.utility.plan_expected_horizon_utility),
                 "hold_utility": str(signature.utility.baseline_expected_horizon_utility),
@@ -556,8 +557,41 @@ def safe_team_strength_summary(run: TeamStrengthComparisonRun) -> dict[str, obje
         "projection_movement": value.movement.model_dump(mode="json"),
         "worlds": tuple(worlds),
         "comparison": value.comparison.model_dump(mode="json"),
+        "screen_metrics": run.screen_metrics.model_dump(mode="json"),
         "controls": {name: True for name, _digest in value.worlds[0].controls},
         "provider_requests_during_solves": 0,
         "random_draw_disclosure": value.random_draw_disclosure,
         "timings": run.timings.model_dump(mode="json"),
     }
+
+
+def _run_screen_metrics(
+    baseline: PrivateV1RollingRunResult, shadow: PrivateV1RollingRunResult
+) -> ScreenComparisonMetrics:
+    def candidates(run: PrivateV1RollingRunResult) -> frozenset[str]:
+        return frozenset(
+            player
+            for node in run.optimiser_request.scenario_tree.nodes
+            for player in node.allowed_transfer_in_ids
+        )
+
+    def eligibility(run: PrivateV1RollingRunResult) -> frozenset[tuple[str, int, str]]:
+        return frozenset(
+            (node.node_id, node.gameweek, player)
+            for node in run.optimiser_request.scenario_tree.nodes
+            for player in node.allowed_transfer_in_ids
+        )
+
+    protected: frozenset[str] = frozenset()
+    for run in (baseline, shadow):
+        plan = run.one_gameweek_optimiser_result.recommended_plan
+        if plan is None:
+            raise ValueError("completed comparison lacks protected one-gameweek plan")
+        protected |= frozenset(plan.current_action.action.transfers_in)
+    return screen_metrics(
+        candidates(baseline),
+        candidates(shadow),
+        protected=protected,
+        baseline_node_eligibility=eligibility(baseline),
+        shadow_node_eligibility=eligibility(shadow),
+    )

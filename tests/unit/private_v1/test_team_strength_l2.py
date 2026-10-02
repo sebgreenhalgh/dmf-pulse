@@ -316,7 +316,6 @@ def test_d1_through_d7_live_control_flow_changes_only_l8_metadata():
     [
         "config/models/current_team_strength_governance.json",
         "src/dmf_pulse/optimisation/multi_gameweek_errors.py",
-        "src/dmf_pulse/private_v1/team_strength_comparison.py",
         "src/dmf_pulse/private_v1/team_strength_comparison_models.py",
         "src/dmf_pulse/private_v1/team_strength_live_network.py",
         "src/dmf_pulse/private_v1/prepared_control.py",

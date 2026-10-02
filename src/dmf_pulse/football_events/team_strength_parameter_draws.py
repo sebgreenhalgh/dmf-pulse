@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import math
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from functools import lru_cache
 from typing import Literal, Self
 from uuid import UUID
@@ -163,8 +163,10 @@ class ParameterDrawSetV1(SealedEvidence):
                 raise ValueError("draw dimension/index mismatch")
             if row.parameter_draw_id != _draw_id(self.model_sha256, self.policy, i):
                 raise ValueError("draw identity mismatch")
-        if sum((row.draw_weight for row in self.draws), Decimal(0)) != 1:
-            raise ValueError("draw weights do not sum to one")
+        with localcontext() as context:
+            context.prec = 120
+            if sum((row.draw_weight for row in self.draws), Decimal(0)) != 1:
+                raise ValueError("draw weights do not sum to one")
         return self
 
 
@@ -210,7 +212,12 @@ def joint_parameter_draws(
     if residual > INVERSE_TOLERANCE:
         raise ParameterMixtureUnavailable("covariance is not the accepted information inverse")
     rows = []
-    weight = Decimal(1) / policy.draw_count
+    with localcontext() as context:
+        context.prec = 60
+        weight = Decimal(1) / policy.draw_count
+    with localcontext() as context:
+        context.prec = 120
+        last_weight = 1 - weight * (policy.draw_count - 1)
     for index in range(policy.draw_count):
         z = normal_vector(policy.seed, index, p)
         values = tuple(
@@ -223,7 +230,7 @@ def joint_parameter_draws(
             ParameterDraw(
                 parameter_draw_id=_draw_id(model.semantic_sha256, policy, index),
                 index=index,
-                draw_weight=weight if index < policy.draw_count - 1 else 1 - weight * index,
+                draw_weight=weight if index < policy.draw_count - 1 else last_weight,
                 free_parameters=values,
             )
         )

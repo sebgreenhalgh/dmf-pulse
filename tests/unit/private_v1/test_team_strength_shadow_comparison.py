@@ -135,6 +135,11 @@ def test_two_real_worlds_keep_controls_and_publish_safe_summary(real_comparison)
     assert "player_movements" not in text
     assert "entry_id" not in text and "live_by_gameweek" not in text
     assert summary["status"] == "SHADOW_NOT_MODEL_INPUT"
+    assert summary["screen_metrics"] == real_comparison.screen_metrics.model_dump(mode="json")
+    assert all(
+        "captain" not in row and "vice" not in row and "root_transfers" not in row
+        for row in summary["worlds"]
+    )
     assert summary["production_activation"] is False
     assert summary["provider_requests_during_solves"] == 0
     assert real_comparison.timings.baseline_solve_ms > 0

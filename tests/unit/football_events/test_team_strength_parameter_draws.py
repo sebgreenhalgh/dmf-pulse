@@ -1,7 +1,7 @@
 """Joint covariance, reproducibility, ordering and fail-closed uncertainty tests."""
 
 import math
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import pytest
 
@@ -54,6 +54,19 @@ def test_zero_scale_preserves_plugin_free_vector():
         *(row.defence for row in artifact.model.effects[:-1]),
     )
     assert all(row.free_parameters == expected for row in draws.draws)
+
+
+@pytest.mark.parametrize("count", [3, 11, 13])
+def test_non_power_of_two_weights_and_ambient_context_reproducibility(count):
+    artifact = synthetic_artifact()
+    policy = draw_policy(seed=23, draw_count=count)
+    expected = joint_parameter_draws(artifact, policy=policy)
+    with localcontext() as context:
+        context.prec = 6
+        assert joint_parameter_draws(artifact, policy=policy) == expected
+    with localcontext() as context:
+        context.prec = 120
+        assert sum((row.draw_weight for row in expected.draws), Decimal(0)) == 1
 
 
 def test_full_covariance_factor_and_empirical_joint_covariance():
