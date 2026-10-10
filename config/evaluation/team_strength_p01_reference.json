@@ -1,0 +1,46 @@
+{
+  "cohort_class": "PROSPECTIVE_PILOT_COHORT",
+  "cohort_id": "P01",
+  "dataset_mode": "LIVE_OBSERVED",
+  "draw_policy_sha256": "444b0b4b8f138bc9188a60e947eb6ff58575c0ceb3f2d825873e9851ddfa49b3",
+  "evaluation_epoch": "EVALUATION_EPOCH_001",
+  "fixture_ids": [
+    "01a0c601-f01b-706c-b029-d73cdb1b2522",
+    "01a0c601-f01b-7073-b040-5b605ff5d8c7",
+    "01a0c601-f01b-742f-bc00-9ffa12ab0f5f",
+    "01a0c601-f01b-7765-bd26-535afc4df5df",
+    "01a0c601-f01b-7769-8be2-7dfb2a374065",
+    "01a0c601-f01b-77b7-9cda-fd5784119360",
+    "01a0c601-f01b-7bc1-b648-fcfb2da000e5",
+    "01a0c601-f01b-7c46-a1aa-a84fa6301c2d",
+    "01a0c601-f01b-7cc9-8b40-673dfe362e9f",
+    "01a0c601-f01b-7dfb-9d4b-18994ea99bf9"
+  ],
+  "fixture_registry_sha256": "de447eb368a807d4edf701a75c094a8b3f4925aa3e87cbff9b9f4fadd63eba18",
+  "forecast_origin": "2026-10-03T13:38:40.513349Z",
+  "forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "frozen_at": "2026-10-03T13:40:19.466686Z",
+  "lead_time_class": "P01_PILOT_LONG_LEAD",
+  "methodology_sha256": "3d5982ca51d984fa56447dee56eb52250c71ffd2bd4ad3acabfae8ab2688d59f",
+  "model_artifact_sha256": "f44ff80d48f4c8e78c09ea27f4344c2f63858c92b0ce0a7f19f9267d6bc5e366",
+  "model_sha256": "d2743d56406a83df5c3af7eca2b492f1ffcda11996db958dd127581c8879ebfe",
+  "promoted_team_fixture_ids": [
+    "01a0c601-f01b-7073-b040-5b605ff5d8c7",
+    "01a0c601-f01b-742f-bc00-9ffa12ab0f5f",
+    "01a0c601-f01b-7c46-a1aa-a84fa6301c2d"
+  ],
+  "protocol_sha256": "93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029",
+  "scheduled_dates": [
+    "2026-10-10",
+    "2026-10-10",
+    "2026-10-12",
+    "2026-10-10",
+    "2026-10-10",
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-11",
+    "2026-10-10",
+    "2026-10-11"
+  ],
+  "source_snapshot_sha256": "8ce22a5718324e2ef13e39587e17477e5cebac7ebda6fa59bbea022864142161"
+}

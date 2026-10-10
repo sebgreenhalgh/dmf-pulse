@@ -55,6 +55,8 @@ exclude = ["/review_pack", "/dist", "/.venv"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "config/evaluation/team_strength_prospective_protocol_v1.json" = "dmf_pulse/evaluation/resources/team_strength_prospective_protocol_v1.json"
+"config/evaluation/team_strength_p01_reference.json" = "dmf_pulse/evaluation/resources/team_strength_p01_reference.json"
+"config/evaluation/team_strength_epoch001_dependencies.json" = "dmf_pulse/evaluation/resources/team_strength_epoch001_dependencies.json"
 "config/providers/fpl.json" = "dmf_pulse/ingestion/resources/fpl.json"
 "config/rights/fpl_profiles.json" = "dmf_pulse/ingestion/resources/fpl_profiles.json"
 "config/providers/the_odds_api.json" = "dmf_pulse/ingestion/resources/the_odds_api.json"

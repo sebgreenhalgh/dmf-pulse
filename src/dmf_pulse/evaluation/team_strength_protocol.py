@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import UTC, date, datetime, time, timedelta
 from importlib import resources
+from itertools import pairwise
 from pathlib import Path
 from typing import Final, Literal, Self
 from uuid import UUID
@@ -28,6 +30,7 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import (
 P01_SHA: Final = "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a"
 DRAW_POLICY_SHA: Final = "444b0b4b8f138bc9188a60e947eb6ff58575c0ceb3f2d825873e9851ddfa49b3"
 PARENT_SHA = "3815152e978dd55e1dc1f115055050d4ed6b1735"
+PROTOCOL_SHA: Final = "93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029"
 PRODUCTS = (
     "LEAGUE_BASELINE",
     "PLUG_IN_TEAM_STRENGTH_SHADOW",
@@ -198,7 +201,39 @@ def load_protocol() -> ProspectiveProtocolV1:
         ).read_bytes()
     protocol = ProspectiveProtocolV1.model_validate_json(body)
     # The versioned packaged artifact is the immutable authority, never `latest`.
-    return authenticate(protocol)
+    protocol = authenticate(protocol, PROTOCOL_SHA)
+    package = resources.files("dmf_pulse")
+    dependencies = package.joinpath("evaluation/resources/team_strength_epoch001_dependencies.json")
+    dependency_body = json.loads(
+        dependencies.read_bytes()
+        if dependencies.is_file()
+        else (
+            Path(__file__).resolve().parents[3]
+            / "config/evaluation/team_strength_epoch001_dependencies.json"
+        ).read_bytes()
+    )
+    if (
+        canonical_sha256(dependency_body)
+        != "b25fd60a0bf4300ef2bda64143137854d7f894010fb8e1c506fb092942a212b6"
+    ):
+        raise StrengthEvidenceError("accepted dependency manifest differs")
+    for name, expected in (*protocol.accepted_code_manifest, *dependency_body["files"]):
+        if name.startswith("src/dmf_pulse/"):
+            body = package.joinpath(name.removeprefix("src/dmf_pulse/")).read_bytes()
+        elif name == "config/models/current_team_strength_governance.json":
+            resource = package.joinpath("ingestion/resources/current_team_strength_governance.json")
+            body = (
+                resource.read_bytes()
+                if resource.is_file()
+                else (Path(__file__).resolve().parents[3] / name).read_bytes()
+            )
+        else:
+            raise StrengthEvidenceError("unrecognized accepted methodology source")
+        if hashlib.sha256(body).hexdigest() != expected:
+            raise StrengthEvidenceError(
+                "runtime methodology differs; new approved evaluation epoch required"
+            )
+    return protocol
 
 
 class CohortAssignment(FrozenEvidence):
@@ -288,6 +323,7 @@ class CampaignLedgerV1(SealedEvidence):
     )
     campaign_id: Literal["CURRENT-TEAM-STRENGTH-001V"] = "CURRENT-TEAM-STRENGTH-001V"
     protocol: ProspectiveProtocolV1
+    protocol_history: tuple[ProspectiveProtocolV1, ...] = ()
     created_at: datetime
     predecessor_sha256: SHA | None = None
     events: tuple[CohortEvent, ...]
@@ -296,6 +332,17 @@ class CampaignLedgerV1(SealedEvidence):
 
     @model_validator(mode="after")
     def check_history(self) -> Self:
+        protocols = {row.semantic_sha256: row for row in (*self.protocol_history, self.protocol)}
+        chain = (*self.protocol_history, self.protocol)
+        for previous, current in pairwise(chain):
+            if (
+                current.predecessor_protocol_sha256 != previous.semantic_sha256
+                or current.evaluation_epoch == previous.evaluation_epoch
+                or current.created_at <= previous.created_at
+            ):
+                raise ValueError("protocol amendment chain/epoch mismatch")
+        if not self.events or self.events[0].assignment != load_pilot_assignment():
+            raise ValueError("campaign must preserve the pinned authentic P01 assignment")
         assigned: dict[str, CohortAssignment] = {}
         used: set[UUID] = set()
         states: dict[str, str] = {}
@@ -304,12 +351,18 @@ class CampaignLedgerV1(SealedEvidence):
                 raise ValueError("ledger predates event")
             if row.assignment is not None:
                 assignment = row.assignment
-                if assignment.protocol_sha256 != self.protocol.semantic_sha256 or (
-                    assignment.evaluation_epoch != self.protocol.evaluation_epoch
-                    or assignment.draw_policy_sha256 != self.protocol.draw_policy_sha256
-                    or assignment.methodology_sha256 != self.protocol.methodology_sha256
+                bound_protocol = protocols.get(assignment.protocol_sha256)
+                if bound_protocol is None or (
+                    assignment.evaluation_epoch != bound_protocol.evaluation_epoch
+                    or assignment.draw_policy_sha256 != bound_protocol.draw_policy_sha256
+                    or assignment.methodology_sha256 != bound_protocol.methodology_sha256
                 ):
                     raise ValueError("model/draw-policy evaluation epoch mismatch")
+                if (
+                    assignment.cohort_id != "P01"
+                    and assignment.forecast_origin < bound_protocol.created_at
+                ):
+                    raise ValueError("standard cohort predates effective protocol")
                 if row.cohort_id in assigned:
                     if assigned[row.cohort_id] != assignment:
                         raise ValueError("historical fixture assignments cannot be rewritten")
@@ -339,6 +392,7 @@ def append_event(ledger: CampaignLedgerV1, event: CohortEvent) -> CampaignLedger
     return seal(
         CampaignLedgerV1,
         protocol=ledger.protocol,
+        protocol_history=ledger.protocol_history,
         created_at=event.recorded_at,
         predecessor_sha256=ledger.semantic_sha256,
         events=(*ledger.events, event),
@@ -348,6 +402,65 @@ def append_event(ledger: CampaignLedgerV1, event: CohortEvent) -> CampaignLedger
 def freeze_window(earliest_date: date) -> tuple[datetime, datetime]:
     start = datetime.combine(earliest_date - timedelta(days=2), time(12), tzinfo=UTC)
     return start, start + timedelta(hours=6)
+
+
+def load_pilot_assignment() -> CohortAssignment:
+    resource = resources.files("dmf_pulse").joinpath(
+        "evaluation/resources/team_strength_p01_reference.json"
+    )
+    body = (
+        resource.read_bytes()
+        if resource.is_file()
+        else (
+            Path(__file__).resolve().parents[3]
+            / "config/evaluation/team_strength_p01_reference.json"
+        ).read_bytes()
+    )
+    assignment = CohortAssignment.model_validate_json(body)
+    if (
+        canonical_sha256(assignment)
+        != "5ffa3c5eea4f483a667e104c79e804cc0707b7d5b1aee98eabcc675c90cf80cf"
+    ):
+        raise StrengthEvidenceError("pinned P01 reference metadata differs")
+    return assignment
+
+
+def initial_campaign_ledger() -> CampaignLedgerV1:
+    protocol = load_protocol()
+    return seal(
+        CampaignLedgerV1,
+        protocol=protocol,
+        created_at=protocol.created_at,
+        events=(
+            CohortEvent(
+                cohort_id="P01",
+                status="FROZEN",
+                recorded_at=protocol.created_at,
+                assignment=load_pilot_assignment(),
+                detail="Existing pre-outcome pilot; unscored and cadence-separate",
+            ),
+        ),
+    )
+
+
+def advance_campaign_protocol(
+    ledger: CampaignLedgerV1, protocol: ProspectiveProtocolV1
+) -> CampaignLedgerV1:
+    ledger, protocol = authenticate(ledger), authenticate(protocol)
+    if (
+        protocol.predecessor_protocol_sha256 != ledger.protocol.semantic_sha256
+        or protocol.evaluation_epoch == ledger.protocol.evaluation_epoch
+        or protocol.created_at <= ledger.created_at
+    ):
+        raise StrengthEvidenceError("explicit amendment must advance protocol and epoch")
+    return seal(
+        CampaignLedgerV1,
+        protocol=protocol,
+        protocol_history=(*ledger.protocol_history, ledger.protocol),
+        created_at=protocol.created_at,
+        predecessor_sha256=ledger.semantic_sha256,
+        events=ledger.events,
+    )
 
 
 class CohortPlanV1(SealedEvidence):
@@ -483,6 +596,26 @@ def guard_freeze(
         raise StrengthEvidenceError("cohort plan differs from current authenticated selection")
     if min(plan.scheduled_dates) <= frozen.date():
         raise StrengthEvidenceError("date-only safeguard cannot be weakened")
+
+
+def next_freeze_opportunity(
+    *,
+    ledger: CampaignLedgerV1,
+    schedule: ParsedSnapshot,
+    registry: FixtureRegistry,
+    as_of: datetime,
+) -> CohortPlanV1:
+    """Predict the next window from this vintage; fresh readiness is still required.
+
+    Advance only calendar time, applying the same first-ten rule at each origin.
+    Never remove a still-eligible fixture merely to obtain a later window.
+    """
+    candidate = plan_cohort(ledger=ledger, schedule=schedule, registry=registry, as_of=as_of)
+    while candidate.freeze_window_end < as_of or candidate.status == "COHORT_FREEZE_WINDOW_MISSED":
+        probe = datetime.combine(candidate.assessed_at.date() + timedelta(days=1), time(), UTC)
+        candidate = plan_cohort(ledger=ledger, schedule=schedule, registry=registry, as_of=probe)
+    origin = max(as_of, candidate.target_freeze)
+    return plan_cohort(ledger=ledger, schedule=schedule, registry=registry, as_of=origin)
 
 
 def amend_protocol(

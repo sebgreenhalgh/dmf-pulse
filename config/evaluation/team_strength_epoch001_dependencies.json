@@ -1,0 +1,53 @@
+{
+  "accepted_parent": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "files": [
+    [
+      "src/dmf_pulse/evaluation/calibration.py",
+      "72a6313be434de31b30609c0a1cb2ae4304336ad4e2de1430d0a0a5bffb31632"
+    ],
+    [
+      "src/dmf_pulse/evaluation/team_strength_mixture_analysis.py",
+      "83f726012a04cc1b5129db988654c32bc42143667ce371bdcca2482b703d2ed4"
+    ],
+    [
+      "src/dmf_pulse/football_events/_decimal.py",
+      "7a2debd3e32c5dd99d63a340c1553d86443f471b0d53f40d00113e66d7d7153b"
+    ],
+    [
+      "src/dmf_pulse/football_events/poisson.py",
+      "a96de8afe0b05d05eb1cfa6d68ba0791e540e50cc862a308f7fd4229873e0dac"
+    ],
+    [
+      "src/dmf_pulse/football_events/score_prior_request.py",
+      "6b1a3a8fb90c7a1fa34cf85498362ab306ee296f66390df9b32c7d23ebbcc9b5"
+    ],
+    [
+      "src/dmf_pulse/football_events/team_strength_adapter.py",
+      "0833d4d21ebdd1b16b506ae614253d0671f8b95fced43769e6cfcf7d1ba6bc06"
+    ],
+    [
+      "src/dmf_pulse/football_events/team_strength_mixture.py",
+      "5a492d3fdc7aaee74e935af17cd45d316342231f2ee8505782e5a0af6472e095"
+    ],
+    [
+      "src/dmf_pulse/ingestion/openfootball/config.py",
+      "3ff24690b3d27a5f4e67deaf9ac867ca1181be2f9c8b18622addcaa4dab1ce5e"
+    ],
+    [
+      "src/dmf_pulse/ingestion/openfootball/parser.py",
+      "776dba26f023c82e4da70dafd70c78efedef464e99f27121f673d0c655963d7d"
+    ],
+    [
+      "src/dmf_pulse/ingestion/openfootball/service.py",
+      "a2b723970a081d70ab3b9e37a6da85e26241cac5b1d02af8f6622a95bc6e4463"
+    ],
+    [
+      "src/dmf_pulse/ingestion/openfootball/team_strength_data.py",
+      "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0"
+    ],
+    [
+      "src/dmf_pulse/ingestion/openfootball/team_strength_governance.py",
+      "781720eb60e15573ba4f806350cb5a25c8647b08a3d6dab49144ee1ec7c7bc38"
+    ]
+  ]
+}
