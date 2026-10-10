@@ -1,0 +1,48 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "build"
+      ],
+      "completed_at": "2026-10-10T11:22:52.563894+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "package-01.log",
+      "log_sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47",
+      "started_at": "2026-10-10T11:22:44.548679+00:00",
+      "timeout_seconds": 2400
+    },
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "python",
+        "scripts/verify_team_strength_protocol_wheel.py"
+      ],
+      "completed_at": "2026-10-10T11:23:00.450820+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "package-02.log",
+      "log_sha256": "9836cf388933a0a9e13ae4d03802f5f2c905a27ec5a2034135c1c9c19f37e0e4",
+      "started_at": "2026-10-10T11:22:52.565055+00:00",
+      "timeout_seconds": 2400
+    },
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "python",
+        "scripts/verify_team_strength_u_wheel.py"
+      ],
+      "completed_at": "2026-10-10T11:23:53.883865+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "package-03.log",
+      "log_sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0",
+      "started_at": "2026-10-10T11:23:00.451825+00:00",
+      "timeout_seconds": 2400
+    }
+  ],
+  "status": "PASS"
+}

@@ -10,6 +10,7 @@ import typer
 from pydantic import ValidationError
 
 from dmf_pulse.cli.team_strength import team_strength_app
+from dmf_pulse.cli.team_strength_protocol import protocol_app
 from dmf_pulse.football_events.coherence import assert_score_coherence
 from dmf_pulse.football_events.evaluation import evaluate_realized_score
 from dmf_pulse.football_events.service import (
@@ -23,6 +24,7 @@ from dmf_pulse.football_events.service import (
 
 events_app = typer.Typer(help="Build coherent team score and clean-sheet distributions.")
 events_app.add_typer(team_strength_app, name="team-strength")
+team_strength_app.add_typer(protocol_app, name="protocol")
 
 
 def _emit(payload: dict[str, Any]) -> None:

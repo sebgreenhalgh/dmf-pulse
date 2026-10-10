@@ -1,0 +1,129 @@
+{
+  "files": {
+    ".gitattributes": {
+      "bytes": 82,
+      "sha256": "1a75832cee6adce8b9f93db041b215464b4527f696339d3455fbb4f9c08a67bc"
+    },
+    "COMMANDS-FINAL-SURFACE.json": {
+      "bytes": 1786,
+      "sha256": "c7b647ee5a9fd7d30e1d47dc1596001844b1bbfa3437cbbc7640ff32b89f23c8"
+    },
+    "COMMANDS-PACKAGE.json": {
+      "bytes": 1849,
+      "sha256": "2940663c2976a55b01f6a67709b1c81955b60596e1d365a5090c9f9ec3adaee3"
+    },
+    "COMMANDS-QUALITY-FIRST-ATTEMPT.json": {
+      "bytes": 728,
+      "sha256": "7de29c1b2f99291ab076a8d7d9124e95b7f9708e219fd612172b9341080a92ce"
+    },
+    "COMMANDS-QUALITY.json": {
+      "bytes": 3558,
+      "sha256": "181bfe1da3d75a29b85d4e9ce793aeeff02c63c4fec4e1c6be99361a0fb3cae3"
+    },
+    "COMMANDS-REPOSITORY.json": {
+      "bytes": 3149,
+      "sha256": "fe0bc11134dbba3b8f4230c0d1f08dc6c258558c5271e8c2465cccf10f0bec5b"
+    },
+    "COMMANDS-SUPPLEMENTAL.json": {
+      "bytes": 1532,
+      "sha256": "fad4b4e5c99fd9953c7b064487768712ab09a21c074b9f2399537f4e7dd0d86e"
+    },
+    "INDEPENDENT-REVIEW.json": {
+      "bytes": 13367,
+      "sha256": "cf8ade84853ecd0a22e8afa64eba9acd72445fde2884dd13060542163ec1dba4"
+    },
+    "P01-PRESERVATION.json": {
+      "bytes": 674,
+      "sha256": "c22602f882a6077055abb0a91ce7da910787dfec6aa7d892f481265a1dc02175"
+    },
+    "PROTOCOL-FINAL.log": {
+      "bytes": 115,
+      "sha256": "0f218cb6dba60608b7fadf8491219cd98e7c81bd3ade742c1e5450acebd4ac6e"
+    },
+    "SYNTHETIC-CAMPAIGN.log": {
+      "bytes": 112,
+      "sha256": "92fe33b2c9ce9ecd504b8f9adff10666df1808a4bced4c421b9c29d7032bfb08"
+    },
+    "SYNTHETIC-INVALID-ROUND.log": {
+      "bytes": 919,
+      "sha256": "9c355f4a750572c1ba01e7c4e6730851c1e565a513dd1a5e99a832350dbf08d0"
+    },
+    "current_manifest.json": {
+      "bytes": 292890,
+      "sha256": "7951f7bab6bf8817b012bb7a639ae1e2319ca390c8ee3819c50a6e955b2420af"
+    },
+    "final-surface-01.log": {
+      "bytes": 28,
+      "sha256": "2ad544c1ce286313e9403ecdabd5d5a5cc4739d8daad783def81a0d5e68e315d"
+    },
+    "final-surface-02.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "final-surface-03.log": {
+      "bytes": 45,
+      "sha256": "33598114891631b44a9dbd8c9711a90cb2e51f9c2d9eb3e68471bfdb25934f2c"
+    },
+    "package-01.log": {
+      "bytes": 505,
+      "sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47"
+    },
+    "package-02.log": {
+      "bytes": 213,
+      "sha256": "9836cf388933a0a9e13ae4d03802f5f2c905a27ec5a2034135c1c9c19f37e0e4"
+    },
+    "package-03.log": {
+      "bytes": 246,
+      "sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0"
+    },
+    "quality-01.log": {
+      "bytes": 27,
+      "sha256": "49a15645bad588ecf360c1e82cdd71f6f55826e75288d9a56a44bc3fa392e7da"
+    },
+    "quality-02.log": {
+      "bytes": 28,
+      "sha256": "1862fe07d93b3ef2d4128ef33d5986e1a9228b9497e5b76343c88ecbe0f4a0fb"
+    },
+    "quality-03.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "quality-04-launcher-blocked.log": {
+      "bytes": 113,
+      "sha256": "1751e90ffe780f82de87dfdeb46e49d4a43bba44e469501668bc7aecffb1b9e6"
+    },
+    "quality-04.log": {
+      "bytes": 45,
+      "sha256": "33598114891631b44a9dbd8c9711a90cb2e51f9c2d9eb3e68471bfdb25934f2c"
+    },
+    "quality-05.log": {
+      "bytes": 4576,
+      "sha256": "8efc07cf12cfe639f70daea06d9c5b8a2e0a31a1845ce90a1ffb09691b843eed"
+    },
+    "repository-01.log": {
+      "bytes": 67,
+      "sha256": "184e9dac0cde94e25879387b2e35386f1b1de2ac3d1f6e8dc015426b62f46e5d"
+    },
+    "repository-02.log": {
+      "bytes": 95,
+      "sha256": "5ea3b5f34a143fd105ceb45d5ef29b397a44d0b4ac74ddc7880a05a925d3ef80"
+    },
+    "repository-03.log": {
+      "bytes": 59,
+      "sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+    },
+    "repository-04.log": {
+      "bytes": 63,
+      "sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+    },
+    "repository-05.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "repository_validation_report.json": {
+      "bytes": 59,
+      "sha256": "5121d83305442ff95da3024afcb4738bdee6b2528746584e63e7210e567139a8"
+    }
+  },
+  "status": "PASS"
+}

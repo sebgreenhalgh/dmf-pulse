@@ -1,0 +1,125 @@
+{
+  "ticket": "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+  "reviewer": "/root/protocol_independent_review",
+  "review_date": "2026-10-10",
+  "accepted_parent": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "checkpoint_head_before_final_commit": "17aadda0a7015b533db006fa83015ad102727e2a",
+  "reviewed_deliverable_manifest": "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-PROTOCOL/current_manifest.json",
+  "reviewed_deliverable_manifest_bytes_sha256": "7951f7bab6bf8817b012bb7a639ae1e2319ca390c8ee3819c50a6e955b2420af",
+  "preceding_reviewed_manifest_bytes_sha256": "74e75a076bdcff38e5f77dae13cb429c6b6a472c209e4781ab362b7a05e80ab9",
+  "final_support_script_recheck": "Reviewed the final acceptance-runner RUNNING/PASS state handling and review-builder phase-count/supplemental-log validation. They preserve honest incomplete-run reporting and exact evidence hashes. No production, configuration, test or CI changes accompanied this snapshot refresh.",
+  "manifest_files_independently_verified": 1604,
+  "manifest_mismatches": [],
+  "command_log_hash_mismatches": [],
+  "review_scope": "Protocol worktree source, configuration, authority, tests, CI delta and retained local evidence. Actual P01 forecast bytes remain outside reviewer access; preservation is supported by retained before/after hash evidence and the independently pinned pilot metadata.",
+  "independent_test_run": {
+    "command": ".venv/Scripts/python.exe -B -m pytest tests/unit/evaluation/test_team_strength_protocol.py tests/unit/evaluation/test_team_strength_campaign.py -p no:cacheprovider --basetemp=review_pack/independent_review_tmp_20261010a -k 'not paired_scores and not authenticated_score and not deterministic_order and not next_window and not plan_cli' -q --tb=short",
+    "passed": 41,
+    "deselected": 5,
+    "exit_code": 0,
+    "seconds": 3.50,
+    "initial_setup_attempt": "Default system pytest temporary directory was inaccessible with WinError 5; no tests executed. A fresh ignored temporary directory inside the worktree resolved the setup failure."
+  },
+  "retained_validation": {
+    "focused_regressions": "797 passed; COMMANDS-QUALITY.json and quality-05.log hashes independently verified",
+    "final_protocol_tests": "25 passed; COMMANDS-SUPPLEMENTAL.json and PROTOCOL-FINAL.log hashes independently verified",
+    "synthetic_end_to_end": "1 passed in 886.53 seconds; 50 disjoint synthetic fixtures and five completed standard cohorts using unchanged fitting, exact 2048-draw policy, forecasting, scorer, registration replay and full report assembly; SYNTHETIC-CAMPAIGN.log hash independently verified",
+    "packaging": "Build, clean external installed protocol wheel commands and inherited U wheel verifier passed; COMMANDS-PACKAGE.json log hashes independently verified",
+    "repository_and_security": "Repository validation, secret scan and git diff --check passed; COMMANDS-REPOSITORY.json log hashes independently verified",
+    "quality": "Frozen sync, Ruff formatting, Ruff lint and mypy passed",
+    "full_branch_coverage_and_exact_sha_ci": "Remain mandatory publication gates to be bound to the final committed SHA; this review does not claim an unrun final commit has passed CI."
+  },
+  "resolved_findings": [
+    {
+      "id": "REV-01",
+      "severity": "P1",
+      "problem": "Self-consistent rehashed score metrics or scoring timestamps could bypass the accepted scorer.",
+      "resolution": "Registration and campaign reporting require the independently assigned forecast hash, bound outcome snapshot, authenticated assignment identities and exact deterministic replay through unchanged FULL_TIME/D+2 scoring.",
+      "locator": "src/dmf_pulse/evaluation/team_strength_campaign.py:verify_score_evidence"
+    },
+    {
+      "id": "REV-02",
+      "severity": "P1",
+      "problem": "A rehashed ledger could truncate history or establish another genesis.",
+      "resolution": "Pinned P01 metadata defines one deterministic initial ledger. Retention and loading verify every immutable predecessor edge back to that root, with exact append prefixes and externally supplied expected ledger identity.",
+      "locator": "src/dmf_pulse/evaluation/team_strength_protocol_store.py:load_campaign"
+    },
+    {
+      "id": "REV-03",
+      "severity": "P1",
+      "problem": "Protocol and accepted methodology identities were only self-derived.",
+      "resolution": "The initial protocol and supplemental accepted dependency manifest are independently pinned. Runtime file bytes are checked against the accepted manifest, including scoring, calibration, numerical, source and baseline dependencies. A negative dependency-byte test proves fail-closed rejection.",
+      "locator": "src/dmf_pulse/evaluation/team_strength_protocol.py:load_protocol"
+    },
+    {
+      "id": "REV-04",
+      "severity": "P1",
+      "problem": "Valid-looking historical freeze timestamps could be registered after the execution window.",
+      "resolution": "Both the registration helper and intrinsic FROZEN event validator enforce the standard cohort registration window. The late-registration attack is rejected through both paths.",
+      "locator": "src/dmf_pulse/evaluation/team_strength_protocol.py:CohortEvent.check_event"
+    },
+    {
+      "id": "REV-05",
+      "severity": "material P2",
+      "problem": "Pilot or historical epoch counts could prevent ten compatible standard cohorts from reaching their own review.",
+      "resolution": "Checkpoint counts use completed standard P02+ cohorts in the active evaluation epoch. Pilot and previous epochs remain separate retained populations; an amendment restarts the review count.",
+      "locator": "src/dmf_pulse/evaluation/team_strength_campaign_report.py:review_checkpoint_count"
+    },
+    {
+      "id": "REV-06",
+      "severity": "P1",
+      "problem": "Offline planning inputs lacked independent expected schedule and registry hashes.",
+      "resolution": "The planning CLI requires explicit expected schedule and fixture registry identities and authenticates both before selection. The next-ticket contract requires governed immutable inputs and fresh readiness reassessment.",
+      "locator": "src/dmf_pulse/cli/team_strength_protocol.py:plan"
+    },
+    {
+      "id": "REV-07",
+      "severity": "material P2",
+      "problem": "Promoted subgroup labels could be changed without changing an authentic forecast identity.",
+      "resolution": "Score evidence verification rederives promoted fixture IDs from authenticated model entrant classifications and compares them with ledger assignment metadata.",
+      "locator": "src/dmf_pulse/evaluation/team_strength_campaign.py:_promoted_fixture_ids"
+    },
+    {
+      "id": "REV-08",
+      "severity": "material P2",
+      "problem": "Successful full campaign registration and report assembly had no end-to-end verification.",
+      "resolution": "A passing synthetic five-cohort test exercises the unchanged numerical implementation through complete registration, ancestry retention, replay and all report levels. It checks independently calculated paired means, exploratory secondary proper scores, subgroup/date-move evidence and explicit insufficient intervals.",
+      "locator": "tests/unit/evaluation/test_team_strength_campaign_end_to_end.py:test_successful_five_cohort_campaign_retains_all_scores_and_reports"
+    }
+  ],
+  "required_questions": [
+    {"number": 1, "question": "Was the protocol frozen before P01 was scored?", "answer": "Yes. The pinned pre-result protocol was created on 2026-10-10; retained preservation evidence states P01 remains unscored and its outcomes were not inspected."},
+    {"number": 2, "question": "Was P01 preserved unchanged?", "answer": "Yes. Retained before/after byte hashes are both e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee. Forecast semantic identity remains 96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a, and pinned pilot metadata is unchanged."},
+    {"number": 3, "question": "Does the protocol apply from P02 onward?", "answer": "Yes. effective_from_cohort is fixed to P02. Existing P01 remains the separate pilot with its original long-lead classification."},
+    {"number": 4, "question": "Is cohort selection deterministic?", "answer": "Yes. Authenticated future unassigned NO_SCORE fixtures with no outcome are ordered by date then canonical ID, selecting the first ten or the eligible season-end remainder."},
+    {"number": 5, "question": "Can a fixture appear in more than one cohort?", "answer": "No. Canonical fixture assignments are permanent across the campaign and epochs; duplicate assignment is rejected and immutable ancestry preserves the original assignment."},
+    {"number": 6, "question": "Is freeze timing predeclared?", "answer": "Yes. The target is 12:00 UTC two calendar days before the earliest selected date, with an inclusive six-hour execution window ending at 18:00 UTC."},
+    {"number": 7, "question": "Does a missed freeze fail closed without backdating?", "answer": "Yes. Forecast origin, frozen time and registration time must satisfy the window and date-only safeguards. Misses are terminal retained events that consume their cohort ID; future opportunities are recomputed without backdating."},
+    {"number": 8, "question": "Are post-freeze fixture moves preserved without substitution?", "answer": "Yes. Original IDs and dates remain immutable. Moved dates are reported as outcome diagnostics; scoring follows actual played-date D+2 eligibility and no replacement assignment is allowed."},
+    {"number": 9, "question": "Is exact-score log loss the fixed primary metric?", "answer": "Yes. The primary is the mean paired plug-in minus baseline exact-score log-loss difference, with unchanged accepted scoring support and definitions."},
+    {"number": 10, "question": "Is plug-in versus league baseline the primary comparison?", "answer": "Yes. Both product identities and comparison order are fixed; negative paired differences favor the plug-in shadow."},
+    {"number": 11, "question": "Is the parameter mixture explicitly exploratory and research only?", "answer": "Yes. Mixture minus plug-in proper-score differences are exploratory, the mixture remains RESEARCH_ONLY, and no operational draw count is selected."},
+    {"number": 12, "question": "Are metrics and subgroups predeclared?", "answer": "Yes. Fixed secondary proper scores and goal biases, lead-time classes, authenticated promoted-team involvement and post-freeze date moves are registered before prospective outcomes."},
+    {"number": 13, "question": "Is result-driven tuning prohibited within the same epoch?", "answer": "Yes. Fixed schema definitions, the pinned protocol and accepted runtime byte guards prevent silent same-epoch methodology or evaluation changes. Normal time-safe refits remain within the fixed accepted method."},
+    {"number": 14, "question": "Does a methodology change require a new epoch?", "answer": "Yes. The amendment contract requires an explicit ticket, new protocol version, new evaluation epoch and predecessor linkage. Historical evidence remains retained and confirmatory populations remain separate."},
+    {"number": 15, "question": "Are operational failures retained?", "answer": "Yes. Missed windows and source, model, schedule or scoring blockers are explicit immutable ledger states; failed freeze identities cannot be reused."},
+    {"number": 16, "question": "Is uncertainty cohort aware?", "answer": "Yes. The fixed deterministic bootstrap resamples whole paired cohorts 4,096 times and retains partial-cohort fixture weights. Fewer than ten compatible completed cohorts reports explicit insufficient evidence; intervals remain descriptive."},
+    {"number": 17, "question": "Is P01-only promotion prohibited?", "answer": "Yes. P01 cannot advance standard review counts and remains cadence separate. Promotion still requires all eight accepted evidence categories and a later separate human decision."},
+    {"number": 18, "question": "Is automatic activation impossible in this scope?", "answer": "Yes. Automatic activation and production-active fields are literal false, no activation operation is introduced, and the production path remains outside scope."},
+    {"number": 19, "question": "Is private data absent from the new retained contracts?", "answer": "Yes. New protocol and ledger evidence are public OpenFootball team-only contracts with strict field rejection; no player, manager, FPL, Odds or credential payload is added."},
+    {"number": 20, "question": "Was FPL, Odds or private provider access avoided?", "answer": "Yes. This reviewer performed no provider or credential access and did not inspect P01 outcomes. Retained execution evidence records zero provider requests; installed-wheel verification runs with network denial and actual P01 remains unscored."}
+  ],
+  "unresolved_findings": [],
+  "unresolved_p0": 0,
+  "unresolved_p1": 0,
+  "unresolved_material_p2": 0,
+  "reviewer_real_p01_outcome_access": false,
+  "reviewer_actual_forecast_freezes": 0,
+  "reviewer_actual_campaign_scores": 0,
+  "reviewer_provider_requests": 0,
+  "reviewer_credential_access": false,
+  "production_activation": false,
+  "human_acceptance_or_merge": false,
+  "publication_status": "FINAL_COMMIT_SHA_BINDING_AND_MANDATORY_FULL_CI_PENDING",
+  "verdict": "CLEAR_FOR_CURRENT_TEAM_STRENGTH_001V_P02_PLUS_PROSPECTIVE_CAMPAIGN"
+}

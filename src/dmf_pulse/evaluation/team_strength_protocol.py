@@ -302,6 +302,12 @@ class CohortEvent(FrozenEvidence):
         if self.status in {"FROZEN", "SCORED", "OUTCOME_NOT_YET_ELIGIBLE", "SCORING_BLOCKED"}:
             if self.assignment is None or self.assignment.frozen_at > self.recorded_at:
                 raise ValueError("event requires an already-frozen assignment")
+            if self.status == "FROZEN" and self.cohort_id != "P01":
+                start, end = freeze_window(min(self.assignment.scheduled_dates))
+                if not start <= self.recorded_at <= end:
+                    raise ValueError(
+                        "COHORT_FREEZE_WINDOW_MISSED: retrospective registration forbidden"
+                    )
         elif self.assignment is not None:
             raise ValueError("failed freeze must not reserve fixture assignments")
         if self.status == "SCORED":
@@ -507,6 +513,7 @@ def plan_cohort(
     registry: FixtureRegistry,
     as_of: datetime,
 ) -> CohortPlanV1:
+    """Select from governed immutable captures authenticated independently by the caller."""
     ledger, schedule, registry = (
         authenticate(ledger),
         authenticate(schedule),

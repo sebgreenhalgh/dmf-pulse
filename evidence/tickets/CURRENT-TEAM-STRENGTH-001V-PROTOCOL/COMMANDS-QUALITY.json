@@ -1,0 +1,99 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "sync",
+        "--all-groups",
+        "--frozen"
+      ],
+      "completed_at": "2026-10-10T10:59:32.055284+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "quality-01.log",
+      "log_sha256": "49a15645bad588ecf360c1e82cdd71f6f55826e75288d9a56a44bc3fa392e7da",
+      "started_at": "2026-10-10T10:59:32.012850+00:00",
+      "timeout_seconds": 2400
+    },
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "completed_at": "2026-10-10T10:59:32.214516+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "quality-02.log",
+      "log_sha256": "1862fe07d93b3ef2d4128ef33d5986e1a9228b9497e5b76343c88ecbe0f4a0fb",
+      "started_at": "2026-10-10T10:59:32.056006+00:00",
+      "timeout_seconds": 2400
+    },
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "completed_at": "2026-10-10T10:59:32.379489+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "quality-03.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-10T10:59:32.215418+00:00",
+      "timeout_seconds": 2400
+    },
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "python",
+        "-m",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "completed_at": "2026-10-10T10:59:33.083183+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "quality-04.log",
+      "log_sha256": "33598114891631b44a9dbd8c9711a90cb2e51f9c2d9eb3e68471bfdb25934f2c",
+      "started_at": "2026-10-10T10:59:32.380163+00:00",
+      "timeout_seconds": 2400
+    },
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "python",
+        "-m",
+        "pytest",
+        "tests/unit/evaluation",
+        "tests/unit/football_events",
+        "tests/unit/ingestion/openfootball",
+        "tests/unit/private_v1/test_team_strength_u_closure.py",
+        "tests/unit/cli/test_team_strength_cli.py",
+        "--ignore=tests/unit/evaluation/test_team_strength_campaign_end_to_end.py",
+        "--basetemp=review_pack/pytest-regressions",
+        "-q",
+        "--tb=short"
+      ],
+      "completed_at": "2026-10-10T11:07:59.647246+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "quality-05.log",
+      "log_sha256": "8efc07cf12cfe639f70daea06d9c5b8a2e0a31a1845ce90a1ffb09691b843eed",
+      "started_at": "2026-10-10T10:59:33.083872+00:00",
+      "timeout_seconds": 2400
+    }
+  ],
+  "status": "PASS"
+}

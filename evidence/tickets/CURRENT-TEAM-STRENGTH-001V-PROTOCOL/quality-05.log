@@ -1,0 +1,47 @@
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 27%]
+........................................................................ [ 36%]
+........................................................................ [ 45%]
+........................................................................ [ 54%]
+........................................................................ [ 63%]
+........................................................................ [ 72%]
+........................................................................ [ 81%]
+........................................................................ [ 90%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+============================== warnings summary ===============================
+tests/unit/evaluation/test_team_strength_campaign.py::test_root_cannot_be_rehashed_or_truncated
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\001V-protocol\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `ProspectiveProtocolV1` - serialized value may not be as expected [field_name='protocol', input_value={'semantic_sha256': '93b9...a5fa325e82c0b3385ab15a'}, input_type=dict])
+    PydanticSerializationUnexpectedValue(Expected `CohortEvent` - serialized value may not be as expected [field_name='events', input_value={'cohort_id': 'P01', 'sta...d and cadence-separate'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/unit/evaluation/test_team_strength_campaign.py::test_predecessor_cannot_be_missing_or_history_rewritten
+tests/unit/evaluation/test_team_strength_protocol.py::test_no_overlap_date_move_no_replacement_and_terminal_identity
+tests/unit/evaluation/test_team_strength_protocol.py::test_ledger_store_preserves_predecessor_and_failures
+tests/unit/evaluation/test_team_strength_protocol.py::test_epoch_draw_method_mismatch[epoch]
+tests/unit/evaluation/test_team_strength_protocol.py::test_epoch_draw_method_mismatch[draw]
+tests/unit/evaluation/test_team_strength_protocol.py::test_epoch_draw_method_mismatch[method]
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\001V-protocol\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `ProspectiveProtocolV1` - serialized value may not be as expected [field_name='protocol', input_value={'semantic_sha256': '93b9...a5fa325e82c0b3385ab15a'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/unit/evaluation/test_team_strength_campaign.py: 2 warnings
+tests/unit/evaluation/test_team_strength_protocol.py: 13 warnings
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\001V-protocol\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `InferencePolicy` - serialized value may not be as expected [field_name='inference_policy', input_value={'method': 'PAIRED_WHOLE_...nificance_claim': False}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/unit/evaluation/test_team_strength_campaign.py::test_authenticated_score_replay_rejects_rehashed_metric_and_d_plus_two
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\001V-protocol\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `PromotionEvidenceStatus` - serialized value may not be as expected [field_name='promotion', input_value={'historical_interpretati...STORAGE_NOT_AUTHORIZED'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/unit/evaluation/test_team_strength_protocol.py::test_deterministic_order_ten_and_season_end_partial
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\001V-protocol\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `SourceLineage` - serialized value may not be as expected [field_name='lineage', input_value={'semantic_sha256': '04e6..._snapshot_sha256': None}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+797 passed, 24 warnings in 503.31s (0:08:23)

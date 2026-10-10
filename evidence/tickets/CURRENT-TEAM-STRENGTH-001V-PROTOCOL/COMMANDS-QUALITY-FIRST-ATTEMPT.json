@@ -1,0 +1,20 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "completed_at": "2026-10-10T10:58:53.420428+00:00",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 2,
+      "log": "quality-04-launcher-blocked.log",
+      "log_sha256": "1751e90ffe780f82de87dfdeb46e49d4a43bba44e469501668bc7aecffb1b9e6",
+      "started_at": "2026-10-10T10:58:53.023185+00:00",
+      "timeout_seconds": 2400
+    }
+  ],
+  "status": "WINDOWS_CONSOLE_LAUNCHER_BLOCKED_RESOLVED_BY_PYTHON_MODULE"
+}

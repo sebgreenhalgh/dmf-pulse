@@ -8,18 +8,22 @@ governance: no provider acquisition, credentials, actual scoring, forecast freez
 model changes, live authority, production activation, PR, merge or tag.
 P01's immutable forecast is authenticated read-only and remains a separate pilot.
 
-- [ ] VPROT.01 strict sealed protocol, immutable packaged configuration, authority.
-- [ ] VPROT.02 authenticated append-only cohort ledger, deterministic selection,
+- [x] VPROT.01 strict sealed protocol, immutable packaged configuration, authority.
+- [x] VPROT.02 authenticated append-only cohort ledger, deterministic selection,
   target/window guards, failure states and permanent fixture assignments.
-- [ ] VPROT.03 paired aggregation, predeclared cohort-block inference, calibration
+- [x] VPROT.03 paired aggregation, predeclared cohort-block inference, calibration
   populations, subgroup definitions and administrative interim reviews.
-- [ ] VPROT.04 adversarial tests, offline CLI, installed wheel, quality/manifests,
-  P01 byte proof, fresh independent review, publication and exact-SHA CI.
+- [x] VPROT.04 adversarial tests, offline CLI, installed wheel, quality/manifests,
+  P01 byte proof and independent review preparation.
+
+Publication remains a separate external gate: commit/push the reviewed snapshot,
+require exact-SHA CI and local/remote equality, then retain the final reviewer
+clearance and publication record outside the commit to avoid self-reference.
 
 Inference is fixed before outcomes: 4,096 deterministic cohort-block resamples,
 95% descriptive percentile interval, at least ten complete cohorts per compatible
 epoch/mode/draw-policy/lead-time population. Administrative looks are at five and
-ten scored cohorts; intervals are not repeated-look significance claims. P01 is
+ten scored standard cohorts within the active epoch; intervals are not repeated-look significance claims. P01 is
 reported separately and cannot on its own trigger a promotion decision.
 
 

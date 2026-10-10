@@ -1,0 +1,12 @@
+F
+================================== FAILURES ===================================
+_____ test_successful_five_cohort_campaign_retains_all_scores_and_reports _____
+tests\unit\evaluation\test_team_strength_campaign_end_to_end.py:133: in test_successful_five_cohort_campaign_retains_all_scores_and_reports
+    outcomes = parse_snapshot(
+src\dmf_pulse\ingestion\openfootball\team_strength_data.py:525: in parse_snapshot
+    raise StrengthEvidenceError("source round is invalid")
+E   dmf_pulse.ingestion.openfootball.team_strength_data.StrengthEvidenceError: source round is invalid
+=========================== short test summary info ===========================
+FAILED tests/unit/evaluation/test_team_strength_campaign_end_to_end.py::test_successful_five_cohort_campaign_retains_all_scores_and_reports
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 143.74s (0:02:23)

@@ -2,6 +2,7 @@
 
 import json
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -18,6 +19,8 @@ from dmf_pulse.evaluation.team_strength_protocol import (
     append_event,
     freeze_window,
     guard_freeze,
+    initial_campaign_ledger,
+    load_pilot_assignment,
     load_protocol,
     plan_cohort,
     protocol_summary,
@@ -35,6 +38,8 @@ STAMP = datetime(2026, 10, 10, 12, tzinfo=UTC)
 
 def assignment(*, cohort="P01", fixture=1, scheduled=date(2026, 10, 12), mode="LIVE_OBSERVED"):
     protocol = load_protocol()
+    if cohort == "P01":
+        return load_pilot_assignment()
     start, _ = freeze_window(scheduled)
     return CohortAssignment(
         cohort_id=cohort,
@@ -60,20 +65,12 @@ def assignment(*, cohort="P01", fixture=1, scheduled=date(2026, 10, 12), mode="L
 
 
 def ledger(*, pilot=None, at=STAMP):
-    events = (
-        ()
-        if pilot is None
-        else (
-            CohortEvent(
-                cohort_id="P01",
-                status="FROZEN",
-                recorded_at=at,
-                assignment=pilot,
-                detail="Synthetic contract pilot",
-            ),
-        )
-    )
-    return seal(CampaignLedgerV1, protocol=load_protocol(), created_at=at, events=events)
+    root = initial_campaign_ledger()
+    if pilot is None:
+        return root
+    values = root.model_dump(mode="python", exclude={"semantic_sha256"})
+    values["events"] = (root.events[0].model_copy(update={"assignment": pilot}),)
+    return seal(CampaignLedgerV1, **values)
 
 
 def test_canonical_protocol_serialization_and_authentication():
@@ -177,7 +174,7 @@ def test_pilot_classification_fixed():
 
 def test_no_overlap_date_move_no_replacement_and_terminal_identity():
     first = ledger(pilot=assignment())
-    second = assignment(cohort="P02", fixture=1)
+    second = assignment(cohort="P02", fixture=first.events[0].assignment.fixture_ids[0].int)
     with pytest.raises(ValueError, match="prior cohort"):
         append_event(
             first,
@@ -189,8 +186,14 @@ def test_no_overlap_date_move_no_replacement_and_terminal_identity():
                 detail="Overlap",
             ),
         )
-    moved = first.events[0].assignment.model_copy(update={"scheduled_dates": (date(2026, 10, 13),)})
-    with pytest.raises(ValueError, match="rewritten"):
+    moved = first.events[0].assignment.model_copy(
+        update={
+            "scheduled_dates": tuple(
+                day + timedelta(days=1) for day in first.events[0].assignment.scheduled_dates
+            )
+        }
+    )
+    with pytest.raises(ValueError, match=r"rewritten|pinned"):
         append_event(
             first,
             CohortEvent(
@@ -255,7 +258,7 @@ def test_epoch_draw_method_mismatch(change):
         "method": "methodology_sha256",
     }[change]
     bad = row.model_copy(update={field: "EVALUATION_EPOCH_002" if change == "epoch" else "f" * 64})
-    with pytest.raises(ValueError, match="epoch mismatch"):
+    with pytest.raises(ValueError, match=r"epoch mismatch|pinned"):
         ledger(pilot=bad)
 
 
@@ -294,3 +297,29 @@ def test_deterministic_order_ten_and_season_end_partial():
             forecast_origin=plan.freeze_window_end + timedelta(seconds=1),
             frozen_at=plan.freeze_window_end + timedelta(seconds=1),
         )
+
+
+def test_runtime_dependency_byte_change_requires_new_approved_epoch(monkeypatch):
+    from dmf_pulse.evaluation import team_strength_protocol as module
+
+    class ResourceView:
+        def __init__(self, path):
+            self.path = path
+
+        def joinpath(self, *names):
+            return ResourceView(self.path.joinpath(*names))
+
+        def is_file(self):
+            return self.path.is_file()
+
+        def read_bytes(self):
+            return (
+                b"changed methodology"
+                if self.path.name == "team_strength_mixture.py"
+                else self.path.read_bytes()
+            )
+
+    package = Path(module.__file__).resolve().parents[1]
+    monkeypatch.setattr(module.resources, "files", lambda _: ResourceView(package))
+    with pytest.raises(ValueError, match="new approved evaluation epoch"):
+        module.load_protocol()

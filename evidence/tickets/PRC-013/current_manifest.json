@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 14975,
+      "bytes": 15046,
       "path": ".github/workflows/ci.yml",
-      "sha256": "dbaa100c0facc7a1792a6919648fa71cba81a9eedc1729f94fb3ff65dce5c9d8"
+      "sha256": "ce8ac252cab0cc94bcab37dad563a403d473a0fc605e00dea89f21c75a06ca43"
     },
     {
       "bytes": 1740,
@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 197275,
+      "bytes": 198906,
       "path": "PLANS.md",
-      "sha256": "7403f6683e4c08717523dc6185edaaa1b8d126fd4ac620674796ed158b654e4e"
+      "sha256": "5a1a332f61e0023e17006f75bda0a3f15ccb23d0e2d8cf58dbda9da1256431e1"
     },
     {
       "bytes": 2761,
@@ -234,6 +234,21 @@
       "bytes": 6289,
       "path": "config/evaluation/evaluation.schema.json",
       "sha256": "93ca364b67e1aaa2e16737196741b2f74f7873f587f1f4fcc406d61475e906fa"
+    },
+    {
+      "bytes": 1836,
+      "path": "config/evaluation/team_strength_epoch001_dependencies.json",
+      "sha256": "f342efb2c1ce79a8e5f7b01adc228ade269c5b69e2da8c7ed29e92e7836fd17a"
+    },
+    {
+      "bytes": 1869,
+      "path": "config/evaluation/team_strength_p01_reference.json",
+      "sha256": "d26ca06bda0f01f041dd34c6877e735a6a87c012cbb23ad6f0a9fe4302ae7eb1"
+    },
+    {
+      "bytes": 4668,
+      "path": "config/evaluation/team_strength_prospective_protocol_v1.json",
+      "sha256": "2f18299c878dded604cab5de4fe27bc3afc3a76dafb55fcd2cc67c918e217fa7"
     },
     {
       "bytes": 572,
@@ -2106,9 +2121,9 @@
       "sha256": "43648b7b695716f2471878466345ca255309b20e29524137a6b032f0bb2060a6"
     },
     {
-      "bytes": 3356,
+      "bytes": 3755,
       "path": "pyproject.toml",
-      "sha256": "f187ef92bd5b302456e7f2945a8afa87bd3a01f626432c2501629b4e770bc4a4"
+      "sha256": "2c303762d6836b5432ae485ba6d81ee7ac53726441c927934837aa3155dc6661"
     },
     {
       "bytes": 2059,
@@ -2326,6 +2341,11 @@
       "sha256": "7210790ae588935653ef7dd99535d2a742b4bb29327ac2803b2151fbb76dcfd2"
     },
     {
+      "bytes": 4491,
+      "path": "scripts/build_team_strength_protocol_review.py",
+      "sha256": "849f726867289e67182afe575fc6eee24f667e7c8ed97d8a17c36032b72fcdfe"
+    },
+    {
       "bytes": 3238,
       "path": "scripts/build_team_strength_review_pack.py",
       "sha256": "af586ab06a3e22ff39e576c9e08be9aed35676c2e288116cce2a8cdd9f417346"
@@ -2404,6 +2424,16 @@
       "bytes": 5567,
       "path": "scripts/explore_team_strength_shadow_cases.py",
       "sha256": "98b3ead654685988a99f97d48bb91e43eb24a72dd9456669163e8960cf5810c4"
+    },
+    {
+      "bytes": 2128,
+      "path": "scripts/freeze_team_strength_protocol.py",
+      "sha256": "e951c6ddc821ec5a9241d664bdfbebf6d1f3b1dccfb79b58eee2f7cf33a5a52f"
+    },
+    {
+      "bytes": 1954,
+      "path": "scripts/freeze_team_strength_protocol_dependencies.py",
+      "sha256": "07248164debc3024c5cc16a5c1dd0dc949cc41ee18f9d8181edd16f8a8245fc5"
     },
     {
       "bytes": 5898,
@@ -2531,9 +2561,19 @@
       "sha256": "aaa76ba88d584b11ae171d687287501a5f8f7b8171579eea4f26acc30ec909d8"
     },
     {
+      "bytes": 4164,
+      "path": "scripts/run_team_strength_protocol_acceptance.py",
+      "sha256": "a39a0f855d3115f68e158513553a9c60e17cb37929157eb1d7bbdf091539fdb5"
+    },
+    {
       "bytes": 1061,
       "path": "scripts/scan_secrets.py",
       "sha256": "1645db9a607d26dfd53337f0116bbd640fa6082e41258d8dc389f900145e2da1"
+    },
+    {
+      "bytes": 2600,
+      "path": "scripts/seed_team_strength_pilot_reference.py",
+      "sha256": "c16b75d6c1f8912a3a36caa88ff0dfac24431ad092266aff227b4184456f90d9"
     },
     {
       "bytes": 42766,
@@ -2679,6 +2719,11 @@
       "bytes": 4046,
       "path": "scripts/verify_team_strength_model.py",
       "sha256": "89e2c67ca683728f855b7e8b43e09cca869b286427ab954a332cafdaa180dddf"
+    },
+    {
+      "bytes": 4025,
+      "path": "scripts/verify_team_strength_protocol_wheel.py",
+      "sha256": "bb2d8b260ededc874fa9dea290f0033ea0fb7b1a8615cbd400bff49f9284369b"
     },
     {
       "bytes": 2267,
@@ -3176,9 +3221,9 @@
       "sha256": "89dc89d2774deaab1411c3a9a98f666b1670c48257a9acd9411388aa31c19750"
     },
     {
-      "bytes": 6546,
+      "bytes": 6667,
       "path": "src/dmf_pulse/cli/events.py",
-      "sha256": "eafa2a8b948475f22a7e95a2e178a62de4f80cf5a45f670202da13276546b392"
+      "sha256": "3d6a0e5be3516c9f3a98d1ed2f112973db842bdd0351b97de5a68a734d7deac2"
     },
     {
       "bytes": 1972,
@@ -3254,6 +3299,11 @@
       "bytes": 10137,
       "path": "src/dmf_pulse/cli/team_strength.py",
       "sha256": "2cc3be8bcab4e6e35e1d3bba568006a5f10a473072edc9ebd7f30372dbe4f326"
+    },
+    {
+      "bytes": 3719,
+      "path": "src/dmf_pulse/cli/team_strength_protocol.py",
+      "sha256": "7ba3064590e70f3b110da9a2b677368ba3d6e019cc0e6eb54de169b646aa2dbd"
     },
     {
       "bytes": 662,
@@ -3501,6 +3551,16 @@
       "sha256": "9b3a96448ce9e1c8bd06fd992d084f28d6a1015cb7c9bb2f2c1b639a95c0d6f4"
     },
     {
+      "bytes": 8352,
+      "path": "src/dmf_pulse/evaluation/team_strength_campaign.py",
+      "sha256": "7a02023f52cf1378fdc6e925ce88a918fe82735b6b2f601ada9d359d7e13727b"
+    },
+    {
+      "bytes": 17265,
+      "path": "src/dmf_pulse/evaluation/team_strength_campaign_report.py",
+      "sha256": "1277151a419da12a98922ebf315c8c2b2dc0aff58eefd329c3bea830e73541e5"
+    },
+    {
       "bytes": 4487,
       "path": "src/dmf_pulse/evaluation/team_strength_mixture_analysis.py",
       "sha256": "83f726012a04cc1b5129db988654c32bc42143667ce371bdcca2482b703d2ed4"
@@ -3514,6 +3574,16 @@
       "bytes": 2529,
       "path": "src/dmf_pulse/evaluation/team_strength_prospective_store.py",
       "sha256": "e7d6d1f9b9b9ecb984217e4ff490e37c2880311c5f37a255795d319491292ed2"
+    },
+    {
+      "bytes": 28264,
+      "path": "src/dmf_pulse/evaluation/team_strength_protocol.py",
+      "sha256": "b8960c33f6c664718ab543bbe11a8f674ccecdfb9b9158722bdd64eb34454f3f"
+    },
+    {
+      "bytes": 5110,
+      "path": "src/dmf_pulse/evaluation/team_strength_protocol_store.py",
+      "sha256": "72cb9e5ff8c056303751e96e4ea8b40dc07112a4847215f5d3c38b1b83497328"
     },
     {
       "bytes": 19079,
@@ -5921,6 +5991,16 @@
       "sha256": "b4a09235e5a8af67d9d3f5a1d5b8e3ad4af223a128af41d2c9ae2f462958e74a"
     },
     {
+      "bytes": 17686,
+      "path": "tests/unit/evaluation/test_team_strength_campaign.py",
+      "sha256": "3a8b49b15fae62afadebbc9b676a14458ac0074a87925faaa2333c74e4749daf"
+    },
+    {
+      "bytes": 8040,
+      "path": "tests/unit/evaluation/test_team_strength_campaign_end_to_end.py",
+      "sha256": "104da41f4d91cd54e2b510948532ec42160b9a88133b37f29b02fbecf5466c90"
+    },
+    {
       "bytes": 1410,
       "path": "tests/unit/evaluation/test_team_strength_mixture_analysis.py",
       "sha256": "044d52fe669a5c516210a2fb131412c004a3085f9cf070b058aae8ae088de8bb"
@@ -5929,6 +6009,11 @@
       "bytes": 18192,
       "path": "tests/unit/evaluation/test_team_strength_prospective.py",
       "sha256": "a79b0e28f3e53b675aabedc0dc4cd6348fe167c4fae953d9ebae92488f4f515f"
+    },
+    {
+      "bytes": 12050,
+      "path": "tests/unit/evaluation/test_team_strength_protocol.py",
+      "sha256": "332d13e0c00a6f04a0e99f8a9b3ea8faaeafd4ef3cad976b07b96712843e8ba3"
     },
     {
       "bytes": 6517,
@@ -7404,6 +7489,21 @@
       "bytes": 881,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001U/ticket.yaml",
       "sha256": "689531b061d54b68ea5372de238618a97631cedb1859b522095f7ab3be8f615b"
+    },
+    {
+      "bytes": 3570,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-PROTOCOL/P02-FREEZE-TICKET.md",
+      "sha256": "723767881f0e5fdbe91e7b0609128c544f4f3e0e2cbb8d5f0ad2f62961912559"
+    },
+    {
+      "bytes": 5062,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-PROTOCOL/PROTOCOL.md",
+      "sha256": "c338576c1ff4e89755e3eb96203e24dceaa20851191c27de29e835b3329aa5e2"
+    },
+    {
+      "bytes": 739,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-PROTOCOL/ticket.yaml",
+      "sha256": "616721b9e7489ae3dfdda79f26de6ed29c1495047f31f0b75973deeaecdc88c5"
     },
     {
       "bytes": 3923,

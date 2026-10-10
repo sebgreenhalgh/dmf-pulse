@@ -1,0 +1,2 @@
+error: Failed to spawn: `mypy`
+  Caused by: An Application Control policy has blocked this file. (os error 4551)

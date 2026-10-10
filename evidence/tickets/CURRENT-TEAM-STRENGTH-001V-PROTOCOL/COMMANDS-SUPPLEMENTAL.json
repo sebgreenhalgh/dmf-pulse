@@ -1,0 +1,47 @@
+{
+  "actual_campaign_cohorts_scored": 0,
+  "commands": [
+    {
+      "argv": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/evaluation/test_team_strength_protocol.py",
+        "-q",
+        "--basetemp",
+        "review_pack/pytest-final-protocol",
+        "--disable-warnings",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "PROTOCOL-FINAL.log",
+      "log_normalization": "PowerShell UTF-16LE redirected text converted to UTF-8 without changing content",
+      "log_sha256": "0f218cb6dba60608b7fadf8491219cd98e7c81bd3ade742c1e5450acebd4ac6e",
+      "tests_passed": 25
+    },
+    {
+      "argv": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/evaluation/test_team_strength_campaign_end_to_end.py",
+        "-q",
+        "-x",
+        "--tb=short",
+        "--basetemp",
+        "review_pack/pytest-campaign-full",
+        "--disable-warnings"
+      ],
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-protocol",
+      "exit_code": 0,
+      "log": "SYNTHETIC-CAMPAIGN.log",
+      "log_normalization": "PowerShell UTF-16LE redirected text converted to UTF-8 without changing content",
+      "log_sha256": "92fe33b2c9ce9ecd504b8f9adff10666df1808a4bced4c421b9c29d7032bfb08",
+      "tests_passed": 1
+    }
+  ],
+  "status": "PASS",
+  "synthetic_only": true
+}

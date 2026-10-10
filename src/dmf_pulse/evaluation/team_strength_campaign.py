@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from uuid import UUID
 
 from dmf_pulse.evaluation.team_strength_prospective import (
     PublicProspectiveScoreV1,
@@ -26,6 +27,18 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import (
     StrengthEvidenceError,
     authenticate,
 )
+
+
+def _promoted_fixture_ids(forecast: PublicTeamStrengthForecastV1) -> tuple[UUID, ...]:
+    return tuple(
+        row.fixture.fixture_id
+        for row in forecast.forecasts
+        if any(
+            effect.is_forecast_entrant
+            and effect.team_id in {row.fixture.home_team_id, row.fixture.away_team_id}
+            for effect in forecast.artifact.model.effects
+        )
+    )
 
 
 def forecast_assignment(
@@ -63,15 +76,7 @@ def forecast_assignment(
         methodology_sha256=protocol.methodology_sha256,
         cohort_class="PROSPECTIVE_PILOT_COHORT" if pilot else "STANDARD_PROSPECTIVE_COHORT",
         lead_time_class="P01_PILOT_LONG_LEAD" if pilot else "P02_PLUS_STANDARD_WINDOW",
-        promoted_team_fixture_ids=tuple(
-            row.fixture.fixture_id
-            for row in forecast.forecasts
-            if any(
-                effect.is_forecast_entrant
-                and effect.team_id in {row.fixture.home_team_id, row.fixture.away_team_id}
-                for effect in forecast.artifact.model.effects
-            )
-        ),
+        promoted_team_fixture_ids=_promoted_fixture_ids(forecast),
     )
 
 
@@ -182,6 +187,7 @@ def verify_score_evidence(
         forecast.fixture_registry.semantic_sha256,
         forecast.draw_set.draw_policy_sha256,
         forecast.dataset_mode,
+        _promoted_fixture_ids(forecast),
     ) != (
         assignment.fixture_ids,
         assignment.scheduled_dates,
@@ -193,6 +199,7 @@ def verify_score_evidence(
         assignment.fixture_registry_sha256,
         assignment.draw_policy_sha256,
         assignment.dataset_mode,
+        assignment.promoted_team_fixture_ids,
     ):
         raise StrengthEvidenceError("score forecast fixture assignment mismatch")
     expected = score_public_team_forecasts(forecast, outcomes=outcomes, as_of=score.scored_at)
