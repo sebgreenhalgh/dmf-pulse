@@ -1,5 +1,28 @@
 # DMF Pulse execution plans
 
+## CURRENT-TEAM-STRENGTH-001V-PROTOCOL
+
+Accepted implementation parent: `3815152e978dd55e1dc1f115055050d4ed6b1735`.
+Work only in the isolated 001V protocol worktree. This is offline pre-result
+governance: no provider acquisition, credentials, actual scoring, forecast freeze,
+model changes, live authority, production activation, PR, merge or tag.
+P01's immutable forecast is authenticated read-only and remains a separate pilot.
+
+- [ ] VPROT.01 strict sealed protocol, immutable packaged configuration, authority.
+- [ ] VPROT.02 authenticated append-only cohort ledger, deterministic selection,
+  target/window guards, failure states and permanent fixture assignments.
+- [ ] VPROT.03 paired aggregation, predeclared cohort-block inference, calibration
+  populations, subgroup definitions and administrative interim reviews.
+- [ ] VPROT.04 adversarial tests, offline CLI, installed wheel, quality/manifests,
+  P01 byte proof, fresh independent review, publication and exact-SHA CI.
+
+Inference is fixed before outcomes: 4,096 deterministic cohort-block resamples,
+95% descriptive percentile interval, at least ten complete cohorts per compatible
+epoch/mode/draw-policy/lead-time population. Administrative looks are at five and
+ten scored cohorts; intervals are not repeated-look significance claims. P01 is
+reported separately and cannot on its own trigger a promotion decision.
+
+
 ## CURRENT-TEAM-STRENGTH-001P-L8 Phase A
 
 - [x] Verify exact D7 parent and isolate a clean L8 worktree.

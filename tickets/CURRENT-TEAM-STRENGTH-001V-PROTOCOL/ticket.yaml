@@ -1,0 +1,18 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001V-PROTOCOL
+status: ACTIVE
+parent: 3815152e978dd55e1dc1f115055050d4ed6b1735
+branch: readiness/CURRENT-TEAM-STRENGTH-001V-prospective-protocol
+authority_scopes: [A3-data-foundation, A8-events, B1-backtesting]
+model_status: SHADOW_NOT_MODEL_INPUT
+production_activation: false
+provider_access: forbidden
+credential_inspection: forbidden
+actual_forecast_freeze: forbidden
+actual_scoring: forbidden
+live_authority: none
+dependencies_added: none
+checkpoints:
+  - VPROT.01 protocol schema and immutable configuration
+  - VPROT.02 ledger, selection, freeze cadence and safeguards
+  - VPROT.03 aggregation, inference and interim review policy
+  - VPROT.04 tests, CLI, independent review and exact-SHA publication

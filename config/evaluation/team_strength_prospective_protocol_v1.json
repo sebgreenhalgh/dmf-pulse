@@ -1,0 +1,116 @@
+{
+  "accepted_code_manifest": [
+    [
+      "config/models/current_team_strength_governance.json",
+      "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3"
+    ],
+    [
+      "src/dmf_pulse/evaluation/team_strength_prospective.py",
+      "969024da204a6382d211f5f70c7877e1714c8fb0bd098a5c1b08bcafc9f96fe1"
+    ],
+    [
+      "src/dmf_pulse/evaluation/team_strength_replay.py",
+      "520f3537c99a482ea1a58f5cdcde52e94db35497b44af57e6047c29e3645822d"
+    ],
+    [
+      "src/dmf_pulse/football_events/team_strength_model.py",
+      "406339d0519eeaffee0fb305c52f2732c356f079d0e1af8f7ef5f8355623f164"
+    ],
+    [
+      "src/dmf_pulse/football_events/team_strength_numerics.py",
+      "cc82edc6c501802207edcf4545a14b704bc54848edf400b67523be0997ad7d36"
+    ],
+    [
+      "src/dmf_pulse/football_events/team_strength_parameter_draws.py",
+      "0bfbe387ebe292c5167ce170a1271011c7ec7904c8fdae0be08a85a6e92421d0"
+    ]
+  ],
+  "accepted_implementation_parent": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "aggregation_policy": "FIXTURE_COHORT_CAMPAIGN_PAIRED_ONLY_SPLIT_EPOCH_MODE_POLICY_LEAD",
+  "amendment_policy": "EXPLICIT_TICKET_NEW_VERSION_NEW_EPOCH_RETAIN_OLD_EVIDENCE",
+  "amendment_ticket": null,
+  "automatic_activation": false,
+  "calibration_policy": "EXISTING_INTERCEPT_SLOPE_RESIDUAL_BRIER_COUNTS_MIN_10_COHORTS",
+  "campaign_id": "CURRENT-TEAM-STRENGTH-001V",
+  "code_sha256": "5b67595af958ab7f40fde45109e7e34615a3dce1b3088c0788a686f7aec8aa39",
+  "cohort_selection_rule": "NEXT_UNASSIGNED_NO_SCORE_EPL_DATE_THEN_CANONICAL_ID",
+  "cohort_size": 10,
+  "created_at": "2026-10-10T10:26:18.407780Z",
+  "data_class": "PUBLIC_OPENFOOTBALL_TEAM_ONLY",
+  "draw_policy_sha256": "444b0b4b8f138bc9188a60e947eb6ff58575c0ceb3f2d825873e9851ddfa49b3",
+  "effective_from_cohort": "P02",
+  "evaluation_epoch": "EVALUATION_EPOCH_001",
+  "exploratory_metrics": "PAIRED_MIXTURE_MINUS_PLUGIN_PROPER_SCORES_RESEARCH_ONLY",
+  "freeze_schedule_rule": "12:00Z_TWO_CALENDAR_DAYS_BEFORE_EARLIEST_DATE",
+  "freeze_window_hours": 6,
+  "inference_policy": {
+    "interval": "DESCRIPTIVE_95_PERCENT_NEAREST_RANK_PERCENTILE",
+    "method": "PAIRED_WHOLE_COHORT_BLOCK_BOOTSTRAP_SHA256_V1",
+    "minimum_complete_cohorts": 10,
+    "repeated_look_significance_claim": false,
+    "resamples": 4096,
+    "seed_domain": "DMF-CTS-001V-PROTOCOL-PRE-RESULT-2026-10-10"
+  },
+  "interim_review_policy": [
+    5,
+    10
+  ],
+  "methodology_sha256": "3d5982ca51d984fa56447dee56eb52250c71ffd2bd4ad3acabfae8ab2688d59f",
+  "missed_freeze_policy": "RETAIN_MISS_CONSUME_COHORT_ID_RECOMPUTE_NO_BACKDATE",
+  "model_policy_sha256": "e8d28521fcb90b625a8dbeff4f72de3b178d16ed7cae748a7429d0e42cdd9fd7",
+  "operational_draw_count_selected": false,
+  "overlap_policy": "ONE_PERMANENT_CANONICAL_FIXTURE_ASSIGNMENT_PER_CAMPAIGN",
+  "p01_forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "parameter_mixture_status": "RESEARCH_ONLY",
+  "predecessor_protocol_sha256": null,
+  "primary_comparison": [
+    "PLUG_IN_TEAM_STRENGTH_SHADOW",
+    "LEAGUE_BASELINE"
+  ],
+  "primary_metric": "MEAN_PAIRED_PLUGIN_MINUS_BASELINE_EXACT_SCORE_LOG_LOSS",
+  "private_provider_policy": "NO_FPL_ODDS_CREDENTIALS_OR_PRIVATE_DATA",
+  "production_activation": false,
+  "production_active": false,
+  "products": [
+    "LEAGUE_BASELINE",
+    "PLUG_IN_TEAM_STRENGTH_SHADOW",
+    "PARAMETER_MIXTURE_TEAM_STRENGTH_SHADOW"
+  ],
+  "promotion_review_policy": "SEPARATE_LATER_HUMAN_DECISION_REQUIRED",
+  "protocol_semantic_sha256": "93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029",
+  "protocol_version": "1.0.0",
+  "required_promotion_evidence": [
+    "PROPER_SCORES",
+    "CALIBRATION",
+    "SUBGROUP_CHECKS",
+    "LEAKAGE_AND_REPRODUCIBILITY",
+    "DOWNSTREAM_DECISIONS",
+    "PROSPECTIVE_OR_LOCKED_HOLDOUT",
+    "OPERATIONAL_VIABILITY",
+    "ROLLBACK"
+  ],
+  "schema_version": "public-team-strength-prospective-protocol-v1",
+  "secondary_metrics": [
+    "team_count_log_loss",
+    "goal_rps",
+    "home_win_brier",
+    "draw_brier",
+    "away_win_brier",
+    "home_clean_sheet_brier",
+    "away_clean_sheet_brier",
+    "total_over_0.5_brier",
+    "total_over_1.5_brier",
+    "total_over_2.5_brier",
+    "total_over_3.5_brier",
+    "total_over_4.5_brier",
+    "total_over_5.5_brier",
+    "home_bias",
+    "away_bias"
+  ],
+  "semantic_sha256": "93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029",
+  "subgroup_registry": [
+    "FORECAST_LEAD_TIME:P01_PILOT_LONG_LEAD,P02_PLUS_STANDARD_WINDOW",
+    "PROMOTED_TEAM_INVOLVEMENT:AUTHENTICATED_IS_FORECAST_ENTRANT_OR_SUBGROUP_NOT_AVAILABLE",
+    "POST_FREEZE_FIXTURE_MOVE:DATE_UNCHANGED,DATE_CHANGED_AFTER_FREEZE"
+  ]
+}
