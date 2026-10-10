@@ -49,7 +49,10 @@ involvement comes solely from `TeamEffect.is_forecast_entrant`, authenticated
 against existing memberships. Date-move subgroups are outcome-timing diagnostics,
 not features or pre-freeze selection inputs. No probability-band subgroup is added.
 
-Administrative interim reviews occur once at five and ten fully scored cohorts,
+Administrative interim reviews occur once at five and ten fully scored standard
+P02+ cohorts within the active evaluation epoch. P01 is retained and reported
+separately; it does not advance the standardized-cadence checkpoint count. Each
+new epoch starts its own checkpoint count, preserving all historical evidence,
 regardless of results. They retain misses/failures, report all predeclared metrics,
 calibration, subgroups, methodology integrity and valid uncertainty. Cohort scoring
 is allowed; cumulative evidence access is restricted to these declared reviews.
