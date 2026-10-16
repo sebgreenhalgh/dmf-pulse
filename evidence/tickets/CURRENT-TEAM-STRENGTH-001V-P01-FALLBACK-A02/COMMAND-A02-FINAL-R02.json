@@ -1,0 +1,20 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "--basetemp",
+    "review_pack/a02-final-suite-r02",
+    "-p",
+    "no:cacheprovider",
+    "-q",
+    "--tb=short"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02",
+  "started_at": "2026-10-16T09:32:00.546110+00:00",
+  "finished_at": "2026-10-16T09:33:09.619566+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-A02-FINAL-R02.log",
+  "output_byte_sha256": "be2b078541b30fa67fe2e600cc4d2b32b2625917d3dc704b1c6db26c98827e3f"
+}

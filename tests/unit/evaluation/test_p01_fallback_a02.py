@@ -30,6 +30,7 @@ from dmf_pulse.evaluation.p01_fallback_context import (
 from dmf_pulse.evaluation.p01_fallback_store import load_fallback, persist_fallback
 from dmf_pulse.evaluation.team_strength_prospective import (
     PublicProspectiveScoreV1,
+    PublicTeamStrengthForecastV1,
     freeze_public_team_forecasts,
     score_public_fixture_labels,
     score_public_team_forecasts,
@@ -487,7 +488,29 @@ def test_t15_legacy_whole_envelope_equals_pre_refactor_oracle():
     assert (
         golden.semantic_sha256 == "17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9"
     )
-    actual = score_public_team_forecasts(frozen(), outcomes=outcome(frozen()), as_of=AT)
+    # Hold the accepted frozen INPUT fixed across platforms. Re-fitting the
+    # synthetic corpus can change binary64 metadata hashes despite identical
+    # stored six-place rates and scoring metrics; it is a different forecast.
+    directory = reference.parent / "a02_legacy_forecast_input"
+    manifest = json.loads((directory / "manifest.json").read_bytes())
+    assert tuple(part["path"] for part in manifest["parts"]) == tuple(
+        f"part-{index:03d}.json.part" for index in range(5)
+    )
+    assert manifest["captured_from_accepted_commit"] == "3815152e978dd55e1dc1f115055050d4ed6b1735"
+    assert (
+        manifest["input_byte_sha256"]
+        == "1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d"
+    )
+    chunks = []
+    for part in manifest["parts"]:
+        data = (directory / part["path"]).read_bytes()
+        assert hashlib.sha256(data).hexdigest() == part["byte_sha256"]
+        chunks.append(data)
+    raw = b"".join(chunks)
+    assert hashlib.sha256(raw).hexdigest() == manifest["input_byte_sha256"]
+    value = PublicTeamStrengthForecastV1.model_validate_json(raw)
+    assert value.semantic_sha256 == golden.forecast_sha256
+    actual = score_public_team_forecasts(value, outcomes=outcome(value), as_of=AT)
     assert actual == golden
 
 

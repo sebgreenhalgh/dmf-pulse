@@ -4856,6 +4856,36 @@
       "sha256": "45109dce357d4a498dd5c73406657d56be119b6a72a82d37fcf71fbc0a5c1b65"
     },
     {
+      "bytes": 1334,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/manifest.json",
+      "sha256": "5cd484bfc597b289b00243fdcf59e22d5e59e23e074688f933e8b88e2d150ed0"
+    },
+    {
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-000.json.part",
+      "sha256": "16153388d701fb6b374a4d4d277d016bb5308fc33e3371bf451027d1058d83f2"
+    },
+    {
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-001.json.part",
+      "sha256": "8a45c12c211cfc4ecef5e2e341ae75fbc8ce63954c0635f3fe282b9ef64cc389"
+    },
+    {
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-002.json.part",
+      "sha256": "e05bd8d8310d26b63f426cacf2f151c5edab132f97b1941740d70d29c5e5a1da"
+    },
+    {
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-003.json.part",
+      "sha256": "8f1ab7b7128caaf6e9df0c28edc2fd2c04d3cf622e4635107767e2912ad22af8"
+    },
+    {
+      "bytes": 3999765,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-004.json.part",
+      "sha256": "1d627e62cca40f3d1825f3493cc5e239dabd54c5fbde5ed357501baf460cdba0"
+    },
+    {
       "bytes": 18982,
       "path": "tests/fixtures/evaluation/a02_legacy_score_oracle.json",
       "sha256": "a2003796ab6bff04a253a75801ed6d472a3d8edfbb1982b40727f39ae2cc008e"
@@ -5971,9 +6001,9 @@
       "sha256": "b1d20cc160cbd668cc1bae57be675b6f1918ea73d5768b89bf558e169c297a71"
     },
     {
-      "bytes": 35204,
+      "bytes": 36400,
       "path": "tests/unit/evaluation/test_p01_fallback_a02.py",
-      "sha256": "7bb00c336a90e03e940335a45af397e505a70dbe7036969334b221fca56c7ace"
+      "sha256": "9a267c7af7af4cc3e2f5529f26026c0557ced74b055d50d285a38f5cf47242f9"
     },
     {
       "bytes": 9125,
@@ -7476,9 +7506,9 @@
       "sha256": "974cc8c0f524ce6228adf3b7c789f93e2f1d0c142d641d572adee63b13c7f6d2"
     },
     {
-      "bytes": 5878,
+      "bytes": 6637,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02/CONTRACT.md",
-      "sha256": "35d65a85a60598a180960fe50132205ead5b26b45fff9bbc6dcbc97223c7f041"
+      "sha256": "038d4f6eb7370fc3ac4d8d6b132e1a9a3a7642787c50d1b92ed071d1da906cb7"
     },
     {
       "bytes": 607,

@@ -1,0 +1,111 @@
+{
+  "assessment": [
+    "T01: Original P01 semantic96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a and bytee3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee authenticated independently. All41 inventoried P01/A01 files remain unchanged. Real forecast typed-view authentication succeeded while every fit/freeze/draw and socket path was patched to raise; zero guarded calls, zero labels and zero real metrics.",
+    "T02: Admission requires exactly the original ten canonical fixture registrations; missing, extra, duplicated or substituted fixtures are rejected before scoring. No partial scoring path exists.",
+    "T03: Mapping uses sealed exact oriented home/away aliases plus competition5996, pl/2026, matchday6 and unique provider match/result IDs. Wrong orientation, club identity collisions, wrong competition/season and date-only matches fail.",
+    "T04: Fixed API routes are metadata /getresulttypes and /getresultinfos/5996, followed by minimal /getmatchdata/pl/2026/6. No alternative publisher or route can be selected after results.",
+    "T05: Finished=true and one unique regulation-time After90Minutes result are required, crosschecked against league/global typed metadata. Half-time, extra-time, penalty, ambiguous, unfinished, abandoned or awarded representations fail closed.",
+    "T06: Actual played date comes from the finished provider matchDateTimeUTC, retained separately from frozen scheduled date. No fallback to schedule date occurs.",
+    "T07: Provider match/result IDs and provider-to-canonical club identities are internally unique and consistent. One invalid or missing row blocks the entire cohort.",
+    "T08: A02 is a legitimate explicit rights-driven single-source successor for descriptive P01 only. Original sealed amendmentae7bf0273623c47dd72f79d067117091c596f13245224acb2ccfadf47ff7ebd3 predates implementation and all actual labels/metrics. Exact reviewed-file hashes, review chronology and exclusive one-attempt marker guard acquisition. No upstream-independence or blocked Premier League gate is reimposed.",
+    "T09: Qualified rights profile canonical SHA31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2 was independently authenticated. It permits automated transient acquisition and derived private/internal evidence; raw bodies, public display, redistribution and model training remain prohibited. Missing or changed rights fail before transport.",
+    "T10: Provider goals and identities use strict integer admission; goals outside0..36, booleans, floats, strings and malformed values are rejected. Shared numerical helper also rejects invalid indices.",
+    "T11: UTC-aware ordered receipt/validation/usable/review times are required. All ten actual dates must satisfy governed D+2 before any metric is computed; before-boundary and moved-date cases are tested.",
+    "T12: Outcome semantic hash covers all retained results, mapping, receipt hashes, rights/context identity and attribution excluding only its own hash. External expected hashes and nested seals authenticate reads and reject tampering.",
+    "T13: Exclusive content-addressed storage uses authenticated types, hardlink publication, collision checks, path containment and no overwrite. Successful persistence immediately authenticates the stored artifact.",
+    "T14: Fallback outcome, score, report and reconciliation envelopes retain PUBLIC_FALLBACK_OUTCOME_SOURCE and full A02 descriptive context. Original OpenFootball lineage is never fabricated.",
+    "T15: The accepted Decimal numerical kernel retains expression/order/context. Independent old-parent oracle reproduction exactly matched17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9; legacy envelope equality and30fixture/product rows with49metric pairs each match across original and fallback synthetic admissions. Operational typed view uses stored distributions without regeneration.",
+    "T16: Immutable operational context6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259 binds original protocol93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029, both A01 records, A02 amendment, original forecast/cohort/registry/origin and exact rights identity. Evaluation epoch003/version1.2.0 does not rewrite original epoch001 forecast evidence.",
+    "T17: All ten fixed fixtures and all three frozen products are retained. No source selection based on performance, refit, tuning, promotion or activation occurs. Mixture2048 remains research-only without operational count selection.",
+    "T18: Future authenticated OpenFootball reconciliation recomputes all ten identities, actual dates and oriented scores from both retained artifacts. FULL_RECONCILIATION or DISAGREEMENT is append-only; rehashed false agreement is rejected. Disputes require human review before promotion-evidence use; original labels/scores are never overwritten.",
+    "T19: Transport admits only three explicit TLS routes, no credentials/proxies/redirect following, bounded bytes/time and no retries or polling. Metadata is validated before the label request. Tests cover forbidden FPL/Odds/PremierLeague/undeclared hosts, review/rights gating, timeout/size/status/type errors, consumed attempts and projection-only retention. No actual provider request was made during review.",
+    "T20: Reviewed final77A02 tests and471focused source/rights/prospective/regression tests pass; Ruff/format, strictmypy327files, frozen sync, build, original and A02 installed-wheel checks, repository validation, secret scan and diff checks pass. All command-log hashes and1600manifest entries independently match. Targeted coverage was collected; full exact-implementation-SHA CI with global coverage threshold remains a mandatory separate gate before any actual acquisition or scoring.",
+    "R02 SUCCESSOR: This review supersedes only the implementation-byte binding of independent review0122745f7497f9ecfaa4cd89cadfcab2fe5d1505493e0237d21ca3c4560eb12d. Original review/assessment remain unchanged; A02 context, rights, scientific policy, numerical runtime, original P01 and all previous resolved findings remain unchanged.",
+    "R02 CI DIAGNOSIS: Independent parsing of retained first Linux failed-shard log confirms all147 synthetic numeric metric pairs are exactly identical. Only platform-regenerated synthetic forecast identity and consequent score envelope hash differ. This was a test-input portability error, not numerical scoring drift or actual P01 evidence.",
+    "R02 FIXED INPUT: Original accepted381 frozen synthetic forecast is retained as five UTF8-valid, fully scanned text parts and manifest. Reviewed test hard-pins full reassembled byteSHA1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d and verifies forecast701cede490dafa51e40e52ed113d3f87d4cf0a7872934fff1a600a265d28c2d8 against unchanged golden. No expected-output regeneration or numerical tolerance was introduced. Independent original381 validator/scorer replay gives exact whole-score17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9.",
+    "R02 VERIFICATION: Independent revised fixed-input test passed1case/9.23s; parent final A02 suite77cases/66.78s, unchanged secret scanner including all input bytes, Ruff/format, strictmypy327files, build, repository validation and diff checks pass. Runtime wheel remains byte-identical71d2c9f11f14c1cd791c31068a21ffaa79b5a89cec81d53cbf006e7e9a8291f6. Full new-commit exact-SHA CI remains mandatory before actual label acquisition/scoring; no actual labels, P01 metrics or private providers accessed."
+  ],
+  "context_sha256": "6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259",
+  "files": [
+    {
+      "byte_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+      "path": "config/evaluation/team_strength_p01_fallback_a02.json"
+    },
+    {
+      "byte_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+      "path": "config/rights/openligadb_p01_fallback.json"
+    },
+    {
+      "byte_sha256": "35df9b296213cd07239b94b506c81d62c5fecfb6e647d128a4a60b4ad6292762",
+      "path": "src/dmf_pulse/evaluation/p01_fallback_context.py"
+    },
+    {
+      "byte_sha256": "ee756a31cb9cde20b02f5a4f967623c25334b2629a86153990dd8c5b29f21a11",
+      "path": "src/dmf_pulse/evaluation/p01_frozen_view.py"
+    },
+    {
+      "byte_sha256": "9bd304ffe2531e9cbdc7473b5efd3d090ad938fbcc37acd8778316fbf7ca002b",
+      "path": "src/dmf_pulse/evaluation/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "5412f4383aa4f23eabb0117a48189975b0495012195846ee819a8944171dcde5",
+      "path": "src/dmf_pulse/evaluation/p01_fallback_store.py"
+    },
+    {
+      "byte_sha256": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5",
+      "path": "src/dmf_pulse/evaluation/team_strength_prospective.py"
+    },
+    {
+      "byte_sha256": "3487332a8c1a43203fb58624fea480d866ef3fe8b905b885792c22eb403f2a2f",
+      "path": "src/dmf_pulse/ingestion/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "bd1a21f4670be6b5d567c52ef0dfca595799e93216a4b75d7f38109ff792880f",
+      "path": "src/dmf_pulse/ingestion/p01_fallback_acquisition.py"
+    },
+    {
+      "byte_sha256": "4c26ea503d7c7a381692c1849f9fd00e4c091c7b8fa4815564d7308456c8f634",
+      "path": "src/dmf_pulse/cli/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "429eb25313fbcb50c86f4c8f6bba9780574369f960f874712a0e6008a196dbeb",
+      "path": "src/dmf_pulse/cli/team_strength.py"
+    },
+    {
+      "byte_sha256": "fcfbc272ae260d29cd85dacf862f0c57b8ecbf43db5f179c8ab1ac5666ead60c",
+      "path": "scripts/run_p01_fallback_a02.py"
+    },
+    {
+      "byte_sha256": "ca7aa252362b6ce1fe747154ff16de59875d3b1b9e71354594957c915f02c9fe",
+      "path": "scripts/verify_p01_fallback_a02_wheel.py"
+    },
+    {
+      "byte_sha256": "9a267c7af7af4cc3e2f5529f26026c0557ced74b055d50d285a38f5cf47242f9",
+      "path": "tests/unit/evaluation/test_p01_fallback_a02.py"
+    },
+    {
+      "byte_sha256": "a2003796ab6bff04a253a75801ed6d472a3d8edfbb1982b40727f39ae2cc008e",
+      "path": "tests/fixtures/evaluation/a02_legacy_score_oracle.json"
+    },
+    {
+      "byte_sha256": "d2c0a5e041553dce0eb988d7eb19dae646997adde0acc06f8c5aa17d007b9652",
+      "path": "pyproject.toml"
+    },
+    {
+      "byte_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "byte_sha256": "038d4f6eb7370fc3ac4d8d6b132e1a9a3a7642787c50d1b92ed071d1da906cb7",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02/CONTRACT.md"
+    }
+  ],
+  "no_live_labels_acquired": true,
+  "no_p01_performance_metrics_inspected": true,
+  "reviewed_at": "2026-10-16T09:35:15.115612Z",
+  "reviewer_identity": "/root/fallback_a02_independent_review",
+  "schema_version": "public-team-strength-p01-a02-independent-review-v1",
+  "semantic_sha256": "a0d30fb0bcbdb216a5352557c4aa9b273cb6007f8989802a9fa489050ed3a866",
+  "unresolved_p0_p1": 0,
+  "verdict": "CLEAR_FOR_P01_OPENLIGADB_DESCRIPTIVE_SCORING"
+}

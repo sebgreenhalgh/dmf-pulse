@@ -1,0 +1,19 @@
+{
+  "cause": "Synthetic fitting metadata differs between Windows and Linux. Fixed original frozen input is required for whole-envelope identity comparisons.",
+  "changed_field": "upstream regenerated synthetic forecast semantic identity (and dependent score identity)",
+  "exact_successor_commit_ci_required_before_acquisition": true,
+  "failed_commit": "04bf0393e011a87ca0d5f85926a8e9b92a889313",
+  "failed_job_log_byte_sha256": "f2556348b956b9280c0db2144042f36bcd710f48bde8216c8e782d6cacef9401",
+  "failed_test": "test_t15_legacy_whole_envelope_equals_pre_refactor_oracle",
+  "fixed_input_byte_sha256": "1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d",
+  "identical_numeric_metric_pairs": 147,
+  "job_id": 116898656836,
+  "job_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/38878171012/job/116898656836",
+  "original_p01_untouched": true,
+  "p01_performance_metrics_inspected": false,
+  "real_labels_acquired": 0,
+  "remediation": "Load exact original accepted381 frozen synthetic input; preserve exact complete expected17e286... output. No tolerance or runtime change.",
+  "run_id": 38878171012,
+  "schema_version": "a02-ci-portability-remediation-v1",
+  "unchanged_expected_score_sha256": "17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9"
+}

@@ -1,0 +1,237 @@
+{
+  "assessment": [
+    "R02 SUCCESSOR: This review supersedes only the implementation-byte binding of independent review0122745f7497f9ecfaa4cd89cadfcab2fe5d1505493e0237d21ca3c4560eb12d. Original review/assessment remain unchanged; A02 context, rights, scientific policy, numerical runtime, original P01 and all previous resolved findings remain unchanged.",
+    "R02 CI DIAGNOSIS: Independent parsing of retained first Linux failed-shard log confirms all147 synthetic numeric metric pairs are exactly identical. Only platform-regenerated synthetic forecast identity and consequent score envelope hash differ. This was a test-input portability error, not numerical scoring drift or actual P01 evidence.",
+    "R02 FIXED INPUT: Original accepted381 frozen synthetic forecast is retained as five UTF8-valid, fully scanned text parts and manifest. Reviewed test hard-pins full reassembled byteSHA1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d and verifies forecast701cede490dafa51e40e52ed113d3f87d4cf0a7872934fff1a600a265d28c2d8 against unchanged golden. No expected-output regeneration or numerical tolerance was introduced. Independent original381 validator/scorer replay gives exact whole-score17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9.",
+    "R02 VERIFICATION: Independent revised fixed-input test passed1case/9.23s; parent final A02 suite77cases/66.78s, unchanged secret scanner including all input bytes, Ruff/format, strictmypy327files, build, repository validation and diff checks pass. Runtime wheel remains byte-identical71d2c9f11f14c1cd791c31068a21ffaa79b5a89cec81d53cbf006e7e9a8291f6. Full new-commit exact-SHA CI remains mandatory before actual label acquisition/scoring; no actual labels, P01 metrics or private providers accessed."
+  ],
+  "changed_reviewed_paths": [
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02/CONTRACT.md"
+  ],
+  "command_records": [
+    {
+      "byte_sha256": "88100f55b8af483a640d191230593ee76fa442971fa7d0abbb5ead1401587b28",
+      "exit_code": 0,
+      "output_byte_sha256": "be2b078541b30fa67fe2e600cc4d2b32b2625917d3dc704b1c6db26c98827e3f",
+      "record": "COMMAND-A02-FINAL-R02.json"
+    },
+    {
+      "byte_sha256": "affbd8d27c50e83e6ad0a2b5d95b18d65ef65648ac2c0e9f836239ae15f8e836",
+      "exit_code": 0,
+      "output_byte_sha256": "93f6f7cc6402cdcfde84381b06f106c4e7dbeda7f2eb334cfc6cd10d4ad8ff0c",
+      "record": "COMMAND-A02-FINAL.json"
+    },
+    {
+      "byte_sha256": "cb5575391e4e1b622bd5c7f28bb0099f460b3219c5bc842258a55408a43fbc4e",
+      "exit_code": 0,
+      "output_byte_sha256": "c69ac79883765b2f676d49a6d41f0f18fde49538371d2a2d5a88ed493385f3e9",
+      "record": "COMMAND-A02-WHEEL.json"
+    },
+    {
+      "byte_sha256": "3ed4dbc4358e9261b1bcadc45938bd386c9db8d77d94502861b48dbeb4a1cae7",
+      "exit_code": 0,
+      "output_byte_sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47",
+      "record": "COMMAND-BUILD-R02.json"
+    },
+    {
+      "byte_sha256": "a46e33d9d0f77039f756ba72964e3cd2609623759176aceb60078940c1f2553f",
+      "exit_code": 0,
+      "output_byte_sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47",
+      "record": "COMMAND-BUILD.json"
+    },
+    {
+      "byte_sha256": "0890ea7f2921b52bc4f09ae85396354daacc42c3f097c6a2ea4c2ee7a404902d",
+      "exit_code": 0,
+      "output_byte_sha256": "9a2eaeeefb21b4ddafb80dc1d7c6594a0c4c59733bdaaa8978c50d4da65bdff5",
+      "record": "COMMAND-CLI-REGRESSION.json"
+    },
+    {
+      "byte_sha256": "0f5168d634d27b822a0541b00dca50690728f3f4e55c514f164eed3008167711",
+      "exit_code": 0,
+      "output_byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "record": "COMMAND-DIFF-R02.json"
+    },
+    {
+      "byte_sha256": "c81c0db6a7e902416515002cab137ebf977fb1b9a7d91a7b7d7b003e05b1145c",
+      "exit_code": 0,
+      "output_byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "record": "COMMAND-DIFF.json"
+    },
+    {
+      "byte_sha256": "9cad9d1eaa07be1b4c652bd4dd90d41b45c50061efb4a1f087029fce44e01426",
+      "exit_code": 0,
+      "output_byte_sha256": "f9867ae91122700387ad49332323637934655fa8416ae0e2e2e4eac176b075fc",
+      "record": "COMMAND-FOCUSED.json"
+    },
+    {
+      "byte_sha256": "601e5e2184c43425079984f0c6a5268d2f67a56f2cb0062d4b688290337f3ec2",
+      "exit_code": 0,
+      "output_byte_sha256": "d7fb19af93b4a682d9d16da71ac1700bc6260c1885ec64c6e5e44e76d532b5c0",
+      "record": "COMMAND-FORMAT-R02.json"
+    },
+    {
+      "byte_sha256": "19cb49f43d0bc447a32a781cd908e9bfb5dbf20c029a1d006fbdb960739b630f",
+      "exit_code": 0,
+      "output_byte_sha256": "d7fb19af93b4a682d9d16da71ac1700bc6260c1885ec64c6e5e44e76d532b5c0",
+      "record": "COMMAND-FORMAT.json"
+    },
+    {
+      "byte_sha256": "b411fda413bdb386ee65bac68231e03a3b21cde9673f5c728bec7fd333343b75",
+      "exit_code": 0,
+      "output_byte_sha256": "aa2fd8f53c9e999c0c5980cfec5de97ee187b482d94cb5ff2764b210a451b7d1",
+      "record": "COMMAND-LEGACY-WHEEL.json"
+    },
+    {
+      "byte_sha256": "a643a51e22db677b06921b7d9e6e7554103611cae5dd3d9f0721add3d9e3f3ec",
+      "exit_code": 0,
+      "output_byte_sha256": "98dd0477f592e3dcea4d43cb8643816a1345a160b71d4654a9e6fc2f168d4522",
+      "record": "COMMAND-MYPY-R02.json"
+    },
+    {
+      "byte_sha256": "2d52d9d4bea71e49ade775dc39d322e2c4d9bb408795058827909321891d83d6",
+      "exit_code": 0,
+      "output_byte_sha256": "98dd0477f592e3dcea4d43cb8643816a1345a160b71d4654a9e6fc2f168d4522",
+      "record": "COMMAND-MYPY.json"
+    },
+    {
+      "byte_sha256": "126da27ffeb198550a2c2a43dd4d25c42123b5a8bd94de7dc1de8320aace7d43",
+      "exit_code": 0,
+      "output_byte_sha256": "7f11eb48da797428788623e1a451d0f9d05c58f4c52d6b241fbb40cbcf393684",
+      "record": "COMMAND-NO-GENERATION.json"
+    },
+    {
+      "byte_sha256": "2aa6d444b373c60963676831d0c5ad7d864296e899374e3d01ea0bd13fa0e18f",
+      "exit_code": 0,
+      "output_byte_sha256": "91714c1a87a5bba038841c1be5b4d4b0356a25341fba293c92939ccd60a26308",
+      "record": "COMMAND-ORACLE-PORTABILITY.json"
+    },
+    {
+      "byte_sha256": "1970fef1f2eab35c180b4e69b01ae49b981fa1e2e273c2ec3341bf6cc047a944",
+      "exit_code": 0,
+      "output_byte_sha256": "f891b23e7875b792e62e928bffbf33448fc91d6090fa0bd0c2b2f12353676cb6",
+      "record": "COMMAND-P01-AUTH-BEFORE.json"
+    },
+    {
+      "byte_sha256": "d2e0d2f7bafa806999971eba2c7337773153c925b97a718d4f184041751171af",
+      "exit_code": 0,
+      "output_byte_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+      "record": "COMMAND-REPOSITORY-R02.json"
+    },
+    {
+      "byte_sha256": "c5d8d3bab2cc940cec5cc0eef28a6e9e4d7ea0dac23a7d0fc920bfa0d2ae6970",
+      "exit_code": 0,
+      "output_byte_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+      "record": "COMMAND-REPOSITORY.json"
+    },
+    {
+      "byte_sha256": "00e28d7569e928d0eadba0ed3814493a253592839418a4e4825f92dee2ecedb2",
+      "exit_code": 0,
+      "output_byte_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "record": "COMMAND-RUFF-R02.json"
+    },
+    {
+      "byte_sha256": "bd71ea3f325c58e337b4e43a791d7342eb54407fdbffd8b25af73b445a4d5a71",
+      "exit_code": 0,
+      "output_byte_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "record": "COMMAND-RUFF.json"
+    },
+    {
+      "byte_sha256": "a7bb560f5f1bb2269dba54412f41e7772f09c21f7321a96a93c67aca06a665ab",
+      "exit_code": 0,
+      "output_byte_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+      "record": "COMMAND-SECRETS-R02.json"
+    },
+    {
+      "byte_sha256": "61ca6c9ec85cd85f467272ffc5bba61a39d082245189381b1d15d16d8813027a",
+      "exit_code": 0,
+      "output_byte_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+      "record": "COMMAND-SECRETS.json"
+    },
+    {
+      "byte_sha256": "69043016bfae0e1bf7caae8c345e0955f55abcaede4ac902ab4941882d40da3d",
+      "exit_code": 0,
+      "output_byte_sha256": "c29972c7fae3bc82ddd243b7d9ede76943d9bf11380e15617494a47cfa6928ad",
+      "record": "COMMAND-SYNC.json"
+    }
+  ],
+  "context_or_source_policy_changed": false,
+  "expected_score_oracle_changed": false,
+  "fixed_expected_score_semantic_sha256": "17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9",
+  "fixed_input_byte_sha256": "1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d",
+  "fixed_input_forecast_semantic_sha256": "701cede490dafa51e40e52ed113d3f87d4cf0a7872934fff1a600a265d28c2d8",
+  "fixed_input_parts": [
+    {
+      "byte_sha256": "16153388d701fb6b374a4d4d277d016bb5308fc33e3371bf451027d1058d83f2",
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-000.json.part"
+    },
+    {
+      "byte_sha256": "8a45c12c211cfc4ecef5e2e341ae75fbc8ce63954c0635f3fe282b9ef64cc389",
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-001.json.part"
+    },
+    {
+      "byte_sha256": "e05bd8d8310d26b63f426cacf2f151c5edab132f97b1941740d70d29c5e5a1da",
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-002.json.part"
+    },
+    {
+      "byte_sha256": "8f1ab7b7128caaf6e9df0c28edc2fd2c04d3cf622e4635107767e2912ad22af8",
+      "bytes": 4000000,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-003.json.part"
+    },
+    {
+      "byte_sha256": "1d627e62cca40f3d1825f3493cc5e239dabd54c5fbde5ed357501baf460cdba0",
+      "bytes": 3999765,
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-004.json.part"
+    }
+  ],
+  "independent_failed_ci_log_review": {
+    "all_numeric_pairs_exactly_equal": true,
+    "byte_sha256": "f2556348b956b9280c0db2144042f36bcd710f48bde8216c8e782d6cacef9401",
+    "cause": "Regenerated synthetic fitting metadata changes forecast identity across platforms; scoring metrics are identical.",
+    "compared_metric_pair_count": 147,
+    "path": "review_pack/CI-FAILED-SHARD-14.log"
+  },
+  "independent_original381_fixed_input_replay": {
+    "match": true,
+    "whole_score_semantic_sha256": "17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9"
+  },
+  "independent_revised_test": {
+    "seconds": 9.23,
+    "tests_passed": 1
+  },
+  "input_manifest": {
+    "byte_sha256": "5cd484bfc597b289b00243fdcf59e22d5e59e23e074688f933e8b88e2d150ed0",
+    "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/manifest.json"
+  },
+  "manifest_byte_sha256": "f82c95cc9871ded61453c4e1fe66b83a06b1e120a1d8c6059d7713f6a778acd4",
+  "manifest_file_count": 1606,
+  "manifest_mismatches": 0,
+  "original_artifact_file_count": 41,
+  "original_artifact_mismatches": 0,
+  "pending_execution_gate": "New implementation commit exact-SHA CI must pass all mandatory jobs including global coverage before acquisition/scoring.",
+  "predecessor_retained_unchanged": true,
+  "predecessor_review_byte_sha256": "76e52057acbddc7175afb96681986a091328b9e70bba7b556a03b897a5a433d4",
+  "predecessor_review_semantic_sha256": "0122745f7497f9ecfaa4cd89cadfcab2fe5d1505493e0237d21ca3c4560eb12d",
+  "public_redistribution": false,
+  "review_byte_sha256": "50a9d132f9d464cbca5474577e539710bb60afb7092627f24752930959dab492",
+  "review_semantic_sha256": "a0d30fb0bcbdb216a5352557c4aa9b273cb6007f8989802a9fa489050ed3a866",
+  "reviewed_path_count": 18,
+  "reviewer": "/root/fallback_a02_independent_review",
+  "reviewer_access": {
+    "actual_P01_metrics_inspected": 0,
+    "credential_inspection": 0,
+    "live_labels_acquired": 0,
+    "private_provider_access": 0,
+    "provider_requests": 0
+  },
+  "runtime_source_changed": false,
+  "schema_version": "p01-fallback-a02-independent-review-assessment-v2",
+  "semantic_sha256": "5bcb41555e4af038994ea6daa2d69d65744cb37c53118c1227c6cb1c7b67bda0",
+  "unresolved_material_p2": 0,
+  "unresolved_p0": 0,
+  "unresolved_p1": 0,
+  "verdict": "CLEAR_FOR_P01_OPENLIGADB_DESCRIPTIVE_SCORING"
+}

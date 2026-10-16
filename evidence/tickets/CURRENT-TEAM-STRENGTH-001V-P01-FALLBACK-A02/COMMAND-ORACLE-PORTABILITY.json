@@ -1,0 +1,22 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "-k",
+    "legacy_whole_envelope",
+    "--basetemp",
+    "review_pack/a02-portable-oracle",
+    "-p",
+    "no:cacheprovider",
+    "-q",
+    "--tb=short"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02",
+  "started_at": "2026-10-16T09:30:34.931136+00:00",
+  "finished_at": "2026-10-16T09:30:45.587575+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-ORACLE-PORTABILITY.log",
+  "output_byte_sha256": "91714c1a87a5bba038841c1be5b4d4b0356a25341fba293c92939ccd60a26308"
+}

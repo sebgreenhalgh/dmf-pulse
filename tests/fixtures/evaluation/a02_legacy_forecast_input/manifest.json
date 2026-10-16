@@ -1,0 +1,37 @@
+{
+  "captured_from_accepted_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "dataset_mode": "RECONSTRUCTED",
+  "expected_original_score_sha256": "17e28605dde856abe21bfce41eb613130b394a5f153f0fb4df98bed333528ad9",
+  "fixture_sha256": "701cede490dafa51e40e52ed113d3f87d4cf0a7872934fff1a600a265d28c2d8",
+  "input_byte_sha256": "1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d",
+  "input_bytes": 19999765,
+  "parts": [
+    {
+      "byte_sha256": "16153388d701fb6b374a4d4d277d016bb5308fc33e3371bf451027d1058d83f2",
+      "bytes": 4000000,
+      "path": "part-000.json.part"
+    },
+    {
+      "byte_sha256": "8a45c12c211cfc4ecef5e2e341ae75fbc8ce63954c0635f3fe282b9ef64cc389",
+      "bytes": 4000000,
+      "path": "part-001.json.part"
+    },
+    {
+      "byte_sha256": "e05bd8d8310d26b63f426cacf2f151c5edab132f97b1941740d70d29c5e5a1da",
+      "bytes": 4000000,
+      "path": "part-002.json.part"
+    },
+    {
+      "byte_sha256": "8f1ab7b7128caaf6e9df0c28edc2fd2c04d3cf622e4635107767e2912ad22af8",
+      "bytes": 4000000,
+      "path": "part-003.json.part"
+    },
+    {
+      "byte_sha256": "1d627e62cca40f3d1825f3493cc5e239dabd54c5fbde5ed357501baf460cdba0",
+      "bytes": 3999765,
+      "path": "part-004.json.part"
+    }
+  ],
+  "schema_version": "a02-fixed-synthetic-legacy-input-v1",
+  "synthetic_only": true
+}

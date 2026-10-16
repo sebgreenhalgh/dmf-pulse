@@ -1,0 +1,12 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/validate_repository.py"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02",
+  "started_at": "2026-10-16T09:32:27.525326+00:00",
+  "finished_at": "2026-10-16T09:32:31.459194+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-REPOSITORY-R02.log",
+  "output_byte_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
+}
