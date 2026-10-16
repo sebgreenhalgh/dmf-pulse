@@ -345,6 +345,7 @@ jobs:
           uv run python scripts/verify_odd005_wheel.py
           uv run python scripts/verify_gcs008_wheel.py
           uv run python scripts/verify_team_strength_u_wheel.py
+          uv run python scripts/verify_p01_fallback_a02_wheel.py
           uv run python scripts/verify_team_strength_l1_wheel.py
 
       - name: Validate repository

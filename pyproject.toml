@@ -54,6 +54,8 @@ packages = ["src/dmf_pulse"]
 exclude = ["/review_pack", "/dist", "/.venv"]
 
 [tool.hatch.build.targets.wheel.force-include]
+"config/evaluation/team_strength_p01_fallback_a02.json" = "dmf_pulse/evaluation/resources/evaluation/team_strength_p01_fallback_a02.json"
+"config/rights/openligadb_p01_fallback.json" = "dmf_pulse/evaluation/resources/rights/openligadb_p01_fallback.json"
 "config/providers/fpl.json" = "dmf_pulse/ingestion/resources/fpl.json"
 "config/rights/fpl_profiles.json" = "dmf_pulse/ingestion/resources/fpl_profiles.json"
 "config/providers/the_odds_api.json" = "dmf_pulse/ingestion/resources/the_odds_api.json"

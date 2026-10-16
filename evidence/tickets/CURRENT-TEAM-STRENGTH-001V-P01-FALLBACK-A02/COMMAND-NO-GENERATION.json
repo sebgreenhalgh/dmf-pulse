@@ -1,0 +1,22 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "-k",
+    "no_fit_freeze",
+    "--basetemp",
+    "review_pack/a02-no-generation-final",
+    "-p",
+    "no:cacheprovider",
+    "-q",
+    "--tb=short"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02",
+  "started_at": "2026-10-16T08:58:45.667500+00:00",
+  "finished_at": "2026-10-16T08:59:43.326952+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-NO-GENERATION.log",
+  "output_byte_sha256": "7f11eb48da797428788623e1a451d0f9d05c58f4c52d6b241fbb40cbcf393684"
+}

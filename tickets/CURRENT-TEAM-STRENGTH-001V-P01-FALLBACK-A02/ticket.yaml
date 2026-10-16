@@ -1,0 +1,13 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02
+status: ACTIVE
+parent: 3815152e978dd55e1dc1f115055050d4ed6b1735
+branch: readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-openligadb-only
+authority_scopes: [A3-data-foundation, A8-events, B1-backtesting]
+authorization: explicit user A02 successor amendment
+model_status: SHADOW_NOT_MODEL_INPUT
+production_activation: false
+private_provider_access: forbidden
+premier_league_website_access: forbidden
+raw_provider_body_retention: forbidden
+live_authority: none
+scope: OpenLigaDB-only descriptive P01 outcome admission and unchanged numerical scoring

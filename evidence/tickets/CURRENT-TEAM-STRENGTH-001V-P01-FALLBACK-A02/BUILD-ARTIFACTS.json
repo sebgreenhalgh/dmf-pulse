@@ -1,0 +1,14 @@
+{
+  ".gitignore": {
+    "byte_sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "bytes": 1
+  },
+  "dmf_pulse-0.2.0-py3-none-any.whl": {
+    "byte_sha256": "71d2c9f11f14c1cd791c31068a21ffaa79b5a89cec81d53cbf006e7e9a8291f6",
+    "bytes": 1532273
+  },
+  "dmf_pulse-0.2.0.tar.gz": {
+    "byte_sha256": "026fb8780059c9d410371e8175913bafdf7eaee477834487b6a24016806e2bff",
+    "bytes": 11782303
+  }
+}

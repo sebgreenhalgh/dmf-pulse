@@ -459,6 +459,63 @@ class PublicProspectiveScoreV1(SealedEvidence):
         return self
 
 
+PublicScoreRow = tuple[UUID, PRODUCT, tuple[tuple[str, Number], ...]]
+
+
+def score_public_fixture_labels(
+    prediction: PublicFixtureForecast, *, hg: int, ag: int
+) -> tuple[PublicScoreRow, ...]:
+    """Accepted Decimal kernel, shared after source-specific typed admission."""
+    if type(hg) is not int or type(ag) is not int or min(hg, ag) < 0:
+        raise StrengthEvidenceError("outcome labels require nonnegative strict integers")
+    scores: list[PublicScoreRow] = []
+    if max(hg, ag) > SUPPORT_MAX:
+        raise StrengthEvidenceError("outcome exceeds governed research score support")
+    with localcontext() as context:
+        context.prec = 60
+        for product in prediction.distributions:
+            matrix = forecast_matrix(product)
+            features = distribution_features(matrix)
+            hp = tuple(sum(line, Decimal(0)) for line in matrix)
+            ap = tuple(
+                sum((line[k] for line in matrix), Decimal(0)) for k in range(SUPPORT_MAX + 1)
+            )
+            if matrix[hg][ag] <= 0:
+                raise StrengthEvidenceError("impossible forecast outcome; no probability clipping")
+            metrics = {
+                "exact_score_log_loss": -matrix[hg][ag].ln(),
+                "team_count_log_loss": -(hp[hg].ln() + ap[ag].ln()) / 2,
+                "goal_rps": sum(
+                    (
+                        (sum(pmf[: k + 1], Decimal(0)) - int(k >= observed_goal)) ** 2
+                        for pmf, observed_goal in ((hp, hg), (ap, ag))
+                        for k in range(SUPPORT_MAX)
+                    ),
+                    Decimal(0),
+                )
+                / 2,
+                "home_bias": features["home_expected_goals"] - hg,
+                "away_bias": features["away_expected_goals"] - ag,
+            }
+            for name, actual in (
+                ("home_win", hg > ag),
+                ("draw", hg == ag),
+                ("away_win", hg < ag),
+                ("home_clean_sheet", ag == 0),
+                ("away_clean_sheet", hg == 0),
+                *((f"total_over_{line}.5", hg + ag > line) for line in range(6)),
+            ):
+                probability = features[name]
+                metrics[name + "_probability"] = probability
+                metrics[name + "_outcome"] = Decimal(int(actual))
+                metrics[name + "_brier"] = (probability - int(actual)) ** 2
+                metrics[name + "_calibration_residual"] = probability - int(actual)
+            scores.append(
+                (prediction.fixture.fixture_id, product.product, tuple(sorted(metrics.items())))
+            )
+    return tuple(scores)
+
+
 def score_public_team_forecasts(
     forecast: PublicTeamStrengthForecastV1, *, outcomes: ParsedSnapshot, as_of: datetime
 ) -> PublicProspectiveScoreV1:
@@ -470,7 +527,7 @@ def score_public_team_forecasts(
     if outcomes.fixture_registry_sha256 != forecast.fixture_registry.semantic_sha256:
         raise StrengthEvidenceError("outcome fixture registry differs from frozen forecast")
     observed = {row.fixture.fixture_id: row for row in outcomes.matches}
-    scores = []
+    scores: list[PublicScoreRow] = []
     for prediction in forecast.forecasts:
         row = observed.get(prediction.fixture.fixture_id)
         if (
@@ -490,53 +547,7 @@ def score_public_team_forecasts(
             )
         if outcomes.lineage.received_at.date() < row.source_match_date:
             raise StrengthEvidenceError("outcome source received before played date")
-        hg, ag = row.home_goals, row.away_goals
-        if max(hg, ag) > SUPPORT_MAX:
-            raise StrengthEvidenceError("outcome exceeds governed research score support")
-        with localcontext() as context:
-            context.prec = 60
-            for product in prediction.distributions:
-                matrix = forecast_matrix(product)
-                features = distribution_features(matrix)
-                hp = tuple(sum(line, Decimal(0)) for line in matrix)
-                ap = tuple(
-                    sum((line[k] for line in matrix), Decimal(0)) for k in range(SUPPORT_MAX + 1)
-                )
-                if matrix[hg][ag] <= 0:
-                    raise StrengthEvidenceError(
-                        "impossible forecast outcome; no probability clipping"
-                    )
-                metrics = {
-                    "exact_score_log_loss": -matrix[hg][ag].ln(),
-                    "team_count_log_loss": -(hp[hg].ln() + ap[ag].ln()) / 2,
-                    "goal_rps": sum(
-                        (
-                            (sum(pmf[: k + 1], Decimal(0)) - int(k >= observed_goal)) ** 2
-                            for pmf, observed_goal in ((hp, hg), (ap, ag))
-                            for k in range(SUPPORT_MAX)
-                        ),
-                        Decimal(0),
-                    )
-                    / 2,
-                    "home_bias": features["home_expected_goals"] - hg,
-                    "away_bias": features["away_expected_goals"] - ag,
-                }
-                for name, actual in (
-                    ("home_win", hg > ag),
-                    ("draw", hg == ag),
-                    ("away_win", hg < ag),
-                    ("home_clean_sheet", ag == 0),
-                    ("away_clean_sheet", hg == 0),
-                    *((f"total_over_{line}.5", hg + ag > line) for line in range(6)),
-                ):
-                    probability = features[name]
-                    metrics[name + "_probability"] = probability
-                    metrics[name + "_outcome"] = Decimal(int(actual))
-                    metrics[name + "_brier"] = (probability - int(actual)) ** 2
-                    metrics[name + "_calibration_residual"] = probability - int(actual)
-                scores.append(
-                    (row.fixture.fixture_id, product.product, tuple(sorted(metrics.items())))
-                )
+        scores.extend(score_public_fixture_labels(prediction, hg=row.home_goals, ag=row.away_goals))
     return seal(
         PublicProspectiveScoreV1,
         forecast_sha256=forecast.semantic_sha256,

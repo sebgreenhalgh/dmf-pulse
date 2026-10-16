@@ -1,0 +1,22 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "pytest",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "-k",
+    "public_cli_score_report_reconcile",
+    "--basetemp",
+    "review_pack/a02-cli-release",
+    "-p",
+    "no:cacheprovider",
+    "-q",
+    "--tb=short"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02",
+  "started_at": "2026-10-16T08:50:25.314919+00:00",
+  "finished_at": "2026-10-16T08:50:55.260641+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-CLI-REGRESSION.log",
+  "output_byte_sha256": "9a2eaeeefb21b4ddafb80dc1d7c6594a0c4c59733bdaaa8978c50d4da65bdff5"
+}

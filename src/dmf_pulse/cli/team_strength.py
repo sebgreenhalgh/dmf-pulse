@@ -10,6 +10,7 @@ from typing import Annotated, Any
 
 import typer
 
+from dmf_pulse.cli.p01_fallback import fallback_app
 from dmf_pulse.evaluation.team_strength_prospective import (
     PromotionEvidenceStatus,
     PublicForecastBuildRequestV1,
@@ -31,6 +32,7 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import ParsedSnapshot, 
 team_strength_app = typer.Typer(
     help="Offline reconstructed team-strength research; shadow only, never ordinary recommendations."
 )
+team_strength_app.add_typer(fallback_app, name="p01-fallback")
 
 
 @team_strength_app.command("prospective-freeze")

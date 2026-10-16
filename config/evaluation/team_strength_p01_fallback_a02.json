@@ -1,0 +1,247 @@
+{
+  "a01_amendment_sha256": "e621ebd745958e84f466f4708586df5d3f40bdca35659716650aba6585f79097",
+  "a01_clarification_sha256": "dcde84a06da3f702136e1a6034dc8b147b8d92d4061cdd1fa3fea3e149462ebc",
+  "a02_amendment_sha256": "ae7bf0273623c47dd72f79d067117091c596f13245224acb2ccfadf47ff7ebd3",
+  "allowed_routes": [
+    "https://api.openligadb.de/getresulttypes",
+    "https://api.openligadb.de/getresultinfos/5996",
+    "https://api.openligadb.de/getmatchdata/pl/2026/6"
+  ],
+  "amended_at": "2026-10-16T08:28:22.084100Z",
+  "amendment_id": "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+  "authorization_request_byte_sha256": "d366667ab9c4837a5503bfb7c74ca572430ba1cb23130565e611dd0138c6a545",
+  "classifications": [
+    "POST_EVENT_PROTOCOL_AMENDMENT",
+    "RIGHTS_DRIVEN_SOURCE_POLICY_CHANGE",
+    "SOURCE_SELECTION_NOT_MODEL_PERFORMANCE_DEPENDENT",
+    "SINGLE_QUALIFIED_FALLBACK_SOURCE",
+    "DESCRIPTIVE_PILOT_ONLY",
+    "DESCRIPTIVE_P01_PILOT",
+    "POST_EVENT_OUTCOME_SOURCE_AMENDMENT",
+    "PUBLIC_FALLBACK_OUTCOME_SOURCE",
+    "NOT_CONFIRMATORY_EPOCH_001",
+    "FIRST_PROSPECTIVE_COHORT",
+    "PROSPECTIVE_FORECAST_WITH_FALLBACK_FINAL_LABELS",
+    "PROSPECTIVE_EVIDENCE_NOT_PROMOTION_DECISION",
+    "EVIDENCE_ACCUMULATION_IN_PROGRESS"
+  ],
+  "draw_policy_sha256": "444b0b4b8f138bc9188a60e947eb6ff58575c0ceb3f2d825873e9851ddfa49b3",
+  "evaluation_epoch": "EVALUATION_EPOCH_003",
+  "fixture_registry_sha256": "de447eb368a807d4edf701a75c094a8b3f4925aa3e87cbff9b9f4fadd63eba18",
+  "fixtures": [
+    {
+      "away_aliases": [
+        "Leeds United",
+        "Leeds United FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7253-ae6d-cef2d502db48",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-706c-b029-d73cdb1b2522",
+        "home_team_id": "01a0c4f8-e0bc-7d1a-be3c-a724e6040810",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Arsenal",
+        "Arsenal FC",
+        "FC Arsenal"
+      ],
+      "scheduled_date": "2026-10-10"
+    },
+    {
+      "away_aliases": [
+        "FC Fulham",
+        "Fulham",
+        "Fulham FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7904-8867-2f27a3c31340",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7073-b040-5b605ff5d8c7",
+        "home_team_id": "01a0c4f8-e0bc-7461-8e09-b55eb1026ad7",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Ipswich Town",
+        "Ipswich Town FC"
+      ],
+      "scheduled_date": "2026-10-10"
+    },
+    {
+      "away_aliases": [
+        "Newcastle United",
+        "Newcastle United FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-77bc-aa95-9e3213ac3de8",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-742f-bc00-9ffa12ab0f5f",
+        "home_team_id": "01a0c4f8-e0bc-7fdb-b5f7-b5152bfdfa13",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Coventry City",
+        "Coventry City FC"
+      ],
+      "scheduled_date": "2026-10-12"
+    },
+    {
+      "away_aliases": [
+        "Brighton",
+        "Brighton & Hove Albion",
+        "Brighton & Hove Albion FC",
+        "Brighton and Hove Albion"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7128-a139-726538c55c11",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7765-bd26-535afc4df5df",
+        "home_team_id": "01a0c4f8-e0bc-7d0d-bafd-cfd8f4b6afcd",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "AFC Sunderland",
+        "Sunderland",
+        "Sunderland AFC"
+      ],
+      "scheduled_date": "2026-10-10"
+    },
+    {
+      "away_aliases": [
+        "Brentford",
+        "Brentford FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7dbf-ab3d-6a8d8dd29d79",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7769-8be2-7dfb2a374065",
+        "home_team_id": "01a0c4f8-e0bc-7e36-9574-e16ffc1da3bf",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Aston Villa",
+        "Aston Villa FC"
+      ],
+      "scheduled_date": "2026-10-10"
+    },
+    {
+      "away_aliases": [
+        "AFC Bournemouth",
+        "Bournemouth"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7f69-b0dc-770ddc83e3a8",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-77b7-9cda-fd5784119360",
+        "home_team_id": "01a0c4f8-e0bc-71ce-a570-290a916e6f65",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Chelsea",
+        "Chelsea FC",
+        "FC Chelsea"
+      ],
+      "scheduled_date": "2026-10-10"
+    },
+    {
+      "away_aliases": [
+        "Manchester City",
+        "Manchester City FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7bcd-9ab2-1c9c2d59e64a",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7bc1-b648-fcfb2da000e5",
+        "home_team_id": "01a0c4f8-e0bc-7e0d-97dd-5347da800b7d",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "FC Liverpool",
+        "Liverpool",
+        "Liverpool FC"
+      ],
+      "scheduled_date": "2026-10-11"
+    },
+    {
+      "away_aliases": [
+        "Everton",
+        "Everton FC",
+        "FC Everton"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7839-b1ba-7791c432434c",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7c46-a1aa-a84fa6301c2d",
+        "home_team_id": "01a0c4f8-e0bc-7714-8ce8-d9ee1469e43d",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Hull City",
+        "Hull City AFC"
+      ],
+      "scheduled_date": "2026-10-11"
+    },
+    {
+      "away_aliases": [
+        "Tottenham",
+        "Tottenham Hotspur",
+        "Tottenham Hotspur FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-7e48-b3c5-5248392e35d3",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7cc9-8b40-673dfe362e9f",
+        "home_team_id": "01a0c4f8-e0bc-7515-8253-456ec6337a5a",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Manchester United",
+        "Manchester United FC"
+      ],
+      "scheduled_date": "2026-10-10"
+    },
+    {
+      "away_aliases": [
+        "Nottingham Forest",
+        "Nottingham Forest FC"
+      ],
+      "fixture": {
+        "away_team_id": "01a0c4f8-e0bc-77e7-b285-5486e1d82bb2",
+        "competition_id": "01a0c601-f01b-7c8c-95cc-f2b18eeb84bc",
+        "fixture_id": "01a0c601-f01b-7dfb-9d4b-18994ea99bf9",
+        "home_team_id": "01a0c4f8-e0bc-79a1-8f3a-90a98b5f44c5",
+        "season": "2026/27"
+      },
+      "home_aliases": [
+        "Crystal Palace",
+        "Crystal Palace FC"
+      ],
+      "scheduled_date": "2026-10-11"
+    }
+  ],
+  "forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "forecast_origin": "2026-10-03T13:38:40.513349Z",
+  "forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "frozen_at": "2026-10-03T13:40:19.466686Z",
+  "league_id": 5996,
+  "league_name": "Premier League",
+  "league_season": 2026,
+  "league_shortcut": "pl",
+  "matchday": 6,
+  "model_tuning_permitted": false,
+  "official_premier_league_used": false,
+  "original_forecast_epoch": "EVALUATION_EPOCH_001",
+  "original_protocol_sha256": "93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029",
+  "performance_metrics_inspected_before_amendment": false,
+  "production_active": false,
+  "promotion_permitted": false,
+  "protocol_version": "1.2.0",
+  "reason": "Rights-driven availability: OpenLigaDB qualified; the A01 verifier was blocked. No P01 model-performance metrics inspected. A02 supersedes only the second-publisher requirement and the corresponding acquisition condition in the unchanged rights-profile notes, for this descriptive P01 pilot.",
+  "reconciliation_status": "OPENFOOTBALL_RECONCILIATION_PENDING",
+  "rights_profile_id": "openligadb_public_final_score_labels_v1",
+  "rights_profile_sha256": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2",
+  "schema_version": "public-team-strength-p01-fallback-context-v1",
+  "semantic_sha256": "6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259",
+  "source": "OpenLigaDB",
+  "source_policy": "SINGLE_QUALIFIED_FALLBACK_SOURCE"
+}

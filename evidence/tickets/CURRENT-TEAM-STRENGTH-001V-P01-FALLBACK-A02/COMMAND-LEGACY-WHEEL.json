@@ -1,0 +1,12 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/verify_team_strength_u_wheel.py"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02",
+  "started_at": "2026-10-16T08:51:06.613096+00:00",
+  "finished_at": "2026-10-16T08:52:00.205531+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-LEGACY-WHEEL.log",
+  "output_byte_sha256": "aa2fd8f53c9e999c0c5980cfec5de97ee187b482d94cb5ff2764b210a451b7d1"
+}

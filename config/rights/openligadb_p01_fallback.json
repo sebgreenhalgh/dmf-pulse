@@ -1,0 +1,38 @@
+{
+  "payload": {
+    "account_scope": "Unauthenticated API; Premier League pl/2026 expected league5996; original ten P01 fixtures only",
+    "approved_at": "2026-10-15T11:44:21.377747+00:00",
+    "approved_by": "User through explicit A01 request; provider rights assessed separately",
+    "approved_purpose": "Canonical regulation-time final home/away-goal labels for descriptive immutable P01 pilot evaluation only",
+    "attribution_required": true,
+    "attribution_text": "Contains OpenLigaDB information made available under ODbL 1.0: https://www.openligadb.de/ ; https://opendatacommons.org/licenses/odbl/1-0/",
+    "capabilities": {
+      "automated_access": "ALLOW",
+      "backup": "ALLOW",
+      "cache": "ALLOW",
+      "derived_storage": "ALLOW",
+      "manual_import": "DENY",
+      "model_training": "DENY",
+      "private_internal_use": "ALLOW",
+      "public_display": "DENY",
+      "raw_storage": "DENY",
+      "redistribution": "DENY",
+      "transient_processing": "ALLOW"
+    },
+    "checked_at": "2026-10-15T11:52:37.494913+00:00",
+    "geography_scope": "Private internal analytical use only",
+    "human_approval_id": "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01#HUMAN_PURPOSE_AND_HIERARCHY_DECISION",
+    "notes": "A01 authorises purpose and selection; first-party ODbL/automated-API declarations establish the narrow rights basis. Linked licence/terms pages returned navigation/cookie shells, not substantive policy text; this limitation is not represented as reviewed text. Public redistribution/display and training are outside approved scope even where a licence may allow conditional broader uses. This profile alone does not permit acquisition while the required verifier remains blocked. approved_at is the recorded authorization-reference instant, not a claimed original message submission timestamp.",
+    "profile_version": "1.0.0",
+    "provider_key": "openligadb",
+    "retention_reason": "ODbL permits internal extraction/reproduction. Retain only the exact ten P01 final-score facts, minimal provenance and evaluation evidence; no raw result bodies, player/media data or unrelated records. Stop/delete if the applicable licence is validly terminated.",
+    "retention_seconds": null,
+    "rights_profile_id": "openligadb_public_final_score_labels_v1",
+    "status": "HUMAN_APPROVED",
+    "termination_deletion_required": true,
+    "terms_source": "https://api.openligadb.de/swagger/v1/swagger.json ; https://opendatacommons.org/licenses/odbl/1-0/ ; linked provider policy captures retained",
+    "terms_version": "First-party ODbL1.0 declaration ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b; full licence b8d8aebb21bf405f93f6e21bbf0d8f0a749844f9812ec58692f189add6402b47",
+    "unresolved_rights": []
+  },
+  "semantic_sha256": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2"
+}

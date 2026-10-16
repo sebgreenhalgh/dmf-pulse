@@ -2753,3 +2753,7 @@ private persistence, live retry, production activation, PR, merge or tag.
 Publication requires the final committed SHA to equal the remote branch SHA and its
 mandatory full CI workflow to finish green. This external gate is reported in the
 final handoff; committed local evidence does not predict an unrun commit's CI result.
+
+# CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02
+
+Active approved slice: fixed OpenLigaDB-only descriptive P01 labels. Seal successor authority before implementation; retain original P01/A01/protocol. Implement typed rights-gated, exact-ten, regulation-final, actual-date/D+2 admission and immutable artifacts. Extract the unchanged Decimal scoring kernel with a pre-refactor synthetic oracle. Preserve fallback provenance through scoring/reporting and append-only future OpenFootball reconciliation. Complete synthetic gates and fresh independent review before one public acquisition. Authenticate P01 before/after, score only if all ten pass, run release checks, publish branch and verify exact-SHA CI. No private providers, Premier League website, refit/freeze/draw generation, tuning/promotion/activation or PR/merge/tag.
