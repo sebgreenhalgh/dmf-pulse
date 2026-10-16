@@ -1,0 +1,37 @@
+import importlib.util
+import json
+import socket
+import sys
+from pathlib import Path
+
+destination = Path(__file__).resolve().parents[1]
+parent = destination.parent / "001V-P01-FALLBACK-A02"
+sys.path.insert(0, str(parent))
+
+def denied(*a, **kw):
+    raise AssertionError('offline synthetic capture only')
+socket.create_connection = socket.getaddrinfo = socket.socket.connect = denied
+import dmf_pulse.ingestion.p01_fallback as source
+assert Path(source.__file__).resolve().is_relative_to(parent)
+spec = importlib.util.spec_from_file_location('fixed_input',destination/'tests/unit/evaluation/p01_d1_test_support.py')
+fixed = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(fixed)
+from tests.unit.evaluation import test_p01_fallback_a02 as support
+from dmf_pulse.evaluation.p01_fallback import _score_admitted, fallback_scorecard
+from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json
+support.frozen = fixed.captured_synthetic_forecast
+support.ten_forecast.cache_clear()
+support.synthetic_context.cache_clear()
+outcomes = support.labels()
+score = _score_admitted(support.ten_forecast(),outcomes=outcomes,as_of=support.AT)
+card = fallback_scorecard(score,outcomes=outcomes)
+value = {'parent':'5ca798db9f2d75c8b577e8b37e9ee21205a2d0f0','synthetic_only':True,
+    'fixed_input_byte_sha256':'1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d',
+    'outcomes_sha256':outcomes.semantic_sha256,'score_sha256':score.semantic_sha256,
+    'scorecard_sha256':card.semantic_sha256,'metrics':score.metrics.model_dump(mode='json'),
+    'provider_calls':0,'production_active':False}
+value['semantic_sha256'] = canonical_sha256(value)
+path = destination/'tests/fixtures/evaluation/a02_d1_parent_semantics.json'
+with path.open('x',encoding='utf-8',newline='\n') as stream:
+    stream.write(pretty_json(value))
+print(json.dumps({k:v for k,v in value.items() if k!='metrics'},sort_keys=True))

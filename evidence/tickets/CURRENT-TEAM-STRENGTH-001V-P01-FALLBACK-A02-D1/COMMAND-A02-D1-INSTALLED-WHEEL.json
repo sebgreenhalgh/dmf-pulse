@@ -1,0 +1,12 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/verify_p01_fallback_a02_wheel.py"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02-D1",
+  "started_at": "2026-10-16T18:58:11.173541+00:00",
+  "finished_at": "2026-10-16T18:59:08.959418+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-A02-D1-INSTALLED-WHEEL.log",
+  "output_byte_sha256": "7d9ed198b561fb5cd49880a0b5837f6839161a3c5f1eb8b83deee6f3a02e4bbf"
+}

@@ -1,0 +1,14 @@
+{
+  "consumed": true,
+  "context_sha256": "6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259",
+  "forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "historical_exact_cause": "NOT_RETAINED",
+  "historical_marker_byte_sha256": "48048afc55688eddb21ce3dbd9f258e8b2dba333cda728109e45bd17f5d28be2",
+  "historical_reason": "P01_OUTCOME_ADMISSION_FAILED_CLOSED",
+  "historical_stage": "UNKNOWN_HISTORICAL",
+  "historical_stopped_handoff_sha256": "38a84ac114b025ce9e2573d7ddbc886c2dd2fb582544a7b41289e699b5afd0e0",
+  "new_provider_authority": false,
+  "schema_version": "public-team-strength-p01-a02-consumption-v1",
+  "sealed_at": "2026-10-16T18:41:55.878932Z",
+  "semantic_sha256": "b7250789c2982de2b4e74371e012f66b7ca8c0b195a554dded00d6a68d36d68f"
+}

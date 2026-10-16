@@ -1,0 +1,297 @@
+{
+  "consumption_sha256": "b7250789c2982de2b4e74371e012f66b7ca8c0b195a554dded00d6a68d36d68f",
+  "credentials_inspected": 0,
+  "exact_sha_ci_success_still_required_for_publication": true,
+  "execution_authorized": false,
+  "historical_a02_exact_cause": "NOT_RETAINED",
+  "historical_a02_reason": "P01_OUTCOME_ADMISSION_FAILED_CLOSED",
+  "historical_a02_stage": "UNKNOWN_HISTORICAL",
+  "immutable_parent": "5ca798db9f2d75c8b577e8b37e9ee21205a2d0f0",
+  "independent_checks": [
+    {
+      "check": "All current D1 tests independently executed",
+      "command": ".venv/Scripts/python.exe -m pytest tests/unit/evaluation/test_p01_fallback_d1.py -q -p no:cacheprovider",
+      "result": "75 passed in25.59s",
+      "socket_dns_denial": true
+    },
+    {
+      "check": "Untouched parent reproduction under explicit socket/DNS denial",
+      "exact_metric_pairs": 1470,
+      "fixed_input_byte_sha256": "1c2c0df07078456822c6cf40cb52fd6e97e551c0cdd6dd030851f72e0c5ffb0d",
+      "outcomes_sha256": "c3adcf4e7b66b1e7075cb865208bed6a7d9a69e88c0100e4d427a16137aef365",
+      "parent_import": "review_pack/001V-P01-FALLBACK-A02/src/dmf_pulse/ingestion/p01_fallback.py",
+      "result": "PASS",
+      "score_sha256": "f31d25383bfa778e59b5ed965b86d06d8d374fc5e89c7867ca34eb92495f1efa",
+      "scorecard_sha256": "470eda82420b73914ac0f3d6c4988066456936137aa58e68f84cdc745acaaa21"
+    },
+    {
+      "check": "Original external artifact inventory independently byte-verified",
+      "files": 49,
+      "result": "PASS"
+    },
+    {
+      "check": "Protected parent files independently compared",
+      "files": 8,
+      "result": "PASS",
+      "scope": "rights/context; nongenerative frozen view; context loader; fallback evaluator/store; accepted prospective scorer; uv.lock"
+    }
+  ],
+  "provider_requests": {
+    "FPL": 0,
+    "OpenFootball_live": 0,
+    "OpenLigaDB": 0,
+    "The_Odds_API": 0
+  },
+  "questions": [
+    {
+      "answer": "YES",
+      "evidence": "Original handoff38a84ac114b025ce9e2573d7ddbc886c2dd2fb582544a7b41289e699b5afd0e0 retains its generic status unchanged; the separate consumed-authority record states UNKNOWN_HISTORICAL, P01_OUTCOME_ADMISSION_FAILED_CLOSED, NOT_RETAINED. No historical receipts or causal inference were synthesized.",
+      "number": 1,
+      "question": "Is historical A02 still correctly left cause-unknown?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Read untouched parent code: StrengthEvidenceError inherits ValueError; runner catches ValueError/OSError, preserves only four exact str(exc) values and collapses all other failures to generic status.",
+      "number": 2,
+      "question": "Is the generic catch/string whitelist confirmed as the diagnostic blind spot?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Fifteen finite ExecutionStage values identify operations. DiagnosticProgress.run sets the stage before each wrapped operation; the outer acquisition wrapper covers unexpected exceptions outside narrow boundaries at the current stage. COMPLETE is success only.",
+      "number": 3,
+      "question": "Does every future execution stage have a typed identity?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Thirty-one FailureReason enum values cover authority, bounded transport, JSON, metadata, projection, exact-ten admission, persistence and D+2, including explicit unknown compatibility failure. Expected branches raise ReasonFailure or translate at narrow typed operation boundaries.",
+      "number": 4,
+      "question": "Does every expected failure have a finite typed reason?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Classification uses enums, typed exceptions and exception classes. No str(exc) parsing or whitelist is used. A finite enum-to-legacy-display-message map preserves compatibility without inspecting exception text.",
+      "number": 5,
+      "question": "Is there no exception-message parsing?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Strict extra-forbid records permit closed route/content-type enums, aware UTC times, bounded numeric status/byte counters and SHA256 of OBSERVED_BYTES. response_complete disambiguates partial observations; raw bodies, arbitrary headers/text and exception messages are excluded.",
+      "number": 6,
+      "question": "Are transport diagnostics disclosure-safe?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Only bounded candidate, match-row, finished-row, regulation-result, projected-fact, unique-mapping and admitted-outcome counts plus a resolution boolean are retained. No score, team or provider fixture/club identity fields exist.",
+      "number": 7,
+      "question": "Are admission diagnostics count-only on failure?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Bodies are processed transiently; failure receipt/store schemas have no raw-body field. Existing raw_storage=DENY rights profile is unchanged and storage reauthenticates it.",
+      "number": 8,
+      "question": "Are raw provider payloads still prohibited?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "StoppedExecutionDiagnostic and SafeDiagnostics schemas exclude labels and match/team identities; canary and extra-field rejection tests verify absence from stored and terminal output. Success outcome artifacts retain the separate existing factual contract.",
+      "number": 9,
+      "question": "Are final-score labels absent from stopped-execution diagnostics?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "All49 historical artifact byte hashes independently rechecked. Packaged pinned consumption record binds original marker byteSHA48048afc55688eddb21ce3dbd9f258e8b2dba333cda728109e45bd17f5d28be2 and stopped handoff SHA. Actual A02 context is refused before root creation or transport regardless of root/marker existence. No force/reset flag exists.",
+      "number": 10,
+      "question": "Is the consumed A02 authority/marker preserved?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "The retired runner passes no transport; approved actual context is denied globally before any transport. Default HTTP transport has no native connection factory and refuses. Explicit connection/transport injection is a test seam used only with fakes under socket/DNS denial; arbitrary externally supplied callable code is not treated as execution authority. Installed-wheel checks exercise blocked defaults. Independent review made zero provider requests.",
+      "number": 11,
+      "question": "Can D1 itself make no provider request?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "All49 original P01/A01/A02 files independently match HISTORICAL-INVENTORY, including original real forecast byteSHAe3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee and unchanged semantic identity96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a. Real P01 was never loaded into scoring/model/draw generation.",
+      "number": 12,
+      "question": "Is P01 unchanged?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Protected numerical evaluator/accepted prospective scorer files match immutable parent. Independently imported untouched5ca implementation and fixed synthetic input reproduced full outcome, score and scorecard SHA values plus all1470 metric pairs exactly. Current D1 tests require same full identities; accepted OpenFootball regression remains intact.",
+      "number": 13,
+      "question": "Are scoring numerics unchanged?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "D1 records new_provider_authority=false and separate_fresh_human_authorization_required=true, creates no A03 context or request authority, and refuses consumed actual A02 independently of caller directories. This verdict clears only a future human reauthorization decision.",
+      "number": 14,
+      "question": "Does a future provider attempt still require a separate fresh human authorization?"
+    },
+    {
+      "answer": "YES",
+      "evidence": "Retired runner has no scoring import/call or activation path. Stopped record requires scoring_performed=false and production_active=false. Unchanged evaluation remains shadow/research only; no model, draw policy, promotion rule or activation change occurred.",
+      "number": 15,
+      "question": "Is production activation still impossible?"
+    }
+  ],
+  "real_p01_fit_freeze_or_draw_generation_performed": false,
+  "real_p01_scoring_performed": false,
+  "reviewed_at": "2026-10-16T19:02:28.265785+00:00",
+  "reviewed_files": [
+    {
+      "byte_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+      "path": "config/evaluation/team_strength_p01_fallback_a02.json"
+    },
+    {
+      "byte_sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+      "path": "config/evaluation/team_strength_p01_a02_consumption.json"
+    },
+    {
+      "byte_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+      "path": "config/rights/openligadb_p01_fallback.json"
+    },
+    {
+      "byte_sha256": "35df9b296213cd07239b94b506c81d62c5fecfb6e647d128a4a60b4ad6292762",
+      "path": "src/dmf_pulse/evaluation/p01_fallback_context.py"
+    },
+    {
+      "byte_sha256": "ee756a31cb9cde20b02f5a4f967623c25334b2629a86153990dd8c5b29f21a11",
+      "path": "src/dmf_pulse/evaluation/p01_frozen_view.py"
+    },
+    {
+      "byte_sha256": "9bd304ffe2531e9cbdc7473b5efd3d090ad938fbcc37acd8778316fbf7ca002b",
+      "path": "src/dmf_pulse/evaluation/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "5412f4383aa4f23eabb0117a48189975b0495012195846ee819a8944171dcde5",
+      "path": "src/dmf_pulse/evaluation/p01_fallback_store.py"
+    },
+    {
+      "byte_sha256": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5",
+      "path": "src/dmf_pulse/evaluation/team_strength_prospective.py"
+    },
+    {
+      "byte_sha256": "63828cf47afdc2e0dfbec862f0ed41290a15f7ecac72f87c566c0cd3fb8fe064",
+      "path": "src/dmf_pulse/ingestion/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "ed5eac2365425f59ec42b291527619efb8916d14a21f119d11955ab685cdb96c",
+      "path": "src/dmf_pulse/ingestion/p01_fallback_acquisition.py"
+    },
+    {
+      "byte_sha256": "cad023e5116be8836ba76b8157a8f74d9767b3235371c9f31f4dbf5aad7a7539",
+      "path": "src/dmf_pulse/ingestion/p01_fallback_consumption.py"
+    },
+    {
+      "byte_sha256": "d6f5221b93b2a6b30907641ab565b262d898c34f8c65c452f6fe101c30073e4f",
+      "path": "src/dmf_pulse/ingestion/p01_fallback_diagnostics.py"
+    },
+    {
+      "byte_sha256": "8011e95534e9291d113f2bc27ae822a9514dd1aa28aaefa1e0caa46dda593b21",
+      "path": "src/dmf_pulse/ingestion/p01_fallback_transport.py"
+    },
+    {
+      "byte_sha256": "11f05a2b5029402b8587b0371dd8af71f22895ae772df4b8d68030ad688d37cd",
+      "path": "scripts/run_p01_fallback_a02.py"
+    },
+    {
+      "byte_sha256": "eafcec31cfe7fb5bb75af59c89e57469dacd4145a4e237030cf1b0535d284354",
+      "path": "scripts/verify_p01_fallback_a02_wheel.py"
+    },
+    {
+      "byte_sha256": "6bfcf1a1d6694ed9993636af4a82db91e855916b0d4f2b48b956407c4f1fc6bf",
+      "path": "tests/unit/evaluation/test_p01_fallback_a02.py"
+    },
+    {
+      "byte_sha256": "ffb5213030d0027a8e9fffd06654f46d03e07e6caeb7d5a280b074d147cd1e6a",
+      "path": "tests/unit/evaluation/test_p01_fallback_d1.py"
+    },
+    {
+      "byte_sha256": "9379c2a3aa0a1a99238e089ffc73575ce38454004d6e08c46976efb79286a179",
+      "path": "tests/unit/evaluation/p01_d1_test_support.py"
+    },
+    {
+      "byte_sha256": "d0b5615b28d530900698948318963c8c361b608e094581148e79dae0406e48b4",
+      "path": "tests/fixtures/evaluation/a02_d1_parent_semantics.json"
+    },
+    {
+      "byte_sha256": "a2003796ab6bff04a253a75801ed6d472a3d8edfbb1982b40727f39ae2cc008e",
+      "path": "tests/fixtures/evaluation/a02_legacy_score_oracle.json"
+    },
+    {
+      "byte_sha256": "5cd484bfc597b289b00243fdcf59e22d5e59e23e074688f933e8b88e2d150ed0",
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/manifest.json"
+    },
+    {
+      "byte_sha256": "16153388d701fb6b374a4d4d277d016bb5308fc33e3371bf451027d1058d83f2",
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-000.json.part"
+    },
+    {
+      "byte_sha256": "8a45c12c211cfc4ecef5e2e341ae75fbc8ce63954c0635f3fe282b9ef64cc389",
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-001.json.part"
+    },
+    {
+      "byte_sha256": "e05bd8d8310d26b63f426cacf2f151c5edab132f97b1941740d70d29c5e5a1da",
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-002.json.part"
+    },
+    {
+      "byte_sha256": "8f1ab7b7128caaf6e9df0c28edc2fd2c04d3cf622e4635107767e2912ad22af8",
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-003.json.part"
+    },
+    {
+      "byte_sha256": "1d627e62cca40f3d1825f3493cc5e239dabd54c5fbde5ed357501baf460cdba0",
+      "path": "tests/fixtures/evaluation/a02_legacy_forecast_input/part-004.json.part"
+    },
+    {
+      "byte_sha256": "90a5608a1f34f88e45203d475b5dce33592aa132d97650e998e1e1a3f5e8a315",
+      "path": "pyproject.toml"
+    },
+    {
+      "byte_sha256": "af7d4de655438868c42d2f7c1d9b7d7a2c096fb72e671365e4a2dd0ffe9f41b9",
+      "path": "uv.lock"
+    },
+    {
+      "byte_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "byte_sha256": "79afc41e03b6e841c6a2f405b952154d66c3cb9ea3a303d625620f97a4343f68",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/CONTRACT.md"
+    },
+    {
+      "byte_sha256": "cec4a1f1f2875811b65c841e4a7b8d9d5bbad0cecfc8cdf6f726be0afa68bffa",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/ACCEPTANCE.md"
+    },
+    {
+      "byte_sha256": "6f70b41d01e351f89788d6b785d1a008a65de06a73f5017748f9c85105e5973b",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/ticket.yaml"
+    },
+    {
+      "byte_sha256": "a8936defa11b5255cc131d5f7609790a2d07f5bc15d237cece07e39779991d26",
+      "path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/HISTORICAL-INVENTORY.json"
+    }
+  ],
+  "reviewer_identity": "/root/fallback_d1_independent_review",
+  "rights_assessment": {
+    "basis": "Offline assessment of already-qualified HUMAN_APPROVED profile. Its ALLOW private_internal_use, derived_storage, cache and backup capabilities and retention of minimal provenance and evaluation evidence cover the narrow failure-receipt metadata. Route class, UTC times, numeric status, finite content-type class, observed-byte count/SHA and completeness/JSON flags are provenance, not raw provider bodies or labels.",
+    "conditions": [
+      "Internal evidence only; existing attribution retained.",
+      "No raw bodies, arbitrary header values, exception text, scores or match/team identities.",
+      "Existing termination/deletion obligations apply.",
+      "Rights authenticated before acquisition and again before diagnostic persistence.",
+      "No change to profile SHA, capabilities, provider/source selection or approved purpose.",
+      "No new legal qualification or provider request performed."
+    ],
+    "fit_within_existing_internal_evidence_storage_purpose": true,
+    "qualified_profile_id": "openligadb_public_final_score_labels_v1",
+    "qualified_profile_sha256": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2"
+  },
+  "schema_version": "public-team-strength-p01-a02-d1-independent-review-v1",
+  "semantic_sha256": "26b793baa8ea272fdfd54ab3ba6e9cce8f8054d20c01406bbe39e338df868fe2",
+  "separate_fresh_human_authorization_required": true,
+  "ticket": "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1",
+  "unresolved_material_p2": 0,
+  "unresolved_p0": 0,
+  "unresolved_p1": 0,
+  "verdict": "CLEAR_FOR_P01_A03_REAUTHORIZATION_DECISION"
+}

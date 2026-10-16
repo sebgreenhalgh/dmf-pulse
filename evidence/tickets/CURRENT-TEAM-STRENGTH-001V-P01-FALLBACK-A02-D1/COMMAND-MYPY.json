@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "mypy"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02-D1",
+  "started_at": "2026-10-16T18:56:30.259276+00:00",
+  "finished_at": "2026-10-16T18:56:31.217529+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-MYPY.log",
+  "output_byte_sha256": "ad3093c2936a9579b06750725a1334b1f5ccc776cc69402ea26e1674add38741"
+}

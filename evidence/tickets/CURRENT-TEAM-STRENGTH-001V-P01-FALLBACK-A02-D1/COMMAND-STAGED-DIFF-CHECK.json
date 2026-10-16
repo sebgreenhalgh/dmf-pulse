@@ -1,0 +1,14 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A02-D1",
+  "started_at": "2026-10-16T19:10:22.972674+00:00",
+  "finished_at": "2026-10-16T19:10:23.039397+00:00",
+  "exit_code": 2,
+  "output": "COMMAND-STAGED-DIFF-CHECK.log",
+  "output_byte_sha256": "b52b693150e24266ad577ccd9fac4f166d6904addd67e4c8b69799572125e410"
+}

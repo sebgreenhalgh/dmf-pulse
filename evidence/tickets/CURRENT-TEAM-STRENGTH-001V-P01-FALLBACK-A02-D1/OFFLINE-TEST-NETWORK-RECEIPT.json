@@ -1,0 +1,11 @@
+{
+  "provider_network_calls": 0,
+  "denied_network_attempts": 0,
+  "openligadb_requests": 0,
+  "openfootball_live_requests": 0,
+  "fpl_requests": 0,
+  "odds_requests": 0,
+  "credentials_inspected": 0,
+  "real_p01_scoring_performed": false,
+  "pytest_exit_code": 0
+}

@@ -1,0 +1,11 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1
+status: ACTIVE
+parent: 5ca798db9f2d75c8b577e8b37e9ee21205a2d0f0
+branch: readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1-failure-localisation
+authority_scopes: [A3-data-foundation, A8-events, B1-backtesting]
+authorization: explicit user D1 offline diagnostic hardening only
+provider_access: forbidden
+real_p01_scoring: forbidden
+live_authority: none
+production_activation: false
+scope: closed disclosure-safe failure localisation and immutable consumed-authority enforcement

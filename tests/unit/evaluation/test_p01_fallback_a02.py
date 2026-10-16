@@ -36,6 +36,7 @@ from dmf_pulse.evaluation.team_strength_prospective import (
     score_public_team_forecasts,
 )
 from dmf_pulse.ingestion import p01_fallback_acquisition as acquisition
+from dmf_pulse.ingestion import p01_fallback_transport as transport_module
 from dmf_pulse.ingestion.openfootball.team_strength_data import (
     SourceLineage,
     SourceResource,
@@ -54,6 +55,7 @@ from dmf_pulse.ingestion.p01_fallback import (
     require_d_plus_2,
     source_receipt,
 )
+from dmf_pulse.ingestion.p01_fallback_diagnostics import FailureReason, P01FallbackExecutionFailure
 from tests.unit.evaluation.test_team_strength_prospective import frozen, outcome
 
 AT = datetime(2026, 10, 6, tzinfo=UTC)
@@ -703,10 +705,11 @@ def test_t08_t09_t19_one_attempt_projection_and_review_before_transport(tmp_path
     with pytest.raises(ValueError):
         acquisition.acquire_p01_once(**(args | {"expected_review_sha256": "0" * 64}))
     assert calls == [] and not (tmp_path / "retained").exists()
-    with pytest.raises(ValueError, match="predates independent review"):
+    with pytest.raises(P01FallbackExecutionFailure) as invalid_review:
         acquisition.acquire_p01_once(
             **(args | {"clock": lambda: datetime(2026, 10, 5, tzinfo=UTC)})
         )
+    assert invalid_review.value.reason == FailureReason.REVIEW_INVALID
     assert calls == []
     admitted = acquisition.acquire_p01_once(**args)
     assert calls == list(context.allowed_routes)
@@ -719,8 +722,9 @@ def test_t08_t09_t19_one_attempt_projection_and_review_before_transport(tmp_path
     assert len(retained) == 2
     assert all("MUST_NOT_BE_RETAINED" not in path.read_text() for path in retained)
     assert all(path.read_bytes() != body for path in retained for body in bodies.values())
-    with pytest.raises(ValueError, match="ONE_ATTEMPT_CONSUMED"):
+    with pytest.raises(P01FallbackExecutionFailure) as consumed:
         acquisition.acquire_p01_once(**args)
+    assert consumed.value.reason == FailureReason.ONE_ATTEMPT_ALREADY_CONSUMED
     assert calls == list(context.allowed_routes)
 
 
@@ -754,8 +758,9 @@ def test_t08_incomplete_acquisition_consumes_attempt_without_partial_artifact(
         acquisition.acquire_p01_once(**args)
     assert len(calls) == (2 if failure == "bad_metadata" else 3)
     assert len(list((tmp_path / "retained").rglob("*.json"))) == 1
-    with pytest.raises(ValueError, match="ONE_ATTEMPT_CONSUMED"):
+    with pytest.raises(P01FallbackExecutionFailure) as consumed:
         acquisition.acquire_p01_once(**args)
+    assert consumed.value.reason == FailureReason.ONE_ATTEMPT_ALREADY_CONSUMED
 
 
 @pytest.mark.parametrize("bad", [-1, True, "2", 37])
@@ -838,16 +843,23 @@ def test_t19_transport_bounded_no_redirect_no_retry(monkeypatch, failure):
 
     connection = Connection()
     monkeypatch.setattr(
-        acquisition.http.client, "HTTPSConnection", lambda *args, **kwargs: connection
+        transport_module.http.client, "HTTPSConnection", lambda *args, **kwargs: connection
     )
     if failure == "timeout":
         times = iter((0, 21))
-        monkeypatch.setattr(acquisition.time, "monotonic", lambda: next(times))
+        monkeypatch.setattr(transport_module.time, "monotonic", lambda: next(times))
     if failure == "ok":
-        assert acquisition.HttpOpenLigaTransport().get(load_context().allowed_routes[0]) == b"[]"
+        assert (
+            acquisition.HttpOpenLigaTransport(connection_factory=lambda *a, **kw: connection).get(
+                load_context().allowed_routes[0]
+            )
+            == b"[]"
+        )
     else:
         with pytest.raises(ValueError):
-            acquisition.HttpOpenLigaTransport().get(load_context().allowed_routes[0])
+            acquisition.HttpOpenLigaTransport(connection_factory=lambda *a, **kw: connection).get(
+                load_context().allowed_routes[0]
+            )
     assert len(connection.requests) == 1 and connection.closed
 
 

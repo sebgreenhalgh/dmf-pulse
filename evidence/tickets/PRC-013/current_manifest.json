@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 198099,
+      "bytes": 199274,
       "path": "PLANS.md",
-      "sha256": "1de065ad83bf722cfcbb4807c0bf32e0704c76d34ec91dbeeb42e2fafd6f9b20"
+      "sha256": "0b041373e5d6782b91ce8120bdd38a29d4784f0bb5ed45795a167d6cd4d52ba1"
     },
     {
       "bytes": 2761,
@@ -234,6 +234,11 @@
       "bytes": 6289,
       "path": "config/evaluation/evaluation.schema.json",
       "sha256": "93ca364b67e1aaa2e16737196741b2f74f7873f587f1f4fcc406d61475e906fa"
+    },
+    {
+      "bytes": 797,
+      "path": "config/evaluation/team_strength_p01_a02_consumption.json",
+      "sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486"
     },
     {
       "bytes": 8557,
@@ -2116,9 +2121,9 @@
       "sha256": "43648b7b695716f2471878466345ca255309b20e29524137a6b032f0bb2060a6"
     },
     {
-      "bytes": 3610,
+      "bytes": 3754,
       "path": "pyproject.toml",
-      "sha256": "d2c0a5e041553dce0eb988d7eb19dae646997adde0acc06f8c5aa17d007b9652"
+      "sha256": "90a5608a1f34f88e45203d475b5dce33592aa132d97650e998e1e1a3f5e8a315"
     },
     {
       "bytes": 2059,
@@ -2531,9 +2536,9 @@
       "sha256": "be301f8c6f0a73ef0df903495578856354c4156bf94ddf4dedf7e4331b035f49"
     },
     {
-      "bytes": 4957,
+      "bytes": 2947,
       "path": "scripts/run_p01_fallback_a02.py",
-      "sha256": "fcfbc272ae260d29cd85dacf862f0c57b8ecbf43db5f179c8ab1ac5666ead60c"
+      "sha256": "11f05a2b5029402b8587b0371dd8af71f22895ae772df4b8d68030ad688d37cd"
     },
     {
       "bytes": 2417,
@@ -2656,9 +2661,9 @@
       "sha256": "c0644779ca59d23224fc43d176698ba4348ea132174089ee709b6d853afaa872"
     },
     {
-      "bytes": 5501,
+      "bytes": 7334,
       "path": "scripts/verify_p01_fallback_a02_wheel.py",
-      "sha256": "ca7aa252362b6ce1fe747154ff16de59875d3b1b9e71354594957c915f02c9fe"
+      "sha256": "eafcec31cfe7fb5bb75af59c89e57469dacd4145a4e237030cf1b0535d284354"
     },
     {
       "bytes": 12612,
@@ -4031,14 +4036,29 @@
       "sha256": "781720eb60e15573ba4f806350cb5a25c8647b08a3d6dab49144ee1ec7c7bc38"
     },
     {
-      "bytes": 14956,
+      "bytes": 18410,
       "path": "src/dmf_pulse/ingestion/p01_fallback.py",
-      "sha256": "3487332a8c1a43203fb58624fea480d866ef3fe8b905b885792c22eb403f2a2f"
+      "sha256": "63828cf47afdc2e0dfbec862f0ed41290a15f7ecac72f87c566c0cd3fb8fe064"
     },
     {
-      "bytes": 9671,
+      "bytes": 11762,
       "path": "src/dmf_pulse/ingestion/p01_fallback_acquisition.py",
-      "sha256": "bd1a21f4670be6b5d567c52ef0dfca595799e93216a4b75d7f38109ff792880f"
+      "sha256": "ed5eac2365425f59ec42b291527619efb8916d14a21f119d11955ab685cdb96c"
+    },
+    {
+      "bytes": 2017,
+      "path": "src/dmf_pulse/ingestion/p01_fallback_consumption.py",
+      "sha256": "cad023e5116be8836ba76b8157a8f74d9767b3235371c9f31f4dbf5aad7a7539"
+    },
+    {
+      "bytes": 13110,
+      "path": "src/dmf_pulse/ingestion/p01_fallback_diagnostics.py",
+      "sha256": "d6f5221b93b2a6b30907641ab565b262d898c34f8c65c452f6fe101c30073e4f"
+    },
+    {
+      "bytes": 4758,
+      "path": "src/dmf_pulse/ingestion/p01_fallback_transport.py",
+      "sha256": "8011e95534e9291d113f2bc27ae822a9514dd1aa28aaefa1e0caa46dda593b21"
     },
     {
       "bytes": 608,
@@ -4854,6 +4874,11 @@
       "bytes": 2821,
       "path": "tests/evaluation_helpers.py",
       "sha256": "45109dce357d4a498dd5c73406657d56be119b6a72a82d37fcf71fbc0a5c1b65"
+    },
+    {
+      "bytes": 192838,
+      "path": "tests/fixtures/evaluation/a02_d1_parent_semantics.json",
+      "sha256": "d0b5615b28d530900698948318963c8c361b608e094581148e79dae0406e48b4"
     },
     {
       "bytes": 1334,
@@ -5961,6 +5986,11 @@
       "sha256": "16e6de64a12a0482e33acb6b1ead2cbd840a5d780690c1f92a07a5462097f558"
     },
     {
+      "bytes": 1138,
+      "path": "tests/unit/evaluation/p01_d1_test_support.py",
+      "sha256": "9379c2a3aa0a1a99238e089ffc73575ce38454004d6e08c46976efb79286a179"
+    },
+    {
       "bytes": 12664,
       "path": "tests/unit/evaluation/test_benchmarks.py",
       "sha256": "c2ffccadfd0d91f9d8df23af13e3c8cbc42e47bf61ca871916a4329d9266cbda"
@@ -6001,9 +6031,14 @@
       "sha256": "b1d20cc160cbd668cc1bae57be675b6f1918ea73d5768b89bf558e169c297a71"
     },
     {
-      "bytes": 36400,
+      "bytes": 36998,
       "path": "tests/unit/evaluation/test_p01_fallback_a02.py",
-      "sha256": "9a267c7af7af4cc3e2f5529f26026c0557ced74b055d50d285a38f5cf47242f9"
+      "sha256": "6bfcf1a1d6694ed9993636af4a82db91e855916b0d4f2b48b956407c4f1fc6bf"
+    },
+    {
+      "bytes": 25762,
+      "path": "tests/unit/evaluation/test_p01_fallback_d1.py",
+      "sha256": "ffb5213030d0027a8e9fffd06654f46d03e07e6caeb7d5a280b074d147cd1e6a"
     },
     {
       "bytes": 9125,
@@ -7499,6 +7534,21 @@
       "bytes": 881,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001U/ticket.yaml",
       "sha256": "689531b061d54b68ea5372de238618a97631cedb1859b522095f7ab3be8f615b"
+    },
+    {
+      "bytes": 4466,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/ACCEPTANCE.md",
+      "sha256": "cec4a1f1f2875811b65c841e4a7b8d9d5bbad0cecfc8cdf6f726be0afa68bffa"
+    },
+    {
+      "bytes": 2661,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/CONTRACT.md",
+      "sha256": "79afc41e03b6e841c6a2f405b952154d66c3cb9ea3a303d625620f97a4343f68"
+    },
+    {
+      "bytes": 541,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/ticket.yaml",
+      "sha256": "6f70b41d01e351f89788d6b785d1a008a65de06a73f5017748f9c85105e5973b"
     },
     {
       "bytes": 3743,

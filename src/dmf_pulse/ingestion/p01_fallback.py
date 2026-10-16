@@ -20,11 +20,16 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import (
     FixtureRegistration,
     FrozenEvidence,
     SealedEvidence,
-    StrengthEvidenceError,
     authenticate,
     seal,
 )
 from dmf_pulse.ingestion.openfootball.team_strength_governance import eligibility_not_before
+from dmf_pulse.ingestion.p01_fallback_diagnostics import (
+    DiagnosticProgress,
+    FailureReason,
+    ReasonFailure,
+    RouteClass,
+)
 
 
 class SourceReceipt(FrozenEvidence):
@@ -181,55 +186,99 @@ def require_d_plus_2(value: PublicP01FallbackOutcomesV1, *, as_of: datetime) -> 
     if value.usable_at > as_of or any(
         eligibility_not_before(row.actual_played_date) > as_of for row in value.outcomes
     ):
-        raise StrengthEvidenceError("P01_D_PLUS_2_NOT_COMPLETE")
+        raise ReasonFailure(FailureReason.D_PLUS_2_NOT_COMPLETE)
 
 
 def _object(value: object) -> dict[str, object]:
     if not isinstance(value, dict) or not all(isinstance(key, str) for key in value):
-        raise StrengthEvidenceError("invalid provider object")
+        raise ReasonFailure(FailureReason.PROVIDER_FIELD_TYPE_INVALID)
     return value
 
 
 def _array(value: object) -> list[object]:
     if not isinstance(value, list):
-        raise StrengthEvidenceError("invalid provider array")
+        raise ReasonFailure(FailureReason.PROVIDER_FIELD_TYPE_INVALID)
     return value
 
 
 def _integer(value: object) -> int:
     if type(value) is not int:
-        raise StrengthEvidenceError("provider score/identity is not an integer")
+        raise ReasonFailure(FailureReason.PROVIDER_FIELD_TYPE_INVALID)
     return value
 
 
-def regulation_type(global_body: bytes, league_body: bytes) -> RegulationResultType:
-    globals_ = [_object(row) for row in _array(strict_json(global_body))]
-    leagues = [_object(row) for row in _array(strict_json(league_body))]
+def _provider_json(
+    body: bytes, route: RouteClass, diagnostics: DiagnosticProgress | None
+) -> object:
+    try:
+        value = strict_json(body)
+    except (ValueError, UnicodeError):
+        if diagnostics is not None:
+            diagnostics.json_valid(route, False)
+        raise ReasonFailure(FailureReason.PROVIDER_JSON_INVALID) from None
+    if diagnostics is not None:
+        diagnostics.json_valid(route, True)
+    return value
+
+
+def regulation_type(
+    global_body: bytes, league_body: bytes, *, diagnostics: DiagnosticProgress | None = None
+) -> RegulationResultType:
+    globals_ = [
+        _object(row)
+        for row in _array(_provider_json(global_body, RouteClass.GLOBAL_RESULT_TYPES, diagnostics))
+    ]
+    leagues = [
+        _object(row)
+        for row in _array(_provider_json(league_body, RouteClass.LEAGUE_RESULT_INFO, diagnostics))
+    ]
     candidates = [row for row in globals_ if row.get("kind") == "After90Minutes"]
     finals = [
         row
         for row in leagues
         if _object(row.get("globalResultInfo")).get("kind") == "After90Minutes"
     ]
+    if diagnostics is not None:
+        diagnostics.update(
+            regulation_global_candidate_count=len(candidates),
+            regulation_league_candidate_count=len(finals),
+        )
     if len(candidates) != 1 or len(finals) != 1:
-        raise StrengthEvidenceError("regulation result metadata is ambiguous")
+        raise ReasonFailure(FailureReason.REGULATION_METADATA_AMBIGUOUS)
     global_row, league_row = candidates[0], finals[0]
     linked = _object(league_row["globalResultInfo"])
     if linked.get("id") != global_row.get("id"):
-        raise StrengthEvidenceError("global and league result metadata disagree")
-    return RegulationResultType(
-        league_result_type_id=_integer(league_row.get("id")),
-        global_result_type_id=_integer(global_row.get("id")),
-    )
+        raise ReasonFailure(FailureReason.REGULATION_METADATA_DISAGREEMENT)
+    try:
+        result = RegulationResultType(
+            league_result_type_id=_integer(league_row.get("id")),
+            global_result_type_id=_integer(global_row.get("id")),
+        )
+    except ReasonFailure:
+        raise
+    except ValueError:
+        raise ReasonFailure(FailureReason.PROVIDER_FIELD_TYPE_INVALID) from None
+    if diagnostics is not None:
+        diagnostics.update(regulation_metadata_resolved=True)
+    return result
 
 
 def project_final_facts(
-    body: bytes, *, context: P01FallbackContext, result_type: RegulationResultType
+    body: bytes,
+    *,
+    context: P01FallbackContext,
+    result_type: RegulationResultType,
+    diagnostics: DiagnosticProgress | None = None,
 ) -> tuple[ProjectedFinalFact, ...]:
     """Process response transiently; retain neither raw JSON nor unrelated fields."""
-    matches = _array(strict_json(body))
+    value = _provider_json(body, RouteClass.MATCHDAY_DATA, diagnostics)
+    if not isinstance(value, list):
+        raise ReasonFailure(FailureReason.MATCHDAY_RESPONSE_INVALID)
+    matches = value
+    if diagnostics is not None:
+        diagnostics.update(provider_match_rows=len(matches))
     if len(matches) != 10:
-        raise StrengthEvidenceError("P01_OPENLIGADB_OUTCOMES_INCOMPLETE")
+        raise ReasonFailure(FailureReason.MATCHDAY_FIXTURE_COUNT_INVALID)
     projected: list[ProjectedFinalFact] = []
     for item in matches:
         row = _object(item)
@@ -243,9 +292,11 @@ def project_final_facts(
             or _object(row.get("group")).get("groupOrderID") != context.matchday
             or type(_object(row.get("group")).get("groupOrderID")) is not int
         ):
-            raise StrengthEvidenceError("OpenLigaDB league/season/matchday identity differs")
+            raise ReasonFailure(FailureReason.MATCHDAY_RESPONSE_INVALID)
         if row.get("matchIsFinished") is not True:
-            raise StrengthEvidenceError("P01_OPENLIGADB_OUTCOMES_INCOMPLETE")
+            raise ReasonFailure(FailureReason.MATCH_NOT_FINISHED)
+        if diagnostics is not None:
+            diagnostics.update(finished_match_rows=diagnostics.safe.finished_match_rows + 1)
         results = [_object(value) for value in _array(row.get("matchResults"))]
         finals = [
             value
@@ -253,15 +304,19 @@ def project_final_facts(
             if value.get("resultTypeKind") == "After90Minutes"
             or value.get("resultTypeID") == result_type.league_result_type_id
         ]
+        if diagnostics is not None:
+            diagnostics.update(
+                regulation_result_rows=diagnostics.safe.regulation_result_rows + len(finals)
+            )
         if len(finals) != 1:
-            raise StrengthEvidenceError("regulation result missing or internally ambiguous")
+            raise ReasonFailure(FailureReason.REGULATION_RESULT_MISSING_OR_AMBIGUOUS)
         final = finals[0]
         if (
             final.get("resultTypeKind") != "After90Minutes"
             or final.get("resultTypeID") != result_type.league_result_type_id
             or type(final.get("resultTypeID")) is not int
         ):
-            raise StrengthEvidenceError("regulation result type disagrees with metadata")
+            raise ReasonFailure(FailureReason.REGULATION_RESULT_TYPE_MISMATCH)
         description = " ".join(
             str(final.get(name) or "") for name in ("resultName", "resultDescription")
         ).casefold()
@@ -278,25 +333,38 @@ def project_final_facts(
                 "elfmeter",
             )
         ):
-            raise StrengthEvidenceError("non-regulation or exceptional result refused")
+            raise ReasonFailure(FailureReason.EXCEPTIONAL_RESULT_REFUSED)
         home, away = _object(row.get("team1")), _object(row.get("team2"))
         played = row.get("matchDateTimeUTC")
-        if not isinstance(played, str):
-            raise StrengthEvidenceError("actual UTC played timestamp missing")
-        projected.append(
-            ProjectedFinalFact(
-                provider_match_id=_integer(row.get("matchID")),
-                provider_home_id=_integer(home.get("teamId")),
-                provider_away_id=_integer(away.get("teamId")),
-                home_name=home.get("teamName"),  # type: ignore[arg-type]
-                away_name=away.get("teamName"),  # type: ignore[arg-type]
-                played_at=datetime.fromisoformat(played),
-                result_id=_integer(final.get("resultID")),
-                result_type_id=_integer(final.get("resultTypeID")),
-                home_goals=_integer(final.get("pointsTeam1")),
-                away_goals=_integer(final.get("pointsTeam2")),
+        try:
+            if not isinstance(played, str):
+                raise ValueError
+            played_at = datetime.fromisoformat(played)
+            if played_at.utcoffset() is None:
+                raise ValueError
+        except ValueError:
+            raise ReasonFailure(FailureReason.PLAYED_TIMESTAMP_MISSING_OR_INVALID) from None
+        try:
+            projected.append(
+                ProjectedFinalFact(
+                    provider_match_id=_integer(row.get("matchID")),
+                    provider_home_id=_integer(home.get("teamId")),
+                    provider_away_id=_integer(away.get("teamId")),
+                    home_name=home.get("teamName"),  # type: ignore[arg-type]
+                    away_name=away.get("teamName"),  # type: ignore[arg-type]
+                    played_at=played_at,
+                    result_id=_integer(final.get("resultID")),
+                    result_type_id=_integer(final.get("resultTypeID")),
+                    home_goals=_integer(final.get("pointsTeam1")),
+                    away_goals=_integer(final.get("pointsTeam2")),
+                )
             )
-        )
+        except ReasonFailure:
+            raise
+        except (ValueError, TypeError):
+            raise ReasonFailure(FailureReason.PROVIDER_FIELD_TYPE_INVALID) from None
+        if diagnostics is not None:
+            diagnostics.update(projected_fact_count=len(projected))
     return tuple(projected)
 
 
@@ -311,6 +379,7 @@ def admit_final_facts(
     attribution: str,
     independent_review_sha256: str,
     independently_reviewed_at: datetime,
+    diagnostics: DiagnosticProgress | None = None,
 ) -> PublicP01FallbackOutcomesV1:
     context = authenticate(context)
     outcomes: list[AdmittedP01Outcome] = []
@@ -321,7 +390,14 @@ def admit_final_facts(
             if fact.home_name in frozen.home_aliases and fact.away_name in frozen.away_aliases
         ]
         if len(candidates) != 1:
-            raise StrengthEvidenceError("P01_OPENLIGADB_OUTCOMES_INCOMPLETE")
+            reason = (
+                FailureReason.EXACT_TEN_INCOMPLETE
+                if not candidates
+                else FailureReason.ORIENTED_MAPPING_AMBIGUOUS
+            )
+            raise ReasonFailure(reason)
+        if diagnostics is not None:
+            diagnostics.update(uniquely_mapped_fixture_count=len(outcomes) + 1)
         fact = candidates[0]
         outcomes.append(
             AdmittedP01Outcome(
@@ -335,8 +411,22 @@ def admit_final_facts(
             )
         )
     if len(facts) != 10:
-        raise StrengthEvidenceError("P01_OPENLIGADB_OUTCOMES_INCOMPLETE")
-    return seal(
+        raise ReasonFailure(FailureReason.EXACT_TEN_INCOMPLETE)
+    provider_clubs: dict[int, UUID] = {}
+    canonical_clubs: dict[UUID, int] = {}
+    for row in outcomes:
+        for provider_id, canonical_id in (
+            (row.source_fact.provider_home_id, row.fixture.home_team_id),
+            (row.source_fact.provider_away_id, row.fixture.away_team_id),
+        ):
+            if (
+                provider_clubs.get(provider_id, canonical_id) != canonical_id
+                or canonical_clubs.get(canonical_id, provider_id) != provider_id
+            ):
+                raise ReasonFailure(FailureReason.PROVIDER_CLUB_IDENTITY_AMBIGUOUS)
+            provider_clubs[provider_id] = canonical_id
+            canonical_clubs[canonical_id] = provider_id
+    admitted = seal(
         PublicP01FallbackOutcomesV1,
         context=context,
         independent_review_sha256=independent_review_sha256,
@@ -352,6 +442,9 @@ def admit_final_facts(
         outcomes=tuple(outcomes),
         attribution=attribution,
     )
+    if diagnostics is not None:
+        diagnostics.update(admitted_outcome_count=len(admitted.outcomes))
+    return admitted
 
 
 def source_receipt(

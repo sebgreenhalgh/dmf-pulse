@@ -1,4 +1,4 @@
-"""Reviewed one-attempt P01 public fallback execution; no model-building path."""
+"""Retired A02 execution gate with safe diagnostics; D1 grants no live authority."""
 
 from __future__ import annotations
 
@@ -7,103 +7,78 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json, sha256_file
-from dmf_pulse.evaluation.p01_fallback import fallback_scorecard, score_p01_fallback
-from dmf_pulse.evaluation.p01_fallback_context import authenticate_p01, load_context
-from dmf_pulse.evaluation.p01_fallback_store import persist_fallback
+from dmf_pulse.assurance.canonical import pretty_json
+from dmf_pulse.evaluation.p01_fallback_context import CONTEXT_SHA
 from dmf_pulse.ingestion.p01_fallback_acquisition import acquire_p01_once
+from dmf_pulse.ingestion.p01_fallback_diagnostics import (
+    DiagnosticProgress,
+    ExecutionStage,
+    FailureReason,
+    P01FallbackExecutionFailure,
+    persist_stopped,
+    stopped_record,
+)
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--forecast", type=Path, required=True)
     parser.add_argument("--review", type=Path, required=True)
     parser.add_argument("--review-sha256", required=True)
     parser.add_argument("--artifact-root", type=Path, required=True)
     args = parser.parse_args()
-    root = args.artifact_root.resolve()
-    context = load_context()
-    before = sha256_file(args.forecast)
-    # This authenticates the immutable forecast before any transport; acquisition
-    # independently repeats the check immediately before its one-attempt marker.
-    forecast = authenticate_p01(args.forecast)
     started = datetime.now(UTC)
+    progress = DiagnosticProgress()
     try:
-        labels = acquire_p01_once(
+        acquire_p01_once(
             forecast_path=args.forecast,
             review_path=args.review,
             expected_review_sha256=args.review_sha256,
             implementation_root=Path(__file__).resolve().parents[1],
-            artifact_root=root,
+            artifact_root=args.artifact_root,
+            progress=progress,
         )
-    except (ValueError, OSError) as exc:
-        after = authenticate_p01(args.forecast)
-        known = {
-            "P01_OPENLIGADB_OUTCOMES_INCOMPLETE",
-            "P01_D_PLUS_2_NOT_COMPLETE",
-            "OPENLIGADB_RIGHTS_IDENTITY_MISMATCH",
-            "P01_SOURCE_POLICY_LOCKED_ONE_ATTEMPT_CONSUMED",
-        }
-        status = str(exc) if str(exc) in known else "P01_OUTCOME_ADMISSION_FAILED_CLOSED"
-        stopped = {
-            "schema_version": "public-team-strength-p01-a02-stopped-execution-v1",
-            "status": status,
-            "context_sha256": context.semantic_sha256,
-            "independent_review_sha256": args.review_sha256,
-            "started_at": started.isoformat(),
-            "stopped_at": datetime.now(UTC).isoformat(),
-            "forecast_sha256_before": forecast.semantic_sha256,
-            "forecast_sha256_after": after.semantic_sha256,
-            "forecast_byte_sha256_before": before,
-            "forecast_byte_sha256_after": sha256_file(args.forecast),
-            "scoring_performed": False,
-            "production_active": False,
-            "no_retry_or_source_switch": True,
-        }
-        write_handoff(stopped, root=root)
+    except P01FallbackExecutionFailure as failure:
+        record = stopped_record(
+            failure,
+            started_at=started,
+            stopped_at=datetime.now(UTC),
+            context_sha256=None if failure.stage == ExecutionStage.LOAD_CONTEXT else CONTEXT_SHA,
+            one_attempt_consumed=True,
+        )
+        persisted = False
+        persistence_reason: str | None = None
+        # No provider receipts exist before rights authentication; do not write
+        # internal provider evidence when that prerequisite has failed.
+        if failure.stage not in {ExecutionStage.LOAD_CONTEXT, ExecutionStage.AUTHENTICATE_RIGHTS}:
+            try:
+                persist_stopped(record, root=args.artifact_root)
+                persisted = True
+            except Exception:
+                persistence_reason = FailureReason.PERSISTENCE_FAILED.value
+        print(
+            pretty_json(
+                {
+                    "stopped_diagnostic": record.model_dump(mode="json"),
+                    "diagnostic_persisted": persisted,
+                    "diagnostic_persistence_reason": persistence_reason,
+                }
+            ),
+            end="",
+        )
         return 2
-    score = score_p01_fallback(forecast, outcomes=labels, as_of=datetime.now(UTC))
-    score_path = persist_fallback(score, artifact_root=root)
-    report = fallback_scorecard(score, outcomes=labels)
-    report_path = persist_fallback(report, artifact_root=root)
-    after = authenticate_p01(args.forecast)
-    handoff = {
-        "schema_version": "public-team-strength-p01-a02-execution-handoff-v1",
-        "context_sha256": context.semantic_sha256,
-        "provenance": "PUBLIC_FALLBACK_OUTCOME_SOURCE",
-        "classification": "DESCRIPTIVE_P01_PILOT",
-        "independent_review_sha256": args.review_sha256,
-        "started_at": started.isoformat(),
-        "completed_at": datetime.now(UTC).isoformat(),
-        "forecast_semantic_sha256_before": forecast.semantic_sha256,
-        "forecast_semantic_sha256_after": after.semantic_sha256,
-        "forecast_byte_sha256_before": before,
-        "forecast_byte_sha256_after": sha256_file(args.forecast),
-        "outcome_artifact_sha256": labels.semantic_sha256,
-        "score_sha256": score.semantic_sha256,
-        "scorecard_sha256": report.semantic_sha256,
-        "score_path": str(score_path),
-        "scorecard_path": str(report_path),
-        "one_attempt_marker_byte_sha256": sha256_file(root / "OPENLIGADB-P01-ONE-ATTEMPT.json"),
-        "fixture_count": len(labels.outcomes),
-        "private_provider_access_performed": False,
-        "official_premier_league_used": False,
-        "production_active": False,
-        "promotion_performed": False,
-        "tuning_performed": False,
-        "reconciliation_status": "OPENFOOTBALL_RECONCILIATION_PENDING",
-    }
-    write_handoff(handoff, root=root)
+    # No scoring import or scoring operation exists in this retired entrypoint.
+    print(
+        pretty_json(
+            {
+                "stage": ExecutionStage.COMPLETE.value,
+                "scoring_performed": False,
+                "production_active": False,
+            }
+        ),
+        end="",
+    )
     return 0
-
-
-def write_handoff(handoff: dict[str, object], *, root: Path) -> None:
-    handoff["semantic_sha256"] = canonical_sha256(handoff)
-    destination = root / "execution-handoffs" / f"{handoff['semantic_sha256']}.json"
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    with destination.open("x", encoding="utf-8", newline="\n") as stream:
-        stream.write(pretty_json(handoff))
-    print(pretty_json(handoff), end="")
 
 
 if __name__ == "__main__":

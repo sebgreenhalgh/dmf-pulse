@@ -55,9 +55,41 @@ assert load_fallback(path, expected_sha256=report.semantic_sha256) == report
 assert len(report.score.metrics.scores) == 30
 assert report.provenance == score.provenance == labels.provenance == 'PUBLIC_FALLBACK_OUTCOME_SOURCE'
 assert not report.score.promotion.production_active
+from datetime import UTC, datetime
+from dmf_pulse.ingestion.p01_fallback_acquisition import acquire_p01_once, HttpOpenLigaTransport
+from dmf_pulse.ingestion.p01_fallback_consumption import load_consumption
+from dmf_pulse.ingestion.p01_fallback_diagnostics import (
+    ExecutionStage, FailureReason, P01FallbackExecutionFailure, ReasonFailure,
+    StoppedExecutionDiagnostic, stopped_record, persist_stopped,
+)
+assert load_consumption().historical_exact_cause == 'NOT_RETAINED'
+try:
+    acquire_p01_once(forecast_path=Path('not-read'), review_path=Path('not-read'),
+        expected_review_sha256='0'*64, implementation_root=Path('.'), artifact_root=Path('blocked-attempt'))
+except P01FallbackExecutionFailure as failure:
+    assert failure.stage == ExecutionStage.SEAL_ONE_ATTEMPT_MARKER
+    assert failure.reason == FailureReason.ONE_ATTEMPT_ALREADY_CONSUMED
+    assert failure.diagnostics.provider_requests_attempted == 0
+    now = datetime.now(UTC)
+    diagnostic = stopped_record(failure, started_at=now, stopped_at=now,
+        context_sha256=context.semantic_sha256, one_attempt_consumed=True)
+else:
+    raise AssertionError('D1 must refuse consumed A02 before transport')
+assert not Path('blocked-attempt').exists()
+diagnostic_path = persist_stopped(diagnostic, root=Path('diagnostics'))
+assert StoppedExecutionDiagnostic.model_validate_json(diagnostic_path.read_bytes()) == diagnostic
+assert 'home_goals' not in diagnostic.model_dump_json()
+try:
+    HttpOpenLigaTransport().get(context.allowed_routes[0])
+except ReasonFailure as failure:
+    assert failure.reason == FailureReason.ONE_ATTEMPT_ALREADY_CONSUMED
+else:
+    raise AssertionError('D1 has no default live transport')
 print(json.dumps({'status':'PASS','installed_import':True,'packaged_context_and_rights':True,
     'public_context_command':True,'typed_fallback_roundtrip':True,'full_metric_report_replay':True,
     'nongenerative_frozen_view_scoring':True,
+    'd1_packaged_consumption':True,'d1_consumed_authority_blocked':True,
+    'd1_safe_stopped_roundtrip':True,'d1_default_transport_blocked':True,
     'fixture_count':10,'product_count':3,'provider_calls':0,'production_active':False}))
 """
 

@@ -1,0 +1,26 @@
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-A02-D1-INSTALLED-WHEEL.log:1: trailing whitespace.
++{"d1_consumed_authority_blocked": true, "d1_default_transport_blocked": true, "d1_packaged_consumption": true, "d1_safe_stopped_roundtrip": true, "fixture_count": 10, "full_metric_report_replay": true, "installed_import": true, "nongenerative_frozen_view_scoring": true, "packaged_context_and_rights": true, "product_count": 3, "production_active": false, "provider_calls": 0, "public_context_command": true, "status": "PASS", "typed_fallback_roundtrip": true}
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-LEGACY-U-INSTALLED-WHEEL.log:1: trailing whitespace.
++{"frozen_forecast_unchanged": true, "installed_import": true, "private_storage_denied": true, "production_active": false, "provider_calls": 0, "public_freeze_command": true, "public_score_command": true, "status": "PASS", "three_products": true}
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-MYPY.log:1: trailing whitespace.
++Success: no issues found in 330 source files
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-REPOSITORY.log:1: trailing whitespace.
++{
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-REPOSITORY.log:2: trailing whitespace.
++  "error_count": 0,
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-REPOSITORY.log:3: trailing whitespace.
++  "errors": [],
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-REPOSITORY.log:4: trailing whitespace.
++  "status": "PASS"
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-REPOSITORY.log:5: trailing whitespace.
++}
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-SECRETS.log:1: trailing whitespace.
++{
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-SECRETS.log:2: trailing whitespace.
++  "finding_count": 0,
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-SECRETS.log:3: trailing whitespace.
++  "findings": [],
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-SECRETS.log:4: trailing whitespace.
++  "status": "PASS"
+evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1/COMMAND-SECRETS.log:5: trailing whitespace.
++}
