@@ -1,0 +1,10 @@
+{
+  "published_checkpoint": "fd2916827b49c8f9f1b41d06bc1bb7d560134998",
+  "issue": "Git interpreted preserved native CRLF in byte-authenticated private review JSON as trailing whitespace; PowerShell continued after diff-check exit2",
+  "remediation": "Explicitly retain blank-at-eol, blank-at-eof and space-before-tab checks while recognizing cr-at-eol only on captured PRIVATE-*.json; source/evidence bytes unchanged; current manifest refreshed",
+  "failed_command_receipt": "RELEASE-PRESERVED-CRLF-DIFF-01.json",
+  "corrected_diff_exit_code": 0,
+  "history_rewritten": false,
+  "tests_or_coverage_gates_changed": false,
+  "next_publication": "Ordinary follow-up commit with fresh exact-SHA CI"
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "started_at": "2026-10-28T23:56:37.022016+00:00",
+  "elapsed_seconds": 0.050533999921754,
+  "exit_code": 0,
+  "output_file": "RELEASE-STAGED-DIFF-02.log",
+  "output_byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

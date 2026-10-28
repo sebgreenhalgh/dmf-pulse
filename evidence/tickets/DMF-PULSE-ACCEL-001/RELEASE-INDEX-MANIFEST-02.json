@@ -1,0 +1,11 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/verify_index_manifest.py"
+  ],
+  "started_at": "2026-10-28T23:56:36.443310+00:00",
+  "elapsed_seconds": 0.4921657999511808,
+  "exit_code": 0,
+  "output_file": "RELEASE-INDEX-MANIFEST-02.log",
+  "output_byte_sha256": "8f98c089b1787a3ff00f2fe67c11901e5f86169c77067fd4a65ff9728d58e05c"
+}

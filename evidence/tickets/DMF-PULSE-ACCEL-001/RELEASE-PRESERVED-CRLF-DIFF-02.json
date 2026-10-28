@@ -1,0 +1,13 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check",
+    "ea3f12bb7ca435331cd3be5b68986e777f68bd54"
+  ],
+  "started_at": "2026-10-28T23:54:29.868507+00:00",
+  "elapsed_seconds": 0.12485010002274066,
+  "exit_code": 0,
+  "output_file": "RELEASE-PRESERVED-CRLF-DIFF-02.log",
+  "output_byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

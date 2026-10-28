@@ -1,0 +1,111 @@
+{
+  "a04_authority_created": false,
+  "actual_p01_scored": false,
+  "corrective_commit_status": "STAGED_NOT_YET_COMMITTED",
+  "manifest": {
+    "byte_sha256": "8199c2abfe11a9ab553e6ad256a46c509839524cd0ca9f15ba3eda92a26735c9",
+    "independent_staged_rows_verified": 1652,
+    "intermediate_observation": "First independent pre-staging check correctly reported .gitattributes mismatch. Root staged correction; independent rerun passed all1652rows. This does not reuse the older index PASS.",
+    "path": "evidence/tickets/PRC-013/current_manifest.json",
+    "verification_source": "Git index object bytes"
+  },
+  "new_provider_requests_by_reviewer": 0,
+  "pending_release_gates": [
+    "Corrective commit and ordinary remote publication with local/remote equality",
+    "Exact final-SHA mandatory fullCI success",
+    "Final capped review pack and handoff verification"
+  ],
+  "prior_cross_review_semantic_sha256": "fe8a69516db8bd9beb9f63d737203848c76d5217a9cf52b305c806b2f06e7bd7",
+  "prior_cross_source_bindings_verified": 11,
+  "private_baseline_gate": "Final independent reviewer verified one-/three-GW full decision byte equality under explicitly test-only D2 code identity; retained real-build provenance differences and numerical equality. Production identity unchanged.",
+  "private_json_artifacts_byte_unchanged": [
+    "PRIVATE-commands.json",
+    "PRIVATE-d2-baseline.json",
+    "PRIVATE-d2-diagnostic-recapture.json",
+    "PRIVATE-decision-diff-1.json",
+    "PRIVATE-decision-diff-3.json",
+    "PRIVATE-EVIDENCE-COPY-MANIFEST.json",
+    "PRIVATE-INDEPENDENT-REVIEW.json",
+    "PRIVATE-log-transcoding.json",
+    "PRIVATE-private-controlled-d2-provenance.control.json",
+    "PRIVATE-private-controlled-d2-provenance.json",
+    "PRIVATE-private-diagnostic-recapture.json",
+    "PRIVATE-private-final-controlled-d2-provenance.control.json",
+    "PRIVATE-private-final-controlled-d2-provenance.json",
+    "PRIVATE-private-independent-comparison.json",
+    "PRIVATE-private-independent-negative-findings.json",
+    "PRIVATE-PRIVATE-INDEPENDENT-REVIEW.json",
+    "PRIVATE-private-review-log-transcoding.json"
+  ],
+  "private_review_functional_bindings_verified": 13,
+  "private_review_semantic_sha256": "da6887203a3baf4fc27dd8ba27a92d4909571ace76eaa2c47b12e96fd31d7152",
+  "production_activation": false,
+  "published_implementation_sha": "fd2916827b49c8f9f1b41d06bc1bb7d560134998",
+  "reason_tests_not_repeated": "No functional bytes changed; independent88-case source review and finalized private74-case/real-stack review continue to bind exact bytes.",
+  "release_complete": false,
+  "reviewed_at": "2026-10-28T23:57:32.836866+00:00",
+  "reviewed_release_records": {
+    "AB-WHEEL-INTEGRATED": {
+      "exit_code": 0,
+      "log_byte_sha256": "e6d14b53fb37699eded9b0a5118c9a1f3f550a6d975ca592bdc16841ef9b4436",
+      "metadata_byte_sha256": "660fc33d3d00e82b6472469bef1b884e6ad5a51fda79ac96fd74f9d87de67248"
+    },
+    "CD-MYPY-FINAL": {
+      "exit_code": 0,
+      "log_byte_sha256": "d70fa934f5a524b1c973feae4086f9aadbb518fff6536027b7180683854eefd3",
+      "metadata_byte_sha256": "ecfa0c6f4836aa58ee0f4bda1d3ddb51d1d8e5d9ae663b73f66d9685eed0499c"
+    },
+    "CD-WHEEL-FINAL": {
+      "exit_code": 0,
+      "log_byte_sha256": "efa4e310c97bf1fb97f34d16978dccf0237a3ea7fb03ea8ddc711d2394fcf9f5",
+      "metadata_byte_sha256": "2b328e4ba7c00664825384455662fb22928d54d70732d2e3222c6279b7f09006"
+    },
+    "RELEASE-FORMAT-01": {
+      "exit_code": 0,
+      "log_byte_sha256": "5fdb88b212e4fd0b569a3fd43726cc672e14fa8f5cba297cf3bae518a87e930e",
+      "metadata_byte_sha256": "fe35a4b30ceb6019429fdead865353cb65c0adf1a0c149ee20b9f39f50c09e8e"
+    },
+    "RELEASE-INDEX-MANIFEST-02": {
+      "exit_code": 0,
+      "log_byte_sha256": "8f98c089b1787a3ff00f2fe67c11901e5f86169c77067fd4a65ff9728d58e05c",
+      "metadata_byte_sha256": "10e81a64565efcc2eaa928b112ec98c46cdbd4c95cc89c7c9ffb78d19208aede"
+    },
+    "RELEASE-LINT-01": {
+      "exit_code": 0,
+      "log_byte_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "metadata_byte_sha256": "ab963a56a84c2a9100cfd970f778c6b283c162379fe7ccf26813e8153a7c4e8c"
+    },
+    "RELEASE-REPOSITORY-02": {
+      "exit_code": 0,
+      "log_byte_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+      "metadata_byte_sha256": "000569de0a0ceeb4e1516a3a5d7e8c018cdeadefc398af45ad090b4518463114"
+    },
+    "RELEASE-SECRETS-01": {
+      "exit_code": 0,
+      "log_byte_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+      "metadata_byte_sha256": "3fccd0bd81905934cf0d66042e4949dc6df72c81c2e154e60f294e80cc592b40"
+    },
+    "RELEASE-STAGED-DIFF-02": {
+      "exit_code": 0,
+      "log_byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "metadata_byte_sha256": "edcf42091a28c0209c3e5a40cdc620ac905cf3891f8f61060364a92dd4b6836a"
+    }
+  },
+  "reviewer": "/root/accel_governance_audit",
+  "schema_version": "accel001-independent-cross-stream-release-addendum-v1",
+  "semantic_sha256": "a511a4aab70b26d044b30fb1d06c3980920e4533029ae8b54d4857e55b8da9a6",
+  "static_gate": "340 source files strict typing;976format;lintPASS;secret scan0findings;authenticated recorded logs.",
+  "tests_repeated_for_format_change": false,
+  "unresolved_material_findings": [],
+  "verdict": "FINAL_SOURCE_AND_EVIDENCE_FORMAT_CLEAR_EXACT_SHA_CI_PENDING",
+  "wheel_gate": "Both final integrated AB synthetic public command and final private publication boundary pass from installed wheel outside checkout; private smoke explicitly substitutes synthetic service output, real numerical stack covered separately.",
+  "whitespace_correction": {
+    "assessment": "Only native CRLF recognition changes for byte-authenticated private review JSON. All three default whitespace checks remain explicitly enabled; -text continues preserving authenticated bytes. No production, test, dependency, workflow or coverage change.",
+    "byte_sha256": "b4e1fb9734171bf1fdcf7274293a050c1bccd0b3300c948431ff1a364e70c08a",
+    "full_programme_diff_check_exit_code": 0,
+    "original_failure_retained": "RELEASE-PRESERVED-CRLF-DIFF-01.json",
+    "path": ".gitattributes",
+    "rule": "evidence/tickets/DMF-PULSE-ACCEL-001/PRIVATE-*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol",
+    "staged_diff_check_exit_code": 0
+  }
+}
