@@ -1,0 +1,85 @@
+{
+  "files": {
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py": {
+      "final_lf_git_byte_sha256": "ac160f8cea2bcd7b91bc9f9ba28d3d516caef69b96ccad8822c4994ca16f124a",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "ac160f8cea2bcd7b91bc9f9ba28d3d516caef69b96ccad8822c4994ca16f124a",
+      "status": "BYTE_IDENTICAL"
+    },
+    "scripts/verify_accel001_wheel.py": {
+      "final_lf_git_byte_sha256": "884949a97b6a96003bbecf6f124ce9ff66c22c44750865e929e98225873268d8",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "884949a97b6a96003bbecf6f124ce9ff66c22c44750865e929e98225873268d8",
+      "status": "BYTE_IDENTICAL"
+    },
+    "src/dmf_pulse/cli/p01_fallback.py": {
+      "final_lf_git_byte_sha256": "b2bf15d1f1e69b79178e0af22ea8e5809daacf0e9f4ca246429cdb654327be5c",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "b2bf15d1f1e69b79178e0af22ea8e5809daacf0e9f4ca246429cdb654327be5c",
+      "status": "BYTE_IDENTICAL"
+    },
+    "src/dmf_pulse/cli/p01_synthetic.py": {
+      "final_lf_git_byte_sha256": "4dc82512036fe2cb1f71fd75bed51d271c6828925b2a9a6140f6dfbf445db4b3",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "4dc82512036fe2cb1f71fd75bed51d271c6828925b2a9a6140f6dfbf445db4b3",
+      "status": "BYTE_IDENTICAL"
+    },
+    "src/dmf_pulse/evaluation/p01_synthetic_readiness.py": {
+      "final_lf_git_byte_sha256": "dfb8f44cefc3548b9d95eef495b7cdffe9fffd0b2a5fc65edba5eecc6df22b3f",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "dfb8f44cefc3548b9d95eef495b7cdffe9fffd0b2a5fc65edba5eecc6df22b3f",
+      "status": "BYTE_IDENTICAL"
+    },
+    "src/dmf_pulse/ingestion/p01_fallback.py": {
+      "final_lf_git_byte_sha256": "ea89002f04af67f052a1ad5069f71b6a2a618062f36dcfdfeaed775f6f296492",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "ea89002f04af67f052a1ad5069f71b6a2a618062f36dcfdfeaed775f6f296492",
+      "status": "BYTE_IDENTICAL"
+    },
+    "src/dmf_pulse/ingestion/p01_metadata_candidate.py": {
+      "final_lf_git_byte_sha256": "f689e1fa599e40e90fb58caa3a38ba93a21b37f30c488bfd909af8c47258adee",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "f689e1fa599e40e90fb58caa3a38ba93a21b37f30c488bfd909af8c47258adee",
+      "status": "BYTE_IDENTICAL"
+    },
+    "tests/unit/evaluation/test_p01_metadata_candidate.py": {
+      "final_lf_git_byte_sha256": "e85ba30a301c30a49e127d5851171d5f499e9c0d81cb75c869de9a8e46234070",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "9ec84f0d24120b6ebb26c489b59fd8639f8cc0649304c66e587f58e5b4d31107",
+      "python_ast_identical": true,
+      "status": "CRLF_TO_LF_ONLY_ORIGINAL_BYTES_RECONSTRUCTED"
+    },
+    "tests/unit/evaluation/test_p01_synthetic_readiness.py": {
+      "final_lf_git_byte_sha256": "9753f39eb00f5101606ca5b0160ee4a929550df8d079f6200b9a54dc2fbe772b",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "f5cabb58dd065cc2e7fe0c9286157b78b660f2cc06cf21146d4eb6c9ed89e81a",
+      "python_ast_identical": true,
+      "status": "CRLF_TO_LF_ONLY_ORIGINAL_BYTES_RECONSTRUCTED"
+    },
+    "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md": {
+      "final_lf_git_byte_sha256": "c0a00b82244177dfc87797652021ff6e6116b3c404b70e4c480a330ad37a8a59",
+      "matches_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+      "original_reviewed_byte_sha256": "c0a00b82244177dfc87797652021ff6e6116b3c404b70e4c480a330ad37a8a59",
+      "status": "BYTE_IDENTICAL"
+    }
+  },
+  "implementation_commit": "3fbf640ddc8e2a86571a6f14db81b5bdd3958a9b",
+  "log_portability_change": {
+    "added_rule": "evidence/tickets/DMF-PULSE-ACCEL-001/*.log binary",
+    "commit_status": "Observed in working tree; root will commit the publication correction separately.",
+    "path": ".gitattributes",
+    "scope": "Preserve raw programme command-log bytes during Git publication. No test, runtime, coverage or acquisition-policy change.",
+    "working_attribute_file_byte_sha256": "ea6edb4d4d392b021bac62c6007130457f2a2c686cdc31b825edcb63140abe4e"
+  },
+  "original_review_byte_sha256": "fc572564642fb2a4c056c1991be17fb48cf82e3120e2f7a2a025ee22781e38c3",
+  "original_review_preserved": true,
+  "original_review_semantic_sha256": "e70b813bbc3fc689a8d19e544546b2770dbe9fb5bb41ac731bc4ff654ed3868d",
+  "release_gates_attested": false,
+  "reviewed_at": "2026-10-28T23:28:46.409212+00:00",
+  "reviewer": "/root/accel_p01_audit",
+  "schema_version": "dmf-pulse-accel-001-independent-ab-portability-review-v1",
+  "semantic_sha256": "fafa8270693e114b796b718a9df52ceaa3ae3f8cc6e4ea1bc8893899b199d9a5",
+  "test_repetition_reason": "Exact reconstruction proves the only changed reviewed bytes are CRLF-to-LF transformations in two Python test files. All eight other reviewed paths, including every runtime/CLI change and the wheel verifier, are byte-identical. Prior independent 97-case coverage remains applicable.",
+  "tests_repeated": false,
+  "verdict": "PRIOR_AB_CLEARANCE_REAFFIRMED_NO_SEMANTIC_CHANGES"
+}
