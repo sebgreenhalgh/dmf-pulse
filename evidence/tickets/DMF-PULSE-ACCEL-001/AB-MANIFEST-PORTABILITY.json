@@ -1,0 +1,9 @@
+{
+  "cause": "CP0 Linux CI exposed manifest hashes over Windows working CRLF rather than committed LF bytes",
+  "failed_run": 40783699076,
+  "failed_job": 123151956503,
+  "failure_class": "REPOSITORY_MANIFEST_PORTABILITY_CODE_DEFECT_NOT_INFRASTRUCTURE",
+  "remediation": "Normalize changed deliverable working bytes to committed LF; regenerate current manifest; verify each index blob against manifest before publication",
+  "tests_or_gates_weakened": false,
+  "source_semantics_changed": false
+}

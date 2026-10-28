@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 844,
+      "bytes": 894,
       "path": ".gitattributes",
-      "sha256": "3eba3df72b1254936a24dcd417202352126229ee43898dae05a80ee3998a00a4"
+      "sha256": "ea6edb4d4d392b021bac62c6007130457f2a2c686cdc31b825edcb63140abe4e"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 206022,
+      "bytes": 203197,
       "path": "PLANS.md",
-      "sha256": "4d0ccfe5e09cd60acf35f9bfa20d898717cca67b783451107edc701765f6aa96"
+      "sha256": "f2550c1ba8036ee0828233e2005d02f14f4e40bb508dfe1a867d824bcbb8dd42"
     },
     {
       "bytes": 2761,
@@ -6116,14 +6116,14 @@
       "sha256": "d07de1f23698008584e81ac8207a31d6f347b192676134034cd99240362227d7"
     },
     {
-      "bytes": 7533,
+      "bytes": 7332,
       "path": "tests/unit/evaluation/test_p01_metadata_candidate.py",
-      "sha256": "9ec84f0d24120b6ebb26c489b59fd8639f8cc0649304c66e587f58e5b4d31107"
+      "sha256": "e85ba30a301c30a49e127d5851171d5f499e9c0d81cb75c869de9a8e46234070"
     },
     {
-      "bytes": 10289,
+      "bytes": 10017,
       "path": "tests/unit/evaluation/test_p01_synthetic_readiness.py",
-      "sha256": "f5cabb58dd065cc2e7fe0c9286157b78b660f2cc06cf21146d4eb6c9ed89e81a"
+      "sha256": "9753f39eb00f5101606ca5b0160ee4a929550df8d079f6200b9a54dc2fbe772b"
     },
     {
       "bytes": 9125,
@@ -7696,9 +7696,9 @@
       "sha256": "c8ed400d3dd6f8f5391e517ca6459bec62af2d88edd032e0096426ff9bb86254"
     },
     {
-      "bytes": 2762,
+      "bytes": 2719,
       "path": "tickets/DMF-PULSE-ACCEL-001/ACCEPTANCE.md",
-      "sha256": "b5b7cdb3fe7bd0b3fc0565d88f76720498c9437d4b665310bb6b3770402ea662"
+      "sha256": "b79d7eb388a942f427478a6859b748468394978be5d8a00fc6019fc4678104c4"
     },
     {
       "bytes": 3462,
