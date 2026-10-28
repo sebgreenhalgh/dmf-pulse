@@ -1,0 +1,169 @@
+"""Independent publication adversaries; no production code or provider access."""
+
+from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
+
+import pytest
+
+from dmf_pulse.private_v1.actionability import DeadlineGuard, checked_report
+from dmf_pulse.private_v1.errors import PrivateV1Error
+
+
+START = datetime(2026, 9, 1, 12, tzinfo=UTC)
+DEADLINE = START + timedelta(minutes=10)
+REPORT = "SYNTHETIC PRIVATE ACTION - DO NOT PUBLISH AFTER EXPIRY"
+
+
+def result():
+    return SimpleNamespace(
+        actionability=DeadlineGuard(lambda: START).bind(
+            deadline_at=DEADLINE, decision_sha256="a" * 64, report=REPORT
+        ),
+        report=REPORT,
+        decision=SimpleNamespace(semantic_sha256="a" * 64),
+        publication_not_before=START,
+    )
+
+
+@pytest.mark.parametrize("when", [START, DEADLINE - timedelta(microseconds=1)])
+def test_before_deadline_preserves_report(when):
+    assert checked_report(result(), clock=lambda: when) == REPORT
+
+
+@pytest.mark.parametrize("when", [DEADLINE, DEADLINE + timedelta(days=1)])
+def test_exact_or_late_publication_withholds_action(when):
+    with pytest.raises(PrivateV1Error) as error:
+        checked_report(result(), clock=lambda: when)
+    assert error.value.code == "DECISION_DEADLINE_PASSED"
+    assert REPORT not in str(error.value)
+
+
+@pytest.mark.parametrize("when", [None, "private-clock-value", START.replace(tzinfo=None), START - timedelta(microseconds=1)])
+def test_invalid_stale_and_naive_publication_clocks_are_typed(when):
+    with pytest.raises(PrivateV1Error) as error:
+        checked_report(result(), clock=lambda: when)
+    assert error.value.code == "DECISION_CLOCK_INVALID"
+    assert "private-clock-value" not in str(error.value)
+
+
+def test_clock_exception_cannot_leak_private_detail():
+    def failed_clock():
+        raise OSError("PRIVATE_CLOCK_DIAGNOSTIC_MUST_NOT_ESCAPE")
+
+    with pytest.raises(PrivateV1Error) as error:
+        checked_report(result(), clock=failed_clock)
+    assert error.value.code == "DECISION_CLOCK_INVALID"
+    assert "PRIVATE_CLOCK_DIAGNOSTIC" not in str(error.value)
+
+
+@pytest.mark.parametrize("mutation", ["missing_receipt", "bad_receipt", "changed_report", "missing_decision", "changed_decision", "nontext_report", "unsealed_deadline_extension"])
+def test_service_result_mutations_are_rejected(mutation):
+    value = result()
+    if mutation == "missing_receipt":
+        del value.actionability
+    elif mutation == "bad_receipt":
+        value.actionability = {"deadline_at": DEADLINE}
+    elif mutation == "changed_report":
+        value.report += "\nDO SOMETHING ELSE"
+    elif mutation == "missing_decision":
+        del value.decision
+    elif mutation == "changed_decision":
+        value.decision.semantic_sha256 = "b" * 64
+    elif mutation == "nontext_report":
+        value.report = b"PRIVATE-BYTES"
+    else:
+        value.actionability = value.actionability.model_copy(
+            update={"deadline_at": DEADLINE + timedelta(days=1)}
+        )
+    with pytest.raises(PrivateV1Error) as error:
+        checked_report(value, clock=lambda: START)
+    assert error.value.code == "DECISION_PUBLICATION_INVALID"
+    assert REPORT not in str(error.value)
+
+
+def test_later_admitted_evidence_raises_clock_floor_without_expiring_cutoff():
+    values = iter((START, START + timedelta(minutes=2)))
+    guard = DeadlineGuard(lambda: next(values), not_before=START)
+    assert guard.check(DEADLINE) == START
+    assert guard.check(DEADLINE, not_before=START + timedelta(minutes=1)) == START + timedelta(minutes=2)
+
+
+def test_stale_clock_before_later_admitted_evidence_fails():
+    guard = DeadlineGuard(lambda: START)
+    with pytest.raises(PrivateV1Error) as error:
+        guard.check(DEADLINE, not_before=START + timedelta(seconds=1))
+    assert error.value.code == "DECISION_CLOCK_INVALID"
+
+
+def test_earlier_evidence_floor_cannot_erase_monotone_clock_history():
+    values = iter((START + timedelta(minutes=2), START + timedelta(minutes=1)))
+    guard = DeadlineGuard(lambda: next(values))
+    guard.check(DEADLINE)
+    with pytest.raises(PrivateV1Error) as error:
+        guard.check(DEADLINE, not_before=START)
+    assert error.value.code == "DECISION_CLOCK_INVALID"
+
+
+def test_binding_validation_cannot_cross_deadline_after_final_clock_sample(monkeypatch):
+    import dmf_pulse.private_v1.actionability as actionability
+
+    value = result()
+    state = {"now": START}
+    original_hash = actionability.hashlib.sha256
+
+    def hash_crossing_deadline(*args, **kwargs):
+        state["now"] = DEADLINE
+        return original_hash(*args, **kwargs)
+
+    monkeypatch.setattr(actionability.hashlib, "sha256", hash_crossing_deadline)
+    with pytest.raises(PrivateV1Error) as error:
+        checked_report(value, clock=lambda: state["now"])
+    assert error.value.code == "DECISION_DEADLINE_PASSED"
+
+
+def test_receipt_sealing_cannot_cross_deadline_and_return_actionability(monkeypatch):
+    import dmf_pulse.private_v1.actionability as actionability
+
+    state = {"now": START}
+    original_hash = actionability.hashlib.sha256
+
+    def hash_crossing_deadline(*args, **kwargs):
+        state["now"] = DEADLINE
+        return original_hash(*args, **kwargs)
+
+    monkeypatch.setattr(actionability.hashlib, "sha256", hash_crossing_deadline)
+    with pytest.raises(PrivateV1Error) as error:
+        DeadlineGuard(lambda: state["now"]).bind(
+            deadline_at=DEADLINE, decision_sha256="a" * 64, report=REPORT
+        )
+    assert error.value.code == "DECISION_DEADLINE_PASSED"
+
+
+@pytest.mark.parametrize("final_seconds, rejected", [(10.5, True), (11, False)])
+def test_post_seal_highwater_survives_service_cli_boundary(final_seconds, rejected):
+    ticks = iter((START + timedelta(seconds=10), START + timedelta(seconds=11)))
+    guard = DeadlineGuard(lambda: next(ticks))
+    value = SimpleNamespace(
+        actionability=guard.bind(deadline_at=DEADLINE, decision_sha256="a" * 64, report=REPORT),
+        publication_not_before=guard.latest_observed_at,
+        report=REPORT,
+        decision=SimpleNamespace(semantic_sha256="a" * 64),
+    )
+    assert value.actionability.checked_at == START + timedelta(seconds=10)
+    assert value.publication_not_before == START + timedelta(seconds=11)
+    if rejected:
+        with pytest.raises(PrivateV1Error) as error:
+            checked_report(value, clock=lambda: START + timedelta(seconds=final_seconds))
+        assert error.value.code == "DECISION_CLOCK_INVALID"
+    else:
+        assert checked_report(value, clock=lambda: START + timedelta(seconds=final_seconds)) == REPORT
+
+
+@pytest.mark.parametrize("floor", [None, "PRIVATE-FLOOR", START.replace(tzinfo=None), START - timedelta(seconds=1), DEADLINE])
+def test_missing_or_invalid_publication_floor_fails_closed(floor):
+    value = result()
+    value.publication_not_before = floor
+    with pytest.raises(PrivateV1Error) as error:
+        checked_report(value, clock=lambda: START)
+    assert error.value.code in {"DECISION_CLOCK_INVALID", "DECISION_PUBLICATION_INVALID"}
+    assert "PRIVATE-FLOOR" not in str(error.value)

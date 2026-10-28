@@ -1,0 +1,49 @@
+"""TEST ONLY: hold inherited whole-package provenance constant for an equality oracle."""
+
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+BASELINE_IDENTITY = "dmf-pulse-0.2.0:source-sha256:b6d6a95dbf7795d26deb3bf39ea842a4207b202ca3bc7d59312c6355e38b4296"
+
+
+def main():
+    repository = Path(sys.argv[sys.argv.index("--repository") + 1]).resolve()
+    output = Path(sys.argv[sys.argv.index("--output") + 1]).resolve()
+    sys.path.insert(0, str(repository))
+    sys.path.insert(0, str(repository / "src"))
+    import dmf_pulse.markets.normalisation as normalisation
+    import dmf_pulse.markets.consensus as consensus
+    import capture_decisions
+
+    original_normalisation = normalisation.code_identity
+    original_consensus = consensus.code_identity
+    actual = original_normalisation()
+    sidecar = {
+        "classification": "TEST_ONLY_CONTROLLED_D2_PROVENANCE_EQUALITY_ORACLE",
+        "actual_build_identity": actual,
+        "controlled_identity": BASELINE_IDENTITY,
+        "production_source_or_runtime_policy_modified": False,
+        "functions_monkeypatched_in_this_test_process_only": [
+            "dmf_pulse.markets.normalisation.code_identity",
+            "dmf_pulse.markets.consensus.code_identity",
+        ],
+        "shim_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "baseline_source_sha": "e8efdd2c1051f75accdb2bd1f635ca02ed410241",
+    }
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.with_name(output.stem + ".control.json").open("x", encoding="utf-8") as handle:
+        json.dump(sidecar, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+    normalisation.code_identity = lambda: BASELINE_IDENTITY
+    consensus.code_identity = lambda: BASELINE_IDENTITY
+    try:
+        return capture_decisions.main()
+    finally:
+        normalisation.code_identity = original_normalisation
+        consensus.code_identity = original_consensus
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

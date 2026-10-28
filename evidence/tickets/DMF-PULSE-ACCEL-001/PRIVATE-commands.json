@@ -1,0 +1,10 @@
+{
+  "schema_version": "accel-001-independent-baseline-command-v1",
+  "working_directory": "C:/Users/sebgr/Documents/dmf-pulse/review_pack/001V-P01-FALLBACK-A03-D2",
+  "shell": "PowerShell",
+  "command": "& '.venv\\Scripts\\python.exe' 'C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\capture.py' --repository 'C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03-D2' --implementation-sha e8efdd2c1051f75accdb2bd1f635ca02ed410241 --output 'C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-baseline.json' 2>&1 | Tee-Object -FilePath 'C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-baseline.log'",
+  "comparison_method": "Rerun the same capture.py with the implementation worktree and SHA, a new exclusive output path, and the same two test names. Compare decision_semantic_sha256 and decision_json_sha256 by horizon. Report hashes may change intentionally. Each runtime is one uncontrolled timing sample, not an accuracy or speedup claim.",
+  "source_edited": false,
+  "real_provider_access": false,
+  "actual_p01_scoring": false
+}

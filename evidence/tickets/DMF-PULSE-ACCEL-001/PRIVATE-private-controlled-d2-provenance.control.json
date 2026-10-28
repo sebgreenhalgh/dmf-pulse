@@ -1,0 +1,12 @@
+{
+  "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:6d993c67983f6754e519e3a94553ec5b8c12bbdcbb7fa53d11db598102e5bda5",
+  "baseline_source_sha": "e8efdd2c1051f75accdb2bd1f635ca02ed410241",
+  "classification": "TEST_ONLY_CONTROLLED_D2_PROVENANCE_EQUALITY_ORACLE",
+  "controlled_identity": "dmf-pulse-0.2.0:source-sha256:b6d6a95dbf7795d26deb3bf39ea842a4207b202ca3bc7d59312c6355e38b4296",
+  "functions_monkeypatched_in_this_test_process_only": [
+    "dmf_pulse.markets.normalisation.code_identity",
+    "dmf_pulse.markets.consensus.code_identity"
+  ],
+  "production_source_or_runtime_policy_modified": false,
+  "shim_sha256": "c36e55ccdacd9e2ff51060ee7467610dc87bfb402891b008936c70f9265f3eb4"
+}

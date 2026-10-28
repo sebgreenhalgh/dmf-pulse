@@ -1,0 +1,16 @@
+[
+  {
+    "original": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-independent-comparison.log",
+    "original_byte_sha256": "d790f443e2ad5564fbf099cd7ef4a5d3d5e8b8fb0f1442c9f65ee2b51356dd45",
+    "utf8": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-independent-comparison.utf8.log",
+    "utf8_byte_sha256": "a8a83cd100d6f1e2ae238071e0116f6a6d5b0ce845496470fd91b008ed1c2fa9",
+    "original_reconstructible_as": "UTF-16LE BOM plus UTF-8-decoded text encoded UTF-16LE"
+  },
+  {
+    "original": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-adversarial-tests.utf16.log",
+    "original_byte_sha256": "3cd3a6dff5a386e48672ff9bf97261acc96113343c2b3710f2711e0655920092",
+    "utf8": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-adversarial-tests.utf16.utf8.log",
+    "utf8_byte_sha256": "93f5381cda80e327b75272369919b4a6b71f5d0e759c61aafa8fbde7c4c7e893",
+    "original_reconstructible_as": "UTF-16LE BOM plus UTF-8-decoded text encoded UTF-16LE"
+  }
+]

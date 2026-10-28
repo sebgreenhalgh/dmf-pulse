@@ -1,0 +1,12 @@
+{
+  "command": [
+    "uv",
+    "build",
+    "--offline"
+  ],
+  "started_at": "2026-10-28T23:45:45.158486+00:00",
+  "elapsed_seconds": 13.091084499959834,
+  "exit_code": 0,
+  "output_file": "CD-BUILD-FINAL.log",
+  "output_byte_sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47"
+}

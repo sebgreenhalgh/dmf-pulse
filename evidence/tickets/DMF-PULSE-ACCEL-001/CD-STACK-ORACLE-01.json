@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+    "-q",
+    "--basetemp=C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c08",
+    "tests/unit/private_v1/test_one_command.py",
+    "tests/unit/private_v1/test_live_transient.py",
+    "tests/unit/private_v1/test_bounded_horizon_oracle.py",
+    "tests/unit/private_v1/test_horizon_candidate_oracle.py"
+  ],
+  "started_at": "2026-10-28T23:33:08.401404+00:00",
+  "elapsed_seconds": 780.8631053999998,
+  "exit_code": 0,
+  "output_file": "CD-STACK-ORACLE-01.log",
+  "output_byte_sha256": "ea5ac43bd1c033f83d88613bf353f758f7614924187d1597df2b3a2da61fb2b7"
+}

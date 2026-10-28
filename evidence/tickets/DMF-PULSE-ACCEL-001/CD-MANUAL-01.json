@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+    "-q",
+    "--basetemp=C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c06",
+    "tests/unit/private_v1/test_live_publication.py"
+  ],
+  "started_at": "2026-10-28T23:32:00.951707+00:00",
+  "elapsed_seconds": 6.5209422000916675,
+  "exit_code": 1,
+  "output_file": "CD-MANUAL-01.log",
+  "output_byte_sha256": "9facdd4cff3b4aa4a5ef8058d79c3704f789d5b0e58f80a19cef4ad08f96f50c"
+}

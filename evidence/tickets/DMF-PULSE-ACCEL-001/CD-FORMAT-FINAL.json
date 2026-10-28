@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "ruff",
+    "format",
+    "--check",
+    "."
+  ],
+  "started_at": "2026-10-28T23:45:41.489288+00:00",
+  "elapsed_seconds": 0.3278528000228107,
+  "exit_code": 0,
+  "output_file": "CD-FORMAT-FINAL.log",
+  "output_byte_sha256": "ddc8f2e2ad55738a4fae6a1060399c6d8978d58d4189d16bc02771c9fe1450a4"
+}

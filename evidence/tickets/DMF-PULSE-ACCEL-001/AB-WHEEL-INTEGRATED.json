@@ -1,0 +1,11 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/verify_accel001_wheel.py"
+  ],
+  "started_at": "2026-10-28T23:46:09.162151+00:00",
+  "elapsed_seconds": 96.17576000001281,
+  "exit_code": 0,
+  "output_file": "AB-WHEEL-INTEGRATED.log",
+  "output_byte_sha256": "e6d14b53fb37699eded9b0a5118c9a1f3f550a6d975ca592bdc16841ef9b4436"
+}

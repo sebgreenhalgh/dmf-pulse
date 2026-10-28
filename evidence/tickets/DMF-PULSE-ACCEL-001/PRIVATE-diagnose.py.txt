@@ -1,0 +1,46 @@
+from pathlib import Path
+import hashlib
+import json
+
+a = Path("C:/Users/sebgr/Documents/dmf-pulse/review_pack/001V-P01-FALLBACK-A03-D2")
+b = Path("C:/Users/sebgr/Documents/dmf-pulse/review_pack/ACCEL-001-PRIVATE")
+roots = ["tests/fixtures", "config", "src/dmf_pulse/rules/resources", "src/dmf_pulse/availability/resources", "src/dmf_pulse/fpl_points/resources"]
+different_inputs = []
+for name in roots:
+    for path in (a / name).rglob("*"):
+        if not path.is_file() or "__pycache__" in path.parts:
+            continue
+        other = b / path.relative_to(a)
+        if other.is_file() and hashlib.sha256(path.read_bytes()).digest() != hashlib.sha256(other.read_bytes()).digest():
+            different_inputs.append(str(path.relative_to(a)))
+print("DIFFERENT_FIXTURE_RESOURCE_BYTES=" + json.dumps(different_inputs))
+
+
+def differences(left, right, path=""):
+    if type(left) is not type(right):
+        return [{"path": path, "before": left, "after": right}]
+    if isinstance(left, dict):
+        result = []
+        for key in sorted(set(left) | set(right)):
+            result.extend(differences(left.get(key), right.get(key), path + "/" + key))
+        return result
+    if isinstance(left, list):
+        if len(left) != len(right):
+            return [{"path": path + "/length", "before": len(left), "after": len(right)}]
+        result = []
+        for index, (first, second) in enumerate(zip(left, right)):
+            result.extend(differences(first, second, path + "/" + str(index)))
+        return result
+    return [] if left == right else [{"path": path, "before": left, "after": right}]
+
+
+for horizon in (1, 3):
+    original = a.parent / "ACCEL-001-private-baseline" / f"d2-diagnostic-recapture.gw{horizon}.decision.json"
+    candidate = b / "review_pack" / f"private-diagnostic-recapture.gw{horizon}.decision.json"
+    if original.exists() and candidate.exists():
+        before, after = json.loads(original.read_bytes()), json.loads(candidate.read_bytes())
+        result = differences(before, after)
+        output = a.parent / "ACCEL-001-private-baseline" / f"decision-diff-{horizon}.json"
+        output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        print("HORIZON=" + str(horizon) + " DIFFERENCES=" + str(len(result)))
+        print(json.dumps(result[:30], indent=2))

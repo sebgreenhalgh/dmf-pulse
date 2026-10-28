@@ -1,0 +1,167 @@
+[
+  {
+    "after": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: c6e7327f329834f669498576cfef6c2f7833ddf334fb73ca083ce1d90f6524d2; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+    "before": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: 6bf54820db9c12f17bdd6031499add7de1961c138eae03ea35f3ab0daee27d54; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+    "path": "/action_space_disclosure"
+  },
+  {
+    "after": "98daead9f42d3ef1178c510145bb0da2e9f97fc25cc31476e9f6c50d0f34b494",
+    "before": "98718dcf025244f56f49f8eb60e03e3d0955c0011fa8ddc34941df79c41b2077",
+    "path": "/lineage/current_execution_input_sha256"
+  },
+  {
+    "after": "145c5f031a51918756c9436f0b28b7c8ff92342599b12bc23ea54719dc731f4b",
+    "before": "27bca69b6a1d525b91b566e668f63d5f0c336f92e37085c3e6428b204ef25d02",
+    "path": "/lineage/fixture_projection_sha256_by_gameweek/2/7886b8a0-b2ab-520e-8980-6f393692b205"
+  },
+  {
+    "after": "62e512ec3008b30ffd319131dfe3a45323cddb5e28aec270256c99c68198015d",
+    "before": "9405dd4d63baa6a366f403eb0b3c3f5cce92041003cdbe9b12373d09a15f6b12",
+    "path": "/lineage/fixture_projection_sha256_by_gameweek/2/d356a801-ca62-5600-96b8-602f517ee4c5"
+  },
+  {
+    "after": "d1da66af2e9017c602056c8cfdcede67689340ce7a070c6b9e76656ad9055fb9",
+    "before": "48122d418f984e8172cc0963e3a9f9f6769587e5f6480bc63b66756582917d2f",
+    "path": "/lineage/fixture_projection_sha256_by_gameweek/2/f4559f88-2a4e-5d91-8ced-c51eacde23e6"
+  },
+  {
+    "after": "43e6196860b33dd4bed2fe3b7fa112f2f0fb5ef54203a1f7b34a018f2985ee89",
+    "before": "fbb4baeb602b942f7eaf220790b83eb6d3b9d9278e43ac1d5bcc29888a101942",
+    "path": "/lineage/fixture_projection_sha256_by_gameweek/3/11c8a795-b854-50d6-b339-da87fa2a1247"
+  },
+  {
+    "after": "419a87a86a67bd6f43493589dae8c0de25f531e83616afba8bb1596bce03f3da",
+    "before": "c8ed7f856013ba59bb3c0f98334eb488495a01bc86905da3d031c5e0750bfb00",
+    "path": "/lineage/fixture_projection_sha256_by_gameweek/3/41a2c9ee-bbfa-5cd4-8d29-a7dea067b39e"
+  },
+  {
+    "after": "e6777eed8669770014241e34649688eb3cf595d99b7fc47bd8109693c29931b4",
+    "before": "ff44f693abab2cc0cc8a502b9957e9480e6c038d9f0bbcd8f79d9a44e92c01aa",
+    "path": "/lineage/fixture_projection_sha256_by_gameweek/3/fbdbba06-a524-5131-b639-0ed47f53361c"
+  },
+  {
+    "after": "b193e6829aa5f1ddf11275e4625d690bc3952d228338a890151c95e915a416c2",
+    "before": "6490dd2f78ee98f7286d6ddf3a16f19774da775844d18e34dfbb8e8b12d45538",
+    "path": "/lineage/future_gameweek_input_sha256_by_gameweek/3"
+  },
+  {
+    "after": "85237a96ed1001290d49dcb264b0a875d4e7eaa0204667a7cbedab06e176f78c",
+    "before": "bd5fd5469c52ac19f3ab35ed304334a03fa07a2772ef7717b2b282f125fe9478",
+    "path": "/lineage/gameweek_projection_sha256_by_gameweek/2"
+  },
+  {
+    "after": "3c3a132e9463854a2f7dedeb88ee383738c57c8ec95dcedb65390da7c9286f8a",
+    "before": "24ecb114450b4c32ddc5660ad3a5416230e3d9e2278db163d700353464c54921",
+    "path": "/lineage/gameweek_projection_sha256_by_gameweek/3"
+  },
+  {
+    "after": "a7244f72e56ea45a1a42145e6b4fb7ad1cf794bae5aa9e37f5f218eea4b5b824",
+    "before": "94e494ace5c0de7f7d91f16c8585837b0be24f6b846d4c30588cb4d93e435ad0",
+    "path": "/lineage/one_gameweek_optimiser_result_sha256"
+  },
+  {
+    "after": "0de0275aeb65994c0f297dd0f17e869e686ec07943aac5828169cdc5d09201ff",
+    "before": "8ba17a836e1f6ed0d3d48d4749c6a36205ee4b359a9ea78f7db548b0bf9d0806",
+    "path": "/lineage/optimiser_request_sha256"
+  },
+  {
+    "after": "8dba591049e13d1253cb0e142c8b0240abd70865b93669616827154725e33671",
+    "before": "b0fd3538796d572f0efc8478e91a02407601fd561c42d0013cc3831a52043787",
+    "path": "/lineage/optimiser_result_sha256"
+  },
+  {
+    "after": "30fb45bed7edfd44233aebb42ecae35732b5327ed74e5ffb553e383b42c6c4fd",
+    "before": "02cacff479f59f7c874f3d3681d437471b4225cf99c3a608690b30f25445fa94",
+    "path": "/lineage/rolling_execution_input_sha256"
+  },
+  {
+    "after": "3bda717f7d4b669a4fb54b8bc519ac8de185cb04e6e4294982432f9762e97c31",
+    "before": "6b83eb0aac9538e0ec503f6c5dcff4b39aa45a4341ee54197d0e6442a8d75b7d",
+    "path": "/lineage/scenario_tree_sha256"
+  },
+  {
+    "after": "3181ce2a9c9ed284f6b442f11228b25243b087914b101add399e80d407b89970",
+    "before": "185ffc0bae7a0b26b72c9cc01a08bf85cb728187ba3fcd52cc9ef17f7a94b03c",
+    "path": "/lineage/stage8_distribution_sha256_by_gameweek/2/7886b8a0-b2ab-520e-8980-6f393692b205"
+  },
+  {
+    "after": "11885f1e14b506d87893bf90d819b36911abc546dc4e4dc69881ec48e617dda4",
+    "before": "859d9dcdbb6a06752b8d91b398036be1c2b45a08c01c300cef483bd207385247",
+    "path": "/lineage/stage8_distribution_sha256_by_gameweek/2/d356a801-ca62-5600-96b8-602f517ee4c5"
+  },
+  {
+    "after": "524bc9025b95299fbb338cbbd1bff448c9b1e2180f6bacfe5f3ad11c1a642947",
+    "before": "0ce4e5a1a3c500d0e9924ddec6daa20d360650f1262866e93a24e66059d23caf",
+    "path": "/lineage/stage8_distribution_sha256_by_gameweek/2/f4559f88-2a4e-5d91-8ced-c51eacde23e6"
+  },
+  {
+    "after": "8a920836478b45a224655e122a368cfd7284fcf404588db350992790c6a46b33",
+    "before": "767e487f45a0199d5279594ae7b7ae82bf5826faf37441dcfed28acc0b83d6da",
+    "path": "/lineage/stage8_distribution_sha256_by_gameweek/3/11c8a795-b854-50d6-b339-da87fa2a1247"
+  },
+  {
+    "after": "b2d4853424b70384776b7b0ebca291e41dd44a8f4b587e070dc17f612c7ef5f0",
+    "before": "8c77f53ec39c4c90ab7f1df9bad79a47ffd313973bdd19e4f88407187853055b",
+    "path": "/lineage/stage8_distribution_sha256_by_gameweek/3/41a2c9ee-bbfa-5cd4-8d29-a7dea067b39e"
+  },
+  {
+    "after": "d666c66d8bb7e5f9e5ab02744dc56272a23a994205b2293f18428b364cfac9f5",
+    "before": "80dd37a55ff3fd07271638c4fed19d4c24618b4a7e89bdd6efc59074a2ffffd5",
+    "path": "/lineage/stage8_distribution_sha256_by_gameweek/3/fbdbba06-a524-5131-b639-0ed47f53361c"
+  },
+  {
+    "after": "50fdd58043f58994b6c8f6dfee7576e6ca637dc9f06cb34d328ea6e186dbe470",
+    "before": "299b4b738558fd5d23619ec424b0ee07b6ded555ed70330be4a8cd1a586d62fd",
+    "path": "/semantic_sha256"
+  },
+  {
+    "after": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: c6e7327f329834f669498576cfef6c2f7833ddf334fb73ca083ce1d90f6524d2; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+    "before": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: 6bf54820db9c12f17bdd6031499add7de1961c138eae03ea35f3ab0daee27d54; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+    "path": "/transfer_frontier/action_space_disclosure"
+  },
+  {
+    "after": "0de0275aeb65994c0f297dd0f17e869e686ec07943aac5828169cdc5d09201ff",
+    "before": "8ba17a836e1f6ed0d3d48d4749c6a36205ee4b359a9ea78f7db548b0bf9d0806",
+    "path": "/transfer_frontier/optimiser_request_sha256"
+  },
+  {
+    "after": "8dba591049e13d1253cb0e142c8b0240abd70865b93669616827154725e33671",
+    "before": "b0fd3538796d572f0efc8478e91a02407601fd561c42d0013cc3831a52043787",
+    "path": "/transfer_frontier/optimiser_result_sha256"
+  },
+  {
+    "after": "1b9cd172b13cde8fa3b01950ea752b0dc3ce7b2762ca2d8e628109051bbc4f74",
+    "before": "1e892b8ec8901f9766f2b46f4cedbfd83882a417acf29faed2d702d84cd70af0",
+    "path": "/transfer_frontier/points/0/semantic_sha256"
+  },
+  {
+    "after": "1496f3fd7a98e8e4b447902b72c05fb96c34a48744a48a3157c289dfe32bed3d",
+    "before": "ef58bd5d727f74a5127e19f9c969c51408649417475284b409277834b4aa79ea",
+    "path": "/transfer_frontier/points/0/stage11_plan_sha256"
+  },
+  {
+    "after": "5cb9e1b6a70bfab9eac0b238909aa4f96c7e115b5a7d9f06954fdc5d4296f604",
+    "before": "329cf0ee441e7c4946514d9822435925f385be39ba2d2a61e25c84549ebd7e3a",
+    "path": "/transfer_frontier/points/1/semantic_sha256"
+  },
+  {
+    "after": "8f62c8acd675f3c36d7340fc46c0e1ef59f4c70d33f9ca1373079510fca0a677",
+    "before": "93fe522abeeb3a03d1b294165033e99bb6d63ceeb4c2ddeff72db86a2b609c09",
+    "path": "/transfer_frontier/points/1/stage11_plan_sha256"
+  },
+  {
+    "after": "8b7d664fd8b76766146ef842768847b7c5f205dc0592bda3685dd48f8178c952",
+    "before": "a80f1825615e459a7675ac41762e7cbc1a5d1bdcb4ce5f9ba5933a808518f729",
+    "path": "/transfer_frontier/points/2/semantic_sha256"
+  },
+  {
+    "after": "14c698582106bbaf1a57aec9cbcaa8658c75a3a78cfea0649c496fcb1150d033",
+    "before": "5703efce0b65e56af984429463d0e1c3d9c62d46f8f5145cc3cc6e9be21888f3",
+    "path": "/transfer_frontier/points/2/stage11_plan_sha256"
+  },
+  {
+    "after": "060d00db4575b9c65af68b19be19b4ca05bbbf10b36bff6052bb9b927af151d3",
+    "before": "7d8b1a928d0d034fd3b5f029ff7e888a5a504ac7a1c0b8173af4f6c564b7cb94",
+    "path": "/transfer_frontier/semantic_sha256"
+  }
+]

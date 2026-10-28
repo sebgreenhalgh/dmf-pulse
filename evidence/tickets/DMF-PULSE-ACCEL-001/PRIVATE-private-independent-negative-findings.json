@@ -1,0 +1,57 @@
+{
+  "schema_version": "accel-001-private-independent-negative-findings-v1",
+  "reviewer": "/root/accel_private_audit",
+  "implementation_authored_by_reviewer": false,
+  "findings": [
+    {
+      "id": "PRIVATE-REVIEW-001",
+      "severity": "P1",
+      "finding": "Legacy live-transient guard initially had no captured/source-usable lower bound; independent input services also needed the aggregate admitted-evidence lower bound before solving.",
+      "remediation": "Initialize from max(captured_at, FPL usable_at); pre-solve check raises the existing monotone floor to current_state.decision_information_at.",
+      "status": "REMEDIATED_SOURCE_REVIEW_AND_ADVERSARIAL_FLOOR_TESTS"
+    },
+    {
+      "id": "PRIVATE-REVIEW-002",
+      "severity": "P2",
+      "finding": "Generic Confidence label could present Stage-7 minutes confidence as overall decision confidence.",
+      "remediation": "Renderer explicitly labels Minutes confidence (Stage 7).",
+      "status": "REMEDIATED_SOURCE_REVIEW"
+    },
+    {
+      "id": "PRIVATE-REVIEW-003",
+      "severity": "P2",
+      "finding": "Final CLI clock read and missing publication receipt could escape the typed publication boundary.",
+      "remediation": "Both CLIs use checked_report; malformed service evidence and clock failures produce sanitized typed errors.",
+      "status": "REMEDIATED_INDEPENDENT_ADVERSARIAL_TESTS"
+    },
+    {
+      "id": "PRIVATE-REVIEW-004",
+      "severity": "P1",
+      "finding": "Final clock was sampled before receipt/report binding validation; crossing the deadline during validation still returned an actionable report. Receipt sealing had the analogous ordering.",
+      "failing_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py::test_binding_validation_cannot_cross_deadline_after_final_clock_sample -p no:cacheprovider",
+      "failing_exit_code": 1,
+      "failure_observed": "Failed: DID NOT RAISE PrivateV1Error",
+      "failure_summary": "1 failed in 2.41s",
+      "original_tool_chunk_id": "df87d6",
+      "remediation": "Read the final clock after all binding validation; check again after receipt sealing before bind returns.",
+      "verification_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py -k 'binding_validation_cannot or receipt_sealing_cannot' -p no:cacheprovider",
+      "verification_exit_code": 0,
+      "verification_summary": "2 passed, 19 deselected in 2.17s",
+      "verification_tool_chunk_id": "a895db",
+      "status": "REMEDIATED_INDEPENDENT_REGRESSION_TESTS"
+    },
+    {
+      "id": "PRIVATE-REVIEW-005",
+      "severity": "P2",
+      "finding": "Receipt checked_at retained the pre-sealing sample t10 while the service observed t11 after sealing; a final CLI clock t10.5 could therefore erase the service high-water mark.",
+      "original_failure_evidence": "Independently reproduced by /root/accel_governance_audit; see retained INDEPENDENT-CROSS-STREAM-FINDING-01 evidence.",
+      "remediation": "Both frozen transient service results carry publication_not_before from the guard's final observed timestamp. The final boundary validates receipt.checked_at <= floor < deadline and checks the publication clock against that floor.",
+      "verification_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py tests/unit/private_v1/test_actionability.py tests/unit/cli/test_pulse.py tests/unit/private_v1/test_cli.py tests/unit/private_v1/test_live_publication.py --basetemp C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-accel-private-independent-006 -p no:cacheprovider",
+      "verification_exit_code": 0,
+      "verification_summary": "74 passed in 8.66s",
+      "verification_tool_chunk_id": "d50f03",
+      "status": "REMEDIATED_INDEPENDENT_HIGHWATER_AND_INVALID_FLOOR_REGRESSIONS"
+    }
+  ],
+  "retention": "Synthetic adversarial evidence only; no provider bodies or manager data."
+}

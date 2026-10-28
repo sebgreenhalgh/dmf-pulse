@@ -50,3 +50,9 @@ CP0 independent review addendum: G06 is also a valid publication P1. C includes
 the legacy live-transient service/CLI with injected clock and the same typed receipt;
 pure synthetic run/replay remains clock-free. G07 reporting parity will be delivered
 after mandatory guards because existing typed evidence supports it without model changes.
+
+Release verification includes scripts/verify_accel001_private_wheel.py as the
+private counterpart of the AB installed-wheel verifier. It exercises only the
+installed public command's publication boundary with synthetic in-memory service
+output; actual one-/three-GW computation is covered separately by offline stack
+and numerical-oracle runs. No new provider or operational command is introduced.

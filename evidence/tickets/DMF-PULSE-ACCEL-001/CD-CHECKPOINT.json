@@ -1,0 +1,33 @@
+{
+  "checkpoint": "CD_INTEGRATED",
+  "immutable_parent": "ea3f12bb7ca435331cd3be5b68986e777f68bd54",
+  "branch": "readiness/DMF-PULSE-ACCEL-001-release",
+  "release_status": "LOCAL_GATES_AND_INDEPENDENT_REVIEW_CLEAR_EXACT_SHA_CI_PENDING",
+  "source_package_identity": "8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+  "private_review_semantic_sha256": "da6887203a3baf4fc27dd8ba27a92d4909571ace76eaa2c47b12e96fd31d7152",
+  "cross_review_semantic_sha256": "fe8a69516db8bd9beb9f63d737203848c76d5217a9cf52b305c806b2f06e7bd7",
+  "local_tests": {
+    "deadline_orchestration_and_cli": 40,
+    "stack_and_tiny_oracles": 29,
+    "final_highwater_and_cli": 46,
+    "independent_final_adversarial": 74,
+    "independent_cross_stream": 88,
+    "independent_final_controlled_stack": 2
+  },
+  "test_count_note": "Suites overlap; counts must not be summed as unique cases. Large root suites began before final highwater-only remediation; final focused, independent stack and full CI bind final implementation.",
+  "numerical_parity": "Both full decision JSONs equal D2 under explicitly TEST_ONLY fixed market code identity; actual build differences are documented provenance hashes and embedded provenance references.",
+  "installed_wheels": "Final pulse synthetic-publication and integrated P01 strict/candidate public CLI both pass outside checkout; zero network.",
+  "format_lint_typing": "PASS;340 source files typed",
+  "frozen_sync_build": "PASS_OFFLINE",
+  "p01_scored": false,
+  "provider_requests": 0,
+  "a04_authority_created": false,
+  "model_promotion": false,
+  "production_activation": false,
+  "retained_root_test_failures": [
+    "CD-DEADLINE-01: incorrect CLI test path, zero tests ran; corrected selection in CD-DEADLINE-02",
+    "CD-MANUAL-01: fixture file snapshot tried to read isolated-home directory; file-only recursive snapshot fixed,5pass CD-MANUAL-02"
+  ],
+  "retained_ci_failure": "CP0 manifest bound local CRLF bytes instead of Git LF; corrected in AB ea3f12b. Not an infrastructure retry.",
+  "semantic_sha256": "b2f50038e066adabbbec6009f8f1058d49d4fbcae00b6530a75d57d46396eaf9"
+}

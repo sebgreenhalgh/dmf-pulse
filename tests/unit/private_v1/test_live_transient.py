@@ -328,6 +328,7 @@ def test_current_like_verified_live_transient_full_stack_has_zero_persistence(
     fpl_times = iter((_CAPTURED + timedelta(minutes=5), _CAPTURED + timedelta(minutes=6)))
     manager_times = iter((_CAPTURED + timedelta(minutes=12), _CAPTURED + timedelta(minutes=13)))
     result = PrivateV1LiveTransientService(
+        clock=lambda: _CUTOFF,
         fpl_service=CurrentFplInputService(clock=lambda: next(fpl_times)),
         manager_service=CurrentManagerStateService(clock=lambda: next(manager_times)),
     ).run(

@@ -1,0 +1,207 @@
+...FF                                                                    [100%]
+================================== FAILURES ===================================
+______ test_manual_public_cli_checks_publication_without_writing[False] _______
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/ACCEL-001-PRIVATE')
+tmp_path = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c06/test_manual_public_cli_checks_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000024E6F277460>
+expired = False
+
+    @pytest.mark.parametrize("expired", [False, True])
+    def test_manual_public_cli_checks_publication_without_writing(
+        repository_root, tmp_path, monkeypatch, expired
+    ):
+        source = tmp_path / "synthetic.json"
+        source.write_text("{}", encoding="utf-8")
+        report = "SYNTHETIC_PRIVATE_ACTION"
+        receipt = DeadlineGuard(lambda: NOW).bind(
+            deadline_at=DEADLINE, decision_sha256="a" * 64, report=report
+        )
+    
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return DEADLINE if expired else NOW
+    
+        monkeypatch.setattr(private_v1, "datetime", Clock)
+        monkeypatch.setattr(
+            private_v1,
+            "load_private_input_model",
+            lambda *args, **kwargs: SimpleNamespace(score_priors=(), fixtures=()),
+        )
+        monkeypatch.setattr(private_v1, "load_mc_policy", lambda path: None)
+        monkeypatch.setattr(
+            private_v1.PrivateV1LiveTransientService,
+            "run",
+            lambda *args: SimpleNamespace(
+                report=report,
+                actionability=receipt,
+                decision=SimpleNamespace(semantic_sha256="a" * 64),
+            ),
+        )
+        args = ["private-v1", "live-transient"]
+        for option in (
+            "bootstrap",
+            "fixtures",
+            "manager",
+            "odds-input",
+            "team-alias-plan",
+            "fixture-mapping-plan",
+            "market-identity-view",
+            "player-identity-map",
+            "score-priors",
+            "stage7",
+            "ownership",
+            "candidate-policy",
+            "mc-policy",
+        ):
+            args += ["--" + option, str(source)]
+        for option in ("rules-approved-at", "captured-at", "information-cutoff", "mapping-decided-at"):
+            args += ["--" + option, NOW.isoformat()]
+        args += [
+            "--ruleset",
+            str(repository_root / "config/rules/fpl-2026-27"),
+            "--rules-approval-reference",
+            "SYNTHETIC_TEST_ONLY",
+            "--gameweek",
+            "2",
+            "--run-id",
+            "SYNTHETIC_TEST_ONLY",
+            "--code-sha",
+            "a" * 40,
+            "--root-seed",
+            "42",
+            "--scenario-count",
+            "1",
+        ]
+>       before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+                          ^^^^^^^^^^^^^^
+
+tests\unit\private_v1\test_live_publication.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\anaconda3\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c06/test_manual_public_cli_checks_0/isolated-home')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-accel001-c06\\test_manual_public_cli_checks_0\\isolated-home'
+
+..\..\..\..\anaconda3\Lib\pathlib\_local.py:537: PermissionError
+_______ test_manual_public_cli_checks_publication_without_writing[True] _______
+
+repository_root = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/ACCEL-001-PRIVATE')
+tmp_path = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c06/test_manual_public_cli_checks_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000024E6F277350>
+expired = True
+
+    @pytest.mark.parametrize("expired", [False, True])
+    def test_manual_public_cli_checks_publication_without_writing(
+        repository_root, tmp_path, monkeypatch, expired
+    ):
+        source = tmp_path / "synthetic.json"
+        source.write_text("{}", encoding="utf-8")
+        report = "SYNTHETIC_PRIVATE_ACTION"
+        receipt = DeadlineGuard(lambda: NOW).bind(
+            deadline_at=DEADLINE, decision_sha256="a" * 64, report=report
+        )
+    
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return DEADLINE if expired else NOW
+    
+        monkeypatch.setattr(private_v1, "datetime", Clock)
+        monkeypatch.setattr(
+            private_v1,
+            "load_private_input_model",
+            lambda *args, **kwargs: SimpleNamespace(score_priors=(), fixtures=()),
+        )
+        monkeypatch.setattr(private_v1, "load_mc_policy", lambda path: None)
+        monkeypatch.setattr(
+            private_v1.PrivateV1LiveTransientService,
+            "run",
+            lambda *args: SimpleNamespace(
+                report=report,
+                actionability=receipt,
+                decision=SimpleNamespace(semantic_sha256="a" * 64),
+            ),
+        )
+        args = ["private-v1", "live-transient"]
+        for option in (
+            "bootstrap",
+            "fixtures",
+            "manager",
+            "odds-input",
+            "team-alias-plan",
+            "fixture-mapping-plan",
+            "market-identity-view",
+            "player-identity-map",
+            "score-priors",
+            "stage7",
+            "ownership",
+            "candidate-policy",
+            "mc-policy",
+        ):
+            args += ["--" + option, str(source)]
+        for option in ("rules-approved-at", "captured-at", "information-cutoff", "mapping-decided-at"):
+            args += ["--" + option, NOW.isoformat()]
+        args += [
+            "--ruleset",
+            str(repository_root / "config/rules/fpl-2026-27"),
+            "--rules-approval-reference",
+            "SYNTHETIC_TEST_ONLY",
+            "--gameweek",
+            "2",
+            "--run-id",
+            "SYNTHETIC_TEST_ONLY",
+            "--code-sha",
+            "a" * 40,
+            "--root-seed",
+            "42",
+            "--scenario-count",
+            "1",
+        ]
+>       before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+                          ^^^^^^^^^^^^^^
+
+tests\unit\private_v1\test_live_publication.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\anaconda3\Lib\pathlib\_abc.py:625: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c06/test_manual_public_cli_checks_1/isolated-home')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-accel001-c06\\test_manual_public_cli_checks_1\\isolated-home'
+
+..\..\..\..\anaconda3\Lib\pathlib\_local.py:537: PermissionError
+=========================== short test summary info ===========================
+FAILED tests/unit/private_v1/test_live_publication.py::test_manual_public_cli_checks_publication_without_writing[False]
+FAILED tests/unit/private_v1/test_live_publication.py::test_manual_public_cli_checks_publication_without_writing[True]
+2 failed, 3 passed in 4.73s
+{"denied_network_attempts": 0, "pytest_exit_code": 1}

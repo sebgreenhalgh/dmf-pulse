@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+    "-q",
+    "--basetemp=C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-c05",
+    "tests/unit/private_v1/test_actionability.py",
+    "tests/unit/private_v1/test_deadline_orchestration.py",
+    "tests/unit/cli/test_pulse.py",
+    "tests/unit/private_v1/test_cli.py"
+  ],
+  "started_at": "2026-10-28T23:30:27.803426+00:00",
+  "elapsed_seconds": 824.7643757000333,
+  "exit_code": 0,
+  "output_file": "CD-DEADLINE-02.log",
+  "output_byte_sha256": "16e5243a658cdf665d89df00b023ab719f2c9cd33bfb9c39a82b14c653d83ff2"
+}

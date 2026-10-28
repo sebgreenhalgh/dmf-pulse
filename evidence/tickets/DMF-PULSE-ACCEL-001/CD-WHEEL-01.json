@@ -1,0 +1,11 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/verify_accel001_private_wheel.py"
+  ],
+  "started_at": "2026-10-28T23:37:11.283831+00:00",
+  "elapsed_seconds": 20.848230100004002,
+  "exit_code": 0,
+  "output_file": "CD-WHEEL-01.log",
+  "output_byte_sha256": "efa4e310c97bf1fb97f34d16978dccf0237a3ea7fb03ea8ddc711d2394fcf9f5"
+}

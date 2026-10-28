@@ -1,0 +1,152 @@
+{
+  "entries": [
+    {
+      "byte_sha256": "93cb5c19976bf662f44a233118303867c498b583eccdb1ca74b2bcfc198cc546",
+      "bytes": 4874,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\capture.py",
+      "suggested_evidence_name": "PRIVATE-capture.py.txt"
+    },
+    {
+      "byte_sha256": "bb2b692474e171e035785ae76e09ef66e5fd728b90abe5254aae6dcc6c4312c7",
+      "bytes": 1130,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\capture_decisions.py",
+      "suggested_evidence_name": "PRIVATE-capture_decisions.py.txt"
+    },
+    {
+      "byte_sha256": "c36e55ccdacd9e2ff51060ee7467610dc87bfb402891b008936c70f9265f3eb4",
+      "bytes": 1998,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\controlled_capture.py",
+      "suggested_evidence_name": "PRIVATE-controlled_capture.py.txt"
+    },
+    {
+      "byte_sha256": "02639fd19b02bdbfcbfc1433bcca6b01453e83f7d3bbb1ffeba3202783901de3",
+      "bytes": 2339,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\diagnose.py",
+      "suggested_evidence_name": "PRIVATE-diagnose.py.txt"
+    },
+    {
+      "byte_sha256": "757cb066c42bd2a87c6e2ff08e633e42c3b91dd1abb0fc78a5dce657cd4481b4",
+      "bytes": 10371,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\seal_review.py",
+      "suggested_evidence_name": "PRIVATE-seal_review.py.txt"
+    },
+    {
+      "byte_sha256": "2089cf70296bebb844f39c2522e1bd436bc61f567bb8d6b3f1408f99e17fc4ef",
+      "bytes": 1157,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\commands.json",
+      "suggested_evidence_name": "PRIVATE-commands.json"
+    },
+    {
+      "byte_sha256": "a943c93b1763a5c617d682a168d7071684853994fcc7bb1c649504b1fa87f0f4",
+      "bytes": 4442,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-baseline.json",
+      "suggested_evidence_name": "PRIVATE-d2-baseline.json"
+    },
+    {
+      "byte_sha256": "52548edc476b803e05a8525c8c8d7cfd9ad7067ca18012752ae4ee391fd7699e",
+      "bytes": 311,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-baseline.utf8.log",
+      "suggested_evidence_name": "PRIVATE-d2-baseline.utf8.log"
+    },
+    {
+      "byte_sha256": "e554107119cbbd01e0a8cc323a8fc6fd293783b8d97d281b4777d23590933a8b",
+      "bytes": 333,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\log-transcoding.json",
+      "suggested_evidence_name": "PRIVATE-log-transcoding.json"
+    },
+    {
+      "byte_sha256": "ebe31b65199db14336228ff6335e28319db5ccf7bbbe650fb8ad6c5bc03801f3",
+      "bytes": 4439,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-diagnostic-recapture.json",
+      "suggested_evidence_name": "PRIVATE-d2-diagnostic-recapture.json"
+    },
+    {
+      "byte_sha256": "2e2fe88ff40c5f14970846677559955da081986f451ec46409477e5fcd570766",
+      "bytes": 4491,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\decision-diff-1.json",
+      "suggested_evidence_name": "PRIVATE-decision-diff-1.json"
+    },
+    {
+      "byte_sha256": "e4f0969d6a098e51113d8a9e59170353b6a8c906278085fec3667366f00dc1cc",
+      "bytes": 14108,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\decision-diff-3.json",
+      "suggested_evidence_name": "PRIVATE-decision-diff-3.json"
+    },
+    {
+      "byte_sha256": "824d00b06454138029810c3ec20858bfc0255f3545d8a7d1d8543477a3ae7ddd",
+      "bytes": 35172,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\PRIVATE-INDEPENDENT-REVIEW.json",
+      "suggested_evidence_name": "PRIVATE-PRIVATE-INDEPENDENT-REVIEW.json"
+    },
+    {
+      "byte_sha256": "1e1dfc4cbd89a3523ddc69e298e7c129afee629e0a002eb3af3979ace7190147",
+      "bytes": 3966,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-independent-negative-findings.json",
+      "suggested_evidence_name": "PRIVATE-private-independent-negative-findings.json"
+    },
+    {
+      "byte_sha256": "83634c151e1fe4f66981fc22c52e76a9779ad64e4a1c07b6b486356d7e5473b3",
+      "bytes": 7057,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\test_independent_private_publication.py",
+      "suggested_evidence_name": "PRIVATE-test_independent_private_publication.py.txt"
+    },
+    {
+      "byte_sha256": "0e31c82f8c1eac138c78f046bc5bff7e9df77d47982f79fd326850e9e3496227",
+      "bytes": 4404,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-independent-comparison.json",
+      "suggested_evidence_name": "PRIVATE-private-independent-comparison.json"
+    },
+    {
+      "byte_sha256": "a8a83cd100d6f1e2ae238071e0116f6a6d5b0ce845496470fd91b008ed1c2fa9",
+      "bytes": 333,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-independent-comparison.utf8.log",
+      "suggested_evidence_name": "PRIVATE-private-independent-comparison.utf8.log"
+    },
+    {
+      "byte_sha256": "6d87285f853506e509a96d24ecfc853e97149b1a8faa62ddd9b9beedabf29e71",
+      "bytes": 4440,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-diagnostic-recapture.json",
+      "suggested_evidence_name": "PRIVATE-private-diagnostic-recapture.json"
+    },
+    {
+      "byte_sha256": "6fa8c4bc8c627d32cb90e421b1e9464fe306ab56f03194f90e77bbd6ba5f1953",
+      "bytes": 4439,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-controlled-d2-provenance.json",
+      "suggested_evidence_name": "PRIVATE-private-controlled-d2-provenance.json"
+    },
+    {
+      "byte_sha256": "b046d2f5c5e47454608f9d766df5e2d8818e12ca0b8e1de6e6203e996ccad277",
+      "bytes": 711,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-controlled-d2-provenance.control.json",
+      "suggested_evidence_name": "PRIVATE-private-controlled-d2-provenance.control.json"
+    },
+    {
+      "byte_sha256": "57503324885cc855c3413debe444d86ac1646d45867405bf64cc2ba2d455131a",
+      "bytes": 4440,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-controlled-d2-provenance.json",
+      "suggested_evidence_name": "PRIVATE-private-final-controlled-d2-provenance.json"
+    },
+    {
+      "byte_sha256": "9031230d73636d0ef981e5fbfe21fdaa9d71ed9be434f509a4538128329c7596",
+      "bytes": 711,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-controlled-d2-provenance.control.json",
+      "suggested_evidence_name": "PRIVATE-private-final-controlled-d2-provenance.control.json"
+    },
+    {
+      "byte_sha256": "93f5381cda80e327b75272369919b4a6b71f5d0e759c61aafa8fbde7c4c7e893",
+      "bytes": 182,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-adversarial-tests.utf16.utf8.log",
+      "suggested_evidence_name": "PRIVATE-private-final-adversarial-tests.utf16.utf8.log"
+    },
+    {
+      "byte_sha256": "b2dcf7c0a74e8d5c869eb826910eb51b7cfb03b7f801bcecc04c544f86bf7f6d",
+      "bytes": 1167,
+      "source_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-review-log-transcoding.json",
+      "suggested_evidence_name": "PRIVATE-private-review-log-transcoding.json"
+    }
+  ],
+  "instructions": "Copy exact bytes to evidence/tickets/DMF-PULSE-ACCEL-001 using suggested names. Python source is retained as .py.txt to avoid formatter changes; restore .py filenames in an isolated reproduction directory. Omit raw synthetic decision JSON: comparison receipt binds their hashes and contains every differing path plus numerical equality proofs.",
+  "reviewer": "/root/accel_private_audit",
+  "schema_version": "accel-001-private-evidence-copy-manifest-v1",
+  "total_bytes": 117015
+}

@@ -1,0 +1,9 @@
+....                                                                     [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-001-PRIVATE\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-001-PRIVATE\.pytest_cache\v\cache\nodeids: [WinError 5] Access is denied: 'C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 1 warning in 4.32s
+{"denied_network_attempts": 0, "pytest_exit_code": 0}

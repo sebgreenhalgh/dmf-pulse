@@ -22,6 +22,7 @@ from dmf_pulse.ingestion.fpl.direct import (
     DirectFplCredential,
     DirectFplCredentialProvider,
 )
+from dmf_pulse.private_v1.actionability import checked_report
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.one_command import (
     OneCommandRequest,
@@ -154,7 +155,8 @@ def pulse_command(
                 horizon_gameweeks=cast(Literal[1, 3], horizon_gameweeks),
             )
         )
-        typer.echo(result.report)
+        report = checked_report(result, clock=lambda: datetime.now(UTC))
+        typer.echo(report)
     except PrivateV1Error as exc:
         if not progress.failure_reported:
             progress.failure("command preflight", exc.code)

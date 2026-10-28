@@ -1,0 +1,33 @@
+"""Retain repository-owned synthetic decisions for exact baseline discrepancy diagnosis."""
+
+from pathlib import Path
+import sys
+
+
+def main():
+    repository = Path(sys.argv[sys.argv.index("--repository") + 1]).resolve()
+    output = Path(sys.argv[sys.argv.index("--output") + 1]).resolve()
+    sys.path.insert(0, str(repository))
+    sys.path.insert(0, str(repository / "src"))
+    import dmf_pulse.private_v1.one_command as module
+    import capture
+
+    original = module.PrivateV1OneCommandService.run
+
+    def retain_synthetic_decision(service, request):
+        result = original(service, request)
+        path = output.with_name(output.stem + f".gw{request.horizon_gameweeks}.decision.json")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("xb") as handle:
+            handle.write(result.decision.model_dump_json().encode("utf-8"))
+        return result
+
+    module.PrivateV1OneCommandService.run = retain_synthetic_decision
+    try:
+        return capture.main()
+    finally:
+        module.PrivateV1OneCommandService.run = original
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

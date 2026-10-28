@@ -15,6 +15,15 @@ render/late CLI publication fail closed; naive/invalid/reversed clocks fail type
 Compute on either side of acquisition cutoff remains valid before the deadline.
 No provider calls/retention changes. Compare timing and decisions with D2 baseline.
 
+Baseline clarification, discovered by independent review: accepted market provenance
+hashes every installed Python source file (`markets/normalisation.py:code_identity`).
+Adding these modules therefore changes real-build lineage and downstream seals.
+Retain those differences; require exact legal/economic/scenario payload equality.
+An additional explicitly TEST-ONLY comparison fixes both market code-identity
+lookups to the recorded D2 identity and must reproduce the original full decision
+hashes. Production source authentication is never patched or weakened. Record the
+initial unequal hashes, their exact differing paths, and both comparison results.
+
 Run targeted tests with socket/DNS denial, inherited P01 and private/optimiser
 regressions, independent oracles, strict mypy, Ruff format/lint, frozen sync, build,
 installed wheel outside checkout, repository/manifests, secret scan and diff checks.

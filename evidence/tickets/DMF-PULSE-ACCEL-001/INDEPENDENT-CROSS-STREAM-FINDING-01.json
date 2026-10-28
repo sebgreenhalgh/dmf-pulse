@@ -1,0 +1,33 @@
+{
+  "controlling_requirement": "ACCEL acceptance: reversed clocks fail typed; DMFP-16 section14.1 clock health fail-closed.",
+  "finding": "Final service clock high-water mark is lost across the result/publication boundary.",
+  "finding_id": "CROSS-R01",
+  "production_edits_by_reviewer": false,
+  "provider_requests_by_reviewer": 0,
+  "recorded_at": "2026-10-28T23:41:15.635643+00:00",
+  "release_gates_attested": false,
+  "reproduction": {
+    "bind_clock_seconds": [
+      10,
+      11
+    ],
+    "expected_result": "DECISION_CLOCK_INVALID",
+    "observed_result": "ACCEPTED",
+    "publication_clock_seconds": 10.5,
+    "receipt_checked_seconds": 10
+  },
+  "required_remediation": "Carry actual final service time in transient result; validate receipt.checked_at <= highwater < deadline and publication time >= highwater. Preserve final post-sealing and post-validation checks.",
+  "reviewed_source_bytes": {
+    "src/dmf_pulse/cli/private_v1.py": "53f6a3e6ee7ec5a395c56b4b3ec4084584de3034b3117192a088cb92f1dfa9af",
+    "src/dmf_pulse/cli/pulse.py": "7dce44c234f7b70499ba8d0784c27653edfeae26147ba215bc5cba7a7ddb1f8f",
+    "src/dmf_pulse/private_v1/actionability.py": "8b8b67c89635fc23f7c1f39093268302fab2fe437dcf28b4c639ee59b033450d",
+    "src/dmf_pulse/private_v1/decision_quality.py": "5eeb4fc677c2dae2034baa526ce40058c9daf60f6fdd47b2542131a5b16bbb34",
+    "src/dmf_pulse/private_v1/live.py": "9d4f706451e112fb5715e530db51620cca85f4512556377698f84c164eb2cac2",
+    "src/dmf_pulse/private_v1/one_command.py": "ed5405fffcc24cf8c41d1ecbf5f9a26ff2a63ac21183e1c9ddc8a792c212fa49"
+  },
+  "reviewer": "/root/accel_governance_audit",
+  "schema_version": "accel001-independent-cross-stream-finding-v1",
+  "semantic_sha256": "8b7d3e82ac5c8214ca6b1def163708535ca6341dcdc930be004d85ac89fbe023",
+  "severity": "MATERIAL_P2",
+  "status": "OPEN_REMEDIATION_IN_PROGRESS"
+}

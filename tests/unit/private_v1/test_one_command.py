@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
@@ -494,6 +495,53 @@ def test_network_blocked_synthetic_one_command_runs_actual_decision_stack(
         result.report
     )
     assert "ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE" in result.report
+    from dmf_pulse.private_v1.actionability import require_publication
+    from dmf_pulse.private_v1.decision_quality import (
+        DecisionQualitySummary,
+        render_decision_quality,
+    )
+
+    decision_bytes = result.decision.model_dump_json()
+    quality = DecisionQualitySummary.from_decision(result.decision)
+    assert quality.confidence == result.decision.confidence
+    assert quality.minutes_family == result.decision.stage7_family
+    assert quality.prior_status == result.decision.player_prior_status
+    assert quality.prior_evidence_cutoff == result.decision.player_prior_evidence_cutoff
+    assert quality.fallback_player_ids == result.decision.player_prior_fallback_player_ids
+    assert quality.monte_carlo_status == result.decision.stage9_monte_carlo_status
+    assert quality.monte_carlo_reasons == result.decision.stage9_monte_carlo_reasons
+    assert quality.scenario_count == result.decision.scenario_count
+    assert quality.information_cutoff == RUN_AT
+    assert quality.decision_sha256 == result.decision.semantic_sha256
+    assert f"Minutes confidence (Stage 7): {quality.confidence}" in result.report
+    assert f"Stage-9 Monte Carlo gate: {quality.monte_carlo_status}" in result.report
+    assert "Current-GW carry-forward is outside historical private GW1 acceptance" in result.report
+    assert "ACTION DEADLINE" in result.report
+    assert result.actionability.deadline_at == datetime(2026, 9, 4, 17, 30, tzinfo=UTC)
+    require_publication(
+        result.actionability,
+        decision_sha256=result.decision.semantic_sha256,
+        report=result.report,
+        now=RUN_AT + timedelta(minutes=1),
+    )
+    # Pure display variants test the two scoped disclosures without inventing a decision.
+    historical = replace(
+        quality,
+        prior_status="HISTORICAL_GW1_ACCEPTED_SCOPE",
+        fallback_player_ids=(),
+        monte_carlo_status="CONTINUE",
+        monte_carlo_reasons=("SYNTHETIC_MC_REASON",),
+    )
+    rendered = render_decision_quality(historical, label=lambda value: "LABEL:" + value)
+    assert "Historical private GW1 acceptance applies only to that GW1 scope" in rendered
+    assert "Explicit position-fallback players: NONE" in rendered
+    assert "CONTINUE; reasons: SYNTHETIC_MC_REASON" in rendered
+    fallback = render_decision_quality(
+        replace(historical, fallback_player_ids=("synthetic-id",)),
+        label=lambda value: "DISPLAY:" + value,
+    )
+    assert "DISPLAY:synthetic-id" in fallback
+    assert result.decision.model_dump_json() == decision_bytes
     assert "global FPL transfer optimum" not in result.report
     assert odds_service.requests == [(RUN_AT, TARGET_KICKOFF + timedelta(hours=2, seconds=1))]
     assert len(direct_transport.requests) == 8
@@ -635,6 +683,9 @@ def test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff(
         item.fixture_coverage.score_prior_only_fixtures for item in result.decision.future_plan
     ) == (0, 3)
     assert result.report.startswith("DMF PULSE - PRIVATE 3-GW ROLLING DECISION")
+    assert result.actionability.decision_sha256 == result.decision.semantic_sha256
+    assert "ACTION DEADLINE" in result.report
+    assert "Minutes confidence (Stage 7)" not in result.report
     assert "GW2 - DO NOW" in result.report
     assert result.report.count("PROVISIONAL - REOPTIMISE AT THAT DEADLINE") == 2
     assert "FUTURE_PRICE_CHANGES_NOT_MODELLED_IN_PRIVATE_3GW_V1" in result.report

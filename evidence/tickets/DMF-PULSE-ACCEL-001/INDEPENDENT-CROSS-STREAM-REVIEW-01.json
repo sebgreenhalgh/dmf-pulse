@@ -1,0 +1,189 @@
+{
+  "adversarial_questions": [
+    {
+      "assessment": "No P01 change: independently authenticated actual byte and semantic hashes using bytes/plain JSON, never forecast model construction.",
+      "question": 1,
+      "status": "PASS"
+    },
+    {
+      "assessment": "85 protected repository files and104 historical external artifacts independently rehashed; zero changes.",
+      "question": 2,
+      "status": "PASS"
+    },
+    {
+      "assessment": "No actual provider metadata value invented; synthetic names and outcomes explicitly classified; A03 failed field/value remain unknown.",
+      "question": 3,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Candidate replaces only descriptive name in transient copy; strict stable competition identifiers remain required.",
+      "question": 4,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Season, matchday, oriented exact-ten identity and regulation-final gates reused; candidate does not admit outcomes independently.",
+      "question": 5,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Actual P01 context and forecast independently excluded; only distinctly classified synthetic receipt leaves new exercise function; no metrics/labels returned.",
+      "question": 6,
+      "status": "PASS"
+    },
+    {
+      "assessment": "A04 remains a prose checklist; no new executable authority instance, acquisition route or consumption marker.",
+      "question": 7,
+      "status": "PASS"
+    },
+    {
+      "assessment": "A02/A03 consumption controls and historical evidence unchanged; old attempts not reset.",
+      "question": 8,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Reviewer made zero provider/credential requests; independent offline suite records zero denied network attempts. Changed code introduces no provider acquisition.",
+      "question": 9,
+      "status": "PASS_REVIEW_SCOPE"
+    },
+    {
+      "assessment": "No numerical model parameters changed or invented. Display length/control restrictions are explicitly conservative candidate engineering choices.",
+      "question": 10,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Accepted optimiser and legal state transitions are unchanged. Final1/3GW numerical/legal baseline evidence remains a separate pending acceptance gate.",
+      "question": 11,
+      "status": "PASS_SOURCE_WITH_BASELINE_GATE_PENDING"
+    },
+    {
+      "assessment": "Acquisition cutoff checks retained; execution time separately checked against authenticated official deadline. No future information introduced.",
+      "question": 12,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Minutes/scenario/projection kernels untouched; display exposes existing evidence only.",
+      "question": 13,
+      "status": "PASS"
+    },
+    {
+      "assessment": "D explicitly labels Stage7 confidence, historical Grade-E prior, limited GW1 acceptance, fallback IDs and MC status. D is one-GW only.",
+      "question": 14,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Bounded candidate-space optimality, constant future prices, deterministic future and zero terminal assumptions retained.",
+      "question": 15,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Common-scenario comparator implementations unchanged. Packagewide code_identity changes genuine build lineage; retain real seals and separately verify test-only pinned-identity equality.",
+      "question": 16,
+      "status": "PASS_SOURCE_WITH_BASELINE_GATE_PENDING"
+    },
+    {
+      "assessment": "Local private operator report uses already-approved fields. No new storage, telemetry, logs or public redistribution; typed publication errors exclude private values.",
+      "question": 17,
+      "status": "PASS_SCOPE"
+    },
+    {
+      "assessment": "Existing rights boundaries preserved before provider/file use. New transient receipt/watermark confers no persistence permission or activation.",
+      "question": 18,
+      "status": "PASS"
+    },
+    {
+      "assessment": "Initial installed-wheel evidence exists; final wheel after CROSS-R01 must rerun. The private wheel smoke substitutes only synthetic service output and must not be claimed as full numerical stack proof.",
+      "question": 19,
+      "status": "PENDING_FINAL_RELEASE_VERIFICATION"
+    },
+    {
+      "assessment": "Reviewed contracts separate inactive candidate, engineering readiness, human acceptance, provider permission and production activation. Exact-SHA CI remains pending.",
+      "question": 20,
+      "status": "PASS"
+    }
+  ],
+  "findings": [
+    {
+      "id": "CROSS-R01",
+      "original_finding": "INDEPENDENT-CROSS-STREAM-FINDING-01.json",
+      "severity": "MATERIAL_P2",
+      "status": "REMEDIATED_IN_REVIEWED_BYTES",
+      "verification": "Independent10/11/10.5 reproduction now returns DECISION_CLOCK_INVALID;10/11/11 remains accepted. Both frozen service results carry actual final post-sealing high-water mark; checked_report requires/validates it before final clock sample."
+    }
+  ],
+  "history_integrity": {
+    "actual_forecast_model_constructed": false,
+    "actual_forecast_scored": false,
+    "forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+    "forecast_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+    "historical_artifacts_unchanged": 104,
+    "protected_files_unchanged": 85
+  },
+  "implementation_base_sha": "ea3f12bb7ca435331cd3be5b68986e777f68bd54",
+  "independent_tests": {
+    "failed": 0,
+    "log": "INDEPENDENT-CROSS-TESTS-01.log",
+    "log_transcoding_receipt": "INDEPENDENT-CROSS-TESTS-01-TRANSCODING.json",
+    "method": "Tracked offline_pytest wrapper with only network-receipt destination changed; pytest -q -p no:cacheprovider --basetemp review_pack/independent-cross-001",
+    "network_attempts": 0,
+    "passed": 88,
+    "seconds": 18.36,
+    "selected_paths": [
+      "tests/unit/private_v1/test_actionability.py",
+      "tests/unit/private_v1/test_live_publication.py",
+      "tests/unit/cli/test_pulse.py",
+      "tests/unit/evaluation/test_p01_fallback_d2.py"
+    ],
+    "skipped": 0
+  },
+  "limitations": [
+    "Deadline check cannot guarantee that terminal output transmission or later manual FPL execution finishes before deadline; explicit expiry and no invented execution buffer remain disclosed.",
+    "Historical stage acceptance records are not rewritten or promoted.",
+    "Candidate remains PROPOSED_UNAPPROVED/INACTIVE/SYNTHETIC_ONLY; provider field/result availability remains unknown."
+  ],
+  "pending_release_gates": [
+    "Final independent private1/3GW baseline evidence and source-specific clearance",
+    "Final broad acceptance/static/build/wheel/manifest/security checks after CROSS-R01",
+    "Final exact-SHA fullCI success and local/remote equality",
+    "Final capped review pack/member hashes"
+  ],
+  "release_gates_attested": false,
+  "reviewed_at": "2026-10-28T23:44:42.087559+00:00",
+  "reviewed_other_bytes": {
+    "ACCEL-001-REPOSITORY-AUDIT.md": "39fbb72c1d19ac8d456bef7628a37a7198647050be53553eba167b8a12f10dba",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/INDEPENDENT-AB-PORTABILITY-REVIEW.json": "fb163521f9961ea9c755860da28072e33b3de21be56ffc9b5ff88efc3e9dc3ca",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/INDEPENDENT-AB-REVIEW.json": "fc572564642fb2a4c056c1991be17fb48cf82e3120e2f7a2a025ee22781e38c3",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/INDEPENDENT-CROSS-STREAM-FINDING-01.json": "97abb22a0e91a4265082f5d2e871ecbe83ffbab600c31f6cee51f85143f535d3",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/INDEPENDENT-CROSS-TESTS-01-TRANSCODING.json": "a26c5d6c3e39d7880a895881a3025c4aaee8707943db4961cffb1129d7dc2a82",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/INDEPENDENT-CROSS-TESTS-01.log": "8777e669cf7512334c7c6ce7575203438458bb25645260fd90d739b2a45fe359",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/INITIAL-SNAPSHOT.json": "2e5ee828a246d24bdf498c4462d6e851c81effd4e625144c243f082f3d100692",
+    "scripts/verify_accel001_private_wheel.py": "fbde7187df2df4f9594ebf6299c431f33c1049be683718ea060db86c1491a8e8",
+    "tests/unit/cli/test_pulse.py": "0dd3c380c5e9aeca673191fad787276c4e0c4cbdc11cf41ca0f94fcc952a6e32",
+    "tests/unit/private_v1/test_actionability.py": "35b2d4c542c819abde7247b6d513683ed18056e8a6d540bda3b25b10ef7050ff",
+    "tests/unit/private_v1/test_deadline_orchestration.py": "a96b7132f987e024f7a4878a90859a151e83b6ed17c604846ee10587bf661840",
+    "tests/unit/private_v1/test_live_publication.py": "78c5988c18f396428d8dda237310fc0c5445c5208261282a72e729abab25f20d",
+    "tests/unit/private_v1/test_one_command.py": "f017b07d55838469d6a9029cc87282601261f2d1f154eaeb6df93d6de8f6f026",
+    "tickets/DMF-PULSE-ACCEL-001/ACCEPTANCE.md": "38bffcb14834fc18dc6a5e10de931230cd3f5bf1e0eb64641f608008d1a0d019",
+    "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md": "8a6abb8c8899468739d8344cfadd2b7ba5960b29a337ae1b8e1d9716004a7bdf",
+    "tickets/DMF-PULSE-ACCEL-001/P01-POLICY-AND-READINESS.md": "92837d46b4b703c9e1de3db39e1c5d42360c1e6a453aea525de02e88d78e6684"
+  },
+  "reviewed_source_bytes": {
+    "src/dmf_pulse/cli/p01_fallback.py": "b2bf15d1f1e69b79178e0af22ea8e5809daacf0e9f4ca246429cdb654327be5c",
+    "src/dmf_pulse/cli/p01_synthetic.py": "4dc82512036fe2cb1f71fd75bed51d271c6828925b2a9a6140f6dfbf445db4b3",
+    "src/dmf_pulse/cli/private_v1.py": "53f6a3e6ee7ec5a395c56b4b3ec4084584de3034b3117192a088cb92f1dfa9af",
+    "src/dmf_pulse/cli/pulse.py": "7dce44c234f7b70499ba8d0784c27653edfeae26147ba215bc5cba7a7ddb1f8f",
+    "src/dmf_pulse/evaluation/p01_synthetic_readiness.py": "dfb8f44cefc3548b9d95eef495b7cdffe9fffd0b2a5fc65edba5eecc6df22b3f",
+    "src/dmf_pulse/ingestion/p01_fallback.py": "ea89002f04af67f052a1ad5069f71b6a2a618062f36dcfdfeaed775f6f296492",
+    "src/dmf_pulse/ingestion/p01_metadata_candidate.py": "f689e1fa599e40e90fb58caa3a38ba93a21b37f30c488bfd909af8c47258adee",
+    "src/dmf_pulse/private_v1/actionability.py": "c8d9213136067b7849202fb4eef5b86835d22d12693b7e1c9e301312571da8ca",
+    "src/dmf_pulse/private_v1/decision_quality.py": "5eeb4fc677c2dae2034baa526ce40058c9daf60f6fdd47b2542131a5b16bbb34",
+    "src/dmf_pulse/private_v1/live.py": "e3b0ce128f4d4c23bf61736fa8f9abe0bab7d543d108e0b7ffb6c68f0d2c695f",
+    "src/dmf_pulse/private_v1/one_command.py": "7fad44ff46fd25e5d83930f18734d95e7b8d73d585559dd6fe35ea49ea0028ed"
+  },
+  "reviewer": "/root/accel_governance_audit",
+  "reviewer_implementation_edits": false,
+  "schema_version": "accel001-independent-cross-stream-review-v1",
+  "semantic_sha256": "fe8a69516db8bd9beb9f63d737203848c76d5217a9cf52b305c806b2f06e7bd7",
+  "source_tree_state": "UNCOMMITTED_CD_SOURCE_REVIEWED_BY_EXACT_BYTES",
+  "unresolved_material_findings": [],
+  "verdict": "CROSS_STREAM_ENGINEERING_REVIEW_CLEAR_RELEASE_GATES_PENDING"
+}

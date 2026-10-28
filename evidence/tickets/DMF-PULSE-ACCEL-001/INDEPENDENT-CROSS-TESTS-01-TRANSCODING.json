@@ -1,0 +1,9 @@
+{
+  "exact_original_bytes_reconstructable": true,
+  "original_bom_hex": "fffe",
+  "original_byte_sha256": "657bfcf97aab824156cc84ca34f0da4a23123feb69b637bd10df49dbf909da0f",
+  "original_codec": "utf-16-le",
+  "path": "evidence/tickets/DMF-PULSE-ACCEL-001/INDEPENDENT-CROSS-TESTS-01.log",
+  "schema_version": "lossless-log-transcoding-v1",
+  "utf8_byte_sha256": "8777e669cf7512334c7c6ce7575203438458bb25645260fd90d739b2a45fe359"
+}

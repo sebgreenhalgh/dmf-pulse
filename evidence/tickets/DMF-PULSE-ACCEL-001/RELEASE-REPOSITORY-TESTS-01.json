@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+    "-q",
+    "--basetemp=C:/Users/sebgr/AppData/Local/Temp/dmf-accel001-repository",
+    "tests/integration/repository/test_manifests.py"
+  ],
+  "started_at": "2026-10-28T23:51:17.385590+00:00",
+  "elapsed_seconds": 6.138982200063765,
+  "exit_code": 0,
+  "output_file": "RELEASE-REPOSITORY-TESTS-01.log",
+  "output_byte_sha256": "a92197f959913116d14d27600caf670a92261c69d0241b3e87d3544efccbf2f7"
+}

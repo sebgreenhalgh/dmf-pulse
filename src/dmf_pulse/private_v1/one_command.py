@@ -49,6 +49,7 @@ from dmf_pulse.markets.current import (
     build_transient_current_market_identity_view,
 )
 from dmf_pulse.optimisation.multi_gameweek_policy import load_terminal_value_policy
+from dmf_pulse.private_v1.actionability import ActionabilityReceipt, DeadlineGuard, deadline_notice
 from dmf_pulse.private_v1.automatic_inputs import (
     automatic_rolling_fixture_id,
     build_automatic_model_minutes,
@@ -57,6 +58,7 @@ from dmf_pulse.private_v1.automatic_inputs import (
     build_automatic_rolling_model_minutes,
     build_full_candidate_policy,
 )
+from dmf_pulse.private_v1.decision_quality import DecisionQualitySummary, render_decision_quality
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.horizon_markets import build_future_market_evidence
 from dmf_pulse.private_v1.models import (
@@ -117,6 +119,8 @@ class OneCommandResult:
     status: Literal["REAL_PRIVATE_TRANSIENT_RECOMMENDATION"]
     decision: PrivateV1Decision | PrivateV1RollingDecision
     report: str
+    actionability: ActionabilityReceipt
+    publication_not_before: datetime
     fpl_request_count: int
     fpl_endpoint_classes: tuple[str, ...]
     stage_timings: tuple[PrivateRollingStageTiming, ...] = ()
@@ -405,6 +409,7 @@ def _display_report(
         for position in ("DEF", "MID", "FWD")
     )
     warnings = "\n".join(f"- {item}" for item in decision.warnings)
+    quality = render_decision_quality(DecisionQualitySummary.from_decision(decision), label=label)
     squad = ", ".join(label(item) for item in decision.resulting_squad)
     xi = ", ".join(label(item) for item in tactics.starting_xi)
     bench = "\n".join(
@@ -440,6 +445,7 @@ def _display_report(
         f"{comparison.gain_p90}\n"
         "P(recommendation > baseline): "
         f"{comparison.probability_recommended_beats_baseline:.1%}\n\n"
+        f"{quality}\n"
         "SEARCH SCOPE\n"
         f"{decision.action_space_disclosure}\n"
         "Limitation: ONE_GAMEWEEK_ZERO_TERMINAL_VALUE_OBJECTIVE; preserving an unused free "
@@ -536,11 +542,10 @@ class PrivateV1OneCommandService:
         if approved_at > run_at:
             raise PrivateV1Error("USAGE_INVALID", "operator approval is after the cutoff")
 
+        deadline_guard = DeadlineGuard(self._clock, not_before=approved_at)
+
         def observed_now() -> datetime:
-            value = self._clock()
-            if value.tzinfo is None or value.utcoffset() is None:
-                raise IngestionError("INTERNAL_INVARIANT", "one-command clock must be aware")
-            value = value.astimezone(UTC)
+            value = deadline_guard.now()
             if value > run_at:
                 raise IngestionError("POST_CUTOFF", "input acquisition exceeded its cutoff")
             return value
@@ -561,6 +566,7 @@ class PrivateV1OneCommandService:
                     captured_at=run_at,
                     clock=observed_now,
                 )
+                deadline_guard.check(snapshot.fpl_input.target_event.deadline_at)
                 ruleset, capability, rules_authority = _rules_authority(approved_at)
                 manager = CurrentManagerStateService(clock=observed_now).compile_provider_snapshot(
                     snapshot.current_team,
@@ -858,6 +864,7 @@ class PrivateV1OneCommandService:
                     odds_rights_profile_id=odds.rights.rights_profile_id,
                     information_cutoff=run_at,
                 )
+                deadline_guard.check(snapshot.fpl_input.target_event.deadline_at)
                 rolling_run = (
                     self._rolling_recommendation_service.run(
                         rolling_execution,
@@ -874,16 +881,25 @@ class PrivateV1OneCommandService:
                     *rolling_run.stage_timings,
                 )
             else:
+                deadline_guard.check(snapshot.fpl_input.target_event.deadline_at)
                 one_gameweek_run = self._recommendation_service.run(
                     execution, progress=self._progress
                 )
                 decision = one_gameweek_run.decision
                 report = _display_report(decision, snapshot, player_map)
                 stage_timings = ()
+            report += deadline_notice(snapshot.fpl_input.target_event.deadline_at)
+            actionability = deadline_guard.bind(
+                deadline_at=snapshot.fpl_input.target_event.deadline_at,
+                decision_sha256=decision.semantic_sha256,
+                report=report,
+            )
             result = OneCommandResult(
                 status="REAL_PRIVATE_TRANSIENT_RECOMMENDATION",
                 decision=decision,
                 report=report,
+                actionability=actionability,
+                publication_not_before=deadline_guard.latest_observed_at,
                 fpl_request_count=snapshot.request_count,
                 fpl_endpoint_classes=snapshot.endpoint_classes,
                 stage_timings=stage_timings,

@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "command_logs_bound_to_staged_bytes": 34,
+  "copied_independent_artifacts_bound_to_staged_bytes": 24,
+  "reviewed_source_bindings": {
+    "PRIVATE-INDEPENDENT-REVIEW.json": 13,
+    "INDEPENDENT-CROSS-STREAM-REVIEW-01.json": 11
+  },
+  "package_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+  "manifest_index_receipt": "RELEASE-INDEX-MANIFEST-01.json",
+  "release_ci": "PENDING_EXACT_COMMIT",
+  "original_worktree_head": "4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb",
+  "original_worktree_dirty_availability_preserved": true,
+  "semantic_sha256": "3693bf65c38d7ab193d8496534966f08501bf7507128e94171a1c66799d2cbeb"
+}

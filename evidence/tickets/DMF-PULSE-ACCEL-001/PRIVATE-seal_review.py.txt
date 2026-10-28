@@ -1,0 +1,169 @@
+"""Seal the independent private-slice review after exact synthetic comparisons finish."""
+
+import hashlib
+import json
+from pathlib import Path
+import re
+import sys
+
+baseline_root = Path(__file__).resolve().parent
+repository = baseline_root.parent / "ACCEL-001-PRIVATE"
+review = repository / "review_pack"
+baseline_repository = baseline_root.parent / "001V-P01-FALLBACK-A03-D2"
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+
+
+def numerical_payload(value):
+    if isinstance(value, dict):
+        return {key: numerical_payload(item) for key, item in value.items() if "sha256" not in key}
+    if isinstance(value, list):
+        return [numerical_payload(item) for item in value]
+    if isinstance(value, str):
+        return re.sub(r"screen SHA256: [0-9a-f]{64}", "screen SHA256: BUILD_BOUND_IDENTITY", value)
+    return value
+
+
+comparisons = []
+for horizon in (1, 3):
+    before_path = baseline_root / f"d2-diagnostic-recapture.gw{horizon}.decision.json"
+    actual_path = review / f"private-diagnostic-recapture.gw{horizon}.decision.json"
+    controlled_path = review / f"private-final-controlled-d2-provenance.gw{horizon}.decision.json"
+    before, actual, controlled = map(read, (before_path, actual_path, controlled_path))
+    changes = read(baseline_root / f"decision-diff-{horizon}.json")
+    for change in changes:
+        path, left, right = change["path"], change["before"], change["after"]
+        if path.endswith("action_space_disclosure"):
+            assert numerical_payload(left) == numerical_payload(right)
+        else:
+            assert "sha256" in path
+            assert re.fullmatch(r"[0-9a-f]{64}", left) and re.fullmatch(r"[0-9a-f]{64}", right)
+    assert numerical_payload(before) == numerical_payload(actual)
+    assert before == controlled
+    assert before_path.read_bytes() == controlled_path.read_bytes()
+    if horizon == 1:
+        assert before["lineage"]["stage9_joint_matrix_sha256"] == actual["lineage"]["stage9_joint_matrix_sha256"]
+    else:
+        assert before["lineage"]["joint_matrix_sha256_by_gameweek"] == actual["lineage"]["joint_matrix_sha256_by_gameweek"]
+    comparisons.append({
+        "horizon_gameweeks": horizon,
+        "baseline_full_semantic_sha256": before["semantic_sha256"],
+        "actual_build_full_semantic_sha256": actual["semantic_sha256"],
+        "actual_build_capture_scope": "Intermediate C/D source build before final highwater fix; retained exact provenance differences, not represented as final-build decision hash.",
+        "controlled_provenance_full_semantic_sha256": controlled["semantic_sha256"],
+        "actual_build_numerical_payload_equal": True,
+        "stage9_joint_scenarios_equal": True,
+        "controlled_full_decision_byte_equal": True,
+        "numerical_payload_sha256": hashlib.sha256(canonical(numerical_payload(before))).hexdigest(),
+        "actual_build_changed_field_count": len(changes),
+        "changes": changes,
+        "artifact_byte_sha256": {str(path): sha(path) for path in (before_path, actual_path, controlled_path)},
+    })
+
+protected = [
+    "src/dmf_pulse/private_v1/service.py",
+    "src/dmf_pulse/private_v1/rolling.py",
+    "src/dmf_pulse/private_v1/models.py",
+    "src/dmf_pulse/private_v1/rolling_models.py",
+    "src/dmf_pulse/private_v1/automatic_inputs.py",
+    "src/dmf_pulse/markets/normalisation.py",
+    "src/dmf_pulse/markets/consensus.py",
+    "uv.lock",
+]
+for path in protected:
+    assert sha(repository / path) == sha(baseline_repository / path)
+
+functional = [
+    "src/dmf_pulse/private_v1/actionability.py",
+    "src/dmf_pulse/private_v1/decision_quality.py",
+    "src/dmf_pulse/private_v1/one_command.py",
+    "src/dmf_pulse/private_v1/live.py",
+    "src/dmf_pulse/cli/pulse.py",
+    "src/dmf_pulse/cli/private_v1.py",
+    "tests/unit/private_v1/test_actionability.py",
+    "tests/unit/private_v1/test_deadline_orchestration.py",
+    "tests/unit/private_v1/test_live_publication.py",
+    "tests/unit/private_v1/test_one_command.py",
+    "tests/unit/private_v1/test_live_transient.py",
+    "tests/unit/cli/test_pulse.py",
+    "scripts/verify_accel001_private_wheel.py",
+]
+controlled_receipt = read(review / "private-final-controlled-d2-provenance.json")
+assert controlled_receipt["pytest_exit_code"] == 0
+controlled_metadata = read(review / "private-final-controlled-d2-provenance.control.json")
+sys.path.insert(0, str(repository / "src"))
+from dmf_pulse.markets.normalisation import code_identity
+assert code_identity() == controlled_metadata["actual_build_identity"]
+for path, expected in controlled_receipt["source_byte_sha256"].items():
+    assert sha(repository / path) == expected
+payload = {
+    "schema_version": "accel-001-private-independent-review-v1",
+    "reviewer": "/root/accel_private_audit",
+    "reviewer_authored_production_implementation": False,
+    "verdict": "CLEAR_FOR_PRIVATE_C_D_CHECKPOINT_PUBLICATION_SUBJECT_TO_FINAL_SHA_CI",
+    "unresolved_P0": [], "unresolved_P1": [], "unresolved_material_P2": [],
+    "findings_and_remediation": read(review / "private-independent-negative-findings.json"),
+    "functional_file_sha256": {path: sha(repository / path) for path in functional},
+    "protected_unchanged_file_sha256": {path: sha(repository / path) for path in protected},
+    "final_controlled_capture_actual_build_identity": controlled_metadata["actual_build_identity"],
+    "final_controlled_capture_metadata_sha256": sha(review / "private-final-controlled-d2-provenance.control.json"),
+    "final_controlled_capture_receipt_sha256": sha(review / "private-final-controlled-d2-provenance.json"),
+    "final_controlled_capture_source_bytes_still_match": True,
+    "reproduction": {
+        "working_directory": str(repository),
+        "final_controlled_command": ".venv\\Scripts\\python.exe C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\controlled_capture.py --repository C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE --implementation-sha ea3f12bb7ca435331cd3be5b68986e777f68bd54 --output C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-controlled-d2-provenance.json",
+        "independent_adversaries_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py tests/unit/private_v1/test_actionability.py tests/unit/cli/test_pulse.py tests/unit/private_v1/test_cli.py tests/unit/private_v1/test_live_publication.py --basetemp C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-accel-private-independent-006 -p no:cacheprovider",
+        "rerun_rule": "Use a fresh output basename and basetemp; immutable evidence outputs use exclusive-create.",
+        "synthetic_source_shim_sha256": {name: sha(baseline_root / name) for name in ("capture.py", "capture_decisions.py", "controlled_capture.py")},
+    },
+    "independent_adversarial_test_sha256": sha(review / "test_independent_private_publication.py"),
+    "retained_final_adversarial_log_utf16_sha256": sha(review / "private-final-adversarial-tests.utf16.log"),
+    "numerical_comparisons": comparisons,
+    "executed_checks": [
+        {"selection": "independent publication adversaries + actionability + pulse CLI + private-v1 run/replay CLI + live publication", "result": "74 passed in 8.66s", "exit_code": 0},
+        {"selection": "same final 74 checks repeated solely to retain complete log; basetemp suffix 007", "result": "74 passed in 8.52s", "exit_code": 0},
+        {"selection": "D2 exact synthetic one-command one-/three-GW original capture", "result": "2 passed in 383.68s", "exit_code": 0},
+        {"selection": "D2 exact synthetic decision JSON recapture", "result": "2 passed in 391.71s", "exit_code": 0},
+        {"selection": "C/D real-build exact synthetic decision JSON capture", "result": "2 passed in 388.81s", "exit_code": 0},
+        {"selection": "C/D test-only controlled D2 provenance", "result": "2 expected horizon captures; pytest exit 0", "exit_code": 0},
+    ],
+    "reviewed_but_not_independently_executed": [
+        "Six root-authored real-input-assembly deadline crossings with intentionally stubbed numerical solver; see root acceptance evidence.",
+        "Installed-wheel public-boundary smoke script inspected; final installed-wheel execution and full CI are root release gates.",
+    ],
+    "integrity_conclusions": {
+        "deadline_and_clock_boundaries_fail_closed": True,
+        "information_cutoff_not_used_as_cpu_expiry": True,
+        "final_clock_sample_after_hash_validation": True,
+        "post_seal_clock_highwater_preserved_across_service_cli_boundary": True,
+        "legacy_manual_and_pulse_publication_share_guard": True,
+        "pure_run_replay_numerical_kernels_unchanged": True,
+        "stage7_confidence_scope_explicit": True,
+        "no_new_numerical_parameters_or_future_information": True,
+        "no_provider_access_credentials_or_actual_P01_scoring": True,
+        "no_private_persistence_or_production_activation": True,
+    },
+    "limits": [
+        "Review binds listed file bytes, not an eventual unobserved commit or CI result.",
+        "Actual full decision hashes legitimately differ because accepted market lineage hashes all installed package sources; this evidence retains the exact differences.",
+        "Controlled provenance monkeypatch occurs only in an isolated synthetic test process; production source identity remains intact.",
+        "Timing samples ran with varying concurrent workload and establish no speedup or football accuracy improvement.",
+        "The final check precedes output; no claim of an atomic clock read and terminal write, deadline refresh, or approved execution buffer.",
+    ],
+}
+payload["semantic_sha256"] = hashlib.sha256(canonical(payload)).hexdigest()
+path = review / "PRIVATE-INDEPENDENT-REVIEW.json"
+with path.open("x", encoding="utf-8") as handle:
+    json.dump(payload, handle, indent=2, sort_keys=True)
+    handle.write("\n")
+print(json.dumps({"path": str(path), "byte_sha256": sha(path), "semantic_sha256": payload["semantic_sha256"], "comparisons": [{k: v for k, v in item.items() if k not in {"changes", "artifact_byte_sha256"}} for item in comparisons]}, indent=2))

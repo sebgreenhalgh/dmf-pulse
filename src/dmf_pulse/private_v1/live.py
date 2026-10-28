@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -46,6 +47,7 @@ from dmf_pulse.markets.current import (
     CurrentMarketConstraintService,
     bind_current_market_constraint_request,
 )
+from dmf_pulse.private_v1.actionability import ActionabilityReceipt, DeadlineGuard, deadline_notice
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import (
     PrivateCandidateActionPolicy,
@@ -129,6 +131,8 @@ class PrivateV1LiveTransientResult:
     persistent_artifacts_created: Literal[0]
     decision: PrivateV1Decision
     report: str
+    actionability: ActionabilityReceipt
+    publication_not_before: datetime
 
 
 class PrivateV1LiveTransientService:
@@ -140,10 +144,12 @@ class PrivateV1LiveTransientService:
         fpl_service: CurrentFplInputService | None = None,
         manager_service: CurrentManagerStateService | None = None,
         recommendation_service: PrivateV1RecommendationService | None = None,
+        clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._fpl_service = fpl_service or CurrentFplInputService()
         self._manager_service = manager_service or CurrentManagerStateService()
         self._recommendation_service = recommendation_service or PrivateV1RecommendationService()
+        self._clock = clock
 
     def run(self, request: PrivateV1LiveTransientRequest) -> PrivateV1LiveTransientResult:
         """Run the accepted boundaries in memory and return display-only material."""
@@ -162,6 +168,10 @@ class PrivateV1LiveTransientService:
                     rights_profile_id="fpl_official_private_manual_v1",
                 )
             )
+            deadline_guard = DeadlineGuard(
+                self._clock, not_before=max(request.captured_at, fpl_input.provenance.usable_at)
+            )
+            deadline_guard.check(fpl_input.target_event.deadline_at)
             manager_request = bind_current_manager_state_request(
                 request.manager_declaration_path,
                 fpl_input,
@@ -282,20 +292,32 @@ class PrivateV1LiveTransientService:
                     semantic_sha256="0" * 64,
                 )
             )
+            deadline_guard.check(
+                fpl_input.target_event.deadline_at, not_before=current_state.decision_information_at
+            )
             run = self._recommendation_service.run(execution)
+            report = (
+                run.report
+                + "\nZERO-RETENTION BOUNDARY\n"
+                + "Persistent artifacts created by live-transient: 0\n"
+                + "FPL raw and derived runtime references were released after execution.\n"
+                + "Operator-owned manual source files were not copied or modified and remain "
+                + "subject to the approved operator-delete requirement.\n"
+                + deadline_notice(fpl_input.target_event.deadline_at)
+            )
+            actionability = deadline_guard.bind(
+                deadline_at=fpl_input.target_event.deadline_at,
+                decision_sha256=run.decision.semantic_sha256,
+                report=report,
+            )
             return PrivateV1LiveTransientResult(
                 execution_status="REAL_PRIVATE_TRANSIENT_RECOMMENDATION",
                 replay_retention="FORBIDDEN_BY_CURRENT_RIGHTS_PROFILE",
                 persistent_artifacts_created=0,
                 decision=run.decision,
-                report=(
-                    run.report
-                    + "\nZERO-RETENTION BOUNDARY\n"
-                    + "Persistent artifacts created by live-transient: 0\n"
-                    + "FPL raw and derived runtime references were released after execution.\n"
-                    + "Operator-owned manual source files were not copied or modified and remain "
-                    + "subject to the approved operator-delete requirement.\n"
-                ),
+                report=report,
+                actionability=actionability,
+                publication_not_before=deadline_guard.latest_observed_at,
             )
         except PrivateV1Error:
             raise

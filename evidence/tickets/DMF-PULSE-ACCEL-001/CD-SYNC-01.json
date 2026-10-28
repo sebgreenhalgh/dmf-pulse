@@ -1,0 +1,14 @@
+{
+  "command": [
+    "uv",
+    "sync",
+    "--all-groups",
+    "--frozen",
+    "--offline"
+  ],
+  "started_at": "2026-10-28T23:34:50.529988+00:00",
+  "elapsed_seconds": 0.558745100046508,
+  "exit_code": 0,
+  "output_file": "CD-SYNC-01.log",
+  "output_byte_sha256": "cc77cd5a169055996fc3ce41c050451100ff04778daa65ed53c52454b14e0668"
+}

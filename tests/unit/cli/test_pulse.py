@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -15,9 +15,21 @@ from typer.testing import CliRunner
 from dmf_pulse.cli import pulse as pulse_module
 from dmf_pulse.cli.app import app
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.private_v1.actionability import DeadlineGuard
 from dmf_pulse.private_v1.errors import PrivateV1Error
 
 runner = CliRunner()
+
+
+def _display_result(report, now):
+    return SimpleNamespace(
+        report=report,
+        decision=SimpleNamespace(semantic_sha256="a" * 64),
+        publication_not_before=now,
+        actionability=DeadlineGuard(lambda: now).bind(
+            deadline_at=now + timedelta(hours=1), decision_sha256="a" * 64, report=report
+        ),
+    )
 
 
 def test_pulse_help_exposes_entry_identifier_and_progress_suppression_only() -> None:
@@ -82,7 +94,7 @@ def test_successful_cli_prints_recommendation_and_passes_only_entry_id(monkeypat
             ):
                 pass
             self.progress.finish()
-            return SimpleNamespace(report="DMF PULSE - GW2\n\nRECOMMENDATION\nNO TRANSFER\n")
+            return _display_result("DMF PULSE - GW2\n\nRECOMMENDATION\nNO TRANSFER\n", approved_at)
 
     monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
     monkeypatch.setattr(pulse_module, "datetime", FixedDatetime)
@@ -114,7 +126,7 @@ def test_horizon_option_is_explicit_and_rejects_every_value_except_one_or_three(
 
         def run(self, request):
             captured.append(request)
-            return SimpleNamespace(report="ROLLING REPORT")
+            return _display_result("ROLLING REPORT", datetime.now(UTC))
 
     monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
 
@@ -144,7 +156,7 @@ def test_no_progress_suppresses_observability_and_preserves_report(monkeypatch) 
         def run(self, request):
             del request
             self.progress.message(f"forbidden {marker}")
-            return SimpleNamespace(report="UNCHANGED FINAL REPORT")
+            return _display_result("UNCHANGED FINAL REPORT", datetime.now(UTC))
 
     monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
     result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])

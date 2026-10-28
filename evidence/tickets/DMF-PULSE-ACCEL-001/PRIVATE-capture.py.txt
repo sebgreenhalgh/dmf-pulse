@@ -1,0 +1,115 @@
+"""Capture synthetic one-command numerical baselines through repository pytest controls."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import platform
+import sys
+import time
+from pathlib import Path
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repository", type=Path, required=True)
+    parser.add_argument("--implementation-sha", required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    repository = args.repository.resolve()
+    sys.path.insert(0, str(repository))
+    sys.path.insert(0, str(repository / "src"))
+    os.chdir(repository)
+
+    import pytest
+    import dmf_pulse.private_v1.one_command as module
+
+    assert Path(module.__file__).resolve().is_relative_to(repository / "src")
+    original = module.PrivateV1OneCommandService.run
+    captures = []
+
+    def capture(service, request):
+        started = time.perf_counter()
+        result = original(service, request)
+        elapsed = time.perf_counter() - started
+        decision = result.decision
+        captures.append(
+            {
+                "horizon_gameweeks": request.horizon_gameweeks,
+                "root_seed": request.root_seed,
+                "scenario_count": request.scenario_count,
+                "information_cutoff": request.run_at.isoformat(),
+                "fixed_clock": "tests.unit.private_v1.test_one_command.RUN_AT",
+                "input_code_sha": request.code_sha,
+                "decision_semantic_sha256": decision.semantic_sha256,
+                "decision_json_sha256": hashlib.sha256(
+                    decision.model_dump_json().encode("utf-8")
+                ).hexdigest(),
+                "report_utf8_sha256": hashlib.sha256(result.report.encode("utf-8")).hexdigest(),
+                "solver_optimality": decision.solver_optimality,
+                "wall_seconds": format(elapsed, ".9f"),
+                "stage_timings_ms": {
+                    item.stage: str(item.elapsed_ms) for item in result.stage_timings
+                },
+                "fpl_transport_calls_injected": result.fpl_request_count,
+                "provider_network_calls": 0,
+                "persistence_performed_by_service": result.persistence_performed,
+            }
+        )
+        return result
+
+    module.PrivateV1OneCommandService.run = capture
+    tests = [
+        "tests/unit/private_v1/test_one_command.py::test_network_blocked_synthetic_one_command_runs_actual_decision_stack",
+        "tests/unit/private_v1/test_one_command.py::test_explicit_three_gameweek_one_command_runs_from_one_current_cutoff",
+    ]
+    try:
+        exit_code = int(pytest.main(["-q", "-p", "no:cacheprovider", *tests]))
+    finally:
+        module.PrivateV1OneCommandService.run = original
+    paths = [
+        "tests/conftest.py",
+        "tests/unit/private_v1/test_one_command.py",
+        "src/dmf_pulse/private_v1/one_command.py",
+        "src/dmf_pulse/private_v1/service.py",
+        "src/dmf_pulse/private_v1/rolling.py",
+        "src/dmf_pulse/private_v1/automatic_inputs.py",
+    ]
+    payload = {
+        "schema_version": "accel-001-private-synthetic-baseline-v1",
+        "classification": "REPOSITORY_OWNED_SYNTHETIC_BENCHMARK_ONLY",
+        "implementation_sha": args.implementation_sha,
+        "python": sys.version,
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "logical_cpu_count": os.cpu_count(),
+        "tests": tests,
+        "pytest_exit_code": exit_code,
+        "source_byte_sha256": {
+            path: hashlib.sha256((repository / path).read_bytes()).hexdigest()
+            for path in paths
+        },
+        "capture_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "network_control": "tests/conftest.py::isolate_home_and_network autouse socket/DNS block",
+        "captures": captures,
+        "limits": [
+            "Synthetic injected transport fixtures only; no real manager or provider bodies retained.",
+            "One timing sample per horizon; not a football forecast accuracy or production runtime claim.",
+            "Numerical code_sha inputs intentionally stay fixed for cross-implementation comparison.",
+        ],
+    }
+    if exit_code == 0 and sorted(item["horizon_gameweeks"] for item in captures) != [1, 3]:
+        raise AssertionError("both expected horizon decisions were not captured")
+    data = (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    with args.output.open("xb") as handle:
+        handle.write(data)
+    print("BASELINE_RECEIPT_SHA256=" + hashlib.sha256(data).hexdigest())
+    print("BASELINE_RECEIPT=" + str(args.output.resolve()))
+    return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

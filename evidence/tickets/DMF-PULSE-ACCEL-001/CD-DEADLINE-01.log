@@ -1,0 +1,5 @@
+ERROR: file or directory not found: tests/unit/cli/test_private_v1.py
+
+
+no tests ran in 0.01s
+{"denied_network_attempts": 0, "pytest_exit_code": 4}

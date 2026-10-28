@@ -1,0 +1,464 @@
+{
+  "executed_checks": [
+    {
+      "exit_code": 0,
+      "result": "74 passed in 8.66s",
+      "selection": "independent publication adversaries + actionability + pulse CLI + private-v1 run/replay CLI + live publication"
+    },
+    {
+      "exit_code": 0,
+      "result": "74 passed in 8.52s",
+      "selection": "same final 74 checks repeated solely to retain complete log; basetemp suffix 007"
+    },
+    {
+      "exit_code": 0,
+      "result": "2 passed in 383.68s",
+      "selection": "D2 exact synthetic one-command one-/three-GW original capture"
+    },
+    {
+      "exit_code": 0,
+      "result": "2 passed in 391.71s",
+      "selection": "D2 exact synthetic decision JSON recapture"
+    },
+    {
+      "exit_code": 0,
+      "result": "2 passed in 388.81s",
+      "selection": "C/D real-build exact synthetic decision JSON capture"
+    },
+    {
+      "exit_code": 0,
+      "result": "2 expected horizon captures; pytest exit 0",
+      "selection": "C/D test-only controlled D2 provenance"
+    }
+  ],
+  "final_controlled_capture_actual_build_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+  "final_controlled_capture_metadata_sha256": "9031230d73636d0ef981e5fbfe21fdaa9d71ed9be434f509a4538128329c7596",
+  "final_controlled_capture_receipt_sha256": "57503324885cc855c3413debe444d86ac1646d45867405bf64cc2ba2d455131a",
+  "final_controlled_capture_source_bytes_still_match": true,
+  "findings_and_remediation": {
+    "findings": [
+      {
+        "finding": "Legacy live-transient guard initially had no captured/source-usable lower bound; independent input services also needed the aggregate admitted-evidence lower bound before solving.",
+        "id": "PRIVATE-REVIEW-001",
+        "remediation": "Initialize from max(captured_at, FPL usable_at); pre-solve check raises the existing monotone floor to current_state.decision_information_at.",
+        "severity": "P1",
+        "status": "REMEDIATED_SOURCE_REVIEW_AND_ADVERSARIAL_FLOOR_TESTS"
+      },
+      {
+        "finding": "Generic Confidence label could present Stage-7 minutes confidence as overall decision confidence.",
+        "id": "PRIVATE-REVIEW-002",
+        "remediation": "Renderer explicitly labels Minutes confidence (Stage 7).",
+        "severity": "P2",
+        "status": "REMEDIATED_SOURCE_REVIEW"
+      },
+      {
+        "finding": "Final CLI clock read and missing publication receipt could escape the typed publication boundary.",
+        "id": "PRIVATE-REVIEW-003",
+        "remediation": "Both CLIs use checked_report; malformed service evidence and clock failures produce sanitized typed errors.",
+        "severity": "P2",
+        "status": "REMEDIATED_INDEPENDENT_ADVERSARIAL_TESTS"
+      },
+      {
+        "failing_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py::test_binding_validation_cannot_cross_deadline_after_final_clock_sample -p no:cacheprovider",
+        "failing_exit_code": 1,
+        "failure_observed": "Failed: DID NOT RAISE PrivateV1Error",
+        "failure_summary": "1 failed in 2.41s",
+        "finding": "Final clock was sampled before receipt/report binding validation; crossing the deadline during validation still returned an actionable report. Receipt sealing had the analogous ordering.",
+        "id": "PRIVATE-REVIEW-004",
+        "original_tool_chunk_id": "df87d6",
+        "remediation": "Read the final clock after all binding validation; check again after receipt sealing before bind returns.",
+        "severity": "P1",
+        "status": "REMEDIATED_INDEPENDENT_REGRESSION_TESTS",
+        "verification_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py -k 'binding_validation_cannot or receipt_sealing_cannot' -p no:cacheprovider",
+        "verification_exit_code": 0,
+        "verification_summary": "2 passed, 19 deselected in 2.17s",
+        "verification_tool_chunk_id": "a895db"
+      },
+      {
+        "finding": "Receipt checked_at retained the pre-sealing sample t10 while the service observed t11 after sealing; a final CLI clock t10.5 could therefore erase the service high-water mark.",
+        "id": "PRIVATE-REVIEW-005",
+        "original_failure_evidence": "Independently reproduced by /root/accel_governance_audit; see retained INDEPENDENT-CROSS-STREAM-FINDING-01 evidence.",
+        "remediation": "Both frozen transient service results carry publication_not_before from the guard's final observed timestamp. The final boundary validates receipt.checked_at <= floor < deadline and checks the publication clock against that floor.",
+        "severity": "P2",
+        "status": "REMEDIATED_INDEPENDENT_HIGHWATER_AND_INVALID_FLOOR_REGRESSIONS",
+        "verification_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py tests/unit/private_v1/test_actionability.py tests/unit/cli/test_pulse.py tests/unit/private_v1/test_cli.py tests/unit/private_v1/test_live_publication.py --basetemp C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-accel-private-independent-006 -p no:cacheprovider",
+        "verification_exit_code": 0,
+        "verification_summary": "74 passed in 8.66s",
+        "verification_tool_chunk_id": "d50f03"
+      }
+    ],
+    "implementation_authored_by_reviewer": false,
+    "retention": "Synthetic adversarial evidence only; no provider bodies or manager data.",
+    "reviewer": "/root/accel_private_audit",
+    "schema_version": "accel-001-private-independent-negative-findings-v1"
+  },
+  "functional_file_sha256": {
+    "scripts/verify_accel001_private_wheel.py": "fbde7187df2df4f9594ebf6299c431f33c1049be683718ea060db86c1491a8e8",
+    "src/dmf_pulse/cli/private_v1.py": "53f6a3e6ee7ec5a395c56b4b3ec4084584de3034b3117192a088cb92f1dfa9af",
+    "src/dmf_pulse/cli/pulse.py": "7dce44c234f7b70499ba8d0784c27653edfeae26147ba215bc5cba7a7ddb1f8f",
+    "src/dmf_pulse/private_v1/actionability.py": "c8d9213136067b7849202fb4eef5b86835d22d12693b7e1c9e301312571da8ca",
+    "src/dmf_pulse/private_v1/decision_quality.py": "5eeb4fc677c2dae2034baa526ce40058c9daf60f6fdd47b2542131a5b16bbb34",
+    "src/dmf_pulse/private_v1/live.py": "e3b0ce128f4d4c23bf61736fa8f9abe0bab7d543d108e0b7ffb6c68f0d2c695f",
+    "src/dmf_pulse/private_v1/one_command.py": "7fad44ff46fd25e5d83930f18734d95e7b8d73d585559dd6fe35ea49ea0028ed",
+    "tests/unit/cli/test_pulse.py": "0dd3c380c5e9aeca673191fad787276c4e0c4cbdc11cf41ca0f94fcc952a6e32",
+    "tests/unit/private_v1/test_actionability.py": "35b2d4c542c819abde7247b6d513683ed18056e8a6d540bda3b25b10ef7050ff",
+    "tests/unit/private_v1/test_deadline_orchestration.py": "a96b7132f987e024f7a4878a90859a151e83b6ed17c604846ee10587bf661840",
+    "tests/unit/private_v1/test_live_publication.py": "78c5988c18f396428d8dda237310fc0c5445c5208261282a72e729abab25f20d",
+    "tests/unit/private_v1/test_live_transient.py": "4ec2bfcd299e129225d79a8e0696d878dfcc932d037884fc2b445e52f02179e8",
+    "tests/unit/private_v1/test_one_command.py": "f017b07d55838469d6a9029cc87282601261f2d1f154eaeb6df93d6de8f6f026"
+  },
+  "independent_adversarial_test_sha256": "83634c151e1fe4f66981fc22c52e76a9779ad64e4a1c07b6b486356d7e5473b3",
+  "integrity_conclusions": {
+    "deadline_and_clock_boundaries_fail_closed": true,
+    "final_clock_sample_after_hash_validation": true,
+    "information_cutoff_not_used_as_cpu_expiry": true,
+    "legacy_manual_and_pulse_publication_share_guard": true,
+    "no_new_numerical_parameters_or_future_information": true,
+    "no_private_persistence_or_production_activation": true,
+    "no_provider_access_credentials_or_actual_P01_scoring": true,
+    "post_seal_clock_highwater_preserved_across_service_cli_boundary": true,
+    "pure_run_replay_numerical_kernels_unchanged": true,
+    "stage7_confidence_scope_explicit": true
+  },
+  "limits": [
+    "Review binds listed file bytes, not an eventual unobserved commit or CI result.",
+    "Actual full decision hashes legitimately differ because accepted market lineage hashes all installed package sources; this evidence retains the exact differences.",
+    "Controlled provenance monkeypatch occurs only in an isolated synthetic test process; production source identity remains intact.",
+    "Timing samples ran with varying concurrent workload and establish no speedup or football accuracy improvement.",
+    "The final check precedes output; no claim of an atomic clock read and terminal write, deadline refresh, or approved execution buffer."
+  ],
+  "numerical_comparisons": [
+    {
+      "actual_build_capture_scope": "Intermediate C/D source build before final highwater fix; retained exact provenance differences, not represented as final-build decision hash.",
+      "actual_build_changed_field_count": 19,
+      "actual_build_full_semantic_sha256": "d94f364696d14362f554a6e6d2ffea7ef4fd959e4f759e00ada6bb4ba4083511",
+      "actual_build_numerical_payload_equal": true,
+      "artifact_byte_sha256": {
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-diagnostic-recapture.gw1.decision.json": "d6e5f91c1fe845229cc17074abe44eeecc79d60a554bec12772cf9ff0d1d99b8",
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-controlled-d2-provenance.gw1.decision.json": "23a30b7011e4fd7d6d518a58be1eef21173f2a6a84da582f0a47ca9926ab6602",
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-diagnostic-recapture.gw1.decision.json": "23a30b7011e4fd7d6d518a58be1eef21173f2a6a84da582f0a47ca9926ab6602"
+      },
+      "baseline_full_semantic_sha256": "f00dfcbe1b10680e40f6bc215afebf33d00d4175325b6e308eb3d332d253bf43",
+      "changes": [
+        {
+          "after": "8b484e2c17b56cf2d41d1c59ee4473ab142f912146d3595f3f11824dbae02a9b",
+          "before": "de2aee4707c1c459d5de74a239d149b8367a0164a53dabbdd01bff3ac7f1fab0",
+          "path": "/lineage/execution_input_sha256"
+        },
+        {
+          "after": "ff7e6a3bb30d0d64783148bc665c8a4ce4444f6b902d61abea039b8a3dedd920",
+          "before": "5a3d67fb619c2683e773248deb1e20852977897dc227f683cfb3d0b97043b5d6",
+          "path": "/lineage/market_constraints_sha256"
+        },
+        {
+          "after": "ea596119acaa5fc6cf7923af223dfa729995cefb58c9768a0b3972c4cf1f10c3",
+          "before": "add94c71ab9f97062512e56191ce5953c71baed6dd818cdc4a29064249d37e57",
+          "path": "/lineage/optimiser_request_sha256"
+        },
+        {
+          "after": "d1aaa1dd009f5a5cbc2198b7a37db3e222cd254885b3e102672b975382ba3ad4",
+          "before": "34663f8ab38d9700edb8cf5afdc24dd06228388cd7f07e619cf50ce515b1d61f",
+          "path": "/lineage/optimiser_result_sha256"
+        },
+        {
+          "after": "72f7d52b522ff9567782e2f34584780c746abaaf14960b2547c4bc60e5d56578",
+          "before": "0b7d40b58d2a1a38b80b5e75ccf0b15f84c6bb85561f03fd3dd04e8d5d400042",
+          "path": "/lineage/stage8_result_sha256_by_fixture/7886b8a0-b2ab-520e-8980-6f393692b205"
+        },
+        {
+          "after": "4ee838e95a48e01299040629559d036163ec9e4277d31ddf6664cedf1e2ca0c0",
+          "before": "fd5c363afce5831be928a90ceff700dde7281fd246d4f9a7c51a213dd58b20c2",
+          "path": "/lineage/stage8_result_sha256_by_fixture/d356a801-ca62-5600-96b8-602f517ee4c5"
+        },
+        {
+          "after": "42775e1fa913bdd045dfd246d5a5bab12d4357168c797b097f4150255b8d46c9",
+          "before": "dd71e8f0b6e83664f71d85c87d81b7956c354349bab621054f52997e57222d59",
+          "path": "/lineage/stage8_result_sha256_by_fixture/f4559f88-2a4e-5d91-8ced-c51eacde23e6"
+        },
+        {
+          "after": "ba2aeb8fc56497445e90eaa01ef1d3d8b71f36104abf1940eecb137e7e2d918a",
+          "before": "e744dd62b401dfb30584ae92d2f2151643eae7c0600b0d53473b4ce75698e847",
+          "path": "/lineage/stage9_result_sha256"
+        },
+        {
+          "after": "d94f364696d14362f554a6e6d2ffea7ef4fd959e4f759e00ada6bb4ba4083511",
+          "before": "f00dfcbe1b10680e40f6bc215afebf33d00d4175325b6e308eb3d332d253bf43",
+          "path": "/semantic_sha256"
+        },
+        {
+          "after": "ea596119acaa5fc6cf7923af223dfa729995cefb58c9768a0b3972c4cf1f10c3",
+          "before": "add94c71ab9f97062512e56191ce5953c71baed6dd818cdc4a29064249d37e57",
+          "path": "/transfer_frontier/optimiser_request_sha256"
+        },
+        {
+          "after": "d1aaa1dd009f5a5cbc2198b7a37db3e222cd254885b3e102672b975382ba3ad4",
+          "before": "34663f8ab38d9700edb8cf5afdc24dd06228388cd7f07e619cf50ce515b1d61f",
+          "path": "/transfer_frontier/optimiser_result_sha256"
+        },
+        {
+          "after": "be50bbd8e305364a7bd89d5348c8b1090e23fb2fdb904afeb929e3ee8b8528ec",
+          "before": "5997c7a2b4d4f33e704003f0c6a0bc1939cfa1751ab74c2eab41a8134a9cf7bf",
+          "path": "/transfer_frontier/points/0/semantic_sha256"
+        },
+        {
+          "after": "e28d6775f4b86a2080086d0832656cff73b39fae289106d0a9ba251dcbd73cc1",
+          "before": "d53ee22fa518a9c608598a03e68a7c4a270df90e9bdbc4bfde242a6eac8c0294",
+          "path": "/transfer_frontier/points/0/stage11_plan_sha256"
+        },
+        {
+          "after": "62baf83ccaf78386e14d4c02be6e1eaea4180dd1bc696844ae85b4acedae686d",
+          "before": "8635c186ed0c3121cdacc0fc166b426b10ac8808658778d699e0ed3521fc5e2f",
+          "path": "/transfer_frontier/points/1/semantic_sha256"
+        },
+        {
+          "after": "9e50e5ca9dce35776bd4c67f39d1e854989c8ead6757b572e23fa8a68957464a",
+          "before": "f309ea73f7761dbee7d75007c72f42ca95d4ab2dc0012cb46d064b4cf721ff2f",
+          "path": "/transfer_frontier/points/1/stage11_plan_sha256"
+        },
+        {
+          "after": "5510d9c5eff707e8300542dac63637ea220b2c3c97b79996250bbf02115feee0",
+          "before": "368dd4ef6d1f8a06ae1b2df82d9aada2802b726d688f69f46d73353dc2fa5f87",
+          "path": "/transfer_frontier/points/2/semantic_sha256"
+        },
+        {
+          "after": "dff90e79ea507b97e32be1167e415721625af445e0cb9f2fbb643bfa3bd8aabd",
+          "before": "dfa9e799317287b3c18b5a8a08e57e813678d3f1c428332eaf3a3c25449e5247",
+          "path": "/transfer_frontier/points/2/stage11_plan_sha256"
+        },
+        {
+          "after": "c93bbbecec9b45fe5e5d229f45e382aea166a006c5db6da13f19ad353b7bcf9a",
+          "before": "1a767537bc1bd018f2e48812caf5d5ae6aa9e3732ae22dd90ee9a992a948c770",
+          "path": "/transfer_frontier/semantic_sha256"
+        },
+        {
+          "after": "ba2aeb8fc56497445e90eaa01ef1d3d8b71f36104abf1940eecb137e7e2d918a",
+          "before": "e744dd62b401dfb30584ae92d2f2151643eae7c0600b0d53473b4ce75698e847",
+          "path": "/transfer_frontier/stage9_projection_sha256"
+        }
+      ],
+      "controlled_full_decision_byte_equal": true,
+      "controlled_provenance_full_semantic_sha256": "f00dfcbe1b10680e40f6bc215afebf33d00d4175325b6e308eb3d332d253bf43",
+      "horizon_gameweeks": 1,
+      "numerical_payload_sha256": "f3e058b1f855e4d33480eea4566662e589136362a6145292e1746c01287cb15c",
+      "stage9_joint_scenarios_equal": true
+    },
+    {
+      "actual_build_capture_scope": "Intermediate C/D source build before final highwater fix; retained exact provenance differences, not represented as final-build decision hash.",
+      "actual_build_changed_field_count": 33,
+      "actual_build_full_semantic_sha256": "50fdd58043f58994b6c8f6dfee7576e6ca637dc9f06cb34d328ea6e186dbe470",
+      "actual_build_numerical_payload_equal": true,
+      "artifact_byte_sha256": {
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-diagnostic-recapture.gw3.decision.json": "84e9ab28fd2b44a18f9052538f17566ee31e232506f9c45e7ada42074abbdf9a",
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-controlled-d2-provenance.gw3.decision.json": "35e5293b1264298446526a8e3badf5e6ab36ce0e625f2e4dbcf72dd5d5fae905",
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\d2-diagnostic-recapture.gw3.decision.json": "35e5293b1264298446526a8e3badf5e6ab36ce0e625f2e4dbcf72dd5d5fae905"
+      },
+      "baseline_full_semantic_sha256": "299b4b738558fd5d23619ec424b0ee07b6ded555ed70330be4a8cd1a586d62fd",
+      "changes": [
+        {
+          "after": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: c6e7327f329834f669498576cfef6c2f7833ddf334fb73ca083ce1d90f6524d2; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+          "before": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: 6bf54820db9c12f17bdd6031499add7de1961c138eae03ea35f3ab0daee27d54; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+          "path": "/action_space_disclosure"
+        },
+        {
+          "after": "98daead9f42d3ef1178c510145bb0da2e9f97fc25cc31476e9f6c50d0f34b494",
+          "before": "98718dcf025244f56f49f8eb60e03e3d0955c0011fa8ddc34941df79c41b2077",
+          "path": "/lineage/current_execution_input_sha256"
+        },
+        {
+          "after": "145c5f031a51918756c9436f0b28b7c8ff92342599b12bc23ea54719dc731f4b",
+          "before": "27bca69b6a1d525b91b566e668f63d5f0c336f92e37085c3e6428b204ef25d02",
+          "path": "/lineage/fixture_projection_sha256_by_gameweek/2/7886b8a0-b2ab-520e-8980-6f393692b205"
+        },
+        {
+          "after": "62e512ec3008b30ffd319131dfe3a45323cddb5e28aec270256c99c68198015d",
+          "before": "9405dd4d63baa6a366f403eb0b3c3f5cce92041003cdbe9b12373d09a15f6b12",
+          "path": "/lineage/fixture_projection_sha256_by_gameweek/2/d356a801-ca62-5600-96b8-602f517ee4c5"
+        },
+        {
+          "after": "d1da66af2e9017c602056c8cfdcede67689340ce7a070c6b9e76656ad9055fb9",
+          "before": "48122d418f984e8172cc0963e3a9f9f6769587e5f6480bc63b66756582917d2f",
+          "path": "/lineage/fixture_projection_sha256_by_gameweek/2/f4559f88-2a4e-5d91-8ced-c51eacde23e6"
+        },
+        {
+          "after": "43e6196860b33dd4bed2fe3b7fa112f2f0fb5ef54203a1f7b34a018f2985ee89",
+          "before": "fbb4baeb602b942f7eaf220790b83eb6d3b9d9278e43ac1d5bcc29888a101942",
+          "path": "/lineage/fixture_projection_sha256_by_gameweek/3/11c8a795-b854-50d6-b339-da87fa2a1247"
+        },
+        {
+          "after": "419a87a86a67bd6f43493589dae8c0de25f531e83616afba8bb1596bce03f3da",
+          "before": "c8ed7f856013ba59bb3c0f98334eb488495a01bc86905da3d031c5e0750bfb00",
+          "path": "/lineage/fixture_projection_sha256_by_gameweek/3/41a2c9ee-bbfa-5cd4-8d29-a7dea067b39e"
+        },
+        {
+          "after": "e6777eed8669770014241e34649688eb3cf595d99b7fc47bd8109693c29931b4",
+          "before": "ff44f693abab2cc0cc8a502b9957e9480e6c038d9f0bbcd8f79d9a44e92c01aa",
+          "path": "/lineage/fixture_projection_sha256_by_gameweek/3/fbdbba06-a524-5131-b639-0ed47f53361c"
+        },
+        {
+          "after": "b193e6829aa5f1ddf11275e4625d690bc3952d228338a890151c95e915a416c2",
+          "before": "6490dd2f78ee98f7286d6ddf3a16f19774da775844d18e34dfbb8e8b12d45538",
+          "path": "/lineage/future_gameweek_input_sha256_by_gameweek/3"
+        },
+        {
+          "after": "85237a96ed1001290d49dcb264b0a875d4e7eaa0204667a7cbedab06e176f78c",
+          "before": "bd5fd5469c52ac19f3ab35ed304334a03fa07a2772ef7717b2b282f125fe9478",
+          "path": "/lineage/gameweek_projection_sha256_by_gameweek/2"
+        },
+        {
+          "after": "3c3a132e9463854a2f7dedeb88ee383738c57c8ec95dcedb65390da7c9286f8a",
+          "before": "24ecb114450b4c32ddc5660ad3a5416230e3d9e2278db163d700353464c54921",
+          "path": "/lineage/gameweek_projection_sha256_by_gameweek/3"
+        },
+        {
+          "after": "a7244f72e56ea45a1a42145e6b4fb7ad1cf794bae5aa9e37f5f218eea4b5b824",
+          "before": "94e494ace5c0de7f7d91f16c8585837b0be24f6b846d4c30588cb4d93e435ad0",
+          "path": "/lineage/one_gameweek_optimiser_result_sha256"
+        },
+        {
+          "after": "0de0275aeb65994c0f297dd0f17e869e686ec07943aac5828169cdc5d09201ff",
+          "before": "8ba17a836e1f6ed0d3d48d4749c6a36205ee4b359a9ea78f7db548b0bf9d0806",
+          "path": "/lineage/optimiser_request_sha256"
+        },
+        {
+          "after": "8dba591049e13d1253cb0e142c8b0240abd70865b93669616827154725e33671",
+          "before": "b0fd3538796d572f0efc8478e91a02407601fd561c42d0013cc3831a52043787",
+          "path": "/lineage/optimiser_result_sha256"
+        },
+        {
+          "after": "30fb45bed7edfd44233aebb42ecae35732b5327ed74e5ffb553e383b42c6c4fd",
+          "before": "02cacff479f59f7c874f3d3681d437471b4225cf99c3a608690b30f25445fa94",
+          "path": "/lineage/rolling_execution_input_sha256"
+        },
+        {
+          "after": "3bda717f7d4b669a4fb54b8bc519ac8de185cb04e6e4294982432f9762e97c31",
+          "before": "6b83eb0aac9538e0ec503f6c5dcff4b39aa45a4341ee54197d0e6442a8d75b7d",
+          "path": "/lineage/scenario_tree_sha256"
+        },
+        {
+          "after": "3181ce2a9c9ed284f6b442f11228b25243b087914b101add399e80d407b89970",
+          "before": "185ffc0bae7a0b26b72c9cc01a08bf85cb728187ba3fcd52cc9ef17f7a94b03c",
+          "path": "/lineage/stage8_distribution_sha256_by_gameweek/2/7886b8a0-b2ab-520e-8980-6f393692b205"
+        },
+        {
+          "after": "11885f1e14b506d87893bf90d819b36911abc546dc4e4dc69881ec48e617dda4",
+          "before": "859d9dcdbb6a06752b8d91b398036be1c2b45a08c01c300cef483bd207385247",
+          "path": "/lineage/stage8_distribution_sha256_by_gameweek/2/d356a801-ca62-5600-96b8-602f517ee4c5"
+        },
+        {
+          "after": "524bc9025b95299fbb338cbbd1bff448c9b1e2180f6bacfe5f3ad11c1a642947",
+          "before": "0ce4e5a1a3c500d0e9924ddec6daa20d360650f1262866e93a24e66059d23caf",
+          "path": "/lineage/stage8_distribution_sha256_by_gameweek/2/f4559f88-2a4e-5d91-8ced-c51eacde23e6"
+        },
+        {
+          "after": "8a920836478b45a224655e122a368cfd7284fcf404588db350992790c6a46b33",
+          "before": "767e487f45a0199d5279594ae7b7ae82bf5826faf37441dcfed28acc0b83d6da",
+          "path": "/lineage/stage8_distribution_sha256_by_gameweek/3/11c8a795-b854-50d6-b339-da87fa2a1247"
+        },
+        {
+          "after": "b2d4853424b70384776b7b0ebca291e41dd44a8f4b587e070dc17f612c7ef5f0",
+          "before": "8c77f53ec39c4c90ab7f1df9bad79a47ffd313973bdd19e4f88407187853055b",
+          "path": "/lineage/stage8_distribution_sha256_by_gameweek/3/41a2c9ee-bbfa-5cd4-8d29-a7dea067b39e"
+        },
+        {
+          "after": "d666c66d8bb7e5f9e5ab02744dc56272a23a994205b2293f18428b364cfac9f5",
+          "before": "80dd37a55ff3fd07271638c4fed19d4c24618b4a7e89bdd6efc59074a2ffffd5",
+          "path": "/lineage/stage8_distribution_sha256_by_gameweek/3/fbdbba06-a524-5131-b639-0ed47f53361c"
+        },
+        {
+          "after": "50fdd58043f58994b6c8f6dfee7576e6ca637dc9f06cb34d328ea6e186dbe470",
+          "before": "299b4b738558fd5d23619ec424b0ee07b6ded555ed70330be4a8cd1a586d62fd",
+          "path": "/semantic_sha256"
+        },
+        {
+          "after": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: c6e7327f329834f669498576cfef6c2f7833ddf334fb73ca083ce1d90f6524d2; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+          "before": "Screening: HORIZON_AWARE; Search: PRIVATE_HORIZON_TRANSFER_CANDIDATE_PRUNING_V3; Full selectable incoming: 2; Certified horizon-dominated: 0; Equivalence compressed: 0; STANDARD per-node retained bound: 18; action-combination budget per state: 17000; Candidate node: GW2; Candidate horizon: GW2,GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW3; Candidate horizon: GW3,GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0 | Candidate node: GW4; Candidate horizon: GW4; Retained candidates: 2; protected: 0; final-tie expansion memberships: 0; largest final tie: 0; Retention categories (overlapping): ACTUAL_ONE_GW_ACTION=0, DEF:SMALL_UNIVERSE=0, FWD:SMALL_UNIVERSE=0, GK:SMALL_UNIVERSE=2, MID:SMALL_UNIVERSE=0; screen SHA256: 6bf54820db9c12f17bdd6031499add7de1961c138eae03ea35f3ab0daee27d54; root transfer counts: (0, 1, 2); root one/two-transfer actions: 4/1; No certified dominance or equivalence removal; heuristic escape buckets; EXACT_ONLY_WITHIN_DECLARED_CANDIDATE_ACTION_SPACE. Three-Gameweek mode uses declared current-cutoff candidate scope at each future node; exactness is only within this bounded action space.",
+          "path": "/transfer_frontier/action_space_disclosure"
+        },
+        {
+          "after": "0de0275aeb65994c0f297dd0f17e869e686ec07943aac5828169cdc5d09201ff",
+          "before": "8ba17a836e1f6ed0d3d48d4749c6a36205ee4b359a9ea78f7db548b0bf9d0806",
+          "path": "/transfer_frontier/optimiser_request_sha256"
+        },
+        {
+          "after": "8dba591049e13d1253cb0e142c8b0240abd70865b93669616827154725e33671",
+          "before": "b0fd3538796d572f0efc8478e91a02407601fd561c42d0013cc3831a52043787",
+          "path": "/transfer_frontier/optimiser_result_sha256"
+        },
+        {
+          "after": "1b9cd172b13cde8fa3b01950ea752b0dc3ce7b2762ca2d8e628109051bbc4f74",
+          "before": "1e892b8ec8901f9766f2b46f4cedbfd83882a417acf29faed2d702d84cd70af0",
+          "path": "/transfer_frontier/points/0/semantic_sha256"
+        },
+        {
+          "after": "1496f3fd7a98e8e4b447902b72c05fb96c34a48744a48a3157c289dfe32bed3d",
+          "before": "ef58bd5d727f74a5127e19f9c969c51408649417475284b409277834b4aa79ea",
+          "path": "/transfer_frontier/points/0/stage11_plan_sha256"
+        },
+        {
+          "after": "5cb9e1b6a70bfab9eac0b238909aa4f96c7e115b5a7d9f06954fdc5d4296f604",
+          "before": "329cf0ee441e7c4946514d9822435925f385be39ba2d2a61e25c84549ebd7e3a",
+          "path": "/transfer_frontier/points/1/semantic_sha256"
+        },
+        {
+          "after": "8f62c8acd675f3c36d7340fc46c0e1ef59f4c70d33f9ca1373079510fca0a677",
+          "before": "93fe522abeeb3a03d1b294165033e99bb6d63ceeb4c2ddeff72db86a2b609c09",
+          "path": "/transfer_frontier/points/1/stage11_plan_sha256"
+        },
+        {
+          "after": "8b7d664fd8b76766146ef842768847b7c5f205dc0592bda3685dd48f8178c952",
+          "before": "a80f1825615e459a7675ac41762e7cbc1a5d1bdcb4ce5f9ba5933a808518f729",
+          "path": "/transfer_frontier/points/2/semantic_sha256"
+        },
+        {
+          "after": "14c698582106bbaf1a57aec9cbcaa8658c75a3a78cfea0649c496fcb1150d033",
+          "before": "5703efce0b65e56af984429463d0e1c3d9c62d46f8f5145cc3cc6e9be21888f3",
+          "path": "/transfer_frontier/points/2/stage11_plan_sha256"
+        },
+        {
+          "after": "060d00db4575b9c65af68b19be19b4ca05bbbf10b36bff6052bb9b927af151d3",
+          "before": "7d8b1a928d0d034fd3b5f029ff7e888a5a504ac7a1c0b8173af4f6c564b7cb94",
+          "path": "/transfer_frontier/semantic_sha256"
+        }
+      ],
+      "controlled_full_decision_byte_equal": true,
+      "controlled_provenance_full_semantic_sha256": "299b4b738558fd5d23619ec424b0ee07b6ded555ed70330be4a8cd1a586d62fd",
+      "horizon_gameweeks": 3,
+      "numerical_payload_sha256": "a0633d3a9ec041c040a32ca8ec768e5428de9e08cc7b05d55a86ca590bfbccf9",
+      "stage9_joint_scenarios_equal": true
+    }
+  ],
+  "protected_unchanged_file_sha256": {
+    "src/dmf_pulse/markets/consensus.py": "5b7b5f41d87b0837cfc5e2e2201b87a2f86589cca6b8bd2f604f7eddf7823b3f",
+    "src/dmf_pulse/markets/normalisation.py": "057b53080cf43b68dd146daa6485aadb8e7c3b6ca825af018420be0492d42c4c",
+    "src/dmf_pulse/private_v1/automatic_inputs.py": "53c390789905f8e053dbaca9eacb21dbbdc3d375b34caf48a55272872f57553f",
+    "src/dmf_pulse/private_v1/models.py": "ba7c9b940910ecc28bd70a2c79393f5549f5b05de43a35f2e5af852f18fd2465",
+    "src/dmf_pulse/private_v1/rolling.py": "2618ed7b9766720bb9cda694baea8f58a6dd94bb2b2996f8ca66225c6a62ce61",
+    "src/dmf_pulse/private_v1/rolling_models.py": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc",
+    "src/dmf_pulse/private_v1/service.py": "4319f56d11eb3eb130c11613247b5697f3820acac4b297bb66501a300fa38855",
+    "uv.lock": "af7d4de655438868c42d2f7c1d9b7d7a2c096fb72e671365e4a2dd0ffe9f41b9"
+  },
+  "reproduction": {
+    "final_controlled_command": ".venv\\Scripts\\python.exe C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-private-baseline\\controlled_capture.py --repository C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE --implementation-sha ea3f12bb7ca435331cd3be5b68986e777f68bd54 --output C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE\\review_pack\\private-final-controlled-d2-provenance.json",
+    "independent_adversaries_command": ".venv\\Scripts\\python.exe -m pytest -q review_pack/test_independent_private_publication.py tests/unit/private_v1/test_actionability.py tests/unit/cli/test_pulse.py tests/unit/private_v1/test_cli.py tests/unit/private_v1/test_live_publication.py --basetemp C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-accel-private-independent-006 -p no:cacheprovider",
+    "rerun_rule": "Use a fresh output basename and basetemp; immutable evidence outputs use exclusive-create.",
+    "synthetic_source_shim_sha256": {
+      "capture.py": "93cb5c19976bf662f44a233118303867c498b583eccdb1ca74b2bcfc198cc546",
+      "capture_decisions.py": "bb2b692474e171e035785ae76e09ef66e5fd728b90abe5254aae6dcc6c4312c7",
+      "controlled_capture.py": "c36e55ccdacd9e2ff51060ee7467610dc87bfb402891b008936c70f9265f3eb4"
+    },
+    "working_directory": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-001-PRIVATE"
+  },
+  "retained_final_adversarial_log_utf16_sha256": "3cd3a6dff5a386e48672ff9bf97261acc96113343c2b3710f2711e0655920092",
+  "reviewed_but_not_independently_executed": [
+    "Six root-authored real-input-assembly deadline crossings with intentionally stubbed numerical solver; see root acceptance evidence.",
+    "Installed-wheel public-boundary smoke script inspected; final installed-wheel execution and full CI are root release gates."
+  ],
+  "reviewer": "/root/accel_private_audit",
+  "reviewer_authored_production_implementation": false,
+  "schema_version": "accel-001-private-independent-review-v1",
+  "semantic_sha256": "da6887203a3baf4fc27dd8ba27a92d4909571ace76eaa2c47b12e96fd31d7152",
+  "unresolved_P0": [],
+  "unresolved_P1": [],
+  "unresolved_material_P2": [],
+  "verdict": "CLEAR_FOR_PRIVATE_C_D_CHECKPOINT_PUBLICATION_SUBJECT_TO_FINAL_SHA_CI"
+}

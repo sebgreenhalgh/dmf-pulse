@@ -198,7 +198,10 @@ def live_transient_command(
             event_allocation_config=load_packaged_event_allocation_config(),
         )
         result = PrivateV1LiveTransientService().run(request)
-        typer.echo(result.report, nl=False)
+        from dmf_pulse.private_v1.actionability import checked_report
+
+        report = checked_report(result, clock=lambda: datetime.now(UTC))
+        typer.echo(report, nl=False)
         del result
     except PrivateV1Error as exc:
         _emit_error(exc)
