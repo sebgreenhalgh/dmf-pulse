@@ -17,3 +17,4 @@ src/dmf_pulse/_data/zoneinfo/Europe/London binary
 
 # Original sealed diagnostic must retain its byte authentication in every checkout.
 tests/fixtures/evaluation/a03_stopped_metadata_gate.json binary
+evidence/tickets/DMF-PULSE-ACCEL-001/REQUEST.txt binary

@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 788,
+      "bytes": 864,
       "path": ".gitattributes",
-      "sha256": "45f706bac426c27f025476f7ba629c8398491ce700e6207eb22fa739cbbdafea"
+      "sha256": "139dc817b9cb0b662c216a0b1e2422bca9ef1d981c9d0542307009d40dee7a2f"
     },
     {
       "bytes": 100,
@@ -94,6 +94,11 @@
       "bytes": 22690,
       "path": "2026_27_RULES_VERIFICATION_REPORT.md",
       "sha256": "12ee3c80b687a24e26e93bdb371f4588c72b8be427bec67484d9882db949aa51"
+    },
+    {
+      "bytes": 7521,
+      "path": "ACCEL-001-REPOSITORY-AUDIT.md",
+      "sha256": "39fbb72c1d19ac8d456bef7628a37a7198647050be53553eba167b8a12f10dba"
     },
     {
       "bytes": 5898,
@@ -166,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 202488,
+      "bytes": 205972,
       "path": "PLANS.md",
-      "sha256": "01c56e83cc7aa602319f3c5e56f3a8d48685079ce2498613c7ead58b1344a7f3"
+      "sha256": "1ff22283eba6d38bffd057fba74cee04bf9275c3330c1e0ffe64ae15cf69042d"
     },
     {
       "bytes": 2761,
@@ -7661,6 +7666,26 @@
       "sha256": "c8ed400d3dd6f8f5391e517ca6459bec62af2d88edd032e0096426ff9bb86254"
     },
     {
+      "bytes": 2657,
+      "path": "tickets/DMF-PULSE-ACCEL-001/ACCEPTANCE.md",
+      "sha256": "8f3cbdf384d560e95bedc34736ac34a2966b051e3e758c86f5a4bbbbb4ba0996"
+    },
+    {
+      "bytes": 3514,
+      "path": "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md",
+      "sha256": "427174aa091294d89565b43cd5e4286ce4f6dae3877fbbd3ac81176d4dba8957"
+    },
+    {
+      "bytes": 8913,
+      "path": "tickets/DMF-PULSE-ACCEL-001/gap-register.json",
+      "sha256": "3c202052457f44f3f7b4ec013c47bf0a027956714511c74244940e8e431ac3d9"
+    },
+    {
+      "bytes": 537,
+      "path": "tickets/DMF-PULSE-ACCEL-001/ticket.yaml",
+      "sha256": "9481242781ae07b4ac953042ddc88b2dc5b7af0f01f26b97771876a7accee5e9"
+    },
+    {
       "bytes": 724,
       "path": "tickets/EVAL-012/ACCEPTANCE.md",
       "sha256": "451d9e91a2bfd4adc8eef34fd5c1427a5b45121fe71a9a582474662820337a77"
@@ -8168,5 +8193,5 @@
   ],
   "schema_version": "1.0",
   "scope": "repository-deliverables-excluding-generated-evidence",
-  "ticket_id": "CURRENT-TEAM-STRENGTH-001V-P01-D2"
+  "ticket_id": "PRC-013"
 }

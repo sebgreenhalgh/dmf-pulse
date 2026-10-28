@@ -1,0 +1,12 @@
+ticket_id: DMF-PULSE-ACCEL-001
+status: ACTIVE
+parent: e8efdd2c1051f75accdb2bd1f635ca02ed410241
+branch: readiness/DMF-PULSE-ACCEL-001-integrated-readiness
+authority_scopes: [A3-data-foundation, A8-events, B1-backtesting, A11-decision-bundle, B2-multi-GW, B6-control-UI]
+human_decision_status: offline implementation and ordinary Git publication only
+maximum_provider_attempts: 0
+a02_attempt_consumed: true
+a03_attempt_consumed: true
+a04_authority_created: false
+metadata_candidate_status: PROPOSED_UNAPPROVED
+production_activation: false

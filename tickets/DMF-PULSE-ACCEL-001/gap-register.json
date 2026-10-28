@@ -1,0 +1,218 @@
+{
+  "schema_version": "accel001-gap-register-v1",
+  "gaps": [
+    {
+      "gap_id": "G01",
+      "severity": "P1",
+      "downstream_impact": "Late one-command output can recommend an expired action",
+      "evidence": "src/dmf_pulse/private_v1/one_command.py:860",
+      "affected_modules": [
+        "private_v1",
+        "cli/pulse"
+      ],
+      "dependencies": [
+        "Official target deadline"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Typed pre-solve/post-render/publication guard",
+      "anticipated_verification": "Fixed-clock1/3GW parity; deadline crossings and invalid clocks",
+      "selected_workstream": "C",
+      "offline_now": true
+    },
+    {
+      "gap_id": "G02",
+      "severity": "P1",
+      "downstream_impact": "Synthetic readiness can resemble actual P01 score if legacy artifacts are persisted",
+      "evidence": "src/dmf_pulse/evaluation/p01_fallback.py:47",
+      "affected_modules": [
+        "evaluation",
+        "cli"
+      ],
+      "dependencies": [
+        "Reconstructed hash-distinct forecast"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Separate synthetic-only receipt with transient kernel exercise",
+      "anticipated_verification": "Ten fixtures/30products, rejection of real context/forecast, immutable receipt",
+      "selected_workstream": "AB",
+      "offline_now": true,
+      "finding_type": "PROSPECTIVE_IMPLEMENTATION_HAZARD"
+    },
+    {
+      "gap_id": "G03",
+      "severity": "P1",
+      "downstream_impact": "Linked result ID bool/float can pass equality as integer",
+      "evidence": "src/dmf_pulse/ingestion/p01_fallback.py:247",
+      "affected_modules": [
+        "ingestion"
+      ],
+      "dependencies": [
+        "Existing retained result-type contract"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Exact integer validation before linked comparison",
+      "anticipated_verification": "True/float/string/null/missing/wrong int",
+      "selected_workstream": "AB",
+      "offline_now": true
+    },
+    {
+      "gap_id": "G04",
+      "severity": "P1",
+      "downstream_impact": "Unknown A03 metadata field prevents justified acquisition repair",
+      "evidence": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/CONTRACT.md",
+      "affected_modules": [
+        "ingestion",
+        "evaluation"
+      ],
+      "dependencies": [
+        "Retained Swagger; fresh policy acceptance needed"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Inactive versioned descriptive compatibility path",
+      "anticipated_verification": "Stable keys/finality/mapping cannot relax; observed versus canonical provenance",
+      "selected_workstream": "AB",
+      "offline_now": true
+    },
+    {
+      "gap_id": "G05",
+      "severity": "P1",
+      "downstream_impact": "Weak historical allocation evidence limits player-level reliability",
+      "evidence": "src/dmf_pulse/private_v1/service.py:999",
+      "affected_modules": [
+        "availability",
+        "football_events"
+      ],
+      "dependencies": [
+        "Lawful longitudinal player labels and calibration"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Predeclared current-player validation cohort",
+      "anticipated_verification": "Prospective proper scoring and ablations",
+      "selected_workstream": "DEFERRED_EVIDENCE",
+      "offline_now": false
+    },
+    {
+      "gap_id": "G06",
+      "severity": "P1",
+      "downstream_impact": "Legacy manual live-transient publication lacks execution-time deadline gate",
+      "evidence": "src/dmf_pulse/private_v1/live.py:285",
+      "affected_modules": [
+        "private_v1",
+        "cli/private_v1"
+      ],
+      "dependencies": [
+        "Separate live versus replay contract"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Same guarded publication on legacy live-transient surface; retain clock-free replay",
+      "anticipated_verification": "Keep historical offline replay clock-free",
+      "selected_workstream": "C",
+      "offline_now": true
+    },
+    {
+      "gap_id": "G07",
+      "severity": "P2",
+      "downstream_impact": "Pulse hides existing decision quality and MC limitations",
+      "evidence": "src/dmf_pulse/private_v1/one_command.py:368",
+      "affected_modules": [
+        "private_v1",
+        "cli"
+      ],
+      "dependencies": [
+        "Existing typed decision only; no persistence"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Shared deterministic quality disclosure",
+      "anticipated_verification": "Exact existing values, fallback visibility, no numerical decision changes",
+      "selected_workstream": "D",
+      "offline_now": true
+    },
+    {
+      "gap_id": "G08",
+      "severity": "P2",
+      "downstream_impact": "Rolling solution only exact within bounded candidates and deterministic future",
+      "evidence": "tickets/PRIVATE-V1-ONE-COMMAND-001N/ticket.yaml",
+      "affected_modules": [
+        "optimisation",
+        "private_v1"
+      ],
+      "dependencies": [
+        "Accepted scope; no invented future information"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Further declared-space oracle/runtime work before expansion",
+      "anticipated_verification": "Same legal state/scenarios and honest solver scope",
+      "selected_workstream": "FOLLOW_UP",
+      "offline_now": true
+    },
+    {
+      "gap_id": "G09",
+      "severity": "P2",
+      "downstream_impact": "Price/timing model uncalibrated and current inputs unavailable",
+      "evidence": "tickets/PRC-013/ticket.yaml",
+      "affected_modules": [
+        "prices"
+      ],
+      "dependencies": [
+        "Rights and target-season calibration"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Calibrate before private integration",
+      "anticipated_verification": "Held-out reliability and ACT/WAIT oracle",
+      "selected_workstream": "BLOCKED_EVIDENCE",
+      "offline_now": false
+    },
+    {
+      "gap_id": "G10",
+      "severity": "P2",
+      "downstream_impact": "Private chip scheduling lacks future opportunity support",
+      "evidence": "tickets/CHIP-014/PROGRESS.md",
+      "affected_modules": [
+        "chips",
+        "private_v1"
+      ],
+      "dependencies": [
+        "Adaptive retain-chip comparison and rules capability"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Whole-opportunity chip vertical slice",
+      "anticipated_verification": "Use-now versus retain-chip common scenarios",
+      "selected_workstream": "BLOCKED_EVIDENCE",
+      "offline_now": false
+    },
+    {
+      "gap_id": "G11",
+      "severity": "P2",
+      "downstream_impact": "Rank objective lacks representative lawful cohort",
+      "evidence": "tickets/RANK-015/PROGRESS.md",
+      "affected_modules": [
+        "rank_strategy"
+      ],
+      "dependencies": [
+        "Cohort rights/representativeness"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Qualified cohort ingestion then pure-points comparator",
+      "anticipated_verification": "Shared football scenarios, safe pure-points fallback",
+      "selected_workstream": "BLOCKED_EVIDENCE",
+      "offline_now": false
+    },
+    {
+      "gap_id": "G12",
+      "severity": "P2",
+      "downstream_impact": "Branch-only engineering and historical human-pending records impede operational integration",
+      "evidence": "evidence/stages/11/stage_acceptance.json",
+      "affected_modules": [
+        "governance"
+      ],
+      "dependencies": [
+        "Owner acceptance; no merges authorized"
+      ],
+      "source_rights_constraints": "No new acquisition in ACCEL; existing rights unchanged",
+      "proposed_implementation": "Exact reviewed integrated branch handoff",
+      "anticipated_verification": "Ancestry, fullCI, explicit status distinctions",
+      "selected_workstream": "AUDIT_AND_RELEASE",
+      "offline_now": true
+    }
+  ]
+}

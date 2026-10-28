@@ -1,0 +1,1639 @@
+{
+  "a03_remote_consumption": {
+    "attempt_number": 1,
+    "authority_sha256": "1b9cde4d72416dc0ada2c20bb60da097106046033d00b4ed28c95c88e7676400",
+    "consumed": true,
+    "consumed_at": "2026-10-28T17:43:11.693169Z",
+    "exact_sha_review_binding_sha256": "885af75b90a8aa4813867e08d348e31811fcb5f7cd0c7478337f8cc0e30967aa",
+    "implementation_sha": "dde795c85f68d87578d3432576dac5d600794a32",
+    "independent_review_sha256": "32fede487c638177425731e7ab09cf59dcd216f4e36780ccdc51e2770deae025",
+    "maximum_attempts": 1,
+    "production_active": false,
+    "provider_requests_before_seal": 0,
+    "retry_permitted": false,
+    "schema_version": "public-team-strength-p01-a03-consumption-v1",
+    "semantic_sha256": "bd64193a985b1629d0b1cec68ddc6d539e1719d814d0ab52a1e5f6dd2e03d3c9",
+    "source": "OpenLigaDB",
+    "source_switch_permitted": false
+  },
+  "forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "forecast_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "historical_artifacts": [
+    {
+      "byte_sha256": "9c099583271934073931e434d36bcbc355430e1bf282ef15324b99735d81eea8",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "INDEPENDENT-RIGHTS-REVIEW.json"
+      ]
+    },
+    {
+      "byte_sha256": "13bfeac190c1adf8097966125d4195a0055e590c30ff0bee12e2c7cee281e747",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "RIGHTS-STOP-REVIEW-87655e3b4620cdf9e8d939d177a9139c457410e88f96723b683415d27dd16449.zip"
+      ]
+    },
+    {
+      "byte_sha256": "4a067df11d6ec74d13d5644711002130d9bdf7ace914a902c54a51f7bdbeb6ac",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "amendments",
+        "dcde84a06da3f702136e1a6034dc8b147b8d92d4061cdd1fa3fea3e149462ebc.json"
+      ]
+    },
+    {
+      "byte_sha256": "d52ae697d7d03fb7fdcbd926ce281158779155cfcf03816cfe70a64a22abe298",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "amendments",
+        "e621ebd745958e84f466f4708586df5d3f40bdca35659716650aba6585f79097.json"
+      ]
+    },
+    {
+      "byte_sha256": "3f0d4f90e5118e46a9cb540844553778db4f4d2281d37d82b6ee8802ab1dd73f",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "execution-handoffs",
+        "87655e3b4620cdf9e8d939d177a9139c457410e88f96723b683415d27dd16449.json"
+      ]
+    },
+    {
+      "byte_sha256": "5cfc91acc28457aef9137ecc840cf74491a84905b15ce40fbbbbe3c7ade8c38c",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "policy-captures",
+        "e01086a92deefa3e9f9d6a69847df417772ee87c61f91c9f117ef3bee7494a37.json"
+      ]
+    },
+    {
+      "byte_sha256": "b13777d8c5e08b2d3ff3eeaf9f36254e22078b878cd84df2030193f016ba6ddf",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-assessments",
+        "5d4a97e06c0aafc0b37af19442774d94154595bddd04c350938a16ecbbfd9e0e.json"
+      ]
+    },
+    {
+      "byte_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-profiles",
+        "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2.json"
+      ]
+    },
+    {
+      "byte_sha256": "6a0b170d1df91210b96e79827888bce8e93a80aa4f68cb1da23466d48efb3c39",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-profiles",
+        "ea7a29a140490651b270e6794c709d073ce49e0f20d71f882476e750d8f97078.json"
+      ]
+    },
+    {
+      "byte_sha256": "49201c5b60a8f35a57fb706834c51d72706788d2538b01edab9349d58d505c30",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-source-bytes",
+        "49201c5b60a8f35a57fb706834c51d72706788d2538b01edab9349d58d505c30"
+      ]
+    },
+    {
+      "byte_sha256": "7de0073796c0ee3a16cda5dd175e2e160e00826d99d799072c4e4d3dc1979ac0",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-source-bytes",
+        "7de0073796c0ee3a16cda5dd175e2e160e00826d99d799072c4e4d3dc1979ac0"
+      ]
+    },
+    {
+      "byte_sha256": "b8d8aebb21bf405f93f6e21bbf0d8f0a749844f9812ec58692f189add6402b47",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-source-bytes",
+        "b8d8aebb21bf405f93f6e21bbf0d8f0a749844f9812ec58692f189add6402b47"
+      ]
+    },
+    {
+      "byte_sha256": "ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01",
+        "rights-source-bytes",
+        "ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b"
+      ]
+    },
+    {
+      "byte_sha256": "1af074b79ed2c7d1fefd8ab2420a9db853c0b712083e0131dad6e3cf6e1a40d3",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1",
+        "ci-receipts",
+        "1af074b79ed2c7d1fefd8ab2420a9db853c0b712083e0131dad6e3cf6e1a40d3.json"
+      ]
+    },
+    {
+      "byte_sha256": "38a4a710657fe78a5af5e8f7eb47dbdc3d438b49f3e374f4f66eb7c356cad469",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1",
+        "publication-bindings",
+        "e826194eabc3a3a283a80e8f8a66dd58a5021c3413fe21da86b519990ea3e951.json"
+      ]
+    },
+    {
+      "byte_sha256": "33ece2b37eda1e39b45385dbee11bf67769e3ab9a41ce24f64baea1dc41c8a82",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1",
+        "review-pack-receipts",
+        "bb484e72347335ec7ec5c00381f8aa2d714a87855e0ddc169b901cc21350a138.json"
+      ]
+    },
+    {
+      "byte_sha256": "97f0bd983be7336b1babcb1739a54063764009d024c202c473226c2470b94cf3",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1",
+        "review-packs",
+        "97f0bd983be7336b1babcb1739a54063764009d024c202c473226c2470b94cf3.zip"
+      ]
+    },
+    {
+      "byte_sha256": "48048afc55688eddb21ce3dbd9f258e8b2dba333cda728109e45bd17f5d28be2",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "OPENLIGADB-P01-ONE-ATTEMPT.json"
+      ]
+    },
+    {
+      "byte_sha256": "87680f357ddb195c14295d41e8afd81dda24c455d391ce8e515409c2088355fe",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "amendments",
+        "ae7bf0273623c47dd72f79d067117091c596f13245224acb2ccfadf47ff7ebd3.json"
+      ]
+    },
+    {
+      "byte_sha256": "5530362a20dcee3357bf0931d5461f81dd7edd669492fd5f6371ac629f503b56",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "ci-receipts",
+        "5530362a20dcee3357bf0931d5461f81dd7edd669492fd5f6371ac629f503b56.json"
+      ]
+    },
+    {
+      "byte_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "contexts",
+        "6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259.json"
+      ]
+    },
+    {
+      "byte_sha256": "62443d2f3d830a042ef9b85e1279bb467d937417894b0c072c085650462d6c86",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "execution-handoffs",
+        "38a84ac114b025ce9e2573d7ddbc886c2dd2fb582544a7b41289e699b5afd0e0.json"
+      ]
+    },
+    {
+      "byte_sha256": "a981bc42a962abfd23414155124c202d10cdda994d8e192bbd274e3cbbd88e12",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "publication-bindings",
+        "17634e58ee0641cec98ff0dfe63bc120d20baa463ffb454cc265db5890ebab5c.json"
+      ]
+    },
+    {
+      "byte_sha256": "a8a906eb2cdd12cfd41a16264d12cf03e0525e8ac6321a6ff9e78dfbaed7f266",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "stopped-audits",
+        "28c7815ffb9529723fa0fce0c06680d9816c2c84a48a4bc40965fd878f598de9.json"
+      ]
+    },
+    {
+      "byte_sha256": "ecfa5c45bd5ea5ecb57d6d05b66b432fbe911458e3b500c01a3d81455d0ee6ad",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02",
+        "stopped-review-packs",
+        "ecfa5c45bd5ea5ecb57d6d05b66b432fbe911458e3b500c01a3d81455d0ee6ad.zip"
+      ]
+    },
+    {
+      "byte_sha256": "61b5d21fca0015c004b007097411ab9037e39dd0f5c4a0b1bb0ec457232fe349",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "ci-diagnostics",
+        "564f5d35d31fbf6ee7dae33fe75e31b3e8cdf203bf71f57f57c75b219472e085.json"
+      ]
+    },
+    {
+      "byte_sha256": "573b30110661ad7870fa6eb33c6bf2aa79df9a53cf06c1005eccac0d66f47f2b",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "ci-diagnostics",
+        "573b30110661ad7870fa6eb33c6bf2aa79df9a53cf06c1005eccac0d66f47f2b.log"
+      ]
+    },
+    {
+      "byte_sha256": "216e45e953aa40cd8a1a02f0fa35178c110f50fcb4b4ece6356de45d9ff25be2",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "ci-plan-audits",
+        "f151c4af3ca3f39ed3129a06ae4fdafa09d2bd64210c253a547d8449df4fe726.json"
+      ]
+    },
+    {
+      "byte_sha256": "800d41a8b53028b0d6be33eb8bd6e42da2d3c2e82d4657c2ac392ac1e5b20084",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "ci-receipts",
+        "800d41a8b53028b0d6be33eb8bd6e42da2d3c2e82d4657c2ac392ac1e5b20084.json"
+      ]
+    },
+    {
+      "byte_sha256": "cdbd54a31f20e726789c267a2c8b1c8ebe77f3dc3feba62f23fb0242e4b97bdc",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "ci-rerun-receipts",
+        "d55319ede5c62250ad65f0207f393ad64249f82b35567c3f117034bb60d07017.json"
+      ]
+    },
+    {
+      "byte_sha256": "24efe1afcf24a0ea2e0b5c7f393da660eb7d490eb183f559665236f64664fa87",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "complete-audits",
+        "24efe1afcf24a0ea2e0b5c7f393da660eb7d490eb183f559665236f64664fa87.json"
+      ]
+    },
+    {
+      "byte_sha256": "9efc21b4d582f66e035f3bc14d4d2458ef4fee252b5aa48a6fc258a1d2cf4999",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "complete-review-pack-receipts",
+        "9efc21b4d582f66e035f3bc14d4d2458ef4fee252b5aa48a6fc258a1d2cf4999.json"
+      ]
+    },
+    {
+      "byte_sha256": "e1ee3274415178df31739a8622abe7f24d9be4a0faa83894bbd84168c42daec0",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "complete-review-packs",
+        "e1ee3274415178df31739a8622abe7f24d9be4a0faa83894bbd84168c42daec0.zip"
+      ]
+    },
+    {
+      "byte_sha256": "cfa553528b7c98b64b9260d7997c5204050550aae0d2637c028859c445dd3981",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "final-handoffs",
+        "cfa553528b7c98b64b9260d7997c5204050550aae0d2637c028859c445dd3981.json"
+      ]
+    },
+    {
+      "byte_sha256": "9bc5d46b1d8f497821e6393057c4a89b60d17b458672e9d6033211dfb8a9a22e",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "review-pack-receipts",
+        "9bc5d46b1d8f497821e6393057c4a89b60d17b458672e9d6033211dfb8a9a22e.json"
+      ]
+    },
+    {
+      "byte_sha256": "c033968b8cef697a6ca5da994837d24945466d49873485d7d6f7f041cc8f3965",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+        "review-packs",
+        "c033968b8cef697a6ca5da994837d24945466d49873485d7d6f7f041cc8f3965.zip"
+      ]
+    },
+    {
+      "byte_sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "authorities",
+        "1b9cde4d72416dc0ada2c20bb60da097106046033d00b4ed28c95c88e7676400.json"
+      ]
+    },
+    {
+      "byte_sha256": "59605d8e6932fddb5a7cc39a7efbb192cd81cddcd0bab2940ec2a59f5a06f3f7",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "ci-receipts",
+        "59605d8e6932fddb5a7cc39a7efbb192cd81cddcd0bab2940ec2a59f5a06f3f7.json"
+      ]
+    },
+    {
+      "byte_sha256": "7de2d1815ef4b8b0787a188f5d5f876c94c715952e6aa093d2efbcc8e98c740a",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "execution-commands",
+        "ONE-COMMAND-REQUESTED.json"
+      ]
+    },
+    {
+      "byte_sha256": "efbd9d162bed9a918097b4299a8b1195e0211b0a834fc80d13599c567a60cd6a",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "execution-commands",
+        "f6b65320df94a24d011a1ae01ad72823d8445ff2eb9ec7d80cc6fec43555db62.json"
+      ]
+    },
+    {
+      "byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "execution-commands",
+        "stderr.log"
+      ]
+    },
+    {
+      "byte_sha256": "694f16498309e9af640631ddd141ce815bf15b23a2608661fe31041c128f86ba",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "execution-commands",
+        "stdout.json"
+      ]
+    },
+    {
+      "byte_sha256": "4df46af1c21a0e07f8206d411a2a401e17f1724f24f32e609613f4cf7e4971f3",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "final-audits",
+        "6bb34b9bf4bbf275633396481c5e61109b72378b4d192173759f513e3b6d5d42.json"
+      ]
+    },
+    {
+      "byte_sha256": "4e5aabe3959169e10aea0a1615fb84749943aa70bc62c2631c342c32d21142e0",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "public-team-strength-p01-a03-remote-consumption-seal-v1",
+        "922247d2c123691b0382fb259b90391bd9fde897bf8bf60af81fac653848b5e8.json"
+      ]
+    },
+    {
+      "byte_sha256": "c395f09ecd3694f6dd6d014e2223dd97879bdb592945c93aed57def5343433db",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "public-team-strength-p01-fallback-a03-execution-handoff-v1",
+        "d2c13225fb40ef290501ad4ffd51e921c55c86dc0924df9674e9672d5ed415b2.json"
+      ]
+    },
+    {
+      "byte_sha256": "d683b15240cd2ff6216d4566442c21c868c822411771715068627bd33d42d30f",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "public-team-strength-p01-fallback-stopped-diagnostic-v1",
+        "db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2.json"
+      ]
+    },
+    {
+      "byte_sha256": "1363ed2fb9d8ce547b60754627a1bdbdb6cf445b46f2f6d59fde362bb0645d12",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "release-bindings",
+        "bdfc3b6fb6609a0a6808302de13550d5cfbb0d74e788f8b037c85af36e027b41.json"
+      ]
+    },
+    {
+      "byte_sha256": "300253e055263dacac190be8b3984c07a07129750c755c9de864c1d918822988",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "review-bindings",
+        "885af75b90a8aa4813867e08d348e31811fcb5f7cd0c7478337f8cc0e30967aa.json"
+      ]
+    },
+    {
+      "byte_sha256": "4414e50716ab8ccc8ad9097f71892fd530475f3eb87d594d43fc6ed201060278",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "review-pack-receipts",
+        "f8e010a8b08fc81eab99926b24c62b52d3c4019cc21400190721dccdd0976455.json"
+      ]
+    },
+    {
+      "byte_sha256": "5454097ce77c54eb30aa93acb034c3972cf1c21c1e9cb10e63e1ac2edb64e5fe",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03",
+        "review-packs",
+        "5454097ce77c54eb30aa93acb034c3972cf1c21c1e9cb10e63e1ac2edb64e5fe.zip"
+      ]
+    },
+    {
+      "byte_sha256": "b2987dc43615ad52cbc4a04acf4b8fe7023209121d2dd93fa11f5ceeacdd4ec9",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-AMENDMENT",
+        "INDEPENDENT-REVIEW.json"
+      ]
+    },
+    {
+      "byte_sha256": "3513e4d096afd141eeccf418026714d2ff03dcd8814ce1a2c68042041c6169cf",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-AMENDMENT",
+        "PRE-SCORING-PROPOSAL.json"
+      ]
+    },
+    {
+      "byte_sha256": "944c99b0e8605d8b47ea086224ab2f66455f54850e611a9155a8bbb279c9e02f",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-AMENDMENT",
+        "PRE-SCORING-REVIEW-51b869b6f01f4de75231d871515031db8832b599cd41e08be230113615ef16b1.zip"
+      ]
+    },
+    {
+      "byte_sha256": "5b3b769048e0ecce9a63db4506ef3cb6cd3664857b1c22cf06d43d2f8d4e3b1c",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-AMENDMENT",
+        "REVIEW-PACK.json"
+      ]
+    },
+    {
+      "byte_sha256": "84f75385a4e02e4386a22ee64f272f73ce3b7a76aca953f1d341becc28d021b0",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-AMENDMENT",
+        "proposals",
+        "51b869b6f01f4de75231d871515031db8832b599cd41e08be230113615ef16b1.json"
+      ]
+    },
+    {
+      "byte_sha256": "61e372386368661dc93322ab8421646739a0ed1ed50de961f01de8467f5e8bb5",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "execution-handoffs",
+        "a30941951eca63064f0cd66bb0fb96c0f5499a1c2ff9bd9bcfe4e062b8cf56c0.json"
+      ]
+    },
+    {
+      "byte_sha256": "d8a97b10d5111571bff4d953bc2fb805a8d0c56e4e20a312bca400faafcd409f",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "COMMAND-EVIDENCE.json"
+      ]
+    },
+    {
+      "byte_sha256": "62099ea8e04c5dcd6f79bdc640142a43a92b7825abfb9e08075ff3bdd88bd876",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "EVIDENCE-MANIFEST.json"
+      ]
+    },
+    {
+      "byte_sha256": "b10a79a748b3719a89d26395e28ca5e587ed1ac07454e68a1159634c55843c69",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "OUTCOME-ACQUISITION-HANDOFF.json"
+      ]
+    },
+    {
+      "byte_sha256": "9156f520c1782352b42d41b7187d294f3b9a7b33f193b5999203b8e24dc08320",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "P01-PRESERVATION.json"
+      ]
+    },
+    {
+      "byte_sha256": "8efa4396fd3725809724770150ffe43a9bb515025ca91266347c758c4b134c37",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "P01-SCORE-BLOCKED-REVIEW.zip"
+      ]
+    },
+    {
+      "byte_sha256": "1a76a7c376489b8e063be3bd3f61c435b2f79b0293ca25ed6e1b8386ac456d46",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "PUBLIC-REQUEST-LOG.json"
+      ]
+    },
+    {
+      "byte_sha256": "88fd982b72b778c4bf6abbfb44bba21f0caa92903fcc3c5c52d629c7f5d0a369",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "forecast-authentication.json"
+      ]
+    },
+    {
+      "byte_sha256": "fbdeb14def8d91bb39dcb10b684ca0924e5239a6ca5705461f8c059238cce3e5",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "promotion-status.json"
+      ]
+    },
+    {
+      "byte_sha256": "6d1d610bbf34ac947d76f6569aa451b7fd722aa29c50bbea2e863fb806263c64",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "promotion-status.stdout.log"
+      ]
+    },
+    {
+      "byte_sha256": "33e6c7a42461cb16a14b0ef5f3101353ae483f7339a8b7db40ea4e28fe0f7928",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "executions",
+        "20261014T130320Z",
+        "source-resolution.json"
+      ]
+    },
+    {
+      "byte_sha256": "cb758af621347e8af0b5badbf33b2932a005bf3084ccd8d3bb3e837a85a6231e",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "forecast-authentication-20261014T130058Z.json"
+      ]
+    },
+    {
+      "byte_sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "openfootball-source-bytes",
+        "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
+      ]
+    },
+    {
+      "byte_sha256": "bb91f0ab3e8359df163bb9ec98549bfed85e200dd4c32f3bd606b5890d932dd2",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "openfootball-source-bytes",
+        "bb91f0ab3e8359df163bb9ec98549bfed85e200dd4c32f3bd606b5890d932dd2"
+      ]
+    },
+    {
+      "byte_sha256": "d3a481674a3226db8802cfcc9cee3e0675abf7ff3e6960dfefce72814e98760a",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01-SCORE",
+        "public-openfootball-outcome-snapshot",
+        "edde851a1f43aeb4ef38455216a8ab82d3698fff46246d2ddbdfb6af841306ea.json"
+      ]
+    },
+    {
+      "byte_sha256": "a75632deed48a375ff28307b44f70bfe82d3714a688fe5fe23df543dd1bca5f8",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "EVIDENCE-MANIFEST.json"
+      ]
+    },
+    {
+      "byte_sha256": "c77b6ddfb93b9f334a88288c5e8541dd51f3177118b20b6aae98c660861f2720",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "NEXT-TICKET.txt"
+      ]
+    },
+    {
+      "byte_sha256": "9c0111ac4ccd4a4aa17763ba383f9bf7085e918afcafa612dc44fd8e105c3066",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "PUBLIC-EXECUTION-HANDOFF.json"
+      ]
+    },
+    {
+      "byte_sha256": "ba15b4a3fd2208398a6e36fa3c4c54d983b327e18585ac7512db1e51d812a3c9",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "PUBLIC-REVIEW-PACK.zip"
+      ]
+    },
+    {
+      "byte_sha256": "aa66a595dca147b46374ad3df61dc8788cd5de807e58a37dc3d77bc9a0ae5a0a",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "STATUS.txt"
+      ]
+    },
+    {
+      "byte_sha256": "6cd422575d69830882dda4ce3058b98b2c8a61d83dbd5b990d8cfa1bca4cf7c3",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "baseline-execution.json"
+      ]
+    },
+    {
+      "byte_sha256": "869e19e69e4adb1e38e9a4bfd1ba7bce0f74745f091bbb8d4d7fc1bdb32c5ebb",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "cohort-selection.json"
+      ]
+    },
+    {
+      "byte_sha256": "32b33382dba54cceee3b5d466519fa196d2ccdeb3c21f49a9b417a0fa289a048",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "current-team-strength-readiness",
+        "c7d0087e4fd29da2e20323a3a3eed8fc37e80c95126a1a60061707487bf0cb7b.json"
+      ]
+    },
+    {
+      "byte_sha256": "557024621faa0ea3034613ade36def431994f1b8fb372076f38cb829c79ba044",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "COMMANDS.json"
+      ]
+    },
+    {
+      "byte_sha256": "3c699cde10e9b1f37ee2d47d7a0ac1abf5d7c097f255e15ff38322df2fce37cb",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "assess_public.py"
+      ]
+    },
+    {
+      "byte_sha256": "5246aa26814d9e8e41779ae501519eae20a7624ab5c200294ea2aafb68833522",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "authenticate_forecast.py"
+      ]
+    },
+    {
+      "byte_sha256": "5642f5d8ed69cbf31ad0432a4e531e4f563c45e91e1a66fcd910ab1be92e9e64",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "authentication-command.log"
+      ]
+    },
+    {
+      "byte_sha256": "ac10e5452598bc19cc96e55ff97d441f3f2ed8d6a68de475bbd9fc173665f204",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "build_baseline.py"
+      ]
+    },
+    {
+      "byte_sha256": "7caf8f6d7d3a1a8f05cc66a8498834733a79c3435d9e3fc01b71dc03cce22b5e",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "build_request.py"
+      ]
+    },
+    {
+      "byte_sha256": "d4f6557d71bbfb85f173fbed2b8693f063eef9e53fff198e1d137d828f9c93a9",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "finalize.py"
+      ]
+    },
+    {
+      "byte_sha256": "e5ca33d993a5ad1c5d488e08a728410a30519210b9bc04c3c53452a569cce2b5",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "freeze-command.log"
+      ]
+    },
+    {
+      "byte_sha256": "2ed39ba0a917167013c9650a69f4f8146e2f37303214c28ec9ea7b1b22c26bfc",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "preflight.py"
+      ]
+    },
+    {
+      "byte_sha256": "393c66060a3df9bf09fb7235ffa5fb90d88170a2dd6243b12fc8f7776e66ac83",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "execution",
+        "repository-verification.json"
+      ]
+    },
+    {
+      "byte_sha256": "2ebfcf41b0e2bf0258edfa79579c35a75902ae03d413acd239accfd27c485080",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "forecast-build-request.json"
+      ]
+    },
+    {
+      "byte_sha256": "c3e73e14e8e3778638fa47b79531cbe7ac4c2840d357273156309ec3c44da57e",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "forecast-origin-source-assessment.json"
+      ]
+    },
+    {
+      "byte_sha256": "3888bcaf37bb48f87dae9125ac55e2869c15e6a77ebbdad5043f26662c74debc",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "league-baseline.json"
+      ]
+    },
+    {
+      "byte_sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "openfootball-source-bytes",
+        "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
+      ]
+    },
+    {
+      "byte_sha256": "bb91f0ab3e8359df163bb9ec98549bfed85e200dd4c32f3bd606b5890d932dd2",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "openfootball-source-bytes",
+        "bb91f0ab3e8359df163bb9ec98549bfed85e200dd4c32f3bd606b5890d932dd2"
+      ]
+    },
+    {
+      "byte_sha256": "ae0ec7b9da576bf941b2d48dd9239ddd6cea7aa2d079e3ac8ee1c796dbe8b3e0",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "promotion-status.json"
+      ]
+    },
+    {
+      "byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "public-team-strength-prospective",
+        "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a.json"
+      ]
+    },
+    {
+      "byte_sha256": "1578e63185e30b69c33f720acc2881e19382c0fd8d533a331a743832d1eda2cb",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "source-assessment.json"
+      ]
+    },
+    {
+      "byte_sha256": "461fc77c957708b82858fd54e3dc1cfa33cf3a76f192fcae17594ffbbe660839",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "source-resolution.json"
+      ]
+    },
+    {
+      "byte_sha256": "2fed9f4435c16150875d4171b641057010f9385cd0a9d22dc193ac24d4066cf0",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-P01",
+        "team-strength-shadow",
+        "d2743d56406a83df5c3af7eca2b492f1ffcda11996db958dd127581c8879ebfe",
+        "f44ff80d48f4c8e78c09ea27f4344c2f63858c92b0ce0a7f19f9267d6bc5e366.json"
+      ]
+    },
+    {
+      "byte_sha256": "723767881f0e5fdbe91e7b0609128c544f4f3e0e2cbb8d5f0ad2f62961912559",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+        "P02-FREEZE-TICKET.md"
+      ]
+    },
+    {
+      "byte_sha256": "0a3dafdc45b14800f16df9e77bd51b16dc60403849432bd339c6057b345d1827",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+        "PUBLICATION.json"
+      ]
+    },
+    {
+      "byte_sha256": "0e421280e8633708d76caffd6dfa14e964532fe4b572d42e14b177c67e51d206",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+        "final-review-binding.json"
+      ]
+    },
+    {
+      "byte_sha256": "2cd7369ca227e417f367b04787807b570423dbfbd9ca382ebde8a37ae942f9e8",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+        "protocol-review.zip"
+      ]
+    },
+    {
+      "byte_sha256": "239a868f73c4285c0a8d86fd6a416b626be04bfd2a1fc31676327c5d5e355855",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+        "public-team-strength-campaign",
+        "e8a8b2cbcfc1e035cdf1b9ec102365ca0704a940976a244684ff4138ee72bcba.json"
+      ]
+    },
+    {
+      "byte_sha256": "2f18299c878dded604cab5de4fe27bc3afc3a76dafb55fcd2cc67c918e217fa7",
+      "path_parts": [
+        "CURRENT-TEAM-STRENGTH-001V-PROTOCOL",
+        "public-team-strength-protocol",
+        "93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029.json"
+      ]
+    }
+  ],
+  "immutable_parent": "e8efdd2c1051f75accdb2bd1f635ca02ed410241",
+  "main_sha": "99418f3316277f4dae347d80358d5dd5a09655b2",
+  "protected_files": {
+    ".github/CODEOWNERS": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2",
+    ".github/workflows/ci.yml": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+    ".github/workflows/windows-smoke.yml": "f04ce4d61d35f007b53e87d0eb26a35d212f0e6e0023288e793cc6066678c6ee",
+    "config/base/application.yaml": "e28e802b07277bc47663ad9ce62ff57f648a1beb6e666665c31ad79b8da9034d",
+    "config/environments/development.yaml": "6b5d79e01c584377b502b64c6914d9af16e65ee9a432580f5b206f83a7fcdaa7",
+    "config/environments/test.yaml": "e2ae2492b97dc9bce5c07de2d6c1c0cac49d0c5765419fa007b3696cb7941272",
+    "config/evaluation/default.yaml": "a1207826b9bffeb598ee9b398839fa05266faacc67800a551e812a8b71af17b9",
+    "config/evaluation/evaluation.schema.json": "93ca364b67e1aaa2e16737196741b2f74f7873f587f1f4fcc406d61475e906fa",
+    "config/evaluation/team_strength_p01_a02_consumption.json": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+    "config/evaluation/team_strength_p01_fallback_a02.json": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+    "config/evaluation/team_strength_p01_fallback_a03.json": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+    "config/markets/confidence_gate_policy.json": "5f374e581f232680163bb37b40aabf756a44a618b950b4bde4bff023ea56dd57",
+    "config/markets/normalisation_policy.json": "201a3450482287b6e9a7929bc25f2c97375d1eccf67b239462644ae983242f18",
+    "config/models/current_team_strength_governance.json": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+    "config/models/event_allocation_baseline.yaml": "759b36bbffe93407e1a44057fbdf73f802da3f7ee92bac3791c9670fdd33be45",
+    "config/models/fpl_points_simulation.yaml": "14107f715769abb2d1bfc2937753c820a7d3eb02c23ae8e8a76350eaa88c0454",
+    "config/models/gw1_private_player_allocation_acceptance_v1.json": "67b69a2c04171ceacd8bcc3667d058e4b2d1864442dc95f3e1c9371f9cd58224",
+    "config/models/gw1_private_player_allocation_prior_v1.json": "995d0166c7d5cdd86f18948f6d374044da116881758622fc98f1ca3718c5fae0",
+    "config/models/price_baseline.yaml": "e2ed7e94eec15ec61a641e02ea073264c46d0447cb8a4e06096f3c4de82e7705",
+    "config/models/score_baseline.yaml": "43172c2639fb07eb5e98537c761373fa318161d31dace804dfe594c3853720ae",
+    "config/optimisation/multi_gameweek.yaml": "0b624b2daa484a6d4bee0c5cb01a708edae57a4746df8b5597ded64d645abc44",
+    "config/optimisation/multi_gameweek_terminal.yaml": "bb66f690b13bcfb7d5ce776ddba93be344b89b872bf56ee014abf7b2c25c3e2b",
+    "config/optimisation/one_gameweek.yaml": "91b5baa912c75966e846ceffbdc19441068c8dc11e516a8855716d57b5e7ae80",
+    "config/providers/fpl.json": "9c203f686d4bc5e197cf708c6c5829bf7865b1039615365db42c70401e6b2041",
+    "config/providers/openfootball_historical_team_identity.json": "81d5ff6571d8a6eeb73de1b978ef1b1e742be4202f704b5453957ba0288a65cc",
+    "config/providers/openfootball_score_prior.json": "35c75720f00f0a069ad28a4165f4eef013a2719d55def5af8362d86a88caf314",
+    "config/providers/the_odds_api.json": "b426fc82fe260621598ee2aa5baaacfb513d138f4f2023b5712b97a2ebea9743",
+    "config/rank_strategy/default.yaml": "6576a10be9d2c12de2dce7a05e55dcfc14168977ba4f318102f57ad314d3f3e2",
+    "config/rights/fpl_profiles.json": "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d",
+    "config/rights/odds_profiles.json": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+    "config/rights/openfootball_profiles.json": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+    "config/rights/openligadb_p01_fallback.json": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+    "config/rules/README.md": "78261749f0a419e86a430fd757868274f8a601d369891cfb5dea59ce71510f96",
+    "config/rules/compiled/.gitkeep": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "config/rules/fpl-2026-27/approval_trust_store.json": "7977cba53986566a204461c3d2c45dabaad7d92e6e0eee24d0a8f774b5e94279",
+    "config/rules/fpl-2026-27/assists.yaml": "f5e6cbacc0192e93eea057304d84b865c5c9305321f13b423226c4c6b4f24c1e",
+    "config/rules/fpl-2026-27/bonus.yaml": "2e680264528f8897665e7c31338b7e5faa1de44ad7d66274abc4eeae4c7a73d6",
+    "config/rules/fpl-2026-27/capabilities.yaml": "ef6a1a55eff8e7600a7dceedf8c100035fe9955227a45a67498487457281940b",
+    "config/rules/fpl-2026-27/chips.yaml": "f8c0586658c237a07bc00a97677f87a9c0e61f820da58cf9bdf26c9b21889651",
+    "config/rules/fpl-2026-27/deadlines.yaml": "4bdf5e075c1a790ea146ebd0cb71a97837831324af940a09bfdfb2460353a7ba",
+    "config/rules/fpl-2026-27/interpretations.yaml": "197e5e57aeec6c6469fe91a4187a7d15f4d90d444a1259b22906cc72aa98c7c5",
+    "config/rules/fpl-2026-27/lineup.yaml": "f82b34545f17556aa1e818572d4b2205a8500f2eb6c6715e15715a6e25eb7283",
+    "config/rules/fpl-2026-27/positions.yaml": "f13ad6f19da0b8bec853257419673e794aa649044d73f0c618f8284203b19598",
+    "config/rules/fpl-2026-27/prices.yaml": "abf772d8a7960961e8b0cf45b33d6b74fc3f9225f7757020d1c45f51c89acdf4",
+    "config/rules/fpl-2026-27/rule_verification.yaml": "02c1c2e68bbd75e1abbb69746cead4148c10aad63e24033d4d06158a1cc549df",
+    "config/rules/fpl-2026-27/scoring.yaml": "4c9e6c62a86ab49769711558abf1e4f677fbd954a55e485de57a6fb52c2aef73",
+    "config/rules/fpl-2026-27/season_manifest.yaml": "42348bd9be0138eaa499fa6ae521e357e4b1271ad7a69d264b3f79a5acde28a8",
+    "config/rules/fpl-2026-27/source_manifest.yaml": "3351d5993daacc26f2d9c9dd3ec27c94563c187dc5ddbee33665d2e332d8fc71",
+    "config/rules/fpl-2026-27/special_events.yaml": "fb9b2e59663fe1741488ac52428726f13fd98f2f28cc73db64f022c8ae629999",
+    "config/rules/fpl-2026-27/squad.yaml": "d204d632e60181b926363c69d4e051d86f834d3dc5a2e4b4f187142ffa8d800f",
+    "config/rules/fpl-2026-27/target_2026_27_claims.yaml": "b9864605f918816f235c2e49d27c60403f07a20dc714c58bdc52d4393651e366",
+    "config/rules/fpl-2026-27/transfers.yaml": "23f3a26b61a341df110cc562c5d362a8cb0828452253dd05c2484dd1687c71e2",
+    "config/testing/cadence.json": "b6b39cbf736e99093352b62be139db666c1bce9b510797b72a1516e7eefd958f",
+    "config/testing/runtime_history.json": "ebd67c216319b104c5785b0e1a2494bb737495fb973d03eb72394f159d4ae763",
+    "pyproject.toml": "11ec5b0f52ff98b6ac583585e58957137725937de955dd21a840e8348221af49",
+    "specs/approved/DMFP-00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION.txt": "b003c63b392f43dcd2278333af5052ac3330f520b3506cd2a9a2b2d4a0b444a3",
+    "specs/approved/DMFP-01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER.txt": "07e35fcba49155e4fd6a149f513172ad72f31dc4aec231d8f9255ca3c2c5b9d6",
+    "specs/approved/DMFP-02_FPL_RULES_SCORING_AND_SEASON_CONFIGURATION.txt": "7080479a784d57a334f0b3ed8c9bd465c89434729e5f7599f666c269bec11916",
+    "specs/approved/DMFP-03_CANONICAL_DATA_MODEL_AND_IDENTIFIERS.txt": "f3ecc7bb990e4f3ae0dcedb06438e04cd5516b156c9130fdc542dcd09dcd58ab",
+    "specs/approved/DMFP-04_DATA_SOURCES_MARKETS_APIS_AND_LICENSING_ZERO_COST_v1.0.txt": "7a29960e3d6dba3f4ed0b4e0d5819e0d8e2ddbd70b79dcf6376b310b59368b85",
+    "specs/approved/DMFP-05_INGESTION_STORAGE_AND_DATA_QUALITY.txt": "de024be01f8e1fdd1bae259ffe9230508870830644da67dc61639cb70cd943dd",
+    "specs/approved/DMFP-06_ODDS_NORMALISATION_AND_MARKET_CONSENSUS.txt": "af171422026588db3e4f93301df3af686b3312cdd40dd0cf8c77b35174ec6e6c",
+    "specs/approved/DMFP-07_PLAYER_AVAILABILITY_START_AND_MINUTES_MODEL.txt": "e6c70afced2e702d99e321a424cec7fbf6c9fccbc91191717566f4aef66d2626",
+    "specs/approved/DMFP-08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE.txt": "7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff",
+    "specs/approved/DMFP-09_FPL_POINTS_DISTRIBUTION_ENGINE.txt": "1b5ee04f0b57f604072b6536fc8e60be19a0590f101f095614639af7cedd36da",
+    "specs/approved/DMFP-10_UNCERTAINTY_SCENARIOS_AND_EARLY_SEASON_POLICY.txt": "5914251e325cd4b57f63413820c5d6a0612f6c33cbf73e7e003624d5faf6cf68",
+    "specs/approved/DMFP-11_PRICE_CHANGE_AND_TEAM_VALUE_MODEL.txt": "32f831e4a249d10cd08323394a713fdd4084b297400503791e410f133184220e",
+    "specs/approved/DMFP-12_SQUAD_TRANSFER_AND_LINEUP_OPTIMISER.txt": "cba15ba9c72ff68c0ea8dca6ac5cf9075bbb34eefca06e86060cf33f824a84f6",
+    "specs/approved/DMFP-13_CAPTAINCY_AND_CHIP_OPTIMISER.txt": "6d2a7df75b53e338f96924de64cc4d847ba2964cabe700641086cf9acc8144b0",
+    "specs/approved/DMFP-14_RANK_EFFECTIVE_OWNERSHIP_AND_RISK_STRATEGY.txt": "e796772890db8e5f6ca9ab8d61605a60a87acf6c545a05ab82c9fc73ae99c6de",
+    "specs/approved/DMFP-15_BACKTESTING_CALIBRATION_AND_BENCHMARKS.txt": "0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed",
+    "specs/approved/DMFP-16_ORCHESTRATION_APIS_AND_DECISION_PIPELINE.txt": "0bf960b211f7f566ae30eed46f1f6b577606d9a8c9fd7229f122f10c64ad18f9",
+    "specs/approved/DMFP-17_OBSERVABILITY_REPRODUCIBILITY_SECURITY_COMPLIANCE.txt": "83fde67e17d8171c8305707c02b90838c7ad984f651f00636bb5a26d1ecd1486",
+    "specs/approved/DMFP-18_DECISION_UI_REPORTING_AND_EXPLANATIONS.txt": "6b2efa3193e6aa123e63038956f06f72dc597ce2bd169130dcaab0c160a1cd0f",
+    "specs/approved/DMFP-19_CODEX_IMPLEMENTATION_ROADMAP_AND_ACCEPTANCE_TESTS.txt": "2b2aac2301956b367b8fbd7c98259ccc7e6edcc9c294038de4e79c8bcabb4691",
+    "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "specs/manifests/decision_manifest.json": "91e617bc0b3d717e320baff483db648db5b453b7129552fdc6d5889dad02ee12",
+    "specs/manifests/document_manifest.json": "a236be8f097c2dfb520cfb33100fb515eb322cfd46ae20084f6c89251ed68455",
+    "specs/manifests/runtime_lock_manifest.json": "0e53faa59a0963846f4a4e431618d02a1e2edd4bef8a12c777820f77a8fb4dc9",
+    "specs/manifests/stage_authority_requirements.json": "d26605207bec6650f1452836c9fde2e627e6eccc1a8ba3dc30eb56c8e026dae2",
+    "src/dmf_pulse/evaluation/p01_fallback.py": "9bd304ffe2531e9cbdc7473b5efd3d090ad938fbcc37acd8778316fbf7ca002b",
+    "src/dmf_pulse/evaluation/p01_fallback_context.py": "35df9b296213cd07239b94b506c81d62c5fecfb6e647d128a4a60b4ad6292762",
+    "src/dmf_pulse/ingestion/p01_match_metadata.py": "48d9d4f25421d0d5a02fba635950ecdac77a5407b76227c98d80e4ed655a47b1",
+    "uv.lock": "af7d4de655438868c42d2f7c1d9b7d7a2c096fb72e671365e4a2dd0ffe9f41b9"
+  },
+  "recorded_at": "2026-10-28T22:47:43.601458+00:00",
+  "remote_refs": [
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/HEAD",
+      "sha": "99418f3316277f4dae347d80358d5dd5a09655b2"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/backup-stage13-recovery-pre-repair-20260818",
+      "sha": "b7556cbc64e8dda505cc446f283faf0bb290dd8e"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/diagnostic/CI-DIAG-02-ubuntu-evaluation-cli",
+      "sha": "6fdcad8153897e7485ac48fcc6409008a24e8274"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/evidence/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-consumed",
+      "sha": "f11b3a27151649276bc3a649a56b23969aabd546"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/governance/CI-GOV-001-ci-runtime-budget",
+      "sha": "6723f121b2b3d2bc477d929e03eb4597eb86df7e"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/infra/ci-runtime-overhaul-2026-09-24",
+      "sha": "3d86e6ae62efc01daa85b2b0991596a80f9847db"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/infra/runtime-informed-ci-scheduling-2026-09-24",
+      "sha": "9239630f355007ba3def2b3cab88a2995d749a22"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/infra/test-suite-rationalisation-2026-09-24",
+      "sha": "8bb6e0f2e0b35f5976994fdc1fae9ffb94aa3712"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient",
+      "sha": "d8054f812910ca5db4c1f4a5bacfb4653d9353ce"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity",
+      "sha": "c23acdb587b39c43263628f642d326bcc62a3d83"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state",
+      "sha": "ad49f0981f731b282130bd879ec3b1d35f24629e"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state",
+      "sha": "a310beb73a8a09995cd2df1c27a2242181d0b702"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints",
+      "sha": "29a3fabd020e14a4f5d869ddfae08a9d2830dbdd"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior",
+      "sha": "850551d90f033dff024f8130eda34279f528494f"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-P0-authority-identity-policy",
+      "sha": "1a6bbc2cfc259f4aeb688c21360af2f1433a176e"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-independent-poisson",
+      "sha": "6b96f5b85692fb3ec368ee261ad93a554128e017"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/post-ci/LIVE-ODDS-001-on-repaired-main",
+      "sha": "feca6ae96837396059bc404007dc52ca71af4a68"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/integration/post-gw1/LIVE-ODDS-001-production-live-odds",
+      "sha": "5e55cf3361a1abff4b2e32dcc30fe42900ea2e16"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/main",
+      "sha": "99418f3316277f4dae347d80358d5dd5a09655b2"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-AVAILABILITY-001B-private-manual-transient-minutes-override",
+      "sha": "ddd74fe38ddfae3733ad5189b417123477e9f23e"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-PLAYER-ALLOCATION-PORT-001A",
+      "sha": "7f4254905bccf79cdc282d04f4928cba850276be"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L1-D1-safe-comparison-failure-diagnostics",
+      "sha": "4d712ecf84e9c1f01a0f29354bd93c5296befb35"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L1-one-shot-live-observation",
+      "sha": "06cbd10719fee3cde87dbb2f9698d81567672618"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L2-D2-wrapper-failure-localisation",
+      "sha": "d2a5e49c1e6b95b89bdcbf5ef23f05ecb67e00db"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L2-one-shot-live-observation",
+      "sha": "c11f4fee160043aafcb4008d4deb0ffa3ef709eb"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L3-D3-prepared-runner-diagnostic-propagation",
+      "sha": "433d7160c0f15588009aff44acc1dd479cb8982d"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L3-one-shot-live-observation",
+      "sha": "b774056f20e855d7a755186fe62489e3d393ecfe"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L4-D4-baseline-rolling-failure-localisation",
+      "sha": "a513f6c7e865f81b81f70d3f06803c23c4acae00"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L4-one-shot-live-observation",
+      "sha": "efbddb9d36261bfa459c6c014a292bb031aa1773"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L5-D5-stage11-resource-limit-remediation",
+      "sha": "1963282d6c45680b764b423ed6cfb28ddc9f6e7b"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L5-one-shot-live-observation",
+      "sha": "c348c3c7f2b26ef929dc0d56fa2dc1dbfd356d7e"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L6-D6-cumulative-legal-action-scalability",
+      "sha": "fbafe72bba6639c9f6758bd2ccf3a9288876e1a7"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L6-one-shot-live-observation",
+      "sha": "7ae84993083756aadf13eb01c019ecd7ed0b196f"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L7-D7-policy-generation-scalability",
+      "sha": "f4585eee4a3ea492b6a535f33fa13183734ab2ac"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L7-one-shot-live-observation",
+      "sha": "57f578efa168919b63574fa8a3bd4656b6b6d4bf"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-L8-one-shot-live-observation",
+      "sha": "605e404984ace1702d86dc69995cccc7ca7d8160"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001P-private-three-gw-shadow",
+      "sha": "338571d535d701cbf0251cfeff23dabe171667d3"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001U-parameter-uncertainty-prospective-evaluation",
+      "sha": "3815152e978dd55e1dc1f115055050d4ed6b1735"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1-failure-localisation",
+      "sha": "f96eaa3e7261d0db6f23bc8eb7dee18917272d00"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-openligadb-only",
+      "sha": "5ca798db9f2d75c8b577e8b37e9ee21205a2d0f0"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2-schema-compatibility",
+      "sha": "e8efdd2c1051f75accdb2bd1f635ca02ed410241"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-one-shot-reauthorization",
+      "sha": "dde795c85f68d87578d3432576dac5d600794a32"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/CURRENT-TEAM-STRENGTH-001V-prospective-protocol",
+      "sha": "40e5edacde51e14580ea7d075c304530c8f9a817"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/GW1-2026-27-live-input-initial-squad",
+      "sha": "d4cc759d4600489c21ba738cfc9b357cc380554e"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/GW1-2026-27-market-primary-remediation",
+      "sha": "3ef25343725aeef1ebb3546a78e63a2ff72ea2e8"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/GW1-2026-27-player-evidence-candidate",
+      "sha": "1a3c63c38a302f9fd4088fdb9f3fa049352652f0"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/GW1-2026-27-player-role-prior-candidate",
+      "sha": "f4d75dc5b107901a3619f136c3d3d7d1d7632a3c"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/GW1-2026-27-support-prior-candidate",
+      "sha": "2ca0e32b32503684d15b70d5c9fce506845939c0"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-E2E-001A",
+      "sha": "8f1047e24745afbcaf27c8aed7e8fdebc6203cd9"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-LIVE-TRANSIENT-001A",
+      "sha": "ba87691c559559757e7cb06f06269a85706268a8"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001A",
+      "sha": "4aa187a7ada60523b5df29856e7e55697e310112"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001B",
+      "sha": "52480d61bcc7aab52441cc310a7f946510dae5de"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001C",
+      "sha": "876b451c7a44502f965fa83f9601f79dcfe816b0"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001D",
+      "sha": "6d396213671622cfd3145f578e50c54a9e7bdfa2"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001E",
+      "sha": "ab09382a9660ea8ddef612c31422f6386a30d0b3"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001F",
+      "sha": "90f6f8fede041fd4a7d616c88053d8103700fa64"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001G",
+      "sha": "0c1c5bfdbdc766d28cb70f7ea6df1cf4633c2c5b"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001H",
+      "sha": "83743c204c47982e74328b77a6124cd305c53022"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001I",
+      "sha": "88e1bd8779abe125fed4c0387b14e4247aaad15f"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001J",
+      "sha": "e2961220ed110854eb9c912448f809ff3bad5e20"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001K",
+      "sha": "9ce56b93502b894a5c2763d6f19e013714336b00"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001L",
+      "sha": "7001d507142cbef8c1d54bff88b3fa67810e65a2"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001M",
+      "sha": "ad155c077253a0525f0c7406e955240146823f80"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N",
+      "sha": "ba8d9917c75ba94e5739c605f38407d4438ff41c"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R1-score-prior-prefetch",
+      "sha": "43229ea760bc2b3587a4ed05e22bef3c9e505497"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R2-stage11-exact-acceleration",
+      "sha": "de57ec634fbf5d9eb8bb86ae4eb2270661b354f9"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R3-fpl-entry-reconciliation",
+      "sha": "e31adbb1491f1b93af559a989c7a7ea62c5b0103"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R3A-manifest-reconciliation",
+      "sha": "47215656bac92d0ef72077b79e179a8c001915bc"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R4-ft-scope-and-comparator",
+      "sha": "56a0776e8e13bfae31297b6b40f631361e1fce95"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R5-horizon-candidate-scope",
+      "sha": "9c02ed86bf181c0a7e75c5983f08d23fe8824dc9"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R6-bounded-horizon-candidate-search",
+      "sha": "5878a39448456df0d07d58823e6dfa7c8e574715"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R7-live-scale-exact-acceleration",
+      "sha": "c60d5b34a7d8922cd274d1ef28648b9e6235d718"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1-rights-approval-reconciliation",
+      "sha": "e4d5774ca6f426e6231ae24e8f2cfc003b1fd5e6"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-horizon-market-coverage-probe",
+      "sha": "b258c6e9c560ff0dd1e6f358f7fe3f74610e1578"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1-live-rights-approval",
+      "sha": "6802441f5a60723929bf5a930b6ea9380f5178c1"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-horizon-market-integration",
+      "sha": "b13619123584800c8817961d81b0d9e0bec34f06"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9A-current-player-history-evidence",
+      "sha": "b4d4c774ac4150a6fbdeb579c143a0458fa9156b"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9B-current-player-eb-shadow",
+      "sha": "32dc27ff78cf492c14e41e17d542fdde95691a9a"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1-three-gw-shadow-decision-adapter",
+      "sha": "f6c3bbf0c768ca83d2b4b993425fb5ff7f6e7ef7"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2-live-three-gw-shadow-observation",
+      "sha": "f39ba4ee3ea748cf60c5743e48f7f68cc6784a71"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-D1-safe-shadow-failure-diagnostics",
+      "sha": "483c0c8cb858381b89c2cf14954c50b1c6ddd306"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-D2-safe-acquisition-trace",
+      "sha": "00aa08acc9b67323fd85e0a6cc95d3f0a1a04a25"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/readiness/RUL-2026-27-full-season-activation",
+      "sha": "1cfa7a9a7b01e1b9f19a8426306c32870840f7ea"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/rebuild/post-A-FPL-001-correctness-stack",
+      "sha": "740e70f0ee836a8fab162c56e8345033a06d926b"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/recovery/GW1-checkpoint-1-2-final-head-verification",
+      "sha": "46722b474d831405eeab161fd3b479c9b3fb5751"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/recovery/GW1-checkpoint-1-2-publication-reconciliation",
+      "sha": "68436c62f5267b1620b20edb4ea0806b8d2c242d"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/recovery/GW1-checkpoint-1-2-publish",
+      "sha": "8d3eabecc636c8231241858f6ff6daf4b64030cf"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/remediation/CI-COVERAGE-SHARD-001-sharded-coverage",
+      "sha": "70d972c49fbb357977cc9cec37361fade6b792fa"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time",
+      "sha": "d41be2df28e7a74b67563056adea4ccc963ac04c"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/remediation/CI-TEST-001-cross-platform-canonical-fixture",
+      "sha": "d550250836c9c39e6caebaa5f12ad94fec7e2b02"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/remediation/CI-TEST-002-evaluation-cli-ansi-contract",
+      "sha": "840b6b7150808f19a3c32171aea6846e55fa8554"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A1/FND-001-foundation",
+      "sha": "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A10/OPT-010-one-gameweek-optimiser",
+      "sha": "49103e03bb1e7500aff5c15b90b136f2cc476405"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A11/OPT-011-multi-gameweek-transfer-optimiser",
+      "sha": "ec41e4cabcf722380016c5c960430bb7ae942e2f"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A12/EVAL-012-backtesting-framework",
+      "sha": "18e71e4974ac348edd53548518bd937989ee3ad1"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A13/PRC-013-price-prediction",
+      "sha": "c13b9336ec72f61018119610a7196407546cbf8d"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A14/CHIP-014-chip-optimisation",
+      "sha": "f4da141704f78b6d3f90610e1c5f61c1433077c2"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A15/RANK-015-rank-aware-strategy",
+      "sha": "9b28b31aa8eec0daf0161077b196ffc99ae5f7bd"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A2/RUL-002-rules-foundation",
+      "sha": "f9b51e965aad1bc94796c17c897f0d99b4c16e1b"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A3/DAT-003-canonical-foundation",
+      "sha": "9b3160a2574d2868b5f26e3a2d429924567510b0"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A4/FPL-004-official-ingestion",
+      "sha": "7034e38f32cd579c90d35c5fe3f10921c3656be0"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A5/ODD-005-odds-provider-foundation",
+      "sha": "e36ea84cda9e80191a9160d037f8e7035477b9b1"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A6/NRM-006-odds-normalisation",
+      "sha": "253baf3f19661a5704bb1fad2f7ac60e1db288eb"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A7/MIN-007-final-recovery",
+      "sha": "c34f98755057c02e5160a50015abb1b070782d8a"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A8/GCS-008-goal-clean-sheet-distributions",
+      "sha": "69b665315ab20b8ac13a38fafed7b5c64ff7e7ce"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/stage/A9/PTS-009-fpl-points-simulation",
+      "sha": "c822ada0034a387644f33cd324e4583ef55970de"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A9/PTS-009-red-card-dismissal-r3",
+      "sha": "793c4533063a291933899e67161c3db3a0f0f9a5"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/A9/PTS-009-static-acceptance-r2",
+      "sha": "fad2fc1fb2503e4de0d5db730fe2a763f2cbd12c"
+    },
+    {
+      "ancestor_of_d2": true,
+      "ancestor_of_main": true,
+      "ref": "refs/remotes/origin/stage/R2/FPL-2026-27-rules",
+      "sha": "5829df3c46c61a29d24a136578d5aae4cecbfee6"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-1-3b-remediation-20260819",
+      "sha": "af924b9e3182945e9a76f2c58ea73a3641f2bea3"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-1-3b-remediation2-20260819",
+      "sha": "a4bc19aa4688b3b8255d312da15ea80ac2c88a5d"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-session1-head-probe",
+      "sha": "448749c072900642a922ae1456d0d30111a3e9ea"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-session1-head-probe-2",
+      "sha": "2a06f154c6ac7f0edef314daea534b916c0a4dad"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-session1-head-probe-3",
+      "sha": "2a06f154c6ac7f0edef314daea534b916c0a4dad"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-session1-head-probe-4",
+      "sha": "7b48ae842cbc7d3f002323153721774b7d1d9f8d"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-session1-head-probe-5",
+      "sha": "538795cecbe2b30179ea66d5c88d3d8072b3b6d4"
+    },
+    {
+      "ancestor_of_d2": false,
+      "ancestor_of_main": false,
+      "ref": "refs/remotes/origin/tmp/gw1-session1-head-probe-6",
+      "sha": "e392bd9666b8af1e8c1aa0d32b838d679d685511"
+    }
+  ],
+  "request_byte_sha256": "af6791402ef2e3dbd9a056012de38fd0d0d148c1e9bf7099b03bc78f736f0125",
+  "schema_version": "accel-001-repository-snapshot-v1",
+  "semantic_sha256": "580c623a00d2171e1a8df66af79a699603b3ce10e372832b9afc16258eae82e0",
+  "source_status": "LOCAL_BYTES_AND_FETCHED_GIT_ONLY"
+}

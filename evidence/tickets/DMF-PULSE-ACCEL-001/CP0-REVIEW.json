@@ -1,0 +1,25 @@
+{
+  "reviewer": "/root/accel_governance_audit",
+  "mode": "independent read-only",
+  "findings": [
+    {
+      "severity": "P1",
+      "gap": "G06",
+      "finding": "Legacy manual live-transient has same deadline publication gap",
+      "resolution": "C contract expanded before code edits"
+    },
+    {
+      "severity": "P2",
+      "gap": "G02",
+      "finding": "Prospective hazard, not demonstrated erroneous persisted readiness",
+      "resolution": "Explicit finding_type added"
+    },
+    {
+      "severity": "P2",
+      "finding": "Ignored network denial wrapper must be reproducible",
+      "resolution": "Exact wrapper will be retained in evidence before acceptance"
+    }
+  ],
+  "checkpoint_scan_remediation": "13 entropy findings arose from concatenated directory/hex-filename tokens; inventory now stores recoverable path components. Scanner unchanged, no exemption.",
+  "verdict": "CP0_AUTHORITY_SCOPE_CLEAR_IMPLEMENTATION_REVIEW_PENDING"
+}

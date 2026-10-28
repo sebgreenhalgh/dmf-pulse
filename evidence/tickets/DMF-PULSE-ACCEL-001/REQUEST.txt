@@ -1,0 +1,1085 @@
+# DMF PULSE — ACCELERATION WAVE 001
+## REPOSITORY-WIDE ARCHITECTURE AUDIT + MULTI-WORKSTREAM IMPLEMENTATION + PRODUCTION-READINESS ADVANCEMENT
+### AMBITIOUS EXECUTION — GIT-FIRST / RESUMABLE / INDEPENDENTLY REVIEWED / PUSH AS YOU GO
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Latest completed P01 diagnostic branch:
+`readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2-schema-compatibility`
+
+Immutable D2 implementation parent:
+`e8efdd2c1051f75accdb2bd1f635ca02ed410241`
+
+Reference `main` HEAD observed during planning:
+`99418f3316277f4dae347d80358d5dd5a09655b2`
+
+These are initial reference points. Re-fetch all remote references before any work. Do not assume `main` remains unchanged.
+
+Programme ID:
+`DMF-PULSE-ACCEL-001`
+
+Suggested primary working branch:
+`readiness/DMF-PULSE-ACCEL-001-integrated-readiness`
+
+Use separate branches/worktrees for independently releasable workstreams if the repository's active governance requires them.
+
+---
+
+# 1. ROLE AND EXECUTION MANDATE
+
+You are the lead implementation engineer and technical architect for DMF Pulse.
+
+This is a **major implementation programme**, not a research-only exercise or a request to produce another plan.
+
+The overarching objective is:
+
+**Make the greatest justified forward progress toward a reliable, operational, scientifically defensible private FPL decision engine in this Codex session.**
+
+You must:
+
+1. Investigate the actual GitHub repository comprehensively.
+2. Reconstruct what has genuinely been implemented, accepted, integrated, tested and activated.
+3. Identify the most important remaining engineering and modelling limitations.
+4. Prioritise improvements according to their effect on actual FPL decision quality and system operability.
+5. Implement multiple high-value, complete improvements where authority and evidence permit.
+6. Address the outstanding P01 OpenLigaDB metadata compatibility issue.
+7. Harden end-to-end validation and future execution readiness.
+8. Perform adversarial independent review.
+9. Run comprehensive tests and release checks.
+10. Publish completed work to GitHub with exact-SHA CI evidence.
+
+**Do not finish with only a gap analysis, architecture document or list of recommended future tickets.**
+
+Implement real capabilities.
+
+Do not spend the entire session resolving one narrow diagnostic issue when other independent, valuable implementation work can proceed.
+
+Conversely, do not sacrifice correctness, source rights, independent review or immutable evidence for apparent velocity.
+
+This programme replaces the need for several sequential narrowly scoped Codex prompts. Internally, retain bounded workstreams and checkpoints so the implementation remains reviewable.
+
+Continue autonomously across permitted checkpoints. Stop an individual workstream only when its controlling evidence or authority genuinely blocks it; proceed with other independent work.
+
+---
+
+# 2. ESTABLISHED PROJECT STATE
+
+## 2.1 P01 A03-D2
+
+Completed D2 SHA:
+
+`e8efdd2c1051f75accdb2bd1f635ca02ed410241`
+
+Exact-SHA CI:
+https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40749235436
+
+Reported completion:
+
+- 20/20 CI jobs green;
+- 671 local tests passed;
+- 198 independently rerun tests passed;
+- all twelve independent-review questions cleared;
+- no unresolved material findings;
+- no provider requests;
+- no A04 authority;
+- no P01 scoring;
+- no production activation.
+
+A02 and A03 are permanently consumed.
+
+A03 stopped with:
+
+`PROJECT_FINAL_FACTS / MATCHDAY_RESPONSE_INVALID`
+
+Three completed responses were HTTP 200 with valid JSON.
+
+The matchday response contained ten records.
+
+However, the projection stopped at the first match's metadata gate, before finality or score evaluation.
+
+Therefore:
+
+**A03 does not establish that OpenLigaDB lacks final results.**
+
+The exact mismatched field and observed value were not retained and remain unknown.
+
+D2 introduced field-specific diagnostics for:
+
+- `leagueId`;
+- `leagueShortcut`;
+- `leagueSeason`;
+- `leagueName`;
+- `group.groupOrderID`.
+
+Diagnostics now distinguish missing, wrong-type and mismatch conditions.
+
+D2 preserved the original admission policy.
+
+Its retained provider Swagger evidence indicates that `leagueName` is descriptive and nullable, but removing the exact display-name equality guard remains:
+
+`PROPOSED_UNAPPROVED`
+
+That status must not be silently converted into an accepted policy.
+
+## 2.2 Immutable P01 forecast
+
+Semantic SHA:
+
+`96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a`
+
+Byte SHA:
+
+`e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee`
+
+The exact original forecast, information cutoff, fixture cohort, model outputs and prediction distributions are frozen.
+
+Do not refit, regenerate, amend, tune, backfill or overwrite this forecast.
+
+A successful future acquisition may only provide governed final-outcome labels for prospective scoring.
+
+## 2.3 Broader repository findings requiring verification
+
+GitHub inspection indicates:
+
+- Stages 1–15 have substantial accepted implementations and merged history.
+- `main` was last updated in August 2026.
+- Important September/October work exists on later readiness branches.
+- `src/dmf_pulse/private_v1/` contains the private operational decision pipeline.
+- `dmf pulse --entry-id` is the existing private one-command surface.
+- The private engine has an explicit three-Gameweek rolling-horizon option.
+- Its disclosed limitations include bounded candidate search, constant future prices, a deterministic future information topology, and zero terminal value beyond the selected horizon.
+- Current team-strength plug-in and parameter-mixture research has extensive shadow and prospective infrastructure.
+- Parameter-mixture research does not establish production readiness.
+- An actionable, fully integrated Stage-16 decision experience requires assessment rather than assumption.
+
+**Reverify every claim against current GitHub code, commit ancestry and evidence.**
+
+Distinguish merged/mainline, independently reviewed, branch-only, research-only, shadow-only and production-active states.
+
+Do not treat a GitHub branch existing as proof that its capability is approved.
+
+---
+
+# 3. NON-NEGOTIABLE SAFETY AND GOVERNANCE
+
+This programme does not authorize A04.
+
+It does not authorize a retry of A02 or A03.
+
+It does not authorize new OpenLigaDB acquisition or switching to another results provider.
+
+It does not authorize private provider requests or credential inspection.
+
+It does not authorize production activation or model promotion.
+
+For the entire programme:
+
+- zero live OpenLigaDB requests;
+- zero live OpenFootball requests;
+- zero live FPL requests;
+- zero Odds API requests;
+- zero other football-provider requests;
+- zero private credential inspection;
+- zero real FPL account writes;
+- zero actual P01 scoring.
+
+GitHub repository access, normal Git fetching and approved Git publication are separate from provider acquisition.
+
+Review existing provider rights profiles before selecting any downstream source-dependent functionality.
+
+Do not introduce paid subscriptions, scraping, quota circumvention or new provider dependencies.
+
+No invented:
+
+- source data;
+- historical outcomes;
+- player identities;
+- model probabilities;
+- scoring weights;
+- FPL rules;
+- metadata field values;
+- provider permissions;
+- optimisation results;
+- performance improvements.
+
+Unknown means unknown.
+
+Preserve the accepted distinction between football projections, decision utility and realised outcomes.
+
+No actual P01 score, calibration result or model-promotion recommendation may be inferred from synthetic tests.
+
+No PR, merge, accepted tag or human-acceptance record.
+
+If controlling authority prohibits a requested Git operation, record the conflict rather than overriding it.
+
+---
+
+# 4. PHASE 0 — COMPREHENSIVE GITHUB RECONNAISSANCE
+
+Before implementation, inspect the repository thoroughly.
+
+This is mandatory, but it must lead directly to engineering work.
+
+## 4.1 Git and branch reconstruction
+
+Fetch origin.
+
+Verify:
+
+- current `main`;
+- D2 branch;
+- A02/D1/A03 ancestry;
+- A03 consumption seal;
+- relevant team-strength branches;
+- current player-allocation branches;
+- private V1 one-command branches;
+- full-season FPL rules branch;
+- stage implementation branches;
+- current GitHub issues and outstanding review findings.
+
+Inspect recently updated branches rather than assuming the default branch represents the complete implementation state.
+
+Determine which features exist only on non-merged descendants.
+
+Do not blindly merge, cherry-pick, reset or rebase histories containing independent authority, consumed acquisition attempts or frozen evidence.
+
+Preserve existing worktrees and local changes.
+
+Use dedicated clean worktrees for separate workstreams.
+
+## 4.2 Authoritative architecture
+
+Read the actual repository-controlled versions of:
+
+- `AGENTS.md`;
+- `PLANS.md`;
+- `CODE_REVIEW.md`;
+- `specs/manifests/authority_manifest.json`;
+- accepted DMFP-20 decisions;
+- DMFP-00, 01, 03, 04, 05, 08, 09, 10, 12, 13, 14, 15, 16, 17, 18 and 19, as relevant;
+- approved rights profiles;
+- stage and ticket contracts;
+- current acceptance and review evidence.
+
+Resolve any conflict by the actual authority hierarchy.
+
+Do not use an outdated planning document to override a newer accepted decision.
+
+## 4.3 Complete implementation inventory
+
+Inspect production code, public APIs/CLI, integration seams, schemas, migrations, tests, fixtures, evidence and deployment assumptions for:
+
+1. FPL rules and current-state ingestion.
+2. Odds acquisition and normalization.
+3. Current fixture and player identity resolution.
+4. Team-strength and football-score priors.
+5. Player availability, starts and minutes.
+6. Football event distributions and player allocation.
+7. Full FPL points distributions.
+8. Uncertainty and scenario coherence.
+9. Price forecasting and transfer timing.
+10. One-Gameweek and rolling transfer optimisation.
+11. Captaincy and chip optimisation.
+12. Rank-aware strategy.
+13. Backtesting and prospective evaluation.
+14. Private one-command operation.
+15. Orchestration, reliability, observability and security.
+16. Decision UI, reporting and explanation surfaces.
+
+For every subsystem establish:
+
+- implemented capability;
+- accepted or shadow status;
+- current integration;
+- actual executable demonstration;
+- test/coverage state;
+- known limitations;
+- blocking rights or data dependencies;
+- next highest-value development step.
+
+Read source code and tests, not just README assertions.
+
+## 4.4 Prioritisation
+
+Create a ranked gap register with:
+
+- gap identifier;
+- severity;
+- downstream impact on FPL decisions;
+- empirical or code evidence;
+- source-rights constraints;
+- affected modules;
+- dependency graph;
+- proposed implementation;
+- anticipated verification;
+- whether it can be completed offline now.
+
+Prioritise:
+
+**P0 — Incorrect, unsafe or non-reproducible decisions.**
+
+**P1 — Missing critical capability preventing a dependable private recommendation or scientifically valid evaluation.**
+
+**P2 — Material improvements to decision quality, optimisation, uncertainty or operational reliability.**
+
+**P3 — Non-blocking presentation and maintenance improvements.**
+
+Do not prioritize a sophisticated feature merely because it is technically interesting.
+
+The priority is the practical objective: better legal FPL decisions, reliable execution and valid evaluation.
+
+Produce:
+
+`ACCEL-001-REPOSITORY-AUDIT.md`
+
+and a machine-readable gap register.
+
+Then move immediately into implementation.
+
+---
+
+# 5. WORKSTREAM A — P01 D3 GOVERNED METADATA COMPATIBILITY
+
+This workstream is mandatory.
+
+Its objective is to progress from D2's accurate failure diagnostics to a rigorously justified, independently reviewable metadata-admission policy.
+
+## 5.1 Source contract
+
+Inspect:
+
+`src/dmf_pulse/ingestion/p01_match_metadata.py`
+
+`src/dmf_pulse/ingestion/p01_fallback.py`
+
+`src/dmf_pulse/ingestion/p01_fallback_diagnostics.py`
+
+`src/dmf_pulse/evaluation/p01_fallback_context.py`
+
+and all related schemas, tests and sealed evidence.
+
+Authenticate the retained Swagger evidence, including the documented Match and League schemas and route parameters.
+
+Distinguish:
+
+- stable provider competition identifiers;
+- route identifiers;
+- season identifiers;
+- matchday identifiers;
+- descriptive source fields;
+- frozen canonical fixture identity;
+- finality and result semantics.
+
+Do not confuse the Match integer `leagueSeason` with the League object's separate season representation.
+
+## 5.2 Exact display-name policy
+
+Investigate whether this requirement is justified:
+
+`leagueName == "Premier League"`
+
+The retained provider contract documents a nullable string and does not establish an immutable literal value.
+
+Evaluate the narrowest defensible policy for:
+
+- exact expected name;
+- alternative descriptive name;
+- null;
+- missing name;
+- wrong type;
+- empty string;
+- malformed text.
+
+No compatibility decision may weaken stable competition, season or matchday identity.
+
+No change may permit ambiguous fixture mappings.
+
+If the documented contract provides adequate justification for a candidate policy, implement it in a separate versioned, reviewable compatibility path.
+
+**Do not activate the candidate policy for actual P01 acquisition without separate human approval.**
+
+If evidence is insufficient, retain the accepted strict default and record what further evidence is required.
+
+Do not manufacture the unknown A03 field or its observed value.
+
+## 5.3 Source versus canonical provenance
+
+Investigate the existing `ProjectedFinalFact.league_name` behaviour.
+
+At D2, the object has a canonical default corresponding to the frozen competition name.
+
+Ensure any future compatibility adjustment cannot misrepresent an internally assigned canonical label as an observed provider field.
+
+Preserve the distinction between:
+
+- provider-observed metadata;
+- canonical competition identity;
+- frozen evaluation context;
+- derived final-outcome facts.
+
+Use the narrowest schema/versioning solution compatible with historical evidence.
+
+Do not modify the immutable P01 forecast or rewrite previous result artifacts.
+
+## 5.4 Extensive negative tests
+
+Build synthetic tests for:
+
+- all metadata categories;
+- exact type enforcement;
+- true competing competition IDs;
+- incorrect season;
+- incorrect matchday;
+- alternate display labels;
+- missing and null fields;
+- malformed nested objects;
+- reordered fixtures;
+- switched home/away orientation;
+- ambiguous frozen aliases;
+- duplicate results;
+- invalid finality;
+- unfinished matches;
+- missing regulation-time result;
+- conflicting result type;
+- abnormal/exceptional match results;
+- post-cutoff evidence;
+- D+2 requirements;
+- false-positive admission attempts.
+
+The central correctness criterion:
+
+**A legitimate variation in descriptive metadata must not be confused with incorrect canonical identity.**
+
+Equally:
+
+**No incorrect competition, season, fixture, matchday or result may be admitted because descriptive validation was relaxed.**
+
+Preserve byte/semantic compatibility of the original A03 diagnostic.
+
+Do not reclassify historical A02/A03 failures retrospectively.
+
+## 5.5 Workstream output
+
+Deliver:
+
+- exact compatibility-policy analysis;
+- versioned candidate implementation where justified;
+- synthetic regression matrix;
+- source/canonical provenance analysis;
+- independent review;
+- clearly stated approval state.
+
+A03 and A02 remain permanently consumed.
+
+---
+
+# 6. WORKSTREAM B — MAKE THE P01 PIPELINE A04-READY WITHOUT EXECUTING A04
+
+This workstream is mandatory.
+
+The objective is to eliminate as many preventable offline execution failures as possible before another irreversible, human-authorized acquisition attempt is considered.
+
+Do not assume that fixing metadata guarantees A04 success.
+
+Inspect the entire P01 chain:
+
+`Frozen P01 forecast`
+→ `source eligibility`
+→ `provider transport`
+→ `JSON/schema validation`
+→ `canonical identity`
+→ `match finality`
+→ `regulation result selection`
+→ `exact-ten mapping`
+→ `D+2 eligibility`
+→ `outcome admission`
+→ `prospective scoring`
+→ `scorecard`
+→ `evidence sealing`.
+
+## 6.1 Full offline failure analysis
+
+Enumerate each remaining possible failure point.
+
+Separate:
+
+- provider transport failure;
+- schema mismatch;
+- identity mismatch;
+- unfinished fixture;
+- missing result;
+- ambiguous regulation result;
+- incorrect exact-ten mapping;
+- temporal violation;
+- source-rights failure;
+- forecast binding failure;
+- persistence failure;
+- scoring/scorecard failure;
+- insufficient promotion evidence.
+
+Locate missing diagnostics and insufficiently tested transitions.
+
+Do not redesign components already proved correct.
+
+## 6.2 End-to-end synthetic exercise
+
+Execute the complete supported pipeline with **clearly labelled synthetic outcomes only**.
+
+Confirm that a valid synthetic set of ten finished fixtures can traverse every subsequent gate without invoking real P01 evaluation.
+
+Test independent failures at every downstream stage.
+
+Where practical, exercise the public CLI from a clean installed wheel outside the source checkout.
+
+Ensure it is impossible to confuse synthetic results with admitted real prospective labels.
+
+The complete synthetic exercise must not create an artifact carrying the semantic status of an actual P01 score.
+
+## 6.3 A04 readiness report
+
+Produce a deterministic readiness report answering:
+
+- Which technical conditions now pass?
+- Which source-contract assumptions are unresolved?
+- Which policy approvals are missing?
+- What would still cause an authorized A04 attempt to stop?
+- Are all existing one-shot controls preserved?
+- Can the actual P01 score be computed only after valid outcome admission?
+- What is the minimum fresh human authority required?
+- What exact implementation SHA would require independent review and CI binding?
+
+Where existing readiness commands are sufficient, reuse them.
+
+Only implement new code where a real testable gap exists.
+
+## 6.4 Future authorization package
+
+Prepare a **non-executable draft** of the eventual A04 authorization requirements and decision checklist.
+
+It must not be accepted as authority by the application.
+
+Do not create an active A04 authority schema instance, consumption marker, credential-bearing command or executable provider acquisition ticket.
+
+The future human authorization is a separate decision after this programme's evidence is reviewed.
+
+---
+
+# 7. WORKSTREAM C — ADVANCE THE REAL PRIVATE FPL ENGINE
+
+This is a mandatory substantial implementation workstream, subject to the repository audit and controlling authority.
+
+Do not assume P01 is the only relevant project blocker.
+
+The ultimate system must produce valuable, timely, reproducible recommendations for a real FPL manager.
+
+Inspect the current private one-command pipeline, especially:
+
+- `src/dmf_pulse/private_v1/`;
+- `src/dmf_pulse/cli/pulse.py`;
+- Stage-7 through Stage-15 integration;
+- current-source and rights boundaries;
+- rolling-horizon orchestration;
+- optimisation runtime;
+- source-quality and confidence reporting;
+- existing production-readiness tests.
+
+The current three-Gameweek path has known limitations requiring assessment:
+
+- bounded candidate search rather than universal global optimality;
+- constant future prices;
+- no modelled future information revelation in the baseline;
+- zero terminal value beyond GW+2;
+- incomplete integration of chip/rank decisions;
+- uncertainty concerning the practical strength of player-allocation priors.
+
+Some of these may be deliberate, accepted limitations rather than defects.
+
+Do not silently change them.
+
+## 7.1 Select the highest-value improvement
+
+After completing Phase 0, select at least one substantial, implementable, end-to-end improvement that materially advances private decision quality or reliability.
+
+Prefer improvements that:
+
+- eliminate a demonstrated correctness or operational defect;
+- use already accepted models and data;
+- improve realistic rolling-horizon decisions;
+- improve player-level expected-points reliability;
+- make uncertainty, solver gaps or missing evidence more actionable;
+- bring an already implemented stage into the actual private decision pipeline;
+- or make the accepted one-command system more reliable before a deadline.
+
+Consider, but do not automatically select:
+
+**A. Player evidence and minutes**
+
+Strengthen the actual current-player allocation/availability path using only accepted data and evidence. Do not promote historical Grade-E or experimental empirical-Bayes alternatives merely because they exist.
+
+**B. Rolling optimisation**
+
+Improve the present three-Gameweek decision objective, candidate coverage, state transitions or honest optimality bounds using accepted Stage-11 interfaces.
+
+Avoid inventing future price changes, transfer information or terminal values.
+
+**C. Price and transfer timing**
+
+Determine whether an accepted Stage-13 capability can be integrated incrementally with the existing private decision interface.
+
+Do not activate speculative price forecasts without calibration or valid current input.
+
+**D. Chips and captaincy**
+
+Determine whether any existing accepted Stage-14 functionality is absent from the real private decision path and could be integrated under the verified rules and current state.
+
+No chip recommendation should use invalid future opportunity assumptions.
+
+**E. Rank-aware strategy**
+
+Determine whether Stage-15 is operationally usable with lawful, representative ownership/opponent evidence.
+
+If not, preserve pure-points operation and avoid inventing effective ownership.
+
+**F. Decision reporting**
+
+Improve the actionable decision output and alternatives where the underlying data already support an accurate explanation.
+
+## 7.2 Required implementation discipline
+
+Select based on evidence, expected utility and feasibility—not convenience.
+
+Freeze a bounded ticket contract before substantive changes.
+
+Implement the complete chosen vertical slice:
+
+typed input
+→ validated model/service
+→ real application integration
+→ public command/report surface
+→ deterministic tests
+→ reproducible acceptance evidence.
+
+Reuse existing numerical kernels and public contracts.
+
+Do not introduce an unrelated second solver or duplicate a model already implemented.
+
+If one candidate is rights-blocked, document the blocker and implement the next highest-value independent candidate instead.
+
+**A blocked model promotion is not a reason to stop all useful engineering work.**
+
+## 7.3 Decision-level acceptance
+
+For the selected improvement, demonstrate:
+
+- a case in which it changes or improves a decision appropriately;
+- a case in which it correctly leaves the decision unchanged;
+- a case in which missing or invalid evidence causes a typed safe failure;
+- comparison with the existing accepted baseline;
+- stable legal squad, transfer, lineup, captain and vice behaviour;
+- preservation of original one-Gameweek semantics where applicable;
+- exact reproducibility under fixed inputs/seeds;
+- clear disclosure of remaining uncertainty and solver limitations.
+
+Do not claim better football forecast accuracy based only on synthetic tests.
+
+---
+
+# 8. WORKSTREAM D — COMPLETE THE NEXT DECISION-EXPERIENCE VERTICAL SLICE
+
+Perform this workstream if Phase 0 identifies it as one of the highest-value, independently implementable remaining gaps and the mandatory workstreams are already secured.
+
+Inspect the actual status of Stage 16 and DMFP-18.
+
+The target is not a decorative dashboard.
+
+It is an operational decision cockpit that accurately communicates the real optimiser's output.
+
+At minimum, assess whether the existing CLI or a supported read-only interface can present:
+
+- recommended action;
+- transfer timing;
+- starting XI and bench;
+- captain and vice;
+- chip decision where active;
+- comparison with no-transfer baseline;
+- current versus horizon value;
+- downside/upside;
+- probability of outperforming the comparator when valid;
+- source/model confidence;
+- material warnings;
+- alternative plans;
+- solver scope and optimality limitations;
+- evidence that would reverse the decision;
+- information cutoff;
+- rights and activation status.
+
+Do not invent values to fill missing fields.
+
+Build from structured, approved output contracts, not free-form explanatory guesses.
+
+Use synthetic fixtures for integration tests.
+
+Respect the private transient zero-retention policy. Do not persist live manager or provider-derived decision data into a new HTML, database, cache, logging or telemetry store without explicit existing rights.
+
+If a graphical surface is not justified by present architecture/rights, improve the existing operator-facing report instead.
+
+This workstream should deliver a real usable vertical slice, not a UI mock-up that is disconnected from the decision service.
+
+---
+
+# 9. IMPLEMENTATION STRATEGY — LARGE SESSION, CONTROLLED CHECKPOINTS
+
+Use one coordinated execution programme with independently reviewable checkpoints.
+
+Do not attempt a single enormous unreviewable commit.
+
+Suggested order:
+
+**Checkpoint 0 — Repository intelligence**
+
+- exact Git state;
+- architecture inventory;
+- gap register;
+- selected implementation programme;
+- scope/authority verification.
+
+**Checkpoint 1 — P01 governed compatibility**
+
+- D3 compatibility policy;
+- source/canonical provenance protection;
+- synthetic regression matrix;
+- documented inactive/approved policy state.
+
+**Checkpoint 2 — P01 execution readiness**
+
+- end-to-end synthetic validation;
+- downstream failure coverage;
+- A04 preflight readiness;
+- non-executable authorization proposal.
+
+**Checkpoint 3 — Private FPL engine improvement**
+
+- highest-value approved implementation selected from audit;
+- integrated CLI/service demonstration;
+- independent tiny oracle where appropriate;
+- measurable baseline comparison.
+
+**Checkpoint 4 — Further product acceleration**
+
+- a second independently valuable private-engine capability or operational decision-experience vertical slice, if justified and feasible.
+
+**Checkpoint 5 — Release hardening**
+
+- adversarial review;
+- remediation;
+- complete acceptance;
+- publication;
+- exact-SHA CI;
+- consolidated delivery report.
+
+Checkpoint names may be adapted to the actual accepted repository conventions.
+
+For distinct domains, use isolated worktrees and branches.
+
+No two agents may concurrently edit the same source files.
+
+Do not let optional UI work delay preservation/publication of mandatory high-value implementation.
+
+## 9.1 Resumability
+
+At each durable checkpoint:
+
+- record exact parent/child SHA;
+- record changed paths;
+- update `PLANS.md`;
+- retain test and review evidence;
+- commit complete code/tests;
+- refresh allowed manifests;
+- publish by ordinary fast-forward where permitted;
+- verify local and remote equality.
+
+No force push, destructive reset, unapproved rebase or history rewrite.
+
+If the session is interrupted, the next execution must be able to reconstruct exactly what is finished.
+
+Do not lose completed implementation work while attempting the next workstream.
+
+## 9.2 Internal parallel review
+
+Where supported, use separate read-only agents for:
+
+- governance/rights review;
+- metadata-schema security review;
+- P01 evaluation integrity;
+- private optimisation correctness;
+- test and coverage gaps;
+- final cross-workstream integration.
+
+A reviewer must not independently approve their own implementation.
+
+If genuine independent review is unavailable, identify the affected checkpoint as pending independent review rather than fabricating clearance.
+
+---
+
+# 10. ADVERSARIAL SCIENTIFIC AND ENGINEERING REVIEW
+
+After implementation, deliberately look for defects.
+
+Questions must include:
+
+1. Did any new code silently change P01?
+2. Did any frozen historical evidence change?
+3. Was a provider field value fabricated?
+4. Could alternate descriptive metadata admit an incorrect competition?
+5. Could wrong season/matchday/fixture evidence pass?
+6. Could a synthetic outcome be mistaken for an actual P01 label?
+7. Was A04 inadvertently authorized?
+8. Could any consumed acquisition be retried?
+9. Did any private-provider access occur?
+10. Were any numerical model parameters invented?
+11. Does the private optimiser retain correct legal state transitions?
+12. Are current and future information sets separated?
+13. Is player-level uncertainty preserved appropriately?
+14. Are source and model limitations honestly represented?
+15. Are solver optimality claims bounded by the actual candidate/action space?
+16. Are baseline comparisons calculated with identical relevant scenarios?
+17. Can reporting leak player, fixture, manager or provider information?
+18. Are rights and retention controls enforced before side effects?
+19. Can a clean installed wheel execute the new supported capability?
+20. Are any production/activation assertions stronger than the evidence supports?
+
+Resolve every valid P0/P1 and material P2 finding.
+
+Retain negative findings and remediation history.
+
+Do not rewrite the review record to conceal defects.
+
+---
+
+# 11. TESTING, PERFORMANCE AND PUBLICATION
+
+For every changed workstream, run:
+
+- targeted unit tests;
+- independent synthetic oracles;
+- property and adversarial tests;
+- relevant inherited stage tests;
+- integration tests;
+- applicable real disposable PostgreSQL tests;
+- CLI/service contract tests;
+- strict typing;
+- Ruff formatting and lint;
+- build and installed-wheel verification;
+- repository validation;
+- manifest validation;
+- frozen dependency synchronization;
+- secret scanning;
+- source/rights exclusion checks;
+- Git diff and protected-file checks.
+
+Run the full required CI workflow with all mandatory jobs and coverage gates unchanged.
+
+Do not lower coverage, exclude tests, disable checks or alter timeout policies merely to obtain a green result.
+
+Where tests are expensive, use targeted tests at checkpoints and the full canonical acceptance suite before final publication.
+
+Measure relevant performance, especially private rolling optimisation runtime, if the selected implementation changes its execution path.
+
+Never report a synthetic benchmark as demonstrated real-world FPL performance.
+
+Record:
+
+- baseline performance;
+- final performance;
+- exact environment;
+- seeds/scenario counts;
+- solver status;
+- statistical/numerical accuracy where relevant;
+- limits of comparison.
+
+Where the repository's active authority permits pushing, require:
+
+- local final SHA = remote final SHA;
+- exact-SHA CI SUCCESS;
+- all 20 required jobs green, if the current workflow remains a 20-job suite;
+- complete review/evidence artifacts;
+- no post-CI code change without a fresh CI run.
+
+A CI infrastructure retry may be recorded only with the precise failure cause and unchanged code/gate evidence.
+
+No PR, merge, tag, human acceptance or production activation.
+
+---
+
+# 12. REQUIRED FINAL DELIVERABLES
+
+Provide a substantive consolidated handoff.
+
+## 12.1 Repository assessment
+
+A ranked table containing:
+
+- actual capability;
+- present status;
+- critical limitation;
+- recommended next step;
+- whether addressed during this programme;
+- remaining blocker;
+- evidence locator.
+
+Include a clear distinction between:
+
+- implemented;
+- integrated;
+- tested;
+- independently reviewed;
+- human accepted;
+- production active.
+
+## 12.2 Completed engineering
+
+For each implemented checkpoint:
+
+- ticket ID;
+- immutable parent;
+- branch;
+- final local SHA;
+- final remote SHA;
+- files changed;
+- functionality added;
+- actual end-to-end demonstration;
+- tests and coverage;
+- independent review;
+- exact-SHA CI;
+- exclusions verified.
+
+Do not report documentation as an implemented capability.
+
+## 12.3 P01 status
+
+Explicitly provide:
+
+- A02 consumption status;
+- A03 consumption status;
+- exact A03 failure conclusion;
+- D3 policy verdict;
+- remaining source-schema uncertainty;
+- final metadata-admission policy state;
+- A04 readiness;
+- whether fresh authority is still needed;
+- P01 scoring status;
+- P01 semantic SHA;
+- P01 byte SHA;
+- team-strength activation status.
+
+Do not conflate readiness with permission.
+
+## 12.4 Private FPL engine advancement
+
+Explain:
+
+- what functionality materially improved;
+- what the old behaviour was;
+- what the new behaviour is;
+- which inputs are now accepted;
+- which decisions can change;
+- what remains approximate;
+- whether the capability is operator-usable;
+- whether it remains shadow/research-only;
+- what prevents full production readiness.
+
+## 12.5 Forward roadmap
+
+Identify the five highest-value remaining engineering tasks after the completed work.
+
+For each, give:
+
+- exact dependency;
+- expected impact;
+- implementation complexity;
+- rights/evidence condition;
+- recommended execution order.
+
+Prefer actual executable next milestones over more abstract architectural research.
+
+## 12.6 Human decision requests
+
+List only decisions genuinely requiring the owner's approval.
+
+Separate:
+
+- optional design choices;
+- source-rights/contract approval;
+- metadata-policy acceptance;
+- fresh one-shot A04 acquisition authorization;
+- model promotion;
+- actual production activation.
+
+Do not describe any of these as granted by this prompt.
+
+---
+
+# 13. SUCCESS CRITERIA
+
+This programme is successful only if it delivers materially more than D3 diagnostics.
+
+Minimum target:
+
+1. Complete repository-wide state reconstruction and prioritisation.
+2. Complete D3's strongest defensible offline compatibility implementation/review.
+3. Complete a rigorous offline P01 future-execution readiness demonstration.
+4. Implement at least one additional substantial private-engine or operational capability, unless independently proven blocked.
+5. Preserve every P01 and provider-governance invariant.
+6. Pass all relevant engineering and CI gates.
+7. Produce an evidence-backed roadmap for the remaining production-readiness programme.
+
+Stretch target:
+
+**Two independently useful improvements to the actual private FPL decision workflow in addition to D3 and P01 readiness.**
+
+Do not claim the stretch target unless both changes are real, integrated, tested and independently reviewable.
+
+The intended outcome is a significantly more capable and more dependable decision engine, not simply another collection of successful unit tests.
+
+Work autonomously through the programme's safe checkpoints.
+
+Prioritise correctness and material end-to-end progress.
+
+If the first implementation opportunity proves blocked, move to the next justified independent opportunity rather than spending the entire session repeatedly documenting the same blocker.
+
+**Do as much valuable, governed implementation work as the actual repository and available evidence permit.**
+
+Final status must distinguish:
+
+`ACCEL_001_REPOSITORY_AUDIT_COMPLETE`
+
+`ACCEL_001_P01_D3_<ACTUAL_STATUS>`
+
+`ACCEL_001_P01_A04_READINESS_<ACTUAL_STATUS>`
+
+`ACCEL_001_PRIVATE_ENGINE_<ACTUAL_STATUS>`
+
+`ACCEL_001_RELEASE_<ACTUAL_STATUS>`
+
+`P01_FORECAST_UNCHANGED`
+
+`A02_ONE_ATTEMPT_CONSUMED`
+
+`A03_ONE_ATTEMPT_CONSUMED`
+
+`NO_A04_AUTHORITY_CREATED`
+
+`NO_NEW_PROVIDER_ACCESS`
+
+`NO_UNAUTHORIZED_MODEL_PROMOTION`
+
+`NO_PRODUCTION_ACTIVATION`
+
+Do not output `COMPLETE` for a checkpoint whose implementation, review or CI remains unfinished.
+
+End with a concise, evidence-grounded statement of:
+
+**What DMF Pulse can do now that it could not do before this programme, and what is still preventing a dependable production decision engine.**
+
+`DMF_PULSE_ACCELERATION_WAVE_001_FINAL_HANDOFF`

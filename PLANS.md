@@ -2813,3 +2813,13 @@ Offline implementation only; isolated worktree preserves unrelated Availability 
 No provider access, real labels/P01 scoring, new acquisition authority, retries,
 model/scorer/rights/dependency/workflow changes, promotion, activation, PR, merge or tag.
 A02/A03 remain consumed; the A03 metadata gate says nothing about final-result availability.
+
+## DMF-PULSE-ACCEL-001
+
+- [x] CP0 fetch, immutable snapshot, independent architecture/governance/P01/private audits; bounded contract and gap ranking.
+- [ ] CP-AB inactive metadata candidate, strict linked-result IDs, synthetic readiness and independent review.
+- [ ] CP-C official-deadline-safe one-command publication and exact baseline parity.
+- [ ] CP-D existing decision-quality reporting if mandatory slices secured.
+- [ ] Release full unchanged gates, protected evidence audit, exact-SHA CI, publication and capped handoff.
+
+No provider access, actual P01 score, A04 authority, promotion or activation. New worktrees preserve dirty Availability work.
