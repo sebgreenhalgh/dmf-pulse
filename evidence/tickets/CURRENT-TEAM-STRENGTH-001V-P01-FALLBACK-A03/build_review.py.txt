@@ -1,0 +1,35 @@
+"""Build capped pre-execution review bundle after staging implementation."""
+import hashlib
+import io
+import json
+import subprocess
+import zipfile
+from pathlib import Path
+from dmf_pulse.assurance.canonical import canonical_sha256,pretty_json
+w=Path(__file__).resolve().parents[1];ticket='CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03'
+e=w/'evidence/tickets'/ticket
+members={}
+for p in e.iterdir():
+ if p.is_file() and p.name!='REVIEW-PACK.json':members['evidence/'+p.name]=p.read_bytes()
+for p in (w/'tickets'/ticket).iterdir():
+ if p.is_file():members['ticket/'+p.name]=p.read_bytes()
+for relative in ('config/evaluation/team_strength_p01_fallback_a03.json','config/rights/openligadb_p01_fallback.json','tests/fixtures/evaluation/a02_d1_parent_semantics.json','tests/fixtures/evaluation/a02_legacy_forecast_input/manifest.json'):
+ members[relative]=(w/relative).read_bytes()
+members['implementation.patch']=subprocess.run(['git','diff','--cached','--','.',' :(exclude)evidence/**'.strip()],cwd=w,capture_output=True,check=True,timeout=60).stdout
+coverage=w/'review_pack/a03-release-coverage.json'
+members['targeted-coverage-reference.json']=pretty_json({'byte_sha256':hashlib.sha256(coverage.read_bytes()).hexdigest(),'bytes':coverage.stat().st_size,'role':'Partial-source diagnostic; normal exact-SHA CI enforces full unchanged gates.'}).encode()
+review=json.loads((e/'INDEPENDENT-REVIEW.json').read_bytes())
+index={'schema_version':'p01-a03-capped-review-v1','immutable_parent':'f96eaa3e7261d0db6f23bc8eb7dee18917272d00','review_sha256':review['semantic_sha256'],'per_member_cap_bytes':1048576,'members':[{'path':n,'bytes':len(data),'byte_sha256':hashlib.sha256(data).hexdigest()} for n,data in sorted(members.items())],'provider_requests':0,'p01_scored':False,'ci_gate':'PENDING_FINAL_EXACT_SHA','production_active':False}
+index['semantic_sha256']=canonical_sha256(index)
+members['REVIEW-MANIFEST.json']=pretty_json(index).encode()
+assert all(len(data)<=1048576 for data in members.values())
+buffer=io.BytesIO()
+with zipfile.ZipFile(buffer,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+ for name,data in sorted(members.items()):
+  info=zipfile.ZipInfo(name,date_time=(2026,10,28,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,data)
+payload=buffer.getvalue();path=w/'review_pack'/(ticket+'-REVIEW.zip')
+with path.open('xb') as stream:stream.write(payload)
+with zipfile.ZipFile(path) as z:assert z.testzip() is None
+v={'path':str(path.relative_to(w)),'byte_sha256':hashlib.sha256(payload).hexdigest(),'bytes':len(payload),'member_count':len(members),'manifest_sha256':index['semantic_sha256'],'per_member_cap_bytes':1048576}
+with (e/'REVIEW-PACK.json').open('x',encoding='utf-8',newline='\n') as stream:stream.write(pretty_json(v))
+print(pretty_json(v),end='')

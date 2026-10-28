@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 199274,
+      "bytes": 200918,
       "path": "PLANS.md",
-      "sha256": "0b041373e5d6782b91ce8120bdd38a29d4784f0bb5ed45795a167d6cd4d52ba1"
+      "sha256": "1bd703d19de6b55a36b54d13dc909a45072195497b40d92f5b154355213c8d0f"
     },
     {
       "bytes": 2761,
@@ -244,6 +244,11 @@
       "bytes": 8557,
       "path": "config/evaluation/team_strength_p01_fallback_a02.json",
       "sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32"
+    },
+    {
+      "bytes": 1841,
+      "path": "config/evaluation/team_strength_p01_fallback_a03.json",
+      "sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c"
     },
     {
       "bytes": 572,
@@ -2121,9 +2126,9 @@
       "sha256": "43648b7b695716f2471878466345ca255309b20e29524137a6b032f0bb2060a6"
     },
     {
-      "bytes": 3754,
+      "bytes": 3892,
       "path": "pyproject.toml",
-      "sha256": "90a5608a1f34f88e45203d475b5dce33592aa132d97650e998e1e1a3f5e8a315"
+      "sha256": "11ec5b0f52ff98b6ac583585e58957137725937de955dd21a840e8348221af49"
     },
     {
       "bytes": 2059,
@@ -2541,6 +2546,11 @@
       "sha256": "11f05a2b5029402b8587b0371dd8af71f22895ae772df4b8d68030ad688d37cd"
     },
     {
+      "bytes": 2757,
+      "path": "scripts/run_p01_fallback_a03.py",
+      "sha256": "a63621e06421aeb7eaa02186b7ec7ed927e6885b8cc9fb7876f29376a51f064e"
+    },
+    {
       "bytes": 2417,
       "path": "scripts/run_r9c_a2_live_shadow.py",
       "sha256": "c05851cb12b3f8e72742cf90c0b007f89dcbeb1919b3b055f9d59bf5da63d37d"
@@ -2661,9 +2671,9 @@
       "sha256": "c0644779ca59d23224fc43d176698ba4348ea132174089ee709b6d853afaa872"
     },
     {
-      "bytes": 7334,
+      "bytes": 8245,
       "path": "scripts/verify_p01_fallback_a02_wheel.py",
-      "sha256": "eafcec31cfe7fb5bb75af59c89e57469dacd4145a4e237030cf1b0535d284354"
+      "sha256": "6f706df3a965306fdc62da973fa83abb99685f5d91bb23957b68041545fa3a39"
     },
     {
       "bytes": 12612,
@@ -3241,9 +3251,14 @@
       "sha256": "9c77ca0e9d895f3cb2b90fcf0979c6b52c75e51da473c11a8a578c14b9e5ff4a"
     },
     {
-      "bytes": 3383,
+      "bytes": 2499,
+      "path": "src/dmf_pulse/cli/p01_a03.py",
+      "sha256": "97cc2eee6e98db825c6ade4c59676c6f595fa49daa22ce8122e9ac7d61a01b1c"
+    },
+    {
+      "bytes": 3494,
       "path": "src/dmf_pulse/cli/p01_fallback.py",
-      "sha256": "4c26ea503d7c7a381692c1849f9fd00e4c091c7b8fa4815564d7308456c8f634"
+      "sha256": "0ae2f2366669d70ef7ac049d75570f3347690993ab02c8a87ba5c08f401d3a7e"
     },
     {
       "bytes": 7428,
@@ -3489,6 +3504,11 @@
       "bytes": 8627,
       "path": "src/dmf_pulse/evaluation/multivariate_metrics.py",
       "sha256": "b9ac6f50d810affb5b6a5bd68a79a4d8b57ed740a790c7077a453195aab96f2d"
+    },
+    {
+      "bytes": 7917,
+      "path": "src/dmf_pulse/evaluation/p01_a03_authority.py",
+      "sha256": "89af6a582a080613859275f57fcca5c8674d9ce19a687679f9d4e5cb8e183347"
     },
     {
       "bytes": 12483,
@@ -4034,6 +4054,16 @@
       "bytes": 27001,
       "path": "src/dmf_pulse/ingestion/openfootball/team_strength_governance.py",
       "sha256": "781720eb60e15573ba4f806350cb5a25c8647b08a3d6dab49144ee1ec7c7bc38"
+    },
+    {
+      "bytes": 9168,
+      "path": "src/dmf_pulse/ingestion/p01_a03_control.py",
+      "sha256": "60eec3abda99ff1280c211876a318e7b0af093ca1021fb49e01b16a46a9a6c05"
+    },
+    {
+      "bytes": 19193,
+      "path": "src/dmf_pulse/ingestion/p01_a03_execution.py",
+      "sha256": "8c16f4225bd120b386bd94e14d9ba36a18fdfacbaacdbb264bfffe1270146157"
     },
     {
       "bytes": 18410,
@@ -6036,6 +6066,11 @@
       "sha256": "6bfcf1a1d6694ed9993636af4a82db91e855916b0d4f2b48b956407c4f1fc6bf"
     },
     {
+      "bytes": 23934,
+      "path": "tests/unit/evaluation/test_p01_fallback_a03.py",
+      "sha256": "fc5db3f58e868a3a54c79aea7a0ee408a4d9abee8cc81b8704a5cce9b15fd68b"
+    },
+    {
       "bytes": 25762,
       "path": "tests/unit/evaluation/test_p01_fallback_d1.py",
       "sha256": "ffb5213030d0027a8e9fffd06654f46d03e07e6caeb7d5a280b074d147cd1e6a"
@@ -7566,6 +7601,21 @@
       "sha256": "43225c8a67e120da63b45d0e5c0691c4322f18c0710f96acd4a5e4c91e0c2ee5"
     },
     {
+      "bytes": 3956,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/ACCEPTANCE.md",
+      "sha256": "499d42f8f24380ed3f9426c3c7042abff251afd261c2fd8c02a64d2c8312bb0e"
+    },
+    {
+      "bytes": 3615,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/CONTRACT.md",
+      "sha256": "9d8fc62831c0f25f100317dcd967fcfb75d3d77e47a28e0e0a3c384074ade9aa"
+    },
+    {
+      "bytes": 467,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/ticket.yaml",
+      "sha256": "7188c0a7fc1ec12f0d25b70df2d84e2b1dc46bc1245c1e51c6f177d37b666fe8"
+    },
+    {
       "bytes": 3923,
       "path": "tickets/DAT-003/ACCEPTANCE.md",
       "sha256": "90d7679be8d4c20ae9c1d67318288bbae32df3c373513c51ef8a90deee90e980"
@@ -8088,5 +8138,5 @@
   ],
   "schema_version": "1.0",
   "scope": "repository-deliverables-excluding-generated-evidence",
-  "ticket_id": "PRC-013"
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001V-P01-A03"
 }

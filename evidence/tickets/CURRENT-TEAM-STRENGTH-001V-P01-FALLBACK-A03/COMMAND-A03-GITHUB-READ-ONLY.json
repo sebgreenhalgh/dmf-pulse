@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-c",
+    "from pathlib import Path;from dmf_pulse.ingestion.p01_a03_control import GitHubA03Control;v=GitHubA03Control(Path.cwd())._api('git/ref/heads/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1-failure-localisation');assert v is not None and v['object']['sha']=='f96eaa3e7261d0db6f23bc8eb7dee18917272d00';print('PASS: GitHub control header parsing and immutable D1 remote identity; provider requests=0')"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03",
+  "started_at": "2026-10-28T15:26:46.237795+00:00",
+  "finished_at": "2026-10-28T15:26:48.824662+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-A03-GITHUB-READ-ONLY.log",
+  "output_byte_sha256": "a912cb29fdfef716d14b36d894616c9c41ef160559ed84bacb89fd73d41d678e"
+}

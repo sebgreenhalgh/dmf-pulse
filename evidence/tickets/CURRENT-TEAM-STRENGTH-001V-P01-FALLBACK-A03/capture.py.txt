@@ -1,0 +1,24 @@
+import hashlib
+import json
+import subprocess
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+
+work = Path(__file__).resolve().parents[1]
+evidence = work / 'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03'
+evidence.mkdir(parents=True, exist_ok=True)
+label = sys.argv[1]
+command = sys.argv[2:]
+started = datetime.now(UTC)
+result = subprocess.run(command, cwd=work, capture_output=True, timeout=2400)
+out = result.stdout + result.stderr
+path = evidence / ('COMMAND-' + label + '.log')
+with path.open('xb') as stream: stream.write(out)
+record = {'command': command, 'cwd': str(work), 'started_at': started.isoformat(),
+          'finished_at': datetime.now(UTC).isoformat(), 'exit_code': result.returncode,
+          'output': path.name, 'output_byte_sha256': hashlib.sha256(out).hexdigest()}
+(evidence / ('COMMAND-' + label + '.json')).write_text(json.dumps(record, indent=2)+'\n', encoding='utf-8', newline='\n')
+print(json.dumps(record))
+print(out.decode('utf-8',errors='replace')[-1200:])
+sys.exit(result.returncode)

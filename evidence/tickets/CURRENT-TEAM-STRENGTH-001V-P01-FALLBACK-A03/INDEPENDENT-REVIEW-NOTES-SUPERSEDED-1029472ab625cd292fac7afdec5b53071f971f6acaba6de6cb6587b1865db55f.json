@@ -1,0 +1,250 @@
+{
+  "additional_d1_protected_paths_verified": [
+    "src/dmf_pulse/ingestion/p01_fallback.py",
+    "src/dmf_pulse/ingestion/p01_fallback_acquisition.py",
+    "src/dmf_pulse/ingestion/p01_fallback_consumption.py",
+    "src/dmf_pulse/ingestion/p01_fallback_diagnostics.py",
+    "src/dmf_pulse/ingestion/p01_fallback_transport.py",
+    "config/evaluation/team_strength_p01_a02_consumption.json",
+    "uv.lock",
+    ".github/workflows/ci.yml"
+  ],
+  "credentials_inspected": 0,
+  "exact_parent_metric_values_verified": 1470,
+  "exact_sha_ci_and_external_reviewer_binding_still_required": true,
+  "forecast_raw_byte_hash_and_canonical_semantic_hash_verified": true,
+  "historical_original_files_verified": 49,
+  "independent_command": {
+    "command": [
+      "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03\\.venv\\Scripts\\python.exe",
+      "review_pack/independent_a03_run.py"
+    ],
+    "completed_at": "2026-10-28T15:33:34.776115+00:00",
+    "exit_code": 0,
+    "network_receipt": {
+      "arguments": [
+        "-ra",
+        "--strict-config",
+        "--strict-markers",
+        "--import-mode=importlib",
+        "tests/unit/evaluation/test_p01_fallback_a03.py",
+        "tests/unit/evaluation/test_p01_fallback_d1.py",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "review_pack/independent-a03-pytest-f73f7f6781e54625989654bd33dc04a2",
+        "--tb=short"
+      ],
+      "completed_at": "2026-10-28T15:33:33.758802+00:00",
+      "credentials_inspected": 0,
+      "denied_network_attempts": 0,
+      "exit_code": 0,
+      "provider_requests": 0,
+      "real_p01_scoring_performed": false,
+      "started_at": "2026-10-28T15:32:27.931752+00:00"
+    },
+    "outputs": {
+      "stderr": {
+        "byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "path": "review_pack/INDEPENDENT-A03-R03-stderr.log"
+      },
+      "stdout": {
+        "byte_sha256": "94e9d9990b3db301685a56a3184ac85f5883b36d21ac451c38b7846a79054861",
+        "bytes": 832,
+        "path": "review_pack/INDEPENDENT-A03-R03-stdout.log"
+      }
+    },
+    "raw_process_capture": true,
+    "started_at": "2026-10-28T15:32:27.536177+00:00"
+  },
+  "independent_raw_output_evidence": [
+    {
+      "byte_sha256": "94e9d9990b3db301685a56a3184ac85f5883b36d21ac451c38b7846a79054861",
+      "bytes": 832,
+      "path": "INDEPENDENT-R03-stdout.log"
+    },
+    {
+      "byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "path": "INDEPENDENT-R03-stderr.log"
+    }
+  ],
+  "model_fit_freeze_or_draw_generation_performed": false,
+  "policy_numerical_files_verified": 7,
+  "provider_requests": {
+    "FPL": 0,
+    "OpenFootball_live": 0,
+    "OpenLigaDB": 0,
+    "The_Odds_API": 0
+  },
+  "questions": [
+    {
+      "answer": "YES",
+      "evidence": "YES. All 49 historical P01/A01/A02 files and their exact file sets were independently rechecked against D1. The packaged consumed A02 record, retired runner and default denied transport remain unchanged; A02 is never reset or called by A03.",
+      "number": 1,
+      "question": "A02 remains consumed and immutable"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. A03ExecutionAuthority has its own sealed identity, literal human-ticket byte hash, D1 implementation/review, unchanged A02 context, forecast semantic/byte pins, fixture registry, rights and exact routes. Outcome and handoff bindings retain A03 identity without modifying accepted D1/v1 outcome schemas or evaluation epoch.",
+      "number": 2,
+      "question": "A03 is genuinely separate authority"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. attempt_number=maximum_attempts=1; retry/source-switch flags are false. A fixed repository/ref atomic create must win and be verified, including the exact receipt bytes, before native HTTP exists. Existing refs are refused even if target matches. Concurrent contenders and object reuse tests pass. Ambiguous governance operations cannot enable HTTP.",
+      "number": 3,
+      "question": "A03 authorizes exactly one attempt"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. All five D1 admission/acquisition/consumption/diagnostic/transport modules remain byte-identical to D1. The independent 75-test D1 regression and 74-test A03 integration passed. Typed stages/reasons, bounded receipt and count-only admission fields, immutable stopped artifacts and no exception-message parsing are preserved.",
+      "number": 4,
+      "question": "D1 typed diagnostics remain intact"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Literal authority, context and native HTTP restrict provider access to api.openligadb.de and only /getresulttypes, /getresultinfos/5996, /getmatchdata/pl/2026/6. There is no provider/source override in the operational command and no second publisher acquisition.",
+      "number": 5,
+      "question": "Source remains OpenLigaDB"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Existing profile openligadb_public_final_score_labels_v1 and semantic SHA 31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2 are unchanged, with automated/transient/internal factual extraction and minimal immutable evidence permitted. Raw storage, public display/redistribution and training remain denied; existing attribution and termination/deletion obligations remain. No new legal qualification or provider access was performed.",
+      "number": 6,
+      "question": "Rights profile remains unchanged"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Unchanged context 6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259 and fixture registry bind the frozen ten. A03 reuses accepted exact-oriented mapping, regulation-final projection, exact-ten all-or-nothing admission and actual-date D+2 functions, with malformed/incomplete/ambiguous cases independently exercised.",
+      "number": 7,
+      "question": "Exact ten-fixture P01 cohort remains unchanged"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Raw bytes independently matched e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee; raw canonical JSON matched semantic 96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a. Ten LIVE_OBSERVED fixtures, all three fixed products and production_active=false were checked without constructing a real forecast/model/draw object. Runtime uses the unchanged nongenerative frozen view before provider access and after either outcome.",
+      "number": 8,
+      "question": "Forecast bytes remain unchanged"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. The source, rights, cohort, alias mapping, finality, actual-date/D+2 policy, kernels, products, draw policy, metrics and promotion rules are unchanged. A03 is an execution-only human reauthorization after a cause-unknown technical stop. No actual P01 score or provider label was acquired/inspected in this review or the offline test work.",
+      "number": 9,
+      "question": "No source/model/metric selection after inspecting P01 scores"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Original historical file sets remain exact and contain no P01 score artifacts; A03's internal root has no score or scorecard artifact. Test scores are explicitly fixed synthetic reconstruction input only. No actual P01 scoring was performed before this review.",
+      "number": 10,
+      "question": "No P01 scores exist yet"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Accepted p01_fallback evaluator/store/frozen-view and team_strength_prospective kernel sources retain their existing byte hashes. Independent A03 success reproduced all 1470 parent metric values, and D1 reproduced the full captured outcome/score/scorecard semantic identities. Acquisition/admission, persistence and D+2 failures never call the scorer. Later score-storage failures truthfully retain a separate post-score failure state.",
+      "number": 11,
+      "question": "Scoring numerics are unchanged"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Accepted OpenFootball/prospective scoring and numerical sources are unchanged; the original scoring regression remains in the mandatory focused and exact-SHA CI gates. A03 has no OpenFootball acquisition or replacement call. Reconciliation remains a separate pending append-only audit.",
+      "number": 12,
+      "question": "OpenFootball path remains unchanged"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES within this guarded execution path. Authority denies private providers; the command exposes no source/control/transport override; only native HTTPS to the fixed OpenLigaDB host/routes is enabled after all gates. No FPL/Odds/credentials are imported or read by this acquisition. Independent global socket/DNS denial recorded zero attempts and no provider/credential access.",
+      "number": 13,
+      "question": "FPL/Odds/private access remains impossible"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES for provider acquisition. HTTP has no retry/redirect/source fallback and reads only the three ordered bounded routes. A verified remote create-only seal cannot be reopened by another CLI/object, cwd, directory or removed local copies. Ambiguous governance writes stop without HTTP and this ticket permits no remediation/retry. one_attempt_consumed denotes policy retirement; only consumption_verified plus the remote seal asserts a proven remote fact.",
+      "number": 14,
+      "question": "No retry or source switching is possible"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Authority and all operational artifacts retain production_active=false, promotion/model-tuning/private-access denial and descriptive shadow/research classification. There is no activation path or operational draw-count selection; the ten-fixture result remains evidence accumulation, never a promotion decision.",
+      "number": 15,
+      "question": "Production activation remains impossible"
+    }
+  ],
+  "real_p01_scoring_performed": false,
+  "resolved_evidence_capture_checkpoints": [
+    {
+      "checkpoint": "R01",
+      "result": "149 tests passed in 45.70s with zero network attempts; PowerShell redirected output as UTF-16. Passing original capture retained in ignored review_pack; R03 supplies raw process-byte proof."
+    },
+    {
+      "checkpoint": "R02",
+      "command": {
+        "command": [
+          "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03\\.venv\\Scripts\\python.exe",
+          "review_pack/independent_a03_run.py"
+        ],
+        "completed_at": "2026-10-28T15:29:42.666370+00:00",
+        "exit_code": 1,
+        "network_receipt": {
+          "arguments": [
+            "-ra",
+            "--strict-config",
+            "--strict-markers",
+            "--import-mode=importlib",
+            "tests/unit/evaluation/test_p01_fallback_a03.py",
+            "tests/unit/evaluation/test_p01_fallback_d1.py",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp",
+            "review_pack/independent-a03-pytest"
+          ],
+          "completed_at": "2026-10-28T15:29:42.108938+00:00",
+          "credentials_inspected": 0,
+          "denied_network_attempts": 0,
+          "exit_code": 1,
+          "provider_requests": 0,
+          "real_p01_scoring_performed": false,
+          "started_at": "2026-10-28T15:29:28.359961+00:00"
+        },
+        "outputs": {
+          "stderr": {
+            "byte_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0,
+            "path": "review_pack/INDEPENDENT-A03-RAW-stderr.log"
+          },
+          "stdout": {
+            "byte_sha256": "c3d9bf51bb1a80929808a4a434256bbfe65e92fb579c89d38ff3e6138a10b969",
+            "bytes": 1134251,
+            "path": "review_pack/INDEPENDENT-A03-RAW-stdout.log"
+          }
+        },
+        "prior_capture_correction": "R01 passed149 tests, but PowerShell encoded redirected output as UTF-16. Original capture retained; this repeat captures raw process byte streams.",
+        "raw_process_capture": true,
+        "started_at": "2026-10-28T15:29:28.021712+00:00"
+      },
+      "result": "All 149 test setups failed before execution because Windows sandbox denied pytest removal of its existing basetemp. No production code failure and zero network attempts. R03 uses a fresh unique basetemp without deletion and passes.",
+      "stdout_parts_in_order": [
+        {
+          "byte_sha256": "783638bab761c8d9f787ab7d63a36f2b5dbddfa8d49e351fd3a37f631fa75579",
+          "bytes": 600000,
+          "path": "INDEPENDENT-R02-stdout.part-001.log"
+        },
+        {
+          "byte_sha256": "57f58492316538c698d19b0c822e3af9f8bce7a5f8b2fd08ea33617dc3d8b8eb",
+          "bytes": 534251,
+          "path": "INDEPENDENT-R02-stdout.part-002.log"
+        }
+      ]
+    }
+  ],
+  "review_sha256": "d67ebebd8c4ca1061016463ed621e1b9a73221d7dcfb502de7c3d9b45fb9f7fb",
+  "reviewer_identity": "/root/a03_independent_review",
+  "rights_profile_sha256": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2",
+  "schema_version": "public-team-strength-p01-a03-independent-review-notes-v1",
+  "semantic_sha256": "1029472ab625cd292fac7afdec5b53071f971f6acaba6de6cb6587b1865db55f",
+  "unresolved_material_p2": 0,
+  "unresolved_p0": 0,
+  "unresolved_p1": 0
+}

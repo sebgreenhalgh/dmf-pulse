@@ -897,7 +897,7 @@ private provider or credential and leaves team strength shadow only.
   separately observed remote `main`: `ce7fe8f4354d95a477afcf6eed45f63cf0ab772e`.
 - Scope: independently verify and remediate the complete 2026/27 rules-data,
   executable manager-state semantics, governance, activation gates, accepted
-  Stage-1–11 consumers, tests, and final evidence. Do not incorporate Stage-12+
+  Stage-1â€“11 consumers, tests, and final evidence. Do not incorporate Stage-12+
   modelling work, merge, activate production, or fabricate human approval.
 
 ### Independent-review checkpoints
@@ -1087,7 +1087,7 @@ timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
 ## MIN-007R5G - CLI public assurance remediation
 
 - Ticket/stage: `MIN-007R5G`, A7; required parent `2986433e32d55aa3153003b3cc98a098c3a9c071`.
-- Scope: close AUDIT-007-3 findings 9–12 only: strict CLI cutoff/seed semantics, data-driven synthetic mapping, superseding public probability schema, portable repository goldens, substantive PostgreSQL G persistence, and all-scenario CLI assurance.
+- Scope: close AUDIT-007-3 findings 9â€“12 only: strict CLI cutoff/seed semantics, data-driven synthetic mapping, superseding public probability schema, portable repository goldens, substantive PostgreSQL G persistence, and all-scenario CLI assurance.
 - Constraints: preserve MIN-007R5F1/F2 architecture and frozen model/registry identities; no migration, Stage-7H work, live provider/network/credential access, or numerical formula changes.
 
 ### MIN-007R5G checkpoints
@@ -1099,7 +1099,7 @@ timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
 ## MIN-007R5F2 - relational and evaluation integrity remediation
 
 - Ticket/stage: `MIN-007R5F2`, A7; required parent `6fc063424ed8e5c4a688432ccf54770f0c8137eb`.
-- Scope: close only AUDIT-007-3 findings 6–8: canonical PMF arrays and exact HALF_EVEN projection checks, scenario/final cross-graph coherence, and strict model-bound evaluation persistence.
+- Scope: close only AUDIT-007-3 findings 6â€“8: canonical PMF arrays and exact HALF_EVEN projection checks, scenario/final cross-graph coherence, and strict model-bound evaluation persistence.
 - Constraints: modify only unmerged migration `20260807_0006`; preserve R5F1 atomicity and all frozen F/G identities; do not fix CLI/public-schema/P2 findings or start MIN-007H.
 
 ### MIN-007R5F2 checkpoints
@@ -1374,7 +1374,7 @@ timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
 - The test credential is the literal fake `changeme`; committed settings retain only the `env:DMF_TEST_DATABASE_URL` reference.
 - The review command uses stable write-ahead records for commands 22-23, then refreshes the same deterministic archive after finally-guaranteed teardown without invoking command 22 twice.
 
-## RUL-002 — governance remediation and rules foundation
+## RUL-002 â€” governance remediation and rules foundation
 
 - Ticket/stage: `RUL-002`, A2.
 - Required branch/baseline: `stage/A2/RUL-002-rules-foundation` from `12049a7de23a4a8fcca3d219dbcab1bf5e1027ea`.
@@ -1384,12 +1384,12 @@ timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
 
 ### RUL-002 checkpoints
 
-- [x] 2026-07-22T12:00:00Z — verified the v1.1 correction notice, all pack and fixture hashes, corrected independent oracles, exact baseline/branch/clean-tree preconditions, and the 104-test FND baseline.
-- [x] 2026-07-22T14:28:55Z — RUL-002.0: generated the complete 94-entry DMFP-20 index, hash-pinned stage authority requirements, generic ticket/evidence/review contracts, and exact runtime lock graph; authority and assurance targeted tests pass.
-- [x] 2026-07-22T14:28:55Z — RUL-002.1: implemented strict safe-subset YAML, exact typed authoring schemas and cross-file coherence, deterministic compilation/hash/diff, in-memory integrity revalidation, and atomic immutable lifecycle gates.
-- [x] 2026-07-22T14:28:55Z — RUL-002.2: implemented pure configured scoring/BPS/competition-ranking/Gameweek aggregation; corrected v1.1 goldens plus boundary, property, lifecycle, schema, and false-success mutation probes pass with 98.84% rules branch coverage in the focused run.
-- [x] 2026-07-22T15:14:18Z — RUL-002.3: exposed all rules CLI commands, updated package/docs/least-privilege CI, and passed the final precommit quality gate with 200 tests, zero skips, 90.81% overall branch coverage, 98.88% rules branch coverage, frozen-lock validation, clean-wheel verification, repository validation, and secret scanning. The exact 19-command final ledger, actual-commit evidence, and 20-file ZIP are deliberately generated from the clean committed tree into ignored evidence/review paths.
-- [x] 2026-07-22T15:19:54Z — RUL-002.4: the first post-commit ledger run exposed a strict-prefix defect for otherwise successful rules commands; changed the generic success summary to the required `PASS:` form and added a focused false-failure regression test before rerunning acceptance from a new commit.
+- [x] 2026-07-22T12:00:00Z â€” verified the v1.1 correction notice, all pack and fixture hashes, corrected independent oracles, exact baseline/branch/clean-tree preconditions, and the 104-test FND baseline.
+- [x] 2026-07-22T14:28:55Z â€” RUL-002.0: generated the complete 94-entry DMFP-20 index, hash-pinned stage authority requirements, generic ticket/evidence/review contracts, and exact runtime lock graph; authority and assurance targeted tests pass.
+- [x] 2026-07-22T14:28:55Z â€” RUL-002.1: implemented strict safe-subset YAML, exact typed authoring schemas and cross-file coherence, deterministic compilation/hash/diff, in-memory integrity revalidation, and atomic immutable lifecycle gates.
+- [x] 2026-07-22T14:28:55Z â€” RUL-002.2: implemented pure configured scoring/BPS/competition-ranking/Gameweek aggregation; corrected v1.1 goldens plus boundary, property, lifecycle, schema, and false-success mutation probes pass with 98.84% rules branch coverage in the focused run.
+- [x] 2026-07-22T15:14:18Z â€” RUL-002.3: exposed all rules CLI commands, updated package/docs/least-privilege CI, and passed the final precommit quality gate with 200 tests, zero skips, 90.81% overall branch coverage, 98.88% rules branch coverage, frozen-lock validation, clean-wheel verification, repository validation, and secret scanning. The exact 19-command final ledger, actual-commit evidence, and 20-file ZIP are deliberately generated from the clean committed tree into ignored evidence/review paths.
+- [x] 2026-07-22T15:19:54Z â€” RUL-002.4: the first post-commit ledger run exposed a strict-prefix defect for otherwise successful rules commands; changed the generic success summary to the required `PASS:` form and added a focused false-failure regression test before rerunning acceptance from a new commit.
 
 ### RUL-002 decision log
 
@@ -1417,7 +1417,7 @@ timeout is retained in `evidence/tickets/RUL-2026-27/VALIDATION_RESULTS.json`.
 
 - Precedence: accepted DMFP-20 decisions; FND-001 ticket/acceptance details; most-specific DMFP module; DMFP-00; implementation playbook/repository guidance.
 - Controlling decisions: `ADR-PROD-004`, `ADR-GOV-001`, `ADR-GOV-002`, `ADR-GOV-004`, `ADR-RES-001`, `ADR-DATA-002`, `ADR-SRC-001`, `ADR-IMPL-001`, `ADR-IMPL-002` (provisional), and `ADR-IMPL-003`.
-- Primary locators: DMFP-19 §7 Stage 1; DMFP-17 §§0.5, 0.8–0.9, and 4; DMFP-20 §0 and the decision blocks above; FND-001 acceptance and review-pack contracts.
+- Primary locators: DMFP-19 Â§7 Stage 1; DMFP-17 Â§Â§0.5, 0.8â€“0.9, and 4; DMFP-20 Â§0 and the decision blocks above; FND-001 acceptance and review-pack contracts.
 
 ## Baseline
 
@@ -1453,23 +1453,23 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
 ## Risks and safe fallback
 
 - Local `python`/`uv` execution may require the approved absolute uv path because managed sandbox policy denied PATH-resolved executables; use the sanctioned uv installation and request only the narrow dependency/network permission if resolution fails.
-- Zoneinfo data on Windows can vary; validation must use the Python 3.13 runtime’s available `zoneinfo` data and provide actionable failure output without adding an unapproved runtime dependency.
+- Zoneinfo data on Windows can vary; validation must use the Python 3.13 runtimeâ€™s available `zoneinfo` data and provide actionable failure output without adding an unapproved runtime dependency.
 - Review ZIP output is requested both in-repository and beside the source pack; generate and validate in-repository first, then copy the final ZIP to the external requested destination without changing Git history.
 
 ## Progress
 
-- [x] 2026-07-22T09:11:21Z — inspected Git status, remote, branches, HEAD, and empty tree.
-- [x] 2026-07-22T09:11:21Z — captured deterministic empty-repository baseline as the first artifact.
-- [x] 2026-07-22T09:11:21Z — read the controlling pack in the mandated order and verified all 42 pack hashes/byte counts.
-- [x] 2026-07-22T09:20:00Z — Checkpoint 0 complete: installed 21 exact DMFP files plus playbook, generated three governed manifests, and passed the first-party validator with zero errors.
-- [x] 2026-07-22T09:20:39Z — Checkpoint 1 complete: added governance, proprietary licensing, ticket records, Codex contracts, owner-derived CODEOWNERS, and cross-platform operational documentation; manifest validation remained green.
-- [x] 2026-07-22T09:48:18Z — Checkpoint 2 complete: uv resolved 29 packages for Python 3.13.9, frozen sync passed, and the wheel verified `py.typed`, installed module provenance, version, doctor, and cleanup outside the source tree.
-- [x] 2026-07-22T09:48:18Z — Checkpoint 3 complete: strict configuration, deterministic overlays/redaction, path/timezone/reference semantics, and no-create loading passed targeted unit/property tests.
-- [x] 2026-07-22T10:50:31Z — Checkpoint 4 complete: deterministic CLI/doctor contracts, privacy-minimized bounded probes, missing-config blocking, safe CPU fallback, and installed default timezone validation passed.
-- [x] 2026-07-22T10:50:31Z — Checkpoint 5 complete: canonical evidence/hashing, fail-closed secret scan, manifest integrity, detached primary-payload digest, atomic capped review ZIP, and negative tamper tests passed.
-- [x] 2026-07-22T10:50:31Z — Checkpoint 6 complete: 103 offline tests passed with 288/318 branches covered (90.57%) and strengthened import/network/write/logging false-success traps.
-- [x] 2026-07-22T10:50:31Z — Checkpoint 7 complete: least-privilege Ubuntu CI, scheduled/manual Windows smoke, exact frozen commands, cross-platform documentation, and clean-clone package verification are in place.
-- [x] 2026-07-22T10:54:29Z — Checkpoint 8 complete: all 14 literal mandatory commands passed, three independent read-only reviews were resolved, machine evidence validated, and a root-only 20-file bootstrap review ZIP passed full detached hash validation before final clean-HEAD assembly.
+- [x] 2026-07-22T09:11:21Z â€” inspected Git status, remote, branches, HEAD, and empty tree.
+- [x] 2026-07-22T09:11:21Z â€” captured deterministic empty-repository baseline as the first artifact.
+- [x] 2026-07-22T09:11:21Z â€” read the controlling pack in the mandated order and verified all 42 pack hashes/byte counts.
+- [x] 2026-07-22T09:20:00Z â€” Checkpoint 0 complete: installed 21 exact DMFP files plus playbook, generated three governed manifests, and passed the first-party validator with zero errors.
+- [x] 2026-07-22T09:20:39Z â€” Checkpoint 1 complete: added governance, proprietary licensing, ticket records, Codex contracts, owner-derived CODEOWNERS, and cross-platform operational documentation; manifest validation remained green.
+- [x] 2026-07-22T09:48:18Z â€” Checkpoint 2 complete: uv resolved 29 packages for Python 3.13.9, frozen sync passed, and the wheel verified `py.typed`, installed module provenance, version, doctor, and cleanup outside the source tree.
+- [x] 2026-07-22T09:48:18Z â€” Checkpoint 3 complete: strict configuration, deterministic overlays/redaction, path/timezone/reference semantics, and no-create loading passed targeted unit/property tests.
+- [x] 2026-07-22T10:50:31Z â€” Checkpoint 4 complete: deterministic CLI/doctor contracts, privacy-minimized bounded probes, missing-config blocking, safe CPU fallback, and installed default timezone validation passed.
+- [x] 2026-07-22T10:50:31Z â€” Checkpoint 5 complete: canonical evidence/hashing, fail-closed secret scan, manifest integrity, detached primary-payload digest, atomic capped review ZIP, and negative tamper tests passed.
+- [x] 2026-07-22T10:50:31Z â€” Checkpoint 6 complete: 103 offline tests passed with 288/318 branches covered (90.57%) and strengthened import/network/write/logging false-success traps.
+- [x] 2026-07-22T10:50:31Z â€” Checkpoint 7 complete: least-privilege Ubuntu CI, scheduled/manual Windows smoke, exact frozen commands, cross-platform documentation, and clean-clone package verification are in place.
+- [x] 2026-07-22T10:54:29Z â€” Checkpoint 8 complete: all 14 literal mandatory commands passed, three independent read-only reviews were resolved, machine evidence validated, and a root-only 20-file bootstrap review ZIP passed full detached hash validation before final clean-HEAD assembly.
 
 ## Decision log
 
@@ -2303,7 +2303,7 @@ The 13 literal commands in `03_ACCEPTANCE_CONTRACT.md` are mandatory, followed b
   moved to pytest-importable test support with unchanged bodies/production bytes. The exact
   planner now collects 4,389 eligible tests and all 20 R6 candidate/oracle tests pass.
 
-## PRIVATE-V1-ONE-COMMAND-001N-R7 — exact live-scale acceleration
+## PRIVATE-V1-ONE-COMMAND-001N-R7 â€” exact live-scale acceleration
 
 - [x] Verify immutable R6 SHA and all 12 parent CI jobs; isolate R7 worktree.
 - [x] Read user scope and accepted exact tactical/cohort/nonanticipativity authority.
@@ -2546,7 +2546,7 @@ the observed slow synthetic populations; no test selector, timeout, coverage gat
 workflow, dependency or production code changes. Validate deterministic complete
 partitioning, refresh independent review/evidence, and publish a new exact-SHA run.
 
-## CURRENT-TEAM-STRENGTH-001P-L2 — Phase A only
+## CURRENT-TEAM-STRENGTH-001P-L2 â€” Phase A only
 
 Exact parent: `4d712ecf84e9c1f01a0f29354bd93c5296befb35`.
 The newest human instruction overrides the execution section of the supplied
@@ -2657,7 +2657,7 @@ Exact parent: `b774056f20e855d7a755186fe62489e3d393ecfe`.
 D3 is offline-only: provider requests and credential inspection remain zero. It
 does not modify model, Stage 8-11, materiality, network-denial or decision semantics.
 
-## CI runtime stabilisation — Phase 1
+## CI runtime stabilisation â€” Phase 1
 
 Exact parent: `42242a886c059fc96b3ed33e8fd4f2521a2379a2`.
 Dedicated branch: `infra/ci-runtime-overhaul-2026-09-24`.
@@ -2679,7 +2679,7 @@ No production code, numerical behavior, rules, provider boundary, test case, ass
 marker, skip, retry, coverage threshold, PR, merge, or acceptance/tag state changes in this
 phase. Static weight replacement and historical Stage-8/GCS-008 cleanup remain Phase-2 debt.
 
-## Test-suite rationalisation — Phase 2
+## Test-suite rationalisation â€” Phase 2
 
 Exact parent: `3d86e6ae62efc01daa85b2b0991596a80f9847db`.
 Dedicated branch: `infra/test-suite-rationalisation-2026-09-24`.
@@ -2700,7 +2700,7 @@ Production semantics, target-season rules, provider rights, numerical behavior, 
 contracts, coverage thresholds, and fail-closed safeguards remain frozen. No PR, merge,
 tag, live provider call, credential access, test retry, or hidden exclusion is authorised.
 
-## CI critical-path optimisation — Phase 3
+## CI critical-path optimisation â€” Phase 3
 
 Exact parent: `8bb6e0f2e0b35f5976994fdc1fae9ffb94aa3712`.
 Dedicated branch: `infra/runtime-informed-ci-scheduling-2026-09-24`.
@@ -2772,3 +2772,28 @@ Offline diagnostic hardening only; historical A02 remains consumed/cause unknown
 
 No provider retry, marker reset, A03 authority, real labels, actual P01 scoring, credential access,
 source/rights/scoring policy changes, tuning, promotion, activation, PR, merge or tag.
+
+
+## CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03
+
+- [x] Read human authorization, isolate exact D1 parent, resolve authority.
+- [x] Seal request/history inventory and distinct A03 authority contract.
+- [x] Implement guarded A03 execution and offline failure/consumption tests.
+- [x] Complete release checks, nongenerative numerical parity and clean wheel.
+- [ ] Fresh independent review; commit/push and exact-SHA CI 20/20.
+- [ ] Bind final review to exact SHA, consume A03 durably and execute once.
+- [ ] Reauthenticate forecast/history; seal stopped or scored handoff/review pack.
+
+A03 local release:622 focused tests and independent149 A03/D1 tests pass;
+review 32fede487c638177425731e7ab09cf59dcd216f4e36780ccdc51e2770deae025
+is CLEAR_FOR_P01_A03_ONE_SHOT_EXECUTION. All27 reviewed files are bound.
+Publication/CI and the exact-SHA reviewer binding remain mandatory before live
+execution. Final append-only external release/execution receipts record the
+completion of the remaining steps without a circular commit-hash dependency.
+
+Prepublication metadata correction: the secret scanner treated the governance
+field authorization as a credential key. Rename to human_decision_status,
+reseal authority1b9cde4d72416dc0ada2c20bb60da097106046033d00b4ed28c95c88e7676400,
+and preserve the failed scan and superseded review. Final secret scan is zero;
+149 affected A03/D1 tests independently pass again. Scanner, rights, source,
+numerical kernels and authority decision value remain unchanged.

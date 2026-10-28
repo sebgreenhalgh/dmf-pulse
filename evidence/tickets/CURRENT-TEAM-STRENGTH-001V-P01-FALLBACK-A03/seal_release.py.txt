@@ -1,0 +1,54 @@
+"""Seal exact publication/CI before the authorized provider attempt."""
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+
+from dmf_pulse.assurance.canonical import canonical_sha256,pretty_json
+from dmf_pulse.assurance.manifests import RepositoryManifest,validate_repository_manifest
+from dmf_pulse.evaluation.p01_a03_authority import BRANCH,D1_SHA,REPOSITORY,load_a03_authority,A03IndependentReview,A03ReviewBinding
+from dmf_pulse.ingestion.p01_a03_control import EXPECTED_JOBS,GitHubA03Control
+from dmf_pulse.ingestion.openfootball.team_strength_data import authenticate
+
+w=Path(__file__).resolve().parents[1];e=w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03'
+root=w.parents[1]/'artifacts/public-prospective/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03'
+sha,run_id,binding_path=sys.argv[1:]
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def run(args):return subprocess.run(args,cwd=w,capture_output=True,check=True,timeout=60).stdout
+def persist(category,name,payload):
+ path=root/category/name;path.parent.mkdir(parents=True,exist_ok=True)
+ with path.open('xb') as stream:stream.write(payload);stream.flush();os.fsync(stream.fileno())
+ assert path.read_bytes()==payload
+ return path
+assert run(['git','rev-parse','HEAD']).decode().strip()==sha
+assert run(['git','rev-parse','HEAD^']).decode().strip()==D1_SHA
+assert not run(['git','status','--porcelain']).strip()
+remote=run(['git','ls-remote','--exit-code','origin','refs/heads/'+BRANCH]).decode().split()[0]
+assert remote==sha
+review=authenticate(A03IndependentReview.model_validate_json((e/'INDEPENDENT-REVIEW.json').read_bytes()))
+binding=authenticate(A03ReviewBinding.model_validate_json(Path(binding_path).read_bytes()))
+assert binding.implementation_sha==sha and binding.ci_run_id==int(run_id)
+assert binding.file_review_sha256==review.semantic_sha256
+for item in review.files:assert digest(w/item.path)==item.byte_sha256,item.path
+raw=run(['gh','run','view',run_id,'--repo',REPOSITORY,'--json','databaseId,url,headSha,status,conclusion,jobs,createdAt,updatedAt'])
+ci=json.loads(raw);assert ci['headSha']==sha and ci['status']=='completed' and ci['conclusion']=='success'
+assert len(ci['jobs'])==20 and {j['name'] for j in ci['jobs']}==EXPECTED_JOBS
+assert all(j['status']=='completed' and j['conclusion']=='success' for j in ci['jobs'])
+assert not validate_repository_manifest(w,RepositoryManifest.model_validate_json((e/'current_manifest.json').read_bytes()))
+local=json.loads((e/'FINAL-LOCAL-AUDIT.json').read_bytes());s=local.pop('semantic_sha256');assert canonical_sha256(local)==s
+pack=json.loads((e/'REVIEW-PACK.json').read_bytes());assert digest(w/pack['path'])==pack['byte_sha256']
+authority=load_a03_authority()
+assert digest(e/'HUMAN-AUTHORIZATION.txt')==authority.human_request_byte_sha256
+control=GitHubA03Control(w)
+# Verify the same runtime gate as the command, without touching consumption or a provider.
+control.verify(binding,expected_review_bytes=(e/'INDEPENDENT-REVIEW.json').read_bytes())
+receipt_sha=hashlib.sha256(raw).hexdigest()
+persist('ci-receipts',receipt_sha+'.json',raw)
+persist('authorities',authority.semantic_sha256+'.json',pretty_json(authority).encode())
+value={'schema_version':'p01-a03-pre-execution-release-binding-v1','sealed_at':datetime.now(UTC).isoformat(),'branch':BRANCH,'immutable_parent':D1_SHA,'implementation_sha':sha,'remote_sha':remote,'ci_run_id':int(run_id),'ci_url':ci['url'],'successful_required_jobs':20,'ci_response_byte_sha256':receipt_sha,'authority_sha256':authority.semantic_sha256,'independent_review_sha256':review.semantic_sha256,'exact_sha_review_binding_sha256':binding.semantic_sha256,'final_local_audit_sha256':s,'pre_execution_review_pack_byte_sha256':pack['byte_sha256'],'provider_requests_before_execution':0,'p01_scored_before_execution':False,'production_active':False,'ready_for_exactly_one_a03_attempt':True}
+value['semantic_sha256']=canonical_sha256(value)
+path=persist('release-bindings',value['semantic_sha256']+'.json',pretty_json(value).encode())
+print(pretty_json(value),end='');print(path)

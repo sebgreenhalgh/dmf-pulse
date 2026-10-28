@@ -1,0 +1,30 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "review_pack/offline_pytest.py",
+    "tests/unit/evaluation/test_p01_fallback_a03.py",
+    "tests/unit/evaluation/test_p01_fallback_d1.py",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "tests/unit/evaluation/test_team_strength_prospective.py",
+    "tests/unit/evaluation/test_calibration.py",
+    "tests/unit/evaluation/test_point_probability_metrics.py",
+    "tests/unit/ingestion/openfootball",
+    "tests/unit/ingestion/test_rights_and_fixtures.py",
+    "--basetemp",
+    "review_pack/a03-release-tests",
+    "-p",
+    "no:cacheprovider",
+    "-q",
+    "--tb=short",
+    "--cov=dmf_pulse",
+    "--cov-branch",
+    "--cov-report=json:review_pack/a03-release-coverage.json",
+    "--cov-fail-under=0"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03",
+  "started_at": "2026-10-28T15:23:38.122863+00:00",
+  "finished_at": "2026-10-28T15:40:32.076492+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-FOCUSED-OFFLINE.log",
+  "output_byte_sha256": "5f42ff666db861eaacaab37b221f3222d9263b538abe791ce32baea82870cb20"
+}

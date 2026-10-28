@@ -85,11 +85,26 @@ except ReasonFailure as failure:
     assert failure.reason == FailureReason.ONE_ATTEMPT_ALREADY_CONSUMED
 else:
     raise AssertionError('D1 has no default live transport')
+from dmf_pulse.evaluation.p01_a03_authority import load_a03_authority
+a03 = load_a03_authority()
+assert a03.maximum_attempts == a03.attempt_number == 1
+assert not a03.retry_permitted and not a03.source_switch_permitted
+assert a03.evaluation_epoch == context.evaluation_epoch
+denied_attempt = CliRunner().invoke(app, ['events','team-strength','p01-fallback','execute-a03',
+    '--forecast','not-read','--review','missing-review','--review-binding','missing-binding',
+    '--review-binding-sha256','0'*64,'--implementation-root','.',
+    '--artifact-root',a03.ticket])
+assert denied_attempt.exit_code == 2
+safe = json.loads(denied_attempt.stdout)
+assert safe['stage'] == 'AUTHENTICATE_REVIEW' and safe['reason'] == 'REVIEW_INVALID'
+assert safe['diagnostics']['provider_requests_attempted'] == 0
+assert not Path(a03.ticket).exists()
 print(json.dumps({'status':'PASS','installed_import':True,'packaged_context_and_rights':True,
     'public_context_command':True,'typed_fallback_roundtrip':True,'full_metric_report_replay':True,
     'nongenerative_frozen_view_scoring':True,
     'd1_packaged_consumption':True,'d1_consumed_authority_blocked':True,
     'd1_safe_stopped_roundtrip':True,'d1_default_transport_blocked':True,
+    'a03_packaged_authority':True,'a03_public_command_precheck_no_network':True,
     'fixture_count':10,'product_count':3,'provider_calls':0,'production_active':False}))
 """
 

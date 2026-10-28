@@ -1,0 +1,16 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "ruff",
+    "format",
+    "--check",
+    "."
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03",
+  "started_at": "2026-10-28T16:18:21.064211+00:00",
+  "finished_at": "2026-10-28T16:18:21.562415+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-FORMAT-R02.log",
+  "output_byte_sha256": "e92954f14fe64ae6dc67cf342809ea6cdc6ce8f5657ca92fdf0daba6d7fd050e"
+}

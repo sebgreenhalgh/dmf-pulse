@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-c",
+    "import hashlib,json;from pathlib import Path;from dmf_pulse.assurance.canonical import canonical_sha256;from dmf_pulse.evaluation.p01_fallback_context import strict_json,FORECAST_SHA,FORECAST_BYTE_SHA;w=Path.cwd();p=w.parents[1]/'artifacts/public-prospective';v=json.loads((w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/HISTORICAL-INVENTORY.json').read_bytes());rows=[(p/folder/path,sha) for folder,items in v['original_artifacts'].items() for path,sha in items.items()];assert len(rows)==49;assert all(hashlib.sha256(path.read_bytes()).hexdigest()==sha for path,sha in rows);assert all(hashlib.sha256((w/path).read_bytes()).hexdigest()==sha for path,sha in v['protected_files'].items());f=p/'CURRENT-TEAM-STRENGTH-001V-P01/public-team-strength-prospective'/ (FORECAST_SHA+'.json');raw=f.read_bytes();assert hashlib.sha256(raw).hexdigest()==FORECAST_BYTE_SHA;value=strict_json(raw);s=value.pop('semantic_sha256');assert canonical_sha256(value)==s==FORECAST_SHA;print('PASS: original49, protected13, forecast semantic+byte hashes unchanged; no model validation/generation/scoring/network')"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03",
+  "started_at": "2026-10-28T15:28:41.286382+00:00",
+  "finished_at": "2026-10-28T15:28:43.122280+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-IMMUTABILITY.log",
+  "output_byte_sha256": "9ff3e80dc7fa4707f0dc6adcb8041fd9470c93fbb6d036fd692c39cd23d55e7b"
+}

@@ -1,0 +1,853 @@
+# DMF PULSE — CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03
+# FRESH ONE-SHOT OPENLIGADB REAUTHORIZATION
+# USE D1 TYPED FAILURE LOCALISATION
+# SCORE P01 IF AND ONLY IF EXACT-TEN ADMISSION SUCCEEDS
+# NO PRIVATE PROVIDERS / NO MODEL CHANGE / NO ACTIVATION
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Immutable D1 parent:
+
+f96eaa3e7261d0db6f23bc8eb7dee18917272d00
+
+D1 branch:
+
+readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1-failure-localisation
+
+D1 exact-SHA CI:
+
+38953534112
+SUCCESS — 20/20
+
+D1 independent-review verdict:
+
+CLEAR_FOR_P01_A03_REAUTHORIZATION_DECISION
+
+D1 independent-review SHA:
+
+26b793baa8ea272fdfd54ab3ba6e9cce8f8054d20c01406bbe39e338df868fe2
+
+Frozen P01 forecast semantic SHA:
+
+96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a
+
+Frozen P01 forecast byte SHA:
+
+e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee
+
+Existing A02 context SHA:
+
+6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259
+
+OpenLigaDB rights profile:
+
+openligadb_public_final_score_labels_v1
+
+Rights profile SHA:
+
+31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2
+
+Ticket:
+
+CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03
+
+Preferred branch:
+
+readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-one-shot-reauthorization
+
+============================================================
+ROLE
+============================================================
+
+Implement and execute a fresh, explicitly human-authorized A03 acquisition attempt
+for the already frozen P01 descriptive prospective evaluation.
+
+A02's one-shot authority is permanently consumed.
+
+DO NOT reset, delete, reinterpret or bypass A02.
+
+D1 added typed failure localisation but deliberately created NO A03 authority.
+
+THIS TICKET IS THE HUMAN DECISION AUTHORIZING EXACTLY ONE NEW A03 PUBLIC
+OPENLIGADB ACQUISITION ATTEMPT.
+
+A03 is an EXECUTION REAUTHORIZATION ONLY.
+
+It does NOT change:
+
+- source policy;
+- rights policy;
+- forecast;
+- model;
+- hyperparameters;
+- parameter-mixture policy;
+- fixture cohort;
+- mapping policy;
+- finality policy;
+- D+2 policy;
+- scoring kernel;
+- scoring metrics;
+- promotion policy;
+- production activation state.
+
+Source remains fixed:
+
+    OpenLigaDB
+
+P01 remains:
+
+    DESCRIPTIVE_P01_PILOT
+    POST_EVENT_OUTCOME_SOURCE_AMENDMENT
+    NOT_CONFIRMATORY_EPOCH_001
+
+============================================================
+1. HUMAN AUTHORIZATION
+============================================================
+
+Record explicitly:
+
+    A03_PUBLIC_OPENLIGADB_ONE_SHOT_AUTHORIZED
+    HUMAN_REAUTHORIZATION_AFTER_D1
+    MAX_PROVIDER_ATTEMPTS = 1
+    RETRY_PERMITTED = false
+    SOURCE_SWITCH_PERMITTED = false
+
+This authorization is for:
+
+- one bounded acquisition through the existing qualified OpenLigaDB source;
+- exact P01 ten-fixture outcome admission;
+- P01 scoring if admission succeeds.
+
+It is NOT authorization for:
+
+- FPL;
+- The Odds API;
+- Premier League website;
+- any other result provider;
+- repeated polling;
+- retries;
+- model modification;
+- tuning;
+- promotion;
+- activation.
+
+============================================================
+2. PRESERVE HISTORICAL A02
+============================================================
+
+Require:
+
+    A02_ONE_ATTEMPT_CONSUMED
+    HISTORICAL_A02_EXACT_CAUSE_NOT_RETAINED
+    HISTORICAL_A02_NOT_RETRIED
+
+Do not modify:
+
+- A02 one-attempt marker;
+- A02 stopped handoff;
+- A02 stopped audit;
+- A02 review pack;
+- any original P01 artifact.
+
+A02 remains historical evidence.
+
+A03 must have its own explicit execution-authority identity and consumption state.
+
+============================================================
+3. D1 MUST BE THE IMPLEMENTATION BASE
+============================================================
+
+Require exact parent:
+
+    f96eaa3e7261d0db6f23bc8eb7dee18917272d00
+
+Verify D1 diagnostic contract remains intact.
+
+The A03 live attempt MUST use the D1 typed stage/reason instrumentation.
+
+It must NOT use the old generic A02 failure wrapper.
+
+The following D1 properties are mandatory:
+
+- typed execution stage;
+- typed failure reason;
+- no exception-message parsing;
+- safe request receipts;
+- safe aggregate admission diagnostics;
+- no raw provider response persistence;
+- no final scores in stopped diagnostics;
+- no team/match identities in stopped diagnostics;
+- immutable stopped diagnostic artifact.
+
+============================================================
+4. A03 EXECUTION AUTHORITY
+============================================================
+
+Implement the smallest explicit A03 execution authority necessary.
+
+Prefer a dedicated sealed authority object such as:
+
+    public-team-strength-p01-fallback-a03-execution-authority-v1
+
+It must bind at minimum:
+
+- ticket = CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03;
+- D1 implementation SHA;
+- D1 review SHA;
+- A02 context SHA;
+- frozen P01 semantic SHA;
+- frozen P01 byte SHA;
+- fixture-registry SHA;
+- OpenLigaDB rights-profile ID;
+- OpenLigaDB rights-profile SHA;
+- source = OpenLigaDB;
+- exact permitted routes;
+- attempt_number = 1;
+- maximum_attempts = 1;
+- retry_permitted = false;
+- source_switch_permitted = false;
+- production_active = false;
+- promotion_permitted = false;
+- model_tuning_permitted = false;
+- private_provider_access_permitted = false.
+
+A03 should remain within the existing descriptive evaluation policy.
+
+Do NOT change the methodological evaluation epoch merely to represent another
+execution attempt.
+
+If repository architecture requires a separate execution epoch/identity, make it
+an execution-authority identity rather than silently changing the evaluation
+methodology.
+
+============================================================
+5. A03 ATTEMPT CONSUMPTION
+============================================================
+
+A03 must be independently one-shot.
+
+Before the first provider request:
+
+seal durable evidence that:
+
+    A03_ATTEMPT_CONSUMED = true
+
+The consumption mechanism must not be bypassable by:
+
+- changing artifact directory;
+- deleting a local convenience marker;
+- passing a force flag;
+- rerunning the CLI;
+- changing working directory.
+
+No:
+
+    --force
+    --retry
+    --reset
+    --ignore-consumed
+
+option may exist.
+
+A failed provider call still consumes A03.
+
+============================================================
+6. NO ACQUISITION UNTIL IMPLEMENTATION IS SEALED
+============================================================
+
+Before any real provider request:
+
+1. implement A03 authority/consumption integration;
+2. run all focused offline tests;
+3. run independent review;
+4. commit and push;
+5. require exact-SHA CI green.
+
+NO OpenLigaDB request may occur before the exact code intended for the live
+attempt is remotely sealed and CI green.
+
+============================================================
+7. PRE-ACQUISITION INDEPENDENT REVIEW
+============================================================
+
+Fresh review must confirm:
+
+1. A02 remains consumed and immutable.
+2. A03 is genuinely separate authority.
+3. A03 authorizes exactly one attempt.
+4. D1 typed diagnostics remain intact.
+5. source remains OpenLigaDB.
+6. rights profile remains unchanged.
+7. exact ten-fixture P01 cohort remains unchanged.
+8. forecast bytes remain unchanged.
+9. no source/model/metric selection occurred after inspecting P01 scores.
+10. no P01 scores exist yet.
+11. scoring numerics are unchanged.
+12. OpenFootball path remains unchanged.
+13. FPL/Odds/private access remains impossible.
+14. no retry or source switching is possible.
+15. production activation remains impossible.
+
+Required verdict:
+
+    CLEAR_FOR_P01_A03_ONE_SHOT_EXECUTION
+
+Do not acquire unless this verdict exists and is bound to the exact implementation
+SHA.
+
+============================================================
+8. EXACT SOURCE
+============================================================
+
+Use only:
+
+    api.openligadb.de
+
+Existing source identity:
+
+    competition = Premier League
+    shortcut = pl
+    season = 2026
+    league_id = 5996
+    matchday = 6
+
+Use exactly the existing reviewed route set unless an actual provider-schema
+defect is discovered before the live attempt.
+
+Expected routes remain:
+
+    /getresulttypes
+    /getresultinfos/5996
+    /getmatchdata/pl/2026/6
+
+Do not broaden acquisition.
+
+Do not poll.
+
+Do not use another website.
+
+============================================================
+9. RIGHTS
+============================================================
+
+Authenticate exactly:
+
+    openligadb_public_final_score_labels_v1
+
+SHA:
+
+    31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2
+
+Permitted scope remains narrowly:
+
+- automated read-only access;
+- transient processing;
+- exact final-score factual projection;
+- internal descriptive evaluation;
+- immutable internal evidence storage.
+
+Public redistribution remains:
+
+    false
+
+Raw response storage remains prohibited.
+
+============================================================
+10. FORECAST AUTHENTICATION
+============================================================
+
+Immediately before provider access authenticate P01.
+
+Require:
+
+semantic SHA:
+
+    96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a
+
+byte SHA:
+
+    e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee
+
+Require:
+
+    fixture_count = 10
+    dataset_mode = LIVE_OBSERVED
+    production_active = false
+
+Products remain exactly:
+
+    LEAGUE_BASELINE
+    PLUG_IN_TEAM_STRENGTH_SHADOW
+    PARAMETER_MIXTURE_TEAM_STRENGTH_SHADOW
+
+No fit.
+
+No freeze.
+
+No forecast generation.
+
+No parameter draw generation.
+
+============================================================
+11. ONE REAL OPENLIGADB ATTEMPT
+============================================================
+
+After all gates pass:
+
+execute exactly one A03 acquisition.
+
+Use D1 instrumentation.
+
+Maintain a typed current execution stage before every operation.
+
+Record disclosure-safe request receipts.
+
+Do not persist raw provider responses.
+
+Do not print raw responses.
+
+Do not print final labels until and unless all ten pass complete admission.
+
+============================================================
+12. FAILURE BEHAVIOUR
+============================================================
+
+If ANY acquisition/admission step fails:
+
+STOP IMMEDIATELY.
+
+Do not retry.
+
+Do not switch source.
+
+Do not score.
+
+Persist the D1 typed stopped diagnostic.
+
+Return at minimum:
+
+    execution_stage
+    failure_reason
+
+and the permitted safe diagnostic fields:
+
+    provider_requests_attempted
+    provider_requests_completed
+    last_route_class
+
+request receipts:
+
+    route_class
+    request_started_at
+    response_received_at
+    http_status_code
+    content_type_class
+    response_bytes
+    response_sha256
+    digest_scope
+    response_complete
+    strict_json_valid
+
+admission counts:
+
+    regulation_global_candidate_count
+    regulation_league_candidate_count
+    regulation_metadata_resolved
+    provider_match_rows
+    finished_match_rows
+    regulation_result_rows
+    projected_fact_count
+    uniquely_mapped_fixture_count
+    admitted_outcome_count
+
+Do not disclose in a stopped diagnostic:
+
+- raw JSON;
+- scores;
+- teams;
+- provider fixture IDs;
+- arbitrary exception strings;
+- stack traces.
+
+Return:
+
+    P01_A03_ONE_ATTEMPT_CONSUMED
+    P01_A03_STOPPED_TYPED
+    P01_NOT_SCORED
+
+and do nothing else.
+
+============================================================
+13. SUCCESSFUL ADMISSION REQUIREMENTS
+============================================================
+
+If acquisition succeeds, require exactly ten admissible P01 fixtures.
+
+Require:
+
+- exact frozen fixture set;
+- exact league;
+- exact season;
+- exact Matchday 6;
+- unique provider match identity;
+- exact oriented home/away mapping;
+- `matchIsFinished = true`;
+- exactly one regulation result;
+- regulation result linked to `After90Minutes`;
+- integer home goals;
+- integer away goals;
+- valid actual played UTC timestamp;
+- no ambiguous mapping;
+- no extra admitted fixture;
+- no missing admitted fixture.
+
+All-or-nothing.
+
+============================================================
+14. D+2
+============================================================
+
+Use the admitted actual played date.
+
+Require all ten to pass the existing governed D+2 rule.
+
+If any fail:
+
+    stage = VALIDATE_D_PLUS_2
+    reason = D_PLUS_2_NOT_COMPLETE
+
+Stop.
+
+No partial scoring.
+
+============================================================
+15. SEAL OUTCOME ARTIFACT
+============================================================
+
+If exact-ten admission succeeds:
+
+seal:
+
+    public-team-strength-p01-fallback-outcomes-v1
+
+with:
+
+    provenance = PUBLIC_FALLBACK_OUTCOME_SOURCE
+    source = OpenLigaDB
+    source_role = CANONICAL_FINAL_OUTCOME_LABEL
+    reconciliation_status = OPENFOOTBALL_RECONCILIATION_PENDING
+
+Persist content-addressably.
+
+Authenticate after write.
+
+Retain:
+
+- exact ten final factual rows;
+- necessary source provenance;
+- retrieval times;
+- receipt hashes;
+- rights identity;
+- mapping evidence;
+- A03 execution authority identity.
+
+No raw provider payload.
+
+============================================================
+16. SCORE P01 IMMEDIATELY AFTER SUCCESS
+============================================================
+
+If and only if:
+
+- exact ten admitted;
+- artifact authenticated;
+- all ten D+2 eligible;
+
+score all three frozen products through the already accepted numerical kernel:
+
+    LEAGUE_BASELINE
+    PLUG_IN_TEAM_STRENGTH_SHADOW
+    PARAMETER_MIXTURE_TEAM_STRENGTH_SHADOW
+
+Do not regenerate forecasts.
+
+Do not tune.
+
+Do not change source.
+
+Do not change scoring.
+
+============================================================
+17. REQUIRED SCORECARD
+============================================================
+
+Return cohort means for each product:
+
+- exact-score log loss;
+- team-count log loss;
+- goal RPS;
+- home bias;
+- away bias.
+
+Return all governed binary-event Brier means.
+
+Return pairwise loss deltas:
+
+    PLUG_IN - LEAGUE_BASELINE
+    PARAMETER_MIXTURE - LEAGUE_BASELINE
+    PARAMETER_MIXTURE - PLUG_IN
+
+Explicit convention:
+
+    NEGATIVE LOSS DELTA = BETTER
+
+Return per-fixture:
+
+- frozen public fixture identity;
+- actual final result;
+- exact-score loss by product;
+- team-count loss by product;
+- goal RPS by product.
+
+============================================================
+18. INTERPRETATION
+============================================================
+
+Explicitly answer:
+
+1. Did plug-in beat league baseline on exact-score log loss?
+2. Did plug-in beat league baseline on team-count log loss?
+3. Did plug-in beat league baseline on goal RPS?
+4. Did parameter mixture beat plug-in on each?
+5. Was there conspicuous home/away bias?
+6. Were there obvious fixture-level failures?
+7. What does this 10-fixture P01 cohort suggest?
+8. What cannot it establish?
+
+Classification remains:
+
+    DESCRIPTIVE_P01_PILOT
+    FIRST_PROSPECTIVE_COHORT
+    POST_EVENT_OUTCOME_SOURCE_AMENDMENT
+    PROSPECTIVE_FORECAST_WITH_FALLBACK_FINAL_LABELS
+    NOT_CONFIRMATORY_EPOCH_001
+    PROSPECTIVE_EVIDENCE_NOT_PROMOTION_DECISION
+    EVIDENCE_ACCUMULATION_IN_PROGRESS
+
+Do not claim model accuracy established.
+
+Do not promote based on P01.
+
+============================================================
+19. PARAMETER MIXTURE
+============================================================
+
+Regardless of P01 result:
+
+    PARAMETER_MIXTURE_REMAINS_RESEARCH_ONLY
+    NO_OPERATIONAL_DRAW_COUNT_SELECTED
+
+Do not choose an operational draw count from P01.
+
+Do not tune mixture behaviour from P01.
+
+============================================================
+20. OPENFOOTBALL RECONCILIATION
+============================================================
+
+Do NOT block A03 scoring on OpenFootball.
+
+After successful OpenLigaDB scoring retain:
+
+    OPENFOOTBALL_RECONCILIATION_PENDING
+
+If the originally governed OpenFootball source is still incomplete, do nothing.
+
+When it later becomes complete, reconciliation remains a separate append-only
+audit.
+
+Do not silently replace OpenLigaDB evidence.
+
+============================================================
+21. FORECAST IMMUTABILITY AFTER EXECUTION
+============================================================
+
+After stopped or successful A03 execution, reauthenticate P01.
+
+Require unchanged:
+
+semantic SHA:
+
+    96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a
+
+byte SHA:
+
+    e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee
+
+Any change is a hard failure.
+
+============================================================
+22. RELEASE CHECKS BEFORE LIVE EXECUTION
+============================================================
+
+Before provider access run:
+
+- focused A03 tests;
+- full D1 diagnostic regression;
+- A02 regression;
+- P01 forecast immutability;
+- rights tests;
+- acquisition-boundary tests;
+- one-shot-consumption tests;
+- numerical equivalence;
+- original OpenFootball scoring regression;
+- Ruff;
+- strict mypy;
+- frozen sync;
+- build;
+- installed-wheel verification;
+- repository validation;
+- manifests;
+- secret scan;
+- git diff --check.
+
+Commit and push.
+
+Require:
+
+    local SHA == remote SHA
+
+Then require exact-SHA CI green.
+
+Only then perform the one real A03 attempt.
+
+No PR.
+No merge.
+No tag.
+
+============================================================
+23. SUCCESS HANDOFF
+============================================================
+
+If A03 succeeds, return:
+
+# PUBLICATION
+
+branch
+immutable D1 parent
+A03 implementation SHA
+remote SHA
+exact-SHA CI
+
+# A03 AUTHORITY
+
+authority schema
+authority SHA
+authorized attempt count
+consumed state
+
+# REVIEW
+
+review verdict
+review SHA
+
+# FORECAST
+
+semantic SHA before/after
+byte SHA before/after
+
+# OPENLIGADB ACQUISITION
+
+provider request count
+route receipt hashes
+source response identities
+typed final stage = COMPLETE
+
+# OUTCOME ARTIFACT
+
+schema
+semantic SHA
+fixture count
+10 final labels
+actual dates
+D+2 eligibility
+reconciliation status
+
+# SCORECARD
+
+three product aggregate metrics
+pairwise deltas
+event Brier metrics
+fixture-level comparison
+
+# INTERPRETATION
+
+descriptive only
+
+# STATUS
+
+PRIOR_L1_ONE_SHOT_CONSUMED
+PRIOR_L2_ONE_SHOT_CONSUMED
+PRIOR_L3_ONE_SHOT_CONSUMED
+PRIOR_L4_ONE_SHOT_CONSUMED
+PRIOR_L5_ONE_SHOT_CONSUMED
+PRIOR_L6_ONE_SHOT_CONSUMED
+PRIOR_L7_ONE_SHOT_CONSUMED
+PRIOR_L8_ONE_SHOT_CONSUMED
+NO_CURRENT_LIVE_AUTHORITY
+P01_FORECAST_UNCHANGED
+P01_A02_ONE_ATTEMPT_CONSUMED
+P01_A02_NOT_RETRIED
+P01_D1_FAILURE_LOCALISATION_ACTIVE
+P01_A03_ONE_ATTEMPT_AUTHORIZED
+P01_A03_ONE_ATTEMPT_CONSUMED
+P01_A03_COMPLETE
+OPENLIGADB_CANONICAL_LABEL_SOURCE
+PUBLIC_FALLBACK_OUTCOME_ARTIFACT_AUTHENTICATED
+P01_DESCRIPTIVE_PILOT_SCORED
+OPENFOOTBALL_RECONCILIATION_PENDING
+PARAMETER_MIXTURE_REMAINS_RESEARCH_ONLY
+NO_OPERATIONAL_DRAW_COUNT_SELECTED
+TEAM_STRENGTH_REMAINS_SHADOW_ONLY
+PROSPECTIVE_EVIDENCE_NOT_PROMOTION_DECISION
+NO_PRIVATE_PROVIDER_ACCESS_PERFORMED
+NO_PRODUCTION_ACTIVATION_PERFORMED
+
+End:
+
+    CURRENT_TEAM_STRENGTH_001V_P01_FALLBACK_A03_COMPLETE
+
+============================================================
+24. STOPPED HANDOFF
+============================================================
+
+If A03 fails at any point after authority is consumed, return instead:
+
+# PUBLICATION
+# A03 AUTHORITY
+# REVIEW
+# FORECAST IMMUTABILITY
+
+# TYPED FAILURE
+
+execution_stage
+failure_reason
+
+safe transport diagnostics
+safe admission diagnostics
+
+Explicitly state:
+
+    P01_A03_ONE_ATTEMPT_CONSUMED
+    P01_A03_STOPPED_TYPED
+    P01_A03_NO_RETRY_PERFORMED
+    P01_NOT_SCORED
+    P01_FORECAST_UNCHANGED
+    NO_SOURCE_SWITCH_PERFORMED
+
+Do NOT attempt remediation against the real provider in the same ticket.
+
+End:
+
+    CURRENT_TEAM_STRENGTH_001V_P01_FALLBACK_A03_STOPPED
