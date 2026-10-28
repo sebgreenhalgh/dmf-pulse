@@ -1,0 +1,23 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+    "tests/unit/evaluation/test_p01_metadata_candidate.py",
+    "tests/unit/evaluation/test_p01_synthetic_readiness.py",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "tests/unit/evaluation/test_p01_fallback_d1.py",
+    "tests/unit/evaluation/test_p01_fallback_a03.py",
+    "tests/unit/evaluation/test_p01_fallback_d2.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--tb=short",
+    "--basetemp",
+    "review_pack/ab-release-01"
+  ],
+  "started_at": "2026-10-28T23:05:20.191518+00:00",
+  "elapsed_seconds": 640.9814935999457,
+  "exit_code": 1,
+  "output_file": "AB-TARGETED-01.log",
+  "output_byte_sha256": "412a140c7e8285175bde3e561dd1d67a5b596a72e24da9c161d68f80e5170fbb"
+}

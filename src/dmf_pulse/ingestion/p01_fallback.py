@@ -248,7 +248,7 @@ def regulation_type(
         raise ReasonFailure(FailureReason.REGULATION_METADATA_AMBIGUOUS)
     global_row, league_row = candidates[0], finals[0]
     linked = _object(league_row["globalResultInfo"])
-    if linked.get("id") != global_row.get("id"):
+    if _integer(linked.get("id")) != _integer(global_row.get("id")):
         raise ReasonFailure(FailureReason.REGULATION_METADATA_DISAGREEMENT)
     try:
         result = RegulationResultType(

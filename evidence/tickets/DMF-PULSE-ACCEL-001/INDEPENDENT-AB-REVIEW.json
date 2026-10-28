@@ -1,0 +1,164 @@
+{
+  "adversarial_assessment": [
+    "Actual context and forecast excluded before candidate/readiness scoring; resealed actual forecast contexts are refused.",
+    "Observed descriptive-name presence/value is distinct from frozen canonical name and transient normalization is explicit.",
+    "Stable IDs, matchday, season, strict finality, regulation-result identity, oriented aliases, exact-ten and time gates remain in accepted kernels.",
+    "Strict operational name policy and consumed acquisition control modules are unchanged.",
+    "New CLI takes bounded local bytes, fails with a value-free refusal, makes no network request and emits only a distinctly classified synthetic receipt.",
+    "Pure accepted scorer and scorecard are reused internally; no actual prospective envelope leaves the new service.",
+    "Installed-wheel verification script exercises package isolation, strict and candidate commands, receipt roundtrip and operational-store rejection; execution of that script belongs to root release evidence.",
+    "Private optimisation, state transitions, scenario comparisons and private reporting are outside this AB review."
+  ],
+  "final_suite_start_files": {
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py": "ac160f8cea2bcd7b91bc9f9ba28d3d516caef69b96ccad8822c4994ca16f124a",
+    "scripts/verify_accel001_wheel.py": "884949a97b6a96003bbecf6f124ce9ff66c22c44750865e929e98225873268d8",
+    "src/dmf_pulse/cli/p01_fallback.py": "b2bf15d1f1e69b79178e0af22ea8e5809daacf0e9f4ca246429cdb654327be5c",
+    "src/dmf_pulse/cli/p01_synthetic.py": "4dc82512036fe2cb1f71fd75bed51d271c6828925b2a9a6140f6dfbf445db4b3",
+    "src/dmf_pulse/evaluation/p01_synthetic_readiness.py": "dfb8f44cefc3548b9d95eef495b7cdffe9fffd0b2a5fc65edba5eecc6df22b3f",
+    "src/dmf_pulse/ingestion/p01_fallback.py": "ea89002f04af67f052a1ad5069f71b6a2a618062f36dcfdfeaed775f6f296492",
+    "src/dmf_pulse/ingestion/p01_metadata_candidate.py": "f689e1fa599e40e90fb58caa3a38ba93a21b37f30c488bfd909af8c47258adee",
+    "tests/unit/evaluation/test_p01_metadata_candidate.py": "6a1fef584ff9a6336ecdf05ce33afc5189fa770faa08a5294ce6015320646922",
+    "tests/unit/evaluation/test_p01_synthetic_readiness.py": "3b04f45e2c36b23ce7fd1ad429ecd86c24cdddca80629d688e01aaf9c53c71db",
+    "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md": "c0a00b82244177dfc87797652021ff6e6116b3c404b70e4c480a330ad37a8a59"
+  },
+  "final_test_accounting": "95 full-run passes plus two repaired previously unsuccessful cases cover all 97 unique cases; the third targeted pass repeats duplicate-json. Production, CLI, wheel verifier and wrapper hashes are identical across the full run and remediation. Only the two identified test files changed.",
+  "final_unique_new_cases_verified": 97,
+  "findings": [
+    {
+      "finding": "Initial synthetic receipt validator excluded actual forecast hash but permitted the actual P01 context hash.",
+      "id": "AB-R01",
+      "remediation": "Validator now independently rejects both pinned hashes; explicit resealing regression covers the context boundary.",
+      "severity": "P2",
+      "status": "REMEDIATED"
+    },
+    {
+      "finding": "Initial candidate numerical-parity test compared hashes and counts without comparing numerical metric rows.",
+      "id": "AB-R02",
+      "remediation": "Test now captures accepted-scorer metrics.scores and compares exact rows for alternate, null and absent descriptive names.",
+      "severity": "P2",
+      "status": "REMEDIATED"
+    },
+    {
+      "finding": "Initial new orchestration matrix omitted malformed top-level data, body bounds, competing stable IDs, repeated provider IDs and rights-before-scoring checks.",
+      "id": "AB-R03",
+      "remediation": "Expanded final matrix covers these boundaries and CLI malformed/missing/oversized/time/candidate paths.",
+      "severity": "P2",
+      "status": "REMEDIATED"
+    },
+    {
+      "finding": "An oversized bytes parameter became a roughly half-megabyte pytest node identifier, causing Windows setup and teardown errors and excessive collection output.",
+      "id": "AB-R04",
+      "remediation": "Explicit duplicate-json and oversized-body test identifiers; both cases independently rerun successfully.",
+      "severity": "P2",
+      "status": "REMEDIATED"
+    },
+    {
+      "finding": "Initial ambiguous-club negative fixture assigned an identifier already belonging to the same home club, so it created valid evidence.",
+      "id": "AB-R05",
+      "remediation": "Fixture now asserts distinct away-club names and assigns one away provider ID to both; independently rerun successfully.",
+      "severity": "P3",
+      "status": "REMEDIATED"
+    },
+    {
+      "finding": "Initial negative context resealing produced synthetic Pydantic serializer warnings because nested fixtures were dictionaries.",
+      "id": "AB-R06",
+      "remediation": "Negative tests retain typed fixture objects; final run and remediation run had no reported serializer warnings.",
+      "severity": "P3",
+      "status": "REMEDIATED"
+    }
+  ],
+  "history_verification": {
+    "actual_p01_model_constructed": false,
+    "actual_p01_scored": false,
+    "historical_files_authenticated": 67,
+    "p01_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+    "p01_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a"
+  },
+  "immutable_parent": "5eee87d2ef477fad51548fe6e2207dbd5ed23097",
+  "implemented_defect_verified": "Previously accepted bool/float linked global result IDs now fail exact integer checks before equality. The linked-ID change is the only modification to the legacy projector module.",
+  "invariants": {
+    "a02_retry_enabled": false,
+    "a03_retry_enabled": false,
+    "a04_authority_created": false,
+    "actual_p01_model_constructed": false,
+    "actual_p01_scored": false,
+    "candidate_accepted_or_activated": false,
+    "candidate_operational_store_refused": true,
+    "legacy_diagnostic_reclassification": false,
+    "original_p01_and_historical_artifacts_unchanged": true,
+    "private_credentials_inspected": false,
+    "production_activation": false,
+    "provider_network_attempts": 0,
+    "score_metrics_or_model_parameters_changed": false,
+    "source_display_value_separate_from_canonical_label": true,
+    "synthetic_intermediate_outcomes_or_metrics_persisted_by_new_code": false,
+    "synthetic_receipt_operational_store_refused": true
+  },
+  "policy_verdict": "Separately versioned inactive synthetic candidate is defensible from retained nullable non-routing descriptive-name schema. Exact stable identifiers, strict legacy name policy, actual P01 context and forecast exclusions remain. Candidate acceptance and fresh one-shot A04 permission are absent.",
+  "release_gate_note": "Independent AB review clearance is separate from final installed-wheel execution, complete repository acceptance, exact-SHA CI, publication binding and human acceptance. Private-engine changes are outside this review.",
+  "release_gates_attested": false,
+  "remaining_conditions": [
+    "Live A03 mismatched field and value remain unknown; source final-result availability is not inferred.",
+    "Candidate metadata policy remains PROPOSED_UNAPPROVED and INACTIVE.",
+    "Actual A04 requires separate human decision, fresh one-shot controls and review/CI binding of its eventual implementation.",
+    "Synthetic checks establish engineering behaviour, not football forecast accuracy, calibration, model promotion or actual P01 evidence."
+  ],
+  "retained_swagger_byte_sha256": "ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b",
+  "reviewed_at": "2026-10-28T23:18:05.822227+00:00",
+  "reviewed_files": {
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py": "ac160f8cea2bcd7b91bc9f9ba28d3d516caef69b96ccad8822c4994ca16f124a",
+    "scripts/verify_accel001_wheel.py": "884949a97b6a96003bbecf6f124ce9ff66c22c44750865e929e98225873268d8",
+    "src/dmf_pulse/cli/p01_fallback.py": "b2bf15d1f1e69b79178e0af22ea8e5809daacf0e9f4ca246429cdb654327be5c",
+    "src/dmf_pulse/cli/p01_synthetic.py": "4dc82512036fe2cb1f71fd75bed51d271c6828925b2a9a6140f6dfbf445db4b3",
+    "src/dmf_pulse/evaluation/p01_synthetic_readiness.py": "dfb8f44cefc3548b9d95eef495b7cdffe9fffd0b2a5fc65edba5eecc6df22b3f",
+    "src/dmf_pulse/ingestion/p01_fallback.py": "ea89002f04af67f052a1ad5069f71b6a2a618062f36dcfdfeaed775f6f296492",
+    "src/dmf_pulse/ingestion/p01_metadata_candidate.py": "f689e1fa599e40e90fb58caa3a38ba93a21b37f30c488bfd909af8c47258adee",
+    "tests/unit/evaluation/test_p01_metadata_candidate.py": "9ec84f0d24120b6ebb26c489b59fd8639f8cc0649304c66e587f58e5b4d31107",
+    "tests/unit/evaluation/test_p01_synthetic_readiness.py": "f5cabb58dd065cc2e7fe0c9286157b78b660f2cc06cf21146d4eb6c9ed89e81a",
+    "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md": "c0a00b82244177dfc87797652021ff6e6116b3c404b70e4c480a330ad37a8a59"
+  },
+  "reviewer": "/root/accel_p01_audit",
+  "reviewer_implemented_source_or_tests": false,
+  "schema_version": "dmf-pulse-accel-001-independent-ab-review-v1",
+  "scope": "ACCEL-001 checkpoints A and B: inactive metadata candidate, synthetic offline pipeline, strict linked-result-ID correction, CLI and wheel verifier.",
+  "semantic_sha256": "e70b813bbc3fc689a8d19e544546b2770dbe9fb5bb41ac731bc4ff654ed3868d",
+  "test_runs": [
+    {
+      "errors": 0,
+      "failed": 0,
+      "id": "INITIAL",
+      "network_receipt": "review_pack/INDEPENDENT-P01-NETWORK-RECEIPT.json",
+      "network_receipt_byte_sha256": "d06bcd19c062b714e0ab696f9a724313f9baee75519429893a109e888dbf2899",
+      "passed": 197,
+      "scope": "Initial new modules plus inherited A02-D1 and A03-D2 tests; initial review findings subsequently remediated.",
+      "seconds": 226.91,
+      "warnings": 2
+    },
+    {
+      "command": "@'\nimport sys\nfrom pathlib import Path\nsys.argv=[\"offline_pytest.py\",\"-q\",\"--basetemp=review_pack/independent-p01-audit-002\",\"tests/unit/evaluation/test_p01_metadata_candidate.py\",\"tests/unit/evaluation/test_p01_synthetic_readiness.py\"]\npath=Path(\"evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py\")\nsource=path.read_text().replace(\"review_pack/OFFLINE-TEST-NETWORK-RECEIPT.json\",\"review_pack/INDEPENDENT-P01-FINAL-NETWORK-RECEIPT.json\")\nexec(compile(source,str(path),\"exec\"))\n'@ | .venv/Scripts/python.exe -",
+      "errors": 2,
+      "failed": 1,
+      "failure_note": "Oversized parameter caused setup/teardown errors; ambiguous_club fixture caused the assertion failure. Root broad-run evidence retains full tracebacks; this record preserves both failures and their causes.",
+      "id": "FROZEN_FULL_NEW",
+      "network_receipt": "review_pack/INDEPENDENT-P01-FINAL-NETWORK-RECEIPT.json",
+      "network_receipt_byte_sha256": "aff8d846fd1747e1dd4fdf36a79b530ae3b028f19e293f43457526cc75cd51e1",
+      "passed": 95,
+      "scope": "All 97 final new test cases before two test-fixture remediations.",
+      "seconds": 489.06,
+      "tool_output_original_token_count": 526423,
+      "tool_output_truncated": true
+    },
+    {
+      "command": "@'\nimport sys\nfrom pathlib import Path\nsys.argv=[\"offline_pytest.py\",\"-q\",\"--basetemp=review_pack/independent-p01-audit-003\",\"tests/unit/evaluation/test_p01_metadata_candidate.py::test_candidate_duplicate_json_or_oversize\",\"tests/unit/evaluation/test_p01_synthetic_readiness.py::test_downstream_independent_gate_failures[ambiguous_club]\"]\npath=Path(\"evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py\")\nsource=path.read_text().replace(\"review_pack/OFFLINE-TEST-NETWORK-RECEIPT.json\",\"review_pack/INDEPENDENT-P01-REMEDIATION-NETWORK-RECEIPT.json\")\nexec(compile(source,str(path),\"exec\"))\n'@ | .venv/Scripts/python.exe -",
+      "errors": 0,
+      "failed": 0,
+      "id": "TARGETED_REMEDIATION",
+      "network_receipt": "review_pack/INDEPENDENT-P01-REMEDIATION-NETWORK-RECEIPT.json",
+      "network_receipt_byte_sha256": "d06bcd19c062b714e0ab696f9a724313f9baee75519429893a109e888dbf2899",
+      "passed": 3,
+      "scope": "Both short-ID cases and corrected ambiguous-club case.",
+      "seconds": 56.7
+    }
+  ],
+  "verdict": "CLEAR_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+}

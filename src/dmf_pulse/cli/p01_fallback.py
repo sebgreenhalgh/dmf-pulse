@@ -7,6 +7,7 @@ from typing import Annotated
 import typer
 
 from dmf_pulse.cli.p01_a03 import execute_a03_command
+from dmf_pulse.cli.p01_synthetic import synthetic_readiness_command
 from dmf_pulse.evaluation.p01_fallback import (
     P01FallbackScoreV1,
     fallback_scorecard,
@@ -23,6 +24,7 @@ from dmf_pulse.ingestion.p01_fallback import PublicP01FallbackOutcomesV1
 
 fallback_app = typer.Typer(help="P01 descriptive fallback evidence; shadow only, no activation.")
 fallback_app.command("execute-a03")(execute_a03_command)
+fallback_app.command("synthetic-readiness")(synthetic_readiness_command)
 
 
 @fallback_app.command("context")

@@ -1,0 +1,20 @@
+{
+  "checkpoint": "AB",
+  "parent": "5eee87d",
+  "review_semantic_sha256": "e70b813bbc3fc689a8d19e544546b2770dbe9fb5bb41ac731bc4ff654ed3868d",
+  "local_regression": "370 passed; one invalid ambiguity test and one oversized-node-ID case repaired and passed in targeted reruns; final full CI pending",
+  "independent_new_cases": 97,
+  "installed_wheel": "PASS; strict and candidate public CLI; zero network; operational receipt rejection",
+  "mypy": "338 source files pass",
+  "p01_scored": false,
+  "candidate_state": "PROPOSED_UNAPPROVED_INACTIVE_SYNTHETIC_ONLY",
+  "a04_authority_created": false,
+  "provider_requests": 0,
+  "initial_setup_failure": "Default pytest temp-root permission denied before tests; subsequent invocations use explicit workspace basetemp",
+  "test_defects_preserved": [
+    "Oversized bytes parameter generated Windows environment-size failure; short pytest ids fixed it",
+    "Synthetic matches share home club; ambiguity test corrected to distinct away clubs"
+  ],
+  "release_status": "LOCAL_CHECKPOINT_READY_EXACT_SHA_CI_PENDING",
+  "semantic_sha256": "6a0f9d7c8275af43f721f214fb58bd2d080e4c4be63ee232ee927075c90cd52b"
+}

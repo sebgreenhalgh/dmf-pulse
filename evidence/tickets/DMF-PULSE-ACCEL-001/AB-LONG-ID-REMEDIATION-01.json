@@ -1,0 +1,20 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+    "tests/unit/evaluation/test_p01_metadata_candidate.py",
+    "-k",
+    "duplicate_json",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--tb=short",
+    "--basetemp",
+    "review_pack/ab-id-fixed"
+  ],
+  "started_at": "2026-10-28T23:09:43.932995+00:00",
+  "elapsed_seconds": 36.99928310001269,
+  "exit_code": 0,
+  "output_file": "AB-LONG-ID-REMEDIATION-01.log",
+  "output_byte_sha256": "b1d24773c0a9247090baf66af9d8fc866aead6e0bdf243d152217f097414e926"
+}

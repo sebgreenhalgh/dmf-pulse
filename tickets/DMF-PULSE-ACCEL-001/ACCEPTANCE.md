@@ -28,7 +28,7 @@ uv sync --all-groups --frozen --offline
 .venv/Scripts/python.exe -m ruff format --check .
 .venv/Scripts/python.exe -m ruff check .
 .venv/Scripts/python.exe -m mypy
-.venv/Scripts/python.exe review_pack/offline_pytest.py tests/unit/evaluation/test_p01_metadata_candidate.py tests/unit/evaluation/test_p01_synthetic_readiness.py tests/unit/evaluation/test_p01_fallback_a02.py tests/unit/evaluation/test_p01_fallback_d1.py tests/unit/evaluation/test_p01_fallback_a03.py tests/unit/evaluation/test_p01_fallback_d2.py -q -p no:cacheprovider
+.venv/Scripts/python.exe evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py tests/unit/evaluation/test_p01_metadata_candidate.py tests/unit/evaluation/test_p01_synthetic_readiness.py tests/unit/evaluation/test_p01_fallback_a02.py tests/unit/evaluation/test_p01_fallback_d1.py tests/unit/evaluation/test_p01_fallback_a03.py tests/unit/evaluation/test_p01_fallback_d2.py -q -p no:cacheprovider --basetemp review_pack/ab-release-01
 uv build --offline
 .venv/Scripts/python.exe scripts/verify_accel001_wheel.py
 .venv/Scripts/python.exe scripts/validate_repository.py

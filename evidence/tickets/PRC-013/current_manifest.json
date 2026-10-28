@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 864,
+      "bytes": 844,
       "path": ".gitattributes",
-      "sha256": "139dc817b9cb0b662c216a0b1e2422bca9ef1d981c9d0542307009d40dee7a2f"
+      "sha256": "3eba3df72b1254936a24dcd417202352126229ee43898dae05a80ee3998a00a4"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 205972,
+      "bytes": 206022,
       "path": "PLANS.md",
-      "sha256": "1ff22283eba6d38bffd057fba74cee04bf9275c3330c1e0ffe64ae15cf69042d"
+      "sha256": "4d0ccfe5e09cd60acf35f9bfa20d898717cca67b783451107edc701765f6aa96"
     },
     {
       "bytes": 2761,
@@ -2606,6 +2606,11 @@
       "sha256": "b8b552daa90e60fe562f260131bfcad725b8d183b2b46960823571b2d85e21c6"
     },
     {
+      "bytes": 4487,
+      "path": "scripts/verify_accel001_wheel.py",
+      "sha256": "884949a97b6a96003bbecf6f124ce9ff66c22c44750865e929e98225873268d8"
+    },
+    {
       "bytes": 20819,
       "path": "scripts/verify_current_markets_wheel.py",
       "sha256": "89004511ce9c2d43bdab391c87dd4ac65ed4c21288b7b307cd93c26407633873"
@@ -3261,9 +3266,14 @@
       "sha256": "97cc2eee6e98db825c6ade4c59676c6f595fa49daa22ce8122e9ac7d61a01b1c"
     },
     {
-      "bytes": 3494,
+      "bytes": 3635,
       "path": "src/dmf_pulse/cli/p01_fallback.py",
-      "sha256": "0ae2f2366669d70ef7ac049d75570f3347690993ab02c8a87ba5c08f401d3a7e"
+      "sha256": "b2bf15d1f1e69b79178e0af22ea8e5809daacf0e9f4ca246429cdb654327be5c"
+    },
+    {
+      "bytes": 2862,
+      "path": "src/dmf_pulse/cli/p01_synthetic.py",
+      "sha256": "4dc82512036fe2cb1f71fd75bed51d271c6828925b2a9a6140f6dfbf445db4b3"
     },
     {
       "bytes": 7428,
@@ -3534,6 +3544,11 @@
       "bytes": 3623,
       "path": "src/dmf_pulse/evaluation/p01_frozen_view.py",
       "sha256": "ee756a31cb9cde20b02f5a4f967623c25334b2629a86153990dd8c5b29f21a11"
+    },
+    {
+      "bytes": 5712,
+      "path": "src/dmf_pulse/evaluation/p01_synthetic_readiness.py",
+      "sha256": "dfb8f44cefc3548b9d95eef495b7cdffe9fffd0b2a5fc65edba5eecc6df22b3f"
     },
     {
       "bytes": 6307,
@@ -4071,9 +4086,9 @@
       "sha256": "8c16f4225bd120b386bd94e14d9ba36a18fdfacbaacdbb264bfffe1270146157"
     },
     {
-      "bytes": 17953,
+      "bytes": 17973,
       "path": "src/dmf_pulse/ingestion/p01_fallback.py",
-      "sha256": "25094df18bd537e9853077192975ecd48d9bbf3e932a59bb8dddbfeeec81b44b"
+      "sha256": "ea89002f04af67f052a1ad5069f71b6a2a618062f36dcfdfeaed775f6f296492"
     },
     {
       "bytes": 11762,
@@ -4099,6 +4114,11 @@
       "bytes": 2036,
       "path": "src/dmf_pulse/ingestion/p01_match_metadata.py",
       "sha256": "48d9d4f25421d0d5a02fba635950ecdac77a5407b76227c98d80e4ed655a47b1"
+    },
+    {
+      "bytes": 4655,
+      "path": "src/dmf_pulse/ingestion/p01_metadata_candidate.py",
+      "sha256": "f689e1fa599e40e90fb58caa3a38ba93a21b37f30c488bfd909af8c47258adee"
     },
     {
       "bytes": 608,
@@ -6096,6 +6116,16 @@
       "sha256": "d07de1f23698008584e81ac8207a31d6f347b192676134034cd99240362227d7"
     },
     {
+      "bytes": 7533,
+      "path": "tests/unit/evaluation/test_p01_metadata_candidate.py",
+      "sha256": "9ec84f0d24120b6ebb26c489b59fd8639f8cc0649304c66e587f58e5b4d31107"
+    },
+    {
+      "bytes": 10289,
+      "path": "tests/unit/evaluation/test_p01_synthetic_readiness.py",
+      "sha256": "f5cabb58dd065cc2e7fe0c9286157b78b660f2cc06cf21146d4eb6c9ed89e81a"
+    },
+    {
       "bytes": 9125,
       "path": "tests/unit/evaluation/test_point_probability_metrics.py",
       "sha256": "8cbeeddd702b9cabf30cfb4e4c7113bf5de79e041e02582942f7cb9486532823"
@@ -7666,19 +7696,24 @@
       "sha256": "c8ed400d3dd6f8f5391e517ca6459bec62af2d88edd032e0096426ff9bb86254"
     },
     {
-      "bytes": 2657,
+      "bytes": 2762,
       "path": "tickets/DMF-PULSE-ACCEL-001/ACCEPTANCE.md",
-      "sha256": "8f3cbdf384d560e95bedc34736ac34a2966b051e3e758c86f5a4bbbbb4ba0996"
+      "sha256": "b5b7cdb3fe7bd0b3fc0565d88f76720498c9437d4b665310bb6b3770402ea662"
     },
     {
-      "bytes": 3514,
+      "bytes": 3462,
       "path": "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md",
-      "sha256": "427174aa091294d89565b43cd5e4286ce4f6dae3877fbbd3ac81176d4dba8957"
+      "sha256": "c0a00b82244177dfc87797652021ff6e6116b3c404b70e4c480a330ad37a8a59"
     },
     {
-      "bytes": 8913,
+      "bytes": 5637,
+      "path": "tickets/DMF-PULSE-ACCEL-001/P01-POLICY-AND-READINESS.md",
+      "sha256": "92837d46b4b703c9e1de3db39e1c5d42360c1e6a453aea525de02e88d78e6684"
+    },
+    {
+      "bytes": 8695,
       "path": "tickets/DMF-PULSE-ACCEL-001/gap-register.json",
-      "sha256": "3c202052457f44f3f7b4ec013c47bf0a027956714511c74244940e8e431ac3d9"
+      "sha256": "e886da0669a6ce2568e0ed27ce7948db59367ab5b7789a9e8e08418aa0bff49f"
     },
     {
       "bytes": 537,

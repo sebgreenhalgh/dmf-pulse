@@ -1,0 +1,12 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "mypy"
+  ],
+  "started_at": "2026-10-28T23:06:00.616438+00:00",
+  "elapsed_seconds": 0.8264989999588579,
+  "exit_code": 0,
+  "output_file": "AB-MYPY-01.log",
+  "output_byte_sha256": "b9da1474f5177073060d6ee5fe2205d38fb123807c50c6f805bf38087259a278"
+}
