@@ -1,0 +1,17 @@
+{
+  "attempt_number": 1,
+  "authority_sha256": "1b9cde4d72416dc0ada2c20bb60da097106046033d00b4ed28c95c88e7676400",
+  "consumed": true,
+  "consumed_at": "2026-10-28T17:43:11.693169Z",
+  "exact_sha_review_binding_sha256": "885af75b90a8aa4813867e08d348e31811fcb5f7cd0c7478337f8cc0e30967aa",
+  "implementation_sha": "dde795c85f68d87578d3432576dac5d600794a32",
+  "independent_review_sha256": "32fede487c638177425731e7ab09cf59dcd216f4e36780ccdc51e2770deae025",
+  "maximum_attempts": 1,
+  "production_active": false,
+  "provider_requests_before_seal": 0,
+  "retry_permitted": false,
+  "schema_version": "public-team-strength-p01-a03-consumption-v1",
+  "semantic_sha256": "bd64193a985b1629d0b1cec68ddc6d539e1719d814d0ab52a1e5f6dd2e03d3c9",
+  "source": "OpenLigaDB",
+  "source_switch_permitted": false
+}
