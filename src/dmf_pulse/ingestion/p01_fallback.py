@@ -30,6 +30,7 @@ from dmf_pulse.ingestion.p01_fallback_diagnostics import (
     ReasonFailure,
     RouteClass,
 )
+from dmf_pulse.ingestion.p01_match_metadata import require_match_metadata
 
 
 class SourceReceipt(FrozenEvidence):
@@ -282,17 +283,7 @@ def project_final_facts(
     projected: list[ProjectedFinalFact] = []
     for item in matches:
         row = _object(item)
-        if (
-            row.get("leagueId") != context.league_id
-            or type(row.get("leagueId")) is not int
-            or row.get("leagueShortcut") != context.league_shortcut
-            or row.get("leagueSeason") != context.league_season
-            or type(row.get("leagueSeason")) is not int
-            or row.get("leagueName") != context.league_name
-            or _object(row.get("group")).get("groupOrderID") != context.matchday
-            or type(_object(row.get("group")).get("groupOrderID")) is not int
-        ):
-            raise ReasonFailure(FailureReason.MATCHDAY_RESPONSE_INVALID)
+        require_match_metadata(row, context=context, diagnostics=diagnostics)
         if row.get("matchIsFinished") is not True:
             raise ReasonFailure(FailureReason.MATCH_NOT_FINISHED)
         if diagnostics is not None:

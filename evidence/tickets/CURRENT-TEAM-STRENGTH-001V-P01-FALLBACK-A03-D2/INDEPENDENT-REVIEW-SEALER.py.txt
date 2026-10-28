@@ -1,0 +1,204 @@
+"""Seal the fresh independent offline D2 review and exact test evidence."""
+
+import hashlib
+import json
+import socket
+import subprocess
+from datetime import UTC, datetime
+from pathlib import Path
+
+
+def denied(*args, **kwargs):
+    raise AssertionError("Independent D2 sealing is offline")
+
+
+socket.create_connection = socket.getaddrinfo = socket.socket.connect = denied
+socket.socket.connect_ex = socket.socket.sendto = denied
+
+from dmf_pulse.evaluation.p01_a03_authority import authenticate_a03_review
+from dmf_pulse.ingestion.openfootball.team_strength_data import StrengthEvidenceError
+
+ROOT = Path.cwd()
+PUBLIC = Path("C:/Users/sebgr/Documents/dmf-pulse/artifacts/public-prospective")
+TICKET = "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2"
+OUT = ROOT / "evidence/tickets" / TICKET
+PARENT = "dde795c85f68d87578d3432576dac5d600794a32"
+
+
+def digest(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def canonical(value):
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+
+
+def sealed(path):
+    value = json.loads(path.read_bytes())
+    body = dict(value)
+    expected = body.pop("semantic_sha256")
+    assert digest(canonical(body)) == expected, str(path)
+    return value
+
+
+def write(name, value):
+    value["semantic_sha256"] = digest(canonical(value))
+    with (OUT / name).open("x", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(value, sort_keys=True, ensure_ascii=False, indent=2) + "\n")
+    return value["semantic_sha256"]
+
+
+inventory = sealed(OUT / "HISTORICAL-INVENTORY.json")
+supplement = sealed(OUT / "PROTECTED-FILES-SUPPLEMENT.json")
+count = 0
+for dirname, files in inventory["original_artifacts"].items():
+    for name, expected in files.items():
+        assert digest((PUBLIC / dirname / name).read_bytes()) == expected
+        count += 1
+assert count == 67
+protected = inventory["protected_files"] | supplement["files"]
+assert len(protected) == 17
+for name, expected in protected.items():
+    assert digest((ROOT / name).read_bytes()) == expected
+    original = subprocess.run(
+        ["git", "show", PARENT + ":" + name], check=True, capture_output=True
+    ).stdout
+    assert digest(original) == expected, name
+
+swagger = PUBLIC / (
+    "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01/rights-source-bytes/"
+    "ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b"
+)
+assert digest(swagger.read_bytes()) == swagger.name
+assert len(swagger.read_bytes()) == 44677
+schema = json.loads(swagger.read_bytes())
+schema_evidence = sealed(OUT / "RETAINED-SCHEMA-EVIDENCE.json")
+for pointer, expected in schema_evidence["json_pointer_excerpts"].items():
+    value = schema
+    for key in pointer.lstrip("/").split("/"):
+        value = value[key.replace("~1", "/").replace("~0", "~")]
+    assert value == expected, pointer
+
+a03 = PUBLIC / "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03"
+diagnostic = sealed(a03 / (
+    "public-team-strength-p01-fallback-stopped-diagnostic-v1/"
+    "db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2.json"
+))
+handoff = sealed(a03 / (
+    "public-team-strength-p01-fallback-a03-execution-handoff-v1/"
+    "d2c13225fb40ef290501ad4ffd51e921c55c86dc0924df9674e9672d5ed415b2.json"
+))
+assert handoff["diagnostic"] == diagnostic
+assert diagnostic["stage"] == "PROJECT_FINAL_FACTS"
+assert diagnostic["reason"] == "MATCHDAY_RESPONSE_INVALID"
+assert diagnostic["diagnostics"]["provider_match_rows"] == 10
+assert diagnostic["diagnostics"]["finished_match_rows"] == 0
+try:
+    authenticate_a03_review(
+        ROOT / "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/INDEPENDENT-REVIEW.json",
+        a03 / "review-bindings/885af75b90a8aa4813867e08d348e31811fcb5f7cd0c7478337f8cc0e30967aa.json",
+        implementation_root=ROOT,
+    )
+except StrengthEvidenceError:
+    old_review_refused = True
+else:
+    raise AssertionError("Archived A03 review must not authorize changed D2 code")
+
+forecast_path = PUBLIC / (
+    "CURRENT-TEAM-STRENGTH-001V-P01/public-team-strength-prospective/"
+    "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a.json"
+)
+forecast_bytes = forecast_path.read_bytes()
+assert digest(forecast_bytes) == "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee"
+forecast = sealed(forecast_path)
+
+command = json.loads((ROOT / "review_pack/INDEPENDENT-D2-TEST-COMMAND.json").read_bytes())
+assert command["exit_code"] == 0 and command["denied_network_attempts"] == 0
+assert b"198 passed" in (ROOT / "review_pack/INDEPENDENT-D2-stdout.log").read_bytes().replace(b"\x00", b"")
+copied = {}
+for source, destination in [
+    ("review_pack/independent_d2_tests.py", "INDEPENDENT-TEST-DRIVER.py.txt"),
+    ("review_pack/INDEPENDENT-D2-stdout.log", "INDEPENDENT-stdout.log"),
+    ("review_pack/INDEPENDENT-D2-stderr.log", "INDEPENDENT-stderr.log"),
+    ("review_pack/seal_independent_d2_review.py", "INDEPENDENT-REVIEW-SEALER.py.txt"),
+]:
+    raw = (ROOT / source).read_bytes()
+    assert len(raw) <= 1048576
+    with (OUT / destination).open("xb") as handle:
+        handle.write(raw)
+    copied[destination] = digest(raw)
+command.update({"schema_version": "p01-a03-d2-independent-test-command-v1", "tests_passed": 198, "evidence_files": copied})
+command_sha = write("INDEPENDENT-TEST-COMMAND.json", command)
+
+questions = [
+    ("The actual failed code path was identified", "YES. At the immutable parent the only explicit MATCHDAY_RESPONSE_INVALID exits are a non-list top level and the composite per-row metadata gate. The authenticated ten-row counter rules out the first. Zero finished rows plus this reason identifies the first row's metadata gate before finality evaluation; malformed row/group objects use a separate reason if reached."),
+    ("No exact observed metadata value was fabricated", "YES. The exact failed predicate and value are explicitly unknown. Synthetic alternate names and corrupt fields are labelled synthetic and never attributed to A03. Retained response hashes are not treated as recoverable payloads."),
+    ("Zero finished rows were not incorrectly interpreted", "YES. The counter increments only after metadata validation and matchIsFinished=true. Zero proves no row passed those gates, not that the provider has no final results. A03 does not establish final-result availability."),
+    ("Every source metadata check has an explicit purpose", "YES. The contract maps leagueId to governed competition ID, shortcut to route competition selector, Match season to the target season and group order to matchday. leagueName equality is explicitly a retained legacy compatibility restriction; Match and League season schemas are distinguished."),
+    ("Canonical identity protections remain intact", "YES. Exact league ID, shortcut, integer season and integer matchday are retained, with no coercion. Exact-ten oriented frozen aliases, provider club uniqueness, finality/result checks, timing, persistence and D+2 gates are unchanged. Reordering preserves outcomes; ambiguous mappings fail closed."),
+    ("Descriptive fields are not improperly treated as identity keys", "YES within this offline scope. Nullable/nonrouting leagueName is classified as potentially descriptive by explicit inference, not asserted to be a canonical key. Its existing equality guard remains to preserve the accepted policy while removing it is PROPOSED_UNAPPROVED. Live compatibility cannot be claimed from the retained schema alone."),
+    ("No data-dependent model or scoring change occurred", "YES. Runtime changes are restricted to metadata diagnostics and safe schema serialization. Protected scoring/context/policy files match the immutable parent. Full synthetic outcome, score, scorecard and metric equivalence regressions pass without actual P01 evaluation."),
+    ("All synthetic failure cases pass", "YES. Independently reran all 49 D2 cases plus 149 D1/A03 cases: 198 passed. The matrix covers independent missing/wrong-type/mismatch, scalar coercion refusal, group shape, alternate names, precedence, finality, completed regulation results, reordering, ambiguity, hash compatibility, closed fields and stage/reason binding. The normal full release/CI remains a separate required gate."),
+    ("P01 remains immutable", "YES. Independently authenticated all 67 historical external files and 17 protected repository files. Actual P01 was read only as bytes and canonical JSON; both pinned hashes match. No model construction, forecast generation, fitting, draw generation or actual scoring occurred."),
+    ("No provider access occurred", "YES. The independent test process globally denied socket/DNS access and recorded zero attempts. Offline evidence used only authenticated retained Swagger and sealed historical artifacts. No provider, FPL, Odds or credential access was performed."),
+    ("No A04 authority was created", "YES. D2 ticket maximum_provider_attempts=0 and a04_authority_created=false. There are no authority/transport/CLI additions. A02/A03 consumption controls are unchanged, and the archived A03 review is independently confirmed to reject the changed D2 source."),
+    ("No production activation occurred", "YES. No promotion, model-policy, scoring-policy or activation implementation changed. Team strength remains shadow only and parameter mixture research only. Offline review confers no acquisition or production authority."),
+]
+
+paths = [
+    "src/dmf_pulse/ingestion/p01_fallback.py",
+    "src/dmf_pulse/ingestion/p01_fallback_diagnostics.py",
+    "src/dmf_pulse/ingestion/p01_match_metadata.py",
+    "scripts/verify_p01_fallback_a02_wheel.py",
+    "tests/unit/evaluation/test_p01_fallback_d2.py",
+    "tests/fixtures/evaluation/a03_stopped_metadata_gate.json",
+    "tests/unit/evaluation/test_p01_fallback_d1.py",
+    "tests/unit/evaluation/test_p01_fallback_a03.py",
+    "tests/unit/evaluation/test_p01_fallback_a02.py",
+    "tests/unit/evaluation/p01_d1_test_support.py",
+    "tests/fixtures/evaluation/a02_d1_parent_semantics.json",
+    "tickets/" + TICKET + "/CONTRACT.md",
+    "tickets/" + TICKET + "/ACCEPTANCE.md",
+    "tickets/" + TICKET + "/ticket.yaml",
+    "evidence/tickets/" + TICKET + "/HUMAN-AUTHORIZATION.txt",
+    "evidence/tickets/" + TICKET + "/HISTORICAL-INVENTORY.json",
+    "evidence/tickets/" + TICKET + "/PROTECTED-FILES-SUPPLEMENT.json",
+    "evidence/tickets/" + TICKET + "/RETAINED-SCHEMA-EVIDENCE.json",
+] + list(protected)
+assert len(paths) == len(set(paths))
+report = {
+    "schema_version": "p01-a03-d2-independent-offline-review-v1",
+    "ticket_id": TICKET,
+    "reviewer_identity": "/root/a03_d2_independent_review",
+    "reviewed_at": datetime.now(UTC).isoformat(),
+    "immutable_parent": PARENT,
+    "verdict": "CLEAR_FOR_P01_A03_D2_OFFLINE_DIAGNOSTIC_PUBLICATION",
+    "questions": [{"number": i, "question": q, "answer": "YES", "evidence": e} for i, (q, e) in enumerate(questions, 1)],
+    "findings": [],
+    "unresolved_p0": 0,
+    "unresolved_p1": 0,
+    "unresolved_material_p2": 0,
+    "compatibility_proposal_status": "PROPOSED_UNAPPROVED",
+    "unresolved_live_schema": ["Exact A03 failed metadata field/value not retained", "Current provider schema not accessed", "No final-result availability inference is warranted", "Removing display-name equality requires separately approved evidence and governance"],
+    "historical_files_authenticated": count,
+    "protected_files_authenticated": len(protected),
+    "original_a03_diagnostic_sha256": diagnostic["semantic_sha256"],
+    "original_a03_handoff_sha256": handoff["semantic_sha256"],
+    "old_a03_review_rejected_for_d2": old_review_refused,
+    "forecast_semantic_sha256": forecast["semantic_sha256"],
+    "forecast_byte_sha256": digest(forecast_bytes),
+    "test_command_sha256": command_sha,
+    "independent_tests_passed": 198,
+    "provider_requests": 0,
+    "credentials_inspected": 0,
+    "actual_p01_scoring_performed": False,
+    "a02_attempt_consumed": True,
+    "a03_attempt_consumed": True,
+    "a04_authority_created": False,
+    "execution_authorized": False,
+    "production_active": False,
+    "publication_gate": "Required local release checks, full exact-SHA CI, remote equality and final immutable publication receipt must pass separately before final completion.",
+    "files": [{"path": name, "byte_sha256": digest((ROOT / name).read_bytes())} for name in sorted(paths)],
+}
+report_sha = write("INDEPENDENT-REVIEW.json", report)
+print(json.dumps({"verdict": report["verdict"], "review_sha256": report_sha, "test_command_sha256": command_sha, "bound_files": len(paths), "tests_passed": 198, "historical_files": count, "protected_files": len(protected)}, sort_keys=True))

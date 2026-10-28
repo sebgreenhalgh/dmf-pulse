@@ -99,12 +99,34 @@ safe = json.loads(denied_attempt.stdout)
 assert safe['stage'] == 'AUTHENTICATE_REVIEW' and safe['reason'] == 'REVIEW_INVALID'
 assert safe['diagnostics']['provider_requests_attempted'] == 0
 assert not Path(a03.ticket).exists()
+from dmf_pulse.ingestion.p01_match_metadata import require_match_metadata
+from dmf_pulse.ingestion.p01_fallback_diagnostics import (
+    DiagnosticProgress, MetadataField, MetadataCategory, SafeDiagnostics,
+)
+assert 'metadata_failure' not in SafeDiagnostics().model_dump()
+progress = DiagnosticProgress()
+try:
+    progress.run(ExecutionStage.PROJECT_FINAL_FACTS, FailureReason.MATCHDAY_RESPONSE_INVALID,
+        lambda: require_match_metadata({'leagueId':5996,'leagueShortcut':'pl',
+            'leagueSeason':2026,'leagueName':'SYNTHETIC_ALTERNATE_NAME','group':{'groupOrderID':6}},
+            context=context,diagnostics=progress))
+except P01FallbackExecutionFailure as failure:
+    assert failure.reason == FailureReason.METADATA_DISPLAY_NAME_INVALID
+    assert failure.diagnostics.metadata_failure.field == MetadataField.DISPLAY_NAME
+    assert failure.diagnostics.metadata_failure.category == MetadataCategory.MISMATCH
+    record = stopped_record(failure,started_at=now,stopped_at=now,
+        context_sha256=context.semantic_sha256,one_attempt_consumed=True)
+    assert StoppedExecutionDiagnostic.model_validate_json(record.model_dump_json()) == record
+    assert 'SYNTHETIC_ALTERNATE_NAME' not in record.model_dump_json()
+else:
+    raise AssertionError('D2 must preserve legacy name restriction')
 print(json.dumps({'status':'PASS','installed_import':True,'packaged_context_and_rights':True,
     'public_context_command':True,'typed_fallback_roundtrip':True,'full_metric_report_replay':True,
     'nongenerative_frozen_view_scoring':True,
     'd1_packaged_consumption':True,'d1_consumed_authority_blocked':True,
     'd1_safe_stopped_roundtrip':True,'d1_default_transport_blocked':True,
     'a03_packaged_authority':True,'a03_public_command_precheck_no_network':True,
+    'd2_typed_metadata_boundary':True,'d2_legacy_admission_preserved':True,
     'fixture_count':10,'product_count':3,'provider_calls':0,'production_active':False}))
 """
 

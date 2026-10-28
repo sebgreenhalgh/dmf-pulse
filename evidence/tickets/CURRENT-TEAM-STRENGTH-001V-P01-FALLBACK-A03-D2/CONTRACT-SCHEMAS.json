@@ -1,0 +1,834 @@
+{
+  "SafeDiagnostics": {
+    "$defs": {
+      "ContentTypeClass": {
+        "enum": [
+          "JSON",
+          "TEXT_JSON",
+          "TEXT_PLAIN",
+          "MISSING",
+          "OTHER"
+        ],
+        "title": "ContentTypeClass",
+        "type": "string"
+      },
+      "MetadataCategory": {
+        "enum": [
+          "MISSING",
+          "WRONG_TYPE",
+          "MISMATCH"
+        ],
+        "title": "MetadataCategory",
+        "type": "string"
+      },
+      "MetadataField": {
+        "enum": [
+          "leagueId",
+          "leagueShortcut",
+          "leagueSeason",
+          "leagueName",
+          "group",
+          "group.groupOrderID"
+        ],
+        "title": "MetadataField",
+        "type": "string"
+      },
+      "RouteClass": {
+        "enum": [
+          "GLOBAL_RESULT_TYPES",
+          "LEAGUE_RESULT_INFO",
+          "MATCHDAY_DATA"
+        ],
+        "title": "RouteClass",
+        "type": "string"
+      },
+      "SafeMetadataFailure": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/$defs/MetadataCategory"
+          },
+          "classification": {
+            "const": "METADATA_VALIDATION_FAILED",
+            "default": "METADATA_VALIDATION_FAILED",
+            "title": "Classification",
+            "type": "string"
+          },
+          "field": {
+            "$ref": "#/$defs/MetadataField"
+          }
+        },
+        "required": [
+          "field",
+          "category"
+        ],
+        "title": "SafeMetadataFailure",
+        "type": "object"
+      },
+      "SafeRequestReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "content_type_class": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ContentTypeClass"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "digest_scope": {
+            "const": "OBSERVED_BYTES",
+            "default": "OBSERVED_BYTES",
+            "title": "Digest Scope",
+            "type": "string"
+          },
+          "http_status_code": {
+            "anyOf": [
+              {
+                "maximum": 599,
+                "minimum": 100,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Http Status Code"
+          },
+          "request_started_at": {
+            "format": "date-time",
+            "title": "Request Started At",
+            "type": "string"
+          },
+          "response_bytes": {
+            "default": 0,
+            "maximum": 524289,
+            "minimum": 0,
+            "title": "Response Bytes",
+            "type": "integer"
+          },
+          "response_complete": {
+            "default": false,
+            "title": "Response Complete",
+            "type": "boolean"
+          },
+          "response_received_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Response Received At"
+          },
+          "response_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Response Sha256"
+          },
+          "route_class": {
+            "$ref": "#/$defs/RouteClass"
+          },
+          "strict_json_valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Strict Json Valid"
+          }
+        },
+        "required": [
+          "route_class",
+          "request_started_at"
+        ],
+        "title": "SafeRequestReceipt",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "admitted_outcome_count": {
+        "default": 0,
+        "maximum": 10,
+        "minimum": 0,
+        "title": "Admitted Outcome Count",
+        "type": "integer"
+      },
+      "finished_match_rows": {
+        "default": 0,
+        "maximum": 10,
+        "minimum": 0,
+        "title": "Finished Match Rows",
+        "type": "integer"
+      },
+      "last_route_class": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/RouteClass"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "metadata_failure": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/SafeMetadataFailure"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "projected_fact_count": {
+        "default": 0,
+        "maximum": 10,
+        "minimum": 0,
+        "title": "Projected Fact Count",
+        "type": "integer"
+      },
+      "provider_match_rows": {
+        "anyOf": [
+          {
+            "maximum": 524288,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Provider Match Rows"
+      },
+      "provider_requests_attempted": {
+        "default": 0,
+        "maximum": 3,
+        "minimum": 0,
+        "title": "Provider Requests Attempted",
+        "type": "integer"
+      },
+      "provider_requests_completed": {
+        "default": 0,
+        "maximum": 3,
+        "minimum": 0,
+        "title": "Provider Requests Completed",
+        "type": "integer"
+      },
+      "regulation_global_candidate_count": {
+        "anyOf": [
+          {
+            "maximum": 524288,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Regulation Global Candidate Count"
+      },
+      "regulation_league_candidate_count": {
+        "anyOf": [
+          {
+            "maximum": 524288,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Regulation League Candidate Count"
+      },
+      "regulation_metadata_resolved": {
+        "default": false,
+        "title": "Regulation Metadata Resolved",
+        "type": "boolean"
+      },
+      "regulation_result_rows": {
+        "default": 0,
+        "maximum": 524288,
+        "minimum": 0,
+        "title": "Regulation Result Rows",
+        "type": "integer"
+      },
+      "request_receipts": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/SafeRequestReceipt"
+        },
+        "maxItems": 3,
+        "title": "Request Receipts",
+        "type": "array"
+      },
+      "uniquely_mapped_fixture_count": {
+        "default": 0,
+        "maximum": 10,
+        "minimum": 0,
+        "title": "Uniquely Mapped Fixture Count",
+        "type": "integer"
+      }
+    },
+    "title": "SafeDiagnostics",
+    "type": "object"
+  },
+  "SafeMetadataFailure": {
+    "$defs": {
+      "MetadataCategory": {
+        "enum": [
+          "MISSING",
+          "WRONG_TYPE",
+          "MISMATCH"
+        ],
+        "title": "MetadataCategory",
+        "type": "string"
+      },
+      "MetadataField": {
+        "enum": [
+          "leagueId",
+          "leagueShortcut",
+          "leagueSeason",
+          "leagueName",
+          "group",
+          "group.groupOrderID"
+        ],
+        "title": "MetadataField",
+        "type": "string"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "category": {
+        "$ref": "#/$defs/MetadataCategory"
+      },
+      "classification": {
+        "const": "METADATA_VALIDATION_FAILED",
+        "default": "METADATA_VALIDATION_FAILED",
+        "title": "Classification",
+        "type": "string"
+      },
+      "field": {
+        "$ref": "#/$defs/MetadataField"
+      }
+    },
+    "required": [
+      "field",
+      "category"
+    ],
+    "title": "SafeMetadataFailure",
+    "type": "object"
+  },
+  "StoppedExecutionDiagnostic": {
+    "$defs": {
+      "ContentTypeClass": {
+        "enum": [
+          "JSON",
+          "TEXT_JSON",
+          "TEXT_PLAIN",
+          "MISSING",
+          "OTHER"
+        ],
+        "title": "ContentTypeClass",
+        "type": "string"
+      },
+      "ExecutionStage": {
+        "enum": [
+          "LOAD_CONTEXT",
+          "AUTHENTICATE_RIGHTS",
+          "AUTHENTICATE_REVIEW",
+          "AUTHENTICATE_FORECAST",
+          "VALIDATE_ACQUISITION_ROOT",
+          "SEAL_ONE_ATTEMPT_MARKER",
+          "FETCH_GLOBAL_RESULT_TYPES",
+          "FETCH_LEAGUE_RESULT_INFO",
+          "RESOLVE_REGULATION_RESULT_TYPE",
+          "FETCH_MATCHDAY_RESPONSE",
+          "PROJECT_FINAL_FACTS",
+          "ADMIT_EXACT_TEN",
+          "PERSIST_OUTCOME_ARTIFACT",
+          "VALIDATE_D_PLUS_2",
+          "COMPLETE"
+        ],
+        "title": "ExecutionStage",
+        "type": "string"
+      },
+      "FailureReason": {
+        "enum": [
+          "CONTEXT_INVALID",
+          "RIGHTS_IDENTITY_MISMATCH",
+          "REVIEW_INVALID",
+          "FORECAST_IDENTITY_MISMATCH",
+          "ACQUISITION_ROOT_INVALID",
+          "ONE_ATTEMPT_ALREADY_CONSUMED",
+          "MARKER_PERSISTENCE_FAILED",
+          "TRANSPORT_ROUTE_REFUSED",
+          "TRANSPORT_STATUS_OR_CONTENT_TYPE_REFUSED",
+          "TRANSPORT_RESPONSE_TOO_LARGE",
+          "TRANSPORT_TIMEOUT",
+          "TRANSPORT_UNAVAILABLE",
+          "TRANSPORT_TRUNCATED",
+          "PROVIDER_JSON_INVALID",
+          "REGULATION_METADATA_AMBIGUOUS",
+          "REGULATION_METADATA_DISAGREEMENT",
+          "MATCHDAY_RESPONSE_INVALID",
+          "MATCHDAY_FIXTURE_COUNT_INVALID",
+          "METADATA_LEAGUE_ID_INVALID",
+          "METADATA_LEAGUE_SHORTCUT_INVALID",
+          "METADATA_LEAGUE_SEASON_INVALID",
+          "METADATA_DISPLAY_NAME_INVALID",
+          "METADATA_MATCHDAY_INVALID",
+          "MATCH_NOT_FINISHED",
+          "REGULATION_RESULT_MISSING_OR_AMBIGUOUS",
+          "REGULATION_RESULT_TYPE_MISMATCH",
+          "EXCEPTIONAL_RESULT_REFUSED",
+          "PLAYED_TIMESTAMP_MISSING_OR_INVALID",
+          "PROVIDER_FIELD_TYPE_INVALID",
+          "EXACT_TEN_INCOMPLETE",
+          "ORIENTED_MAPPING_AMBIGUOUS",
+          "PROVIDER_CLUB_IDENTITY_AMBIGUOUS",
+          "FALLBACK_ADMISSION_INVALID",
+          "PERSISTENCE_FAILED",
+          "D_PLUS_2_NOT_COMPLETE",
+          "UNKNOWN_P01_OUTCOME_FAILURE"
+        ],
+        "title": "FailureReason",
+        "type": "string"
+      },
+      "MetadataCategory": {
+        "enum": [
+          "MISSING",
+          "WRONG_TYPE",
+          "MISMATCH"
+        ],
+        "title": "MetadataCategory",
+        "type": "string"
+      },
+      "MetadataField": {
+        "enum": [
+          "leagueId",
+          "leagueShortcut",
+          "leagueSeason",
+          "leagueName",
+          "group",
+          "group.groupOrderID"
+        ],
+        "title": "MetadataField",
+        "type": "string"
+      },
+      "RouteClass": {
+        "enum": [
+          "GLOBAL_RESULT_TYPES",
+          "LEAGUE_RESULT_INFO",
+          "MATCHDAY_DATA"
+        ],
+        "title": "RouteClass",
+        "type": "string"
+      },
+      "SafeDiagnostics": {
+        "additionalProperties": false,
+        "properties": {
+          "admitted_outcome_count": {
+            "default": 0,
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Admitted Outcome Count",
+            "type": "integer"
+          },
+          "finished_match_rows": {
+            "default": 0,
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Finished Match Rows",
+            "type": "integer"
+          },
+          "last_route_class": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/RouteClass"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "metadata_failure": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SafeMetadataFailure"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "projected_fact_count": {
+            "default": 0,
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Projected Fact Count",
+            "type": "integer"
+          },
+          "provider_match_rows": {
+            "anyOf": [
+              {
+                "maximum": 524288,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Provider Match Rows"
+          },
+          "provider_requests_attempted": {
+            "default": 0,
+            "maximum": 3,
+            "minimum": 0,
+            "title": "Provider Requests Attempted",
+            "type": "integer"
+          },
+          "provider_requests_completed": {
+            "default": 0,
+            "maximum": 3,
+            "minimum": 0,
+            "title": "Provider Requests Completed",
+            "type": "integer"
+          },
+          "regulation_global_candidate_count": {
+            "anyOf": [
+              {
+                "maximum": 524288,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Regulation Global Candidate Count"
+          },
+          "regulation_league_candidate_count": {
+            "anyOf": [
+              {
+                "maximum": 524288,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Regulation League Candidate Count"
+          },
+          "regulation_metadata_resolved": {
+            "default": false,
+            "title": "Regulation Metadata Resolved",
+            "type": "boolean"
+          },
+          "regulation_result_rows": {
+            "default": 0,
+            "maximum": 524288,
+            "minimum": 0,
+            "title": "Regulation Result Rows",
+            "type": "integer"
+          },
+          "request_receipts": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SafeRequestReceipt"
+            },
+            "maxItems": 3,
+            "title": "Request Receipts",
+            "type": "array"
+          },
+          "uniquely_mapped_fixture_count": {
+            "default": 0,
+            "maximum": 10,
+            "minimum": 0,
+            "title": "Uniquely Mapped Fixture Count",
+            "type": "integer"
+          }
+        },
+        "title": "SafeDiagnostics",
+        "type": "object"
+      },
+      "SafeMetadataFailure": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/$defs/MetadataCategory"
+          },
+          "classification": {
+            "const": "METADATA_VALIDATION_FAILED",
+            "default": "METADATA_VALIDATION_FAILED",
+            "title": "Classification",
+            "type": "string"
+          },
+          "field": {
+            "$ref": "#/$defs/MetadataField"
+          }
+        },
+        "required": [
+          "field",
+          "category"
+        ],
+        "title": "SafeMetadataFailure",
+        "type": "object"
+      },
+      "SafeRequestReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "content_type_class": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ContentTypeClass"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "digest_scope": {
+            "const": "OBSERVED_BYTES",
+            "default": "OBSERVED_BYTES",
+            "title": "Digest Scope",
+            "type": "string"
+          },
+          "http_status_code": {
+            "anyOf": [
+              {
+                "maximum": 599,
+                "minimum": 100,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Http Status Code"
+          },
+          "request_started_at": {
+            "format": "date-time",
+            "title": "Request Started At",
+            "type": "string"
+          },
+          "response_bytes": {
+            "default": 0,
+            "maximum": 524289,
+            "minimum": 0,
+            "title": "Response Bytes",
+            "type": "integer"
+          },
+          "response_complete": {
+            "default": false,
+            "title": "Response Complete",
+            "type": "boolean"
+          },
+          "response_received_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Response Received At"
+          },
+          "response_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Response Sha256"
+          },
+          "route_class": {
+            "$ref": "#/$defs/RouteClass"
+          },
+          "strict_json_valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Strict Json Valid"
+          }
+        },
+        "required": [
+          "route_class",
+          "request_started_at"
+        ],
+        "title": "SafeRequestReceipt",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "attribution": {
+        "const": "Contains OpenLigaDB information made available under ODbL 1.0: https://www.openligadb.de/ ; https://opendatacommons.org/licenses/odbl/1-0/",
+        "default": "Contains OpenLigaDB information made available under ODbL 1.0: https://www.openligadb.de/ ; https://opendatacommons.org/licenses/odbl/1-0/",
+        "title": "Attribution",
+        "type": "string"
+      },
+      "context_sha256": {
+        "anyOf": [
+          {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Context Sha256"
+      },
+      "diagnostics": {
+        "$ref": "#/$defs/SafeDiagnostics"
+      },
+      "historical_a02_exact_cause": {
+        "const": "NOT_RETAINED",
+        "default": "NOT_RETAINED",
+        "title": "Historical A02 Exact Cause",
+        "type": "string"
+      },
+      "internal_evidence_only": {
+        "const": true,
+        "default": true,
+        "title": "Internal Evidence Only",
+        "type": "boolean"
+      },
+      "one_attempt_consumed": {
+        "title": "One Attempt Consumed",
+        "type": "boolean"
+      },
+      "production_active": {
+        "const": false,
+        "default": false,
+        "title": "Production Active",
+        "type": "boolean"
+      },
+      "reason": {
+        "$ref": "#/$defs/FailureReason"
+      },
+      "redistribution_permitted": {
+        "const": false,
+        "default": false,
+        "title": "Redistribution Permitted",
+        "type": "boolean"
+      },
+      "rights_profile_id": {
+        "const": "openligadb_public_final_score_labels_v1",
+        "default": "openligadb_public_final_score_labels_v1",
+        "title": "Rights Profile Id",
+        "type": "string"
+      },
+      "rights_profile_sha256": {
+        "const": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2",
+        "default": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2",
+        "title": "Rights Profile Sha256",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": "public-team-strength-p01-fallback-stopped-diagnostic-v1",
+        "default": "public-team-strength-p01-fallback-stopped-diagnostic-v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "scoring_performed": {
+        "const": false,
+        "default": false,
+        "title": "Scoring Performed",
+        "type": "boolean"
+      },
+      "semantic_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Semantic Sha256",
+        "type": "string"
+      },
+      "separate_fresh_human_authorization_required": {
+        "const": true,
+        "default": true,
+        "title": "Separate Fresh Human Authorization Required",
+        "type": "boolean"
+      },
+      "source": {
+        "const": "OpenLigaDB",
+        "default": "OpenLigaDB",
+        "title": "Source",
+        "type": "string"
+      },
+      "stage": {
+        "$ref": "#/$defs/ExecutionStage"
+      },
+      "started_at": {
+        "format": "date-time",
+        "title": "Started At",
+        "type": "string"
+      },
+      "stopped_at": {
+        "format": "date-time",
+        "title": "Stopped At",
+        "type": "string"
+      }
+    },
+    "required": [
+      "semantic_sha256",
+      "stage",
+      "reason",
+      "diagnostics",
+      "started_at",
+      "stopped_at",
+      "one_attempt_consumed"
+    ],
+    "title": "StoppedExecutionDiagnostic",
+    "type": "object"
+  }
+}

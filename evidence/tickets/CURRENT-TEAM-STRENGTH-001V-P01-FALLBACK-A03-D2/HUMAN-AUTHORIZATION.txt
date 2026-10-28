@@ -1,0 +1,268 @@
+# DMF PULSE — P01 A03-D2
+# OFFLINE SOURCE-SCHEMA COMPATIBILITY REVIEW
+# NO PROVIDER REQUEST / NO NEW ACQUISITION AUTHORITY
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Immutable parent:
+`dde795c85f68d87578d3432576dac5d600794a32`
+
+Branch:
+`readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-one-shot-reauthorization`
+
+New ticket:
+`CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2`
+
+Preferred branch:
+`readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2-schema-compatibility`
+
+## ROLE
+
+Investigate and harden the OpenLigaDB matchday metadata-admission boundary after A03's authenticated stopped execution.
+
+This is an OFFLINE IMPLEMENTATION AND REVIEW TASK.
+
+Do not acquire any actual results.
+
+Do not authorize or execute A04.
+
+Do not modify P01.
+
+## 1. Established A03 result
+
+A03 was consumed.
+
+The three provider requests completed successfully.
+
+The Matchday 6 response contained:
+
+- HTTP 200;
+- valid JSON;
+- 10 match records;
+- 34,613 response bytes.
+
+Failure:
+
+`execution_stage = PROJECT_FINAL_FACTS`
+
+`failure_reason = MATCHDAY_RESPONSE_INVALID`
+
+Diagnostics:
+
+`provider_match_rows = 10`
+
+`finished_match_rows = 0`
+
+`regulation_result_rows = 0`
+
+`projected_fact_count = 0`
+
+The response bytes were not retained.
+
+The exact mismatched metadata field was not recorded.
+
+Do not invent the missing field value.
+
+## 2. Reconstruct the actual failure path
+
+Inspect `project_final_facts()` in:
+
+`src/dmf_pulse/ingestion/p01_fallback.py`
+
+Establish which conditions can produce `MATCHDAY_RESPONSE_INVALID`.
+
+Specifically assess:
+
+- leagueId;
+- leagueShortcut;
+- leagueSeason;
+- leagueName;
+- group.groupOrderID.
+
+Confirm whether the reported diagnostic means projection stopped before finality evaluation.
+
+Distinguish:
+
+`METADATA_VALIDATION_FAILED`
+
+from:
+
+`MATCH_NOT_FINISHED`
+
+Do not interpret zero finished rows as proof that the provider lacks final results.
+
+## 3. Review identifier semantics
+
+Determine which metadata attributes are genuine canonical identity requirements and which are display labels.
+
+In particular, assess whether exact equality of:
+
+`leagueName == "Premier League"`
+
+is a valid prerequisite when league identity is already established through governed identifiers.
+
+Do not weaken stable competition, season or matchday identity checks.
+
+Do not change matching logic solely because a synthetic fixture passes.
+
+Use existing repository contracts, retained public provider documentation and offline evidence.
+
+No live provider access.
+
+If there is insufficient evidence for a proposed compatibility change, record it as unresolved rather than guessing.
+
+## 4. Improve typed failure localisation
+
+Replace the composite metadata failure with finite, field-specific diagnostic categories.
+
+At minimum distinguish:
+
+- league ID mismatch;
+- league shortcut mismatch;
+- league season mismatch or wrong type;
+- league display-name mismatch;
+- group/matchday mismatch or wrong type.
+
+Do not retain actual unapproved provider field values.
+
+Diagnostics should report only:
+
+- field identifier;
+- mismatch/missing/wrong-type category;
+- safe aggregate counts where appropriate.
+
+No raw provider JSON, team identities, fixture IDs or score labels in stopped diagnostics.
+
+Do not change numerical scoring.
+
+## 5. Correct metadata policy only where justified
+
+If independent offline evidence demonstrates that a field is descriptive rather than an identity key, propose the narrowest governed compatibility adjustment.
+
+Require:
+
+- documented provider-contract evidence;
+- preserved stable identity checks;
+- exact frozen P01 fixture matching;
+- no ambiguous acceptance;
+- regression tests for false-positive admission;
+- explicit independent review.
+
+Do not silently relax or delete validation.
+
+If the correct live schema remains unknown, leave the change proposed but unapproved.
+
+## 6. Synthetic regression matrix
+
+Test each individual metadata mismatch independently.
+
+Test:
+
+- correct metadata;
+- missing field;
+- wrong type;
+- incorrect league identity;
+- incorrect season;
+- incorrect matchday;
+- alternate descriptive league name;
+- reordered matches;
+- ambiguous fixture mapping;
+- finished matches with valid regulation results;
+- unfinished matches;
+- missing final results.
+
+Ensure valid completed fixtures reach the subsequent finality checks.
+
+Ensure malformed/incorrect fixtures still fail closed.
+
+Preserve full A02, D1 and A03 regression compatibility.
+
+## 7. Existing evidence must remain immutable
+
+Do not modify:
+
+- original P01 forecast;
+- A02 stopped evidence;
+- D1 evidence;
+- A03 consumption seal;
+- A03 stopped diagnostic;
+- A03 execution handoff.
+
+A03 remains permanently consumed.
+
+No retries.
+
+## 8. Independent review
+
+Require a reviewer to confirm:
+
+1. The actual failed code path was identified.
+2. No exact observed metadata value was fabricated.
+3. Zero finished rows were not incorrectly interpreted.
+4. Every source metadata check has an explicit purpose.
+5. Canonical identity protections remain intact.
+6. Descriptive fields are not improperly treated as identity keys.
+7. No data-dependent model or scoring change occurred.
+8. All synthetic failure cases pass.
+9. P01 remains immutable.
+10. No provider access occurred.
+11. No A04 authority was created.
+12. No production activation occurred.
+
+Resolve all P0/P1 and material P2 findings.
+
+## 9. Publication
+
+Run focused and relevant regression tests, Ruff, strict mypy, build, installed-wheel verification, repository validation, manifests, secret scanning and diff checks.
+
+Publish on the D2 branch.
+
+Require exact-SHA CI green.
+
+No PR, merge or tag.
+
+## 10. Final handoff
+
+Return:
+
+- final SHA;
+- remote SHA;
+- exact-SHA CI;
+- offline diagnostic conclusion;
+- list of actual predicates capable of causing A03's failure;
+- field-specific diagnostic taxonomy;
+- any justified schema compatibility changes;
+- unresolved live-schema uncertainties;
+- independent-review verdict;
+- exact P01 forecast semantic/byte hashes.
+
+Explicitly answer:
+
+**Can A03's result establish that OpenLigaDB does not have final results?**
+
+**What must be resolved before authorizing A04?**
+
+Status:
+
+`A02_ONE_ATTEMPT_CONSUMED`
+
+`A03_ONE_ATTEMPT_CONSUMED`
+
+`A03_FAILURE_METADATA_GATE_IDENTIFIED`
+
+`P01_NOT_SCORED`
+
+`P01_FORECAST_UNCHANGED`
+
+`NO_NEW_PROVIDER_ACCESS`
+
+`NO_A04_AUTHORITY_CREATED`
+
+`TEAM_STRENGTH_REMAINS_SHADOW_ONLY`
+
+`NO_PRODUCTION_ACTIVATION_PERFORMED`
+
+End:
+
+`CURRENT_TEAM_STRENGTH_001V_P01_FALLBACK_A03_D2_COMPLETE`

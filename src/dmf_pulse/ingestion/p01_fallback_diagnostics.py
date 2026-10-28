@@ -11,7 +11,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from dmf_pulse.assurance.canonical import pretty_json
 from dmf_pulse.ingestion.openfootball.team_strength_data import (
@@ -60,6 +60,11 @@ class FailureReason(StrEnum):
     REGULATION_METADATA_DISAGREEMENT = "REGULATION_METADATA_DISAGREEMENT"
     MATCHDAY_RESPONSE_INVALID = "MATCHDAY_RESPONSE_INVALID"
     MATCHDAY_FIXTURE_COUNT_INVALID = "MATCHDAY_FIXTURE_COUNT_INVALID"
+    METADATA_LEAGUE_ID_INVALID = "METADATA_LEAGUE_ID_INVALID"
+    METADATA_LEAGUE_SHORTCUT_INVALID = "METADATA_LEAGUE_SHORTCUT_INVALID"
+    METADATA_LEAGUE_SEASON_INVALID = "METADATA_LEAGUE_SEASON_INVALID"
+    METADATA_DISPLAY_NAME_INVALID = "METADATA_DISPLAY_NAME_INVALID"
+    METADATA_MATCHDAY_INVALID = "METADATA_MATCHDAY_INVALID"
     MATCH_NOT_FINISHED = "MATCH_NOT_FINISHED"
     REGULATION_RESULT_MISSING_OR_AMBIGUOUS = "REGULATION_RESULT_MISSING_OR_AMBIGUOUS"
     REGULATION_RESULT_TYPE_MISMATCH = "REGULATION_RESULT_TYPE_MISMATCH"
@@ -117,6 +122,37 @@ class SafeRequestReceipt(FrozenEvidence):
         return self
 
 
+class MetadataField(StrEnum):
+    LEAGUE_ID = "leagueId"
+    LEAGUE_SHORTCUT = "leagueShortcut"
+    LEAGUE_SEASON = "leagueSeason"
+    DISPLAY_NAME = "leagueName"
+    GROUP = "group"
+    MATCHDAY = "group.groupOrderID"
+
+
+class MetadataCategory(StrEnum):
+    MISSING = "MISSING"
+    WRONG_TYPE = "WRONG_TYPE"
+    MISMATCH = "MISMATCH"
+
+
+METADATA_REASONS = {
+    MetadataField.LEAGUE_ID: FailureReason.METADATA_LEAGUE_ID_INVALID,
+    MetadataField.LEAGUE_SHORTCUT: FailureReason.METADATA_LEAGUE_SHORTCUT_INVALID,
+    MetadataField.LEAGUE_SEASON: FailureReason.METADATA_LEAGUE_SEASON_INVALID,
+    MetadataField.DISPLAY_NAME: FailureReason.METADATA_DISPLAY_NAME_INVALID,
+    MetadataField.GROUP: FailureReason.METADATA_MATCHDAY_INVALID,
+    MetadataField.MATCHDAY: FailureReason.METADATA_MATCHDAY_INVALID,
+}
+
+
+class SafeMetadataFailure(FrozenEvidence):
+    classification: Literal["METADATA_VALIDATION_FAILED"] = "METADATA_VALIDATION_FAILED"
+    field: MetadataField
+    category: MetadataCategory
+
+
 class SafeDiagnostics(FrozenEvidence):
     provider_requests_attempted: int = Field(default=0, ge=0, le=3)
     provider_requests_completed: int = Field(default=0, ge=0, le=3)
@@ -131,6 +167,15 @@ class SafeDiagnostics(FrozenEvidence):
     projected_fact_count: int = Field(default=0, ge=0, le=10)
     uniquely_mapped_fixture_count: int = Field(default=0, ge=0, le=10)
     admitted_outcome_count: int = Field(default=0, ge=0, le=10)
+    metadata_failure: SafeMetadataFailure | None = None
+
+    @model_serializer(mode="wrap")
+    def omit_absent_metadata(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """Additive v1 extension: old records retain their exact semantic representation."""
+        result: dict[str, Any] = handler(self)
+        if self.metadata_failure is None:
+            result.pop("metadata_failure", None)
+        return result
 
     @model_validator(mode="after")
     def request_consistency(self) -> SafeDiagnostics:
@@ -163,8 +208,20 @@ class P01FallbackExecutionFailure(StrengthEvidenceError):
     def __init__(
         self, stage: ExecutionStage, reason: FailureReason, diagnostics: SafeDiagnostics
     ) -> None:
+        require_metadata_binding(stage, reason, diagnostics)
         self.stage, self.reason, self.diagnostics = stage, reason, diagnostics
         super().__init__(reason.value)
+
+
+def require_metadata_binding(
+    stage: ExecutionStage, reason: FailureReason, diagnostics: SafeDiagnostics
+) -> None:
+    issue = diagnostics.metadata_failure
+    if issue is not None:
+        if stage != ExecutionStage.PROJECT_FINAL_FACTS or reason != METADATA_REASONS[issue.field]:
+            raise ValueError("metadata diagnostic stage/reason differs")
+    elif reason in METADATA_REASONS.values():
+        raise ValueError("metadata reason requires field/category")
 
 
 @dataclass
@@ -247,6 +304,7 @@ class StoppedExecutionDiagnostic(SealedEvidence):
 
     @model_validator(mode="after")
     def stopped_consistency(self) -> StoppedExecutionDiagnostic:
+        require_metadata_binding(self.stage, self.reason, self.diagnostics)
         if self.stopped_at < self.started_at or self.stage == ExecutionStage.COMPLETE:
             raise ValueError("invalid stopped execution chronology/stage")
         if self.diagnostics.provider_requests_attempted and not self.one_attempt_consumed:

@@ -1,0 +1,52 @@
+"""Independent D2 review: synthetic tests only, deny network and record command."""
+
+import hashlib
+import json
+import socket
+import sys
+import uuid
+from datetime import UTC, datetime
+from pathlib import Path
+
+attempts = []
+
+
+def denied(*args, **kwargs):
+    attempts.append("NETWORK_REFUSED")
+    raise AssertionError("Independent D2 review must remain offline")
+
+
+socket.create_connection = socket.getaddrinfo = socket.socket.connect = denied
+socket.socket.connect_ex = socket.socket.sendto = denied
+
+import pytest
+
+start = datetime.now(UTC)
+arguments = [
+    "tests/unit/evaluation/test_p01_fallback_d2.py",
+    "tests/unit/evaluation/test_p01_fallback_d1.py",
+    "tests/unit/evaluation/test_p01_fallback_a03.py",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    "review_pack/independent-d2-" + uuid.uuid4().hex,
+    "--tb=short",
+]
+code = int(pytest.main(arguments))
+record = {
+    "arguments": arguments,
+    "started_at": start.isoformat(),
+    "completed_at": datetime.now(UTC).isoformat(),
+    "exit_code": code,
+    "denied_network_attempts": len(attempts),
+    "provider_requests": 0,
+    "credentials_inspected": 0,
+    "real_p01_scoring_performed": False,
+    "driver_byte_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+}
+Path("review_pack/INDEPENDENT-D2-TEST-COMMAND.json").write_text(
+    json.dumps(record, indent=2) + "\n", encoding="utf-8", newline="\n"
+)
+print(json.dumps(record, sort_keys=True))
+sys.exit(code if not attempts else 1)

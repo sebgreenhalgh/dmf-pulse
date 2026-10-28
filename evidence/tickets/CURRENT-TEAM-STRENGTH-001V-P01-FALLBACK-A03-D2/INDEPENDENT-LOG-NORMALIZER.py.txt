@@ -1,0 +1,135 @@
+"""Losslessly transcode visible independent stdout and supersede review evidence."""
+
+import hashlib
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+
+OUT = Path("evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2")
+
+
+def digest(value):
+    return hashlib.sha256(value).hexdigest()
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+
+
+def authenticate(path):
+    value = json.loads(path.read_bytes())
+    body = dict(value)
+    expected = body.pop("semantic_sha256")
+    assert digest(canonical(body)) == expected
+    return value
+
+
+def write(name, value):
+    value["semantic_sha256"] = digest(canonical(value))
+    with (OUT / name).open("x", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(value, sort_keys=True, ensure_ascii=False, indent=2) + "\n")
+    return value["semantic_sha256"]
+
+
+review_path = OUT / "INDEPENDENT-REVIEW.json"
+command_path = OUT / "INDEPENDENT-TEST-COMMAND.json"
+old_review = authenticate(review_path)
+old_command = authenticate(command_path)
+assert old_review["semantic_sha256"] == "77a8eb66f0cdcaca05b6ab73c2d22610c21c9519d98cdb936565bfe467a696f5"
+assert old_command["semantic_sha256"] == "f04e858e1e8631767f2c06c2e45cca665cbec70c4c01c2ddd52a1c8f8cffe9fd"
+for item in old_review["files"]:
+    assert digest(Path(item["path"]).read_bytes()) == item["byte_sha256"]
+
+stdout_path = OUT / "INDEPENDENT-stdout.log"
+raw = stdout_path.read_bytes()
+assert raw.startswith(bytes.fromhex("fffe"))
+assert digest(raw) == old_command["evidence_files"]["INDEPENDENT-stdout.log"]
+text = raw[2:].decode("utf-16-le", errors="strict")
+reconstructed = bytes.fromhex("fffe") + text.encode("utf-16-le", errors="strict")
+assert reconstructed == raw
+normalized = text.encode("utf-8", errors="strict")
+assert normalized.decode("utf-8") == text
+assert "198 passed in 49.29s" in text
+
+receipt = {
+    "schema_version": "p01-a03-d2-independent-log-transcoding-v1",
+    "transcoded_at": datetime.now(UTC).isoformat(),
+    "path": "INDEPENDENT-stdout.log",
+    "original_encoding": "UTF-16LE",
+    "byte_order_mark_hex": "fffe",
+    "original_byte_length": len(raw),
+    "original_byte_sha256": digest(raw),
+    "decoded_text": text,
+    "reconstruction_algorithm": "bytes.fromhex(byte_order_mark_hex) + decoded_text.encode('utf-16-le')",
+    "reconstructed_bytes_equal_original": reconstructed == raw,
+    "normalized_encoding": "UTF-8",
+    "normalized_byte_length": len(normalized),
+    "normalized_byte_sha256": digest(normalized),
+    "newline_policy": "PRESERVED",
+    "text_removed": False,
+    "raw_bytes_recoverable_exactly": True,
+    "base64_or_opaque_payload_encoding_used": False,
+    "scanner_exception_added": False,
+    "tests_repeated": False,
+}
+receipt_sha = write("INDEPENDENT-LOG-TRANSCODING.json", receipt)
+# Exact byte recovery is sealed before replacing the unscannable representation.
+check = authenticate(OUT / "INDEPENDENT-LOG-TRANSCODING.json")
+assert bytes.fromhex(check["byte_order_mark_hex"]) + check["decoded_text"].encode("utf-16-le") == raw
+
+old_review_name = "INDEPENDENT-REVIEW-SUPERSEDED-" + old_review["semantic_sha256"] + ".json"
+old_command_name = "INDEPENDENT-TEST-COMMAND-SUPERSEDED-" + old_command["semantic_sha256"] + ".json"
+for source, name in [(review_path, old_review_name), (command_path, old_command_name)]:
+    with (OUT / name).open("xb") as handle:
+        handle.write(source.read_bytes())
+    authenticate(OUT / name)
+
+stdout_path.write_bytes(normalized)
+assert stdout_path.read_bytes().decode("utf-8") == text
+normalizer_name = "INDEPENDENT-LOG-NORMALIZER.py.txt"
+with (OUT / normalizer_name).open("xb") as handle:
+    handle.write(Path(__file__).read_bytes())
+
+new_command = dict(old_command)
+new_command.pop("semantic_sha256")
+new_command["supersedes_command_sha256"] = old_command["semantic_sha256"]
+new_command["tests_repeated"] = False
+new_command["log_transcoding_receipt_sha256"] = receipt_sha
+new_command["evidence_files"] = {
+    **old_command["evidence_files"],
+    "INDEPENDENT-stdout.log": digest(normalized),
+    "INDEPENDENT-LOG-TRANSCODING.json": digest((OUT / "INDEPENDENT-LOG-TRANSCODING.json").read_bytes()),
+    normalizer_name: digest((OUT / normalizer_name).read_bytes()),
+    old_command_name: digest((OUT / old_command_name).read_bytes()),
+}
+command_path.unlink()
+command_sha = write("INDEPENDENT-TEST-COMMAND.json", new_command)
+
+new_review = dict(old_review)
+new_review.pop("semantic_sha256")
+new_review.update({
+    "reviewed_at": datetime.now(UTC).isoformat(),
+    "supersedes_review_sha256": old_review["semantic_sha256"],
+    "test_command_sha256": command_sha,
+    "log_transcoding_receipt_sha256": receipt_sha,
+    "evidence_correction": "PowerShell's UTF-16LE stdout was losslessly represented as readable UTF-8 JSON and a UTF-8 visible log. Exact original bytes are reconstructible from the complete decoded text, explicit codec and BOM. No tests rerun and no functional changes.",
+    "fixture_attribute_review": "Declaring the immutable original A03 fixture binary for Git newline handling is benign: its exact original byte hash and strict JSON/semantic authentication remain tested. The secret scanner is unchanged and scans the UTF-8 fixture.",
+})
+additional = [
+    "INDEPENDENT-TEST-COMMAND.json", "INDEPENDENT-LOG-TRANSCODING.json",
+    "INDEPENDENT-stdout.log", "INDEPENDENT-stderr.log", normalizer_name,
+    old_review_name, old_command_name,
+]
+new_review["files"] = sorted(
+    old_review["files"] + [
+        {"path": (OUT / name).as_posix(), "byte_sha256": digest((OUT / name).read_bytes())}
+        for name in additional
+    ], key=lambda item: item["path"]
+)
+review_path.unlink()
+review_sha = write("INDEPENDENT-REVIEW.json", new_review)
+for item in new_review["files"]:
+    assert digest(Path(item["path"]).read_bytes()) == item["byte_sha256"]
+assert authenticate(OUT / old_review_name)["semantic_sha256"] == old_review["semantic_sha256"]
+assert authenticate(OUT / old_command_name)["semantic_sha256"] == old_command["semantic_sha256"]
+print(json.dumps({"review_sha256": review_sha, "command_sha256": command_sha, "transcoding_receipt_sha256": receipt_sha, "bound_files": len(new_review["files"]), "old_reports_preserved": True, "original_stdout_recoverable": True, "normalized_stdout_sha256": digest(normalized)}, sort_keys=True))

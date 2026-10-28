@@ -1,0 +1,254 @@
+{
+  "a02_attempt_consumed": true,
+  "a03_attempt_consumed": true,
+  "a04_authority_created": false,
+  "actual_p01_scoring_performed": false,
+  "compatibility_proposal_status": "PROPOSED_UNAPPROVED",
+  "credentials_inspected": 0,
+  "execution_authorized": false,
+  "files": [
+    {
+      "byte_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "byte_sha256": "f04ce4d61d35f007b53e87d0eb26a35d212f0e6e0023288e793cc6066678c6ee",
+      "path": ".github/workflows/windows-smoke.yml"
+    },
+    {
+      "byte_sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+      "path": "config/evaluation/team_strength_p01_a02_consumption.json"
+    },
+    {
+      "byte_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+      "path": "config/evaluation/team_strength_p01_fallback_a02.json"
+    },
+    {
+      "byte_sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+      "path": "config/evaluation/team_strength_p01_fallback_a03.json"
+    },
+    {
+      "byte_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+      "path": "config/rights/openligadb_p01_fallback.json"
+    },
+    {
+      "byte_sha256": "0271af10a34376d557b2407135d3a832c553de47d4c8c217a835ab8e95ff601c",
+      "path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/HISTORICAL-INVENTORY.json"
+    },
+    {
+      "byte_sha256": "88a52f0c0533e709af47b57f8391948c5c8c98316c3b44df001dca6b1221014d",
+      "path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/HUMAN-AUTHORIZATION.txt"
+    },
+    {
+      "byte_sha256": "0353d2a780c309973fd5b2ec86b0ad72069bd0d78091eea2292ab474223c2cb3",
+      "path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/PROTECTED-FILES-SUPPLEMENT.json"
+    },
+    {
+      "byte_sha256": "084928372be455d632a3daaa5f956f73461e80adda4a602f1f6d7ca39704f3ba",
+      "path": "evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/RETAINED-SCHEMA-EVIDENCE.json"
+    },
+    {
+      "byte_sha256": "11ec5b0f52ff98b6ac583585e58957137725937de955dd21a840e8348221af49",
+      "path": "pyproject.toml"
+    },
+    {
+      "byte_sha256": "f6ee614c4bf2870a33e00f902fa27fdd899b1b6d6d57e3332cbdd95fedd54c5a",
+      "path": "scripts/verify_p01_fallback_a02_wheel.py"
+    },
+    {
+      "byte_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+      "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt"
+    },
+    {
+      "byte_sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+      "path": "specs/manifests/authority_manifest.json"
+    },
+    {
+      "byte_sha256": "89af6a582a080613859275f57fcca5c8674d9ce19a687679f9d4e5cb8e183347",
+      "path": "src/dmf_pulse/evaluation/p01_a03_authority.py"
+    },
+    {
+      "byte_sha256": "9bd304ffe2531e9cbdc7473b5efd3d090ad938fbcc37acd8778316fbf7ca002b",
+      "path": "src/dmf_pulse/evaluation/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "35df9b296213cd07239b94b506c81d62c5fecfb6e647d128a4a60b4ad6292762",
+      "path": "src/dmf_pulse/evaluation/p01_fallback_context.py"
+    },
+    {
+      "byte_sha256": "ee756a31cb9cde20b02f5a4f967623c25334b2629a86153990dd8c5b29f21a11",
+      "path": "src/dmf_pulse/evaluation/p01_frozen_view.py"
+    },
+    {
+      "byte_sha256": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5",
+      "path": "src/dmf_pulse/evaluation/team_strength_prospective.py"
+    },
+    {
+      "byte_sha256": "60eec3abda99ff1280c211876a318e7b0af093ca1021fb49e01b16a46a9a6c05",
+      "path": "src/dmf_pulse/ingestion/p01_a03_control.py"
+    },
+    {
+      "byte_sha256": "8c16f4225bd120b386bd94e14d9ba36a18fdfacbaacdbb264bfffe1270146157",
+      "path": "src/dmf_pulse/ingestion/p01_a03_execution.py"
+    },
+    {
+      "byte_sha256": "25094df18bd537e9853077192975ecd48d9bbf3e932a59bb8dddbfeeec81b44b",
+      "path": "src/dmf_pulse/ingestion/p01_fallback.py"
+    },
+    {
+      "byte_sha256": "3cd81b4c5a2c8a0c78c6129fb7b2c23f9b463db10e820a10148911580ae653f8",
+      "path": "src/dmf_pulse/ingestion/p01_fallback_diagnostics.py"
+    },
+    {
+      "byte_sha256": "48d9d4f25421d0d5a02fba635950ecdac77a5407b76227c98d80e4ed655a47b1",
+      "path": "src/dmf_pulse/ingestion/p01_match_metadata.py"
+    },
+    {
+      "byte_sha256": "d0b5615b28d530900698948318963c8c361b608e094581148e79dae0406e48b4",
+      "path": "tests/fixtures/evaluation/a02_d1_parent_semantics.json"
+    },
+    {
+      "byte_sha256": "d683b15240cd2ff6216d4566442c21c868c822411771715068627bd33d42d30f",
+      "path": "tests/fixtures/evaluation/a03_stopped_metadata_gate.json"
+    },
+    {
+      "byte_sha256": "9379c2a3aa0a1a99238e089ffc73575ce38454004d6e08c46976efb79286a179",
+      "path": "tests/unit/evaluation/p01_d1_test_support.py"
+    },
+    {
+      "byte_sha256": "6bfcf1a1d6694ed9993636af4a82db91e855916b0d4f2b48b956407c4f1fc6bf",
+      "path": "tests/unit/evaluation/test_p01_fallback_a02.py"
+    },
+    {
+      "byte_sha256": "fc5db3f58e868a3a54c79aea7a0ee408a4d9abee8cc81b8704a5cce9b15fd68b",
+      "path": "tests/unit/evaluation/test_p01_fallback_a03.py"
+    },
+    {
+      "byte_sha256": "ffb5213030d0027a8e9fffd06654f46d03e07e6caeb7d5a280b074d147cd1e6a",
+      "path": "tests/unit/evaluation/test_p01_fallback_d1.py"
+    },
+    {
+      "byte_sha256": "d07de1f23698008584e81ac8207a31d6f347b192676134034cd99240362227d7",
+      "path": "tests/unit/evaluation/test_p01_fallback_d2.py"
+    },
+    {
+      "byte_sha256": "5603d7002eed23c12c1076ea1e9b4bd950fe363f9304a9d10d0e0cce5e3227eb",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/ACCEPTANCE.md"
+    },
+    {
+      "byte_sha256": "9d98a76c81a6d69cf18eac7ae7e579eb127b3b37b01a8406a48ba8f6f599eaa6",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/CONTRACT.md"
+    },
+    {
+      "byte_sha256": "5eb14e80eb33abd1fdb781c1e82f658136994d3c8190adfb014421b18e6ab088",
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/ticket.yaml"
+    },
+    {
+      "byte_sha256": "af7d4de655438868c42d2f7c1d9b7d7a2c096fb72e671365e4a2dd0ffe9f41b9",
+      "path": "uv.lock"
+    }
+  ],
+  "findings": [],
+  "forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "forecast_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "historical_files_authenticated": 67,
+  "immutable_parent": "dde795c85f68d87578d3432576dac5d600794a32",
+  "independent_tests_passed": 198,
+  "old_a03_review_rejected_for_d2": true,
+  "original_a03_diagnostic_sha256": "db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2",
+  "original_a03_handoff_sha256": "d2c13225fb40ef290501ad4ffd51e921c55c86dc0924df9674e9672d5ed415b2",
+  "production_active": false,
+  "protected_files_authenticated": 17,
+  "provider_requests": 0,
+  "publication_gate": "Required local release checks, full exact-SHA CI, remote equality and final immutable publication receipt must pass separately before final completion.",
+  "questions": [
+    {
+      "answer": "YES",
+      "evidence": "YES. At the immutable parent the only explicit MATCHDAY_RESPONSE_INVALID exits are a non-list top level and the composite per-row metadata gate. The authenticated ten-row counter rules out the first. Zero finished rows plus this reason identifies the first row's metadata gate before finality evaluation; malformed row/group objects use a separate reason if reached.",
+      "number": 1,
+      "question": "The actual failed code path was identified"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. The exact failed predicate and value are explicitly unknown. Synthetic alternate names and corrupt fields are labelled synthetic and never attributed to A03. Retained response hashes are not treated as recoverable payloads.",
+      "number": 2,
+      "question": "No exact observed metadata value was fabricated"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. The counter increments only after metadata validation and matchIsFinished=true. Zero proves no row passed those gates, not that the provider has no final results. A03 does not establish final-result availability.",
+      "number": 3,
+      "question": "Zero finished rows were not incorrectly interpreted"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. The contract maps leagueId to governed competition ID, shortcut to route competition selector, Match season to the target season and group order to matchday. leagueName equality is explicitly a retained legacy compatibility restriction; Match and League season schemas are distinguished.",
+      "number": 4,
+      "question": "Every source metadata check has an explicit purpose"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Exact league ID, shortcut, integer season and integer matchday are retained, with no coercion. Exact-ten oriented frozen aliases, provider club uniqueness, finality/result checks, timing, persistence and D+2 gates are unchanged. Reordering preserves outcomes; ambiguous mappings fail closed.",
+      "number": 5,
+      "question": "Canonical identity protections remain intact"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES within this offline scope. Nullable/nonrouting leagueName is classified as potentially descriptive by explicit inference, not asserted to be a canonical key. Its existing equality guard remains to preserve the accepted policy while removing it is PROPOSED_UNAPPROVED. Live compatibility cannot be claimed from the retained schema alone.",
+      "number": 6,
+      "question": "Descriptive fields are not improperly treated as identity keys"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Runtime changes are restricted to metadata diagnostics and safe schema serialization. Protected scoring/context/policy files match the immutable parent. Full synthetic outcome, score, scorecard and metric equivalence regressions pass without actual P01 evaluation.",
+      "number": 7,
+      "question": "No data-dependent model or scoring change occurred"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Independently reran all 49 D2 cases plus 149 D1/A03 cases: 198 passed. The matrix covers independent missing/wrong-type/mismatch, scalar coercion refusal, group shape, alternate names, precedence, finality, completed regulation results, reordering, ambiguity, hash compatibility, closed fields and stage/reason binding. The normal full release/CI remains a separate required gate.",
+      "number": 8,
+      "question": "All synthetic failure cases pass"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. Independently authenticated all 67 historical external files and 17 protected repository files. Actual P01 was read only as bytes and canonical JSON; both pinned hashes match. No model construction, forecast generation, fitting, draw generation or actual scoring occurred.",
+      "number": 9,
+      "question": "P01 remains immutable"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. The independent test process globally denied socket/DNS access and recorded zero attempts. Offline evidence used only authenticated retained Swagger and sealed historical artifacts. No provider, FPL, Odds or credential access was performed.",
+      "number": 10,
+      "question": "No provider access occurred"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. D2 ticket maximum_provider_attempts=0 and a04_authority_created=false. There are no authority/transport/CLI additions. A02/A03 consumption controls are unchanged, and the archived A03 review is independently confirmed to reject the changed D2 source.",
+      "number": 11,
+      "question": "No A04 authority was created"
+    },
+    {
+      "answer": "YES",
+      "evidence": "YES. No promotion, model-policy, scoring-policy or activation implementation changed. Team strength remains shadow only and parameter mixture research only. Offline review confers no acquisition or production authority.",
+      "number": 12,
+      "question": "No production activation occurred"
+    }
+  ],
+  "reviewed_at": "2026-10-28T18:40:24.321038+00:00",
+  "reviewer_identity": "/root/a03_d2_independent_review",
+  "schema_version": "p01-a03-d2-independent-offline-review-v1",
+  "semantic_sha256": "77a8eb66f0cdcaca05b6ab73c2d22610c21c9519d98cdb936565bfe467a696f5",
+  "test_command_sha256": "f04e858e1e8631767f2c06c2e45cca665cbec70c4c01c2ddd52a1c8f8cffe9fd",
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2",
+  "unresolved_live_schema": [
+    "Exact A03 failed metadata field/value not retained",
+    "Current provider schema not accessed",
+    "No final-result availability inference is warranted",
+    "Removing display-name equality requires separately approved evidence and governance"
+  ],
+  "unresolved_material_p2": 0,
+  "unresolved_p0": 0,
+  "unresolved_p1": 0,
+  "verdict": "CLEAR_FOR_P01_A03_D2_OFFLINE_DIAGNOSTIC_PUBLICATION"
+}

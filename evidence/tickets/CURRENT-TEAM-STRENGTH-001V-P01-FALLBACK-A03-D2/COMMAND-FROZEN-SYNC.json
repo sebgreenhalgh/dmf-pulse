@@ -1,0 +1,14 @@
+{
+  "command": [
+    "uv",
+    "sync",
+    "--all-groups",
+    "--frozen"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03-D2",
+  "started_at": "2026-10-28T18:37:35.220934+00:00",
+  "finished_at": "2026-10-28T18:37:35.492379+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-FROZEN-SYNC.log",
+  "output_byte_sha256": "ca8a65f134bbc9e47317d19a0c68441606d8e414d5e54701e59b31a309b4956d"
+}

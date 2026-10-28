@@ -1,0 +1,13 @@
+ticket_id: CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2
+status: ACTIVE
+parent: dde795c85f68d87578d3432576dac5d600794a32
+branch: readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2-schema-compatibility
+authority_scopes: [A3-data-foundation, A8-events, B1-backtesting]
+human_decision_status: explicit offline diagnostic implementation and independent review only
+maximum_provider_attempts: 0
+retry_permitted: false
+a02_attempt_consumed: true
+a03_attempt_consumed: true
+a04_authority_created: false
+compatibility_proposal_status: PROPOSED_UNAPPROVED
+production_activation: false

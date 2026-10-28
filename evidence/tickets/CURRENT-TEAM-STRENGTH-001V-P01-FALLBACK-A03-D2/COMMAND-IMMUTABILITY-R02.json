@@ -1,0 +1,12 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "review_pack/verify_history.py"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03-D2",
+  "started_at": "2026-10-28T18:37:28.182845+00:00",
+  "finished_at": "2026-10-28T18:37:29.278677+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-IMMUTABILITY-R02.log",
+  "output_byte_sha256": "7474049d39e478f071076b265c3f9873777e80d17bb7ae5c523d03749f7874f0"
+}

@@ -1,0 +1,116 @@
+{
+  "compatibility_proposal_status": "PROPOSED_UNAPPROVED",
+  "current_policy": "Preserve every existing equality/type guard including legacy exact display-name restriction.",
+  "examined_at": "2026-10-28T18:33:15.611344+00:00",
+  "interpretation": "Route shortcut/season/group and returned leagueId are governed identity checks. leagueName is nullable and not a route key; descriptive classification is an inference, not an observed A03 value or an immutability guarantee.",
+  "json_pointer_excerpts": {
+    "/components/schemas/Group/properties/groupOrderID": {
+      "format": "int32",
+      "type": "integer"
+    },
+    "/components/schemas/League/properties/leagueSeason": {
+      "nullable": true,
+      "type": "string"
+    },
+    "/components/schemas/Match/properties/group": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/Group"
+        }
+      ],
+      "nullable": true
+    },
+    "/components/schemas/Match/properties/leagueId": {
+      "format": "int32",
+      "type": "integer"
+    },
+    "/components/schemas/Match/properties/leagueName": {
+      "nullable": true,
+      "type": "string"
+    },
+    "/components/schemas/Match/properties/leagueSeason": {
+      "format": "int32",
+      "type": "integer"
+    },
+    "/components/schemas/Match/properties/leagueShortcut": {
+      "nullable": true,
+      "type": "string"
+    },
+    "/components/schemas/Match/properties/matchIsFinished": {
+      "type": "boolean"
+    },
+    "/paths/~1getmatchdata~1{leagueShortcut}~1{leagueSeason}~1{groupOrderId}/get": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "leagueShortcut",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "leagueSeason",
+          "required": true,
+          "schema": {
+            "default": 0,
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "groupOrderId",
+          "required": true,
+          "schema": {
+            "default": 0,
+            "format": "int32",
+            "type": "integer"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/Match"
+                },
+                "type": "array"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/Match"
+                },
+                "type": "array"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/Match"
+                },
+                "type": "array"
+              }
+            }
+          },
+          "description": "OK"
+        }
+      },
+      "tags": [
+        "Matchdata"
+      ]
+    }
+  },
+  "retained_byte_sha256": "ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b",
+  "retained_bytes": 44677,
+  "retrieved_during_d2": false,
+  "schema_version": "p01-a03-d2-retained-schema-evidence-v1",
+  "semantic_sha256": "099f1f7d27cb6af18ae3aa5a9362115165b99ef3f67a76f7b8e911a7af56bb44",
+  "source_url": "https://api.openligadb.de/swagger/v1/swagger.json",
+  "unresolved": "Exact A03 mismatch field/value and current live response schema were not retained."
+}

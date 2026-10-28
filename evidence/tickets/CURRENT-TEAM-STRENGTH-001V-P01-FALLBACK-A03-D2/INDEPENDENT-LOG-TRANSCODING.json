@@ -1,0 +1,22 @@
+{
+  "base64_or_opaque_payload_encoding_used": false,
+  "byte_order_mark_hex": "fffe",
+  "decoded_text": "........................................................................ [ 36%]\r\n........................................................................ [ 72%]\r\n......................................................                   [100%]\r\n198 passed in 49.29s\r\n{\"arguments\": [\"-ra\", \"--strict-config\", \"--strict-markers\", \"--import-mode=importlib\", \"tests/unit/evaluation/test_p01_fallback_d2.py\", \"tests/unit/evaluation/test_p01_fallback_d1.py\", \"tests/unit/evaluation/test_p01_fallback_a03.py\", \"-q\", \"-p\", \"no:cacheprovider\", \"--basetemp\", \"review_pack/independent-d2-1ce6f52401ca40f39069c036ac1b4793\", \"--tb=short\"], \"completed_at\": \"2026-10-28T18:37:56.800795+00:00\", \"credentials_inspected\": 0, \"denied_network_attempts\": 0, \"driver_byte_sha256\": \"e7f21d68b61f679fdbb5e4e08d53d7a2846c759567a907343b0c47109f5f9faa\", \"exit_code\": 0, \"provider_requests\": 0, \"real_p01_scoring_performed\": false, \"started_at\": \"2026-10-28T18:37:06.764414+00:00\"}\r\n",
+  "newline_policy": "PRESERVED",
+  "normalized_byte_length": 953,
+  "normalized_byte_sha256": "3875975d341788fbf77254cda2e782fd4c41b79d38e8fdcefd8436231177d1ff",
+  "normalized_encoding": "UTF-8",
+  "original_byte_length": 1908,
+  "original_byte_sha256": "75938db1edbfd598f5d92e4120a639954b055495d53e53c668f76ce9d85b30e0",
+  "original_encoding": "UTF-16LE",
+  "path": "INDEPENDENT-stdout.log",
+  "raw_bytes_recoverable_exactly": true,
+  "reconstructed_bytes_equal_original": true,
+  "reconstruction_algorithm": "bytes.fromhex(byte_order_mark_hex) + decoded_text.encode('utf-16-le')",
+  "scanner_exception_added": false,
+  "schema_version": "p01-a03-d2-independent-log-transcoding-v1",
+  "semantic_sha256": "ce3fabf52ad3739f4491bcdaf1e00d73a4175c170d82d907d2862a3b1322066f",
+  "tests_repeated": false,
+  "text_removed": false,
+  "transcoded_at": "2026-10-28T18:50:36.795681+00:00"
+}

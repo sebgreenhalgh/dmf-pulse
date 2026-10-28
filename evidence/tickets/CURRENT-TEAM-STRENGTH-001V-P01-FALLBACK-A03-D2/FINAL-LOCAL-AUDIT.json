@@ -1,0 +1,61 @@
+{
+  "a04_authority_created": false,
+  "audited_at": "2026-10-28T18:52:15.758586+00:00",
+  "command_record_byte_hashes": {
+    "COMMAND-A02-D1-A03-D2-INSTALLED-WHEEL.json": "9794fa179d2a6afed83a1a16189cbed6aacf905a3b76f5122b0a0e482b969557",
+    "COMMAND-BUILD.json": "4fdc964e2f0b3978922cd68d8043b1747b092c8e4cac703a600ae01948ad8915",
+    "COMMAND-CHECKPOINT.json": "52b46b8be784441bbd1b4f8ebadef6bbc31701e2d4834fe172bb17aea20e9c84",
+    "COMMAND-DIFF-CHECK.json": "f9c1e9091d63e184ee03b84348d26bbe4b21a7d24058d51418b0e38da5e90ded",
+    "COMMAND-FOCUSED-OFFLINE.json": "cae4600842546b81d385c3b6f90492d820c0d22084b67fcf9024f1a8f3943b69",
+    "COMMAND-FORMAT.json": "90fd7c9bd7146dd7ab31df60df6a6bf13e82098550acd80dcffd61964b0c2113",
+    "COMMAND-FROZEN-SYNC.json": "e78e2d3247a77c8b57a8e60d6ffdb58a98b2939dc7bf1d82034451ba00c92eeb",
+    "COMMAND-IMMUTABILITY-R02.json": "ac4e8550ff6c12e9ea5c0696715ebc26e39f2da5cb15b3ff2e6dc0a035a77d1a",
+    "COMMAND-IMMUTABILITY.json": "69097c5a326ec79c361615903a458f2124c9cb549d03ca565a799f633d2e98d9",
+    "COMMAND-LEGACY-U-INSTALLED-WHEEL.json": "5c9a56dbfd386afa93dadabf6d7030d723ee964c17f1d7965c6f801df1ee43d1",
+    "COMMAND-LINT.json": "fbfa876041ab8f2d0f26954145805e8d5437a16308cb5e7d228cb167d9ccc5e6",
+    "COMMAND-MYPY.json": "e20dd8bf5e613f42978fc0eb87834662061c8612921d6c0104463f331fab7d48",
+    "COMMAND-REPOSITORY-R02.json": "4e504fab5bc28696d30cb88ba1489aaeaf86094d34243e1c06f0b81a1e097f45",
+    "COMMAND-REPOSITORY.json": "7dcdaea7de39c43a776f296b85d94e5fa0f4d7b421716b3c619f560112aa1295",
+    "COMMAND-SECRETS-R02.json": "39d9216d9c4c3b750a9bbe00afcda0752e8e66d8e2ba911a1a9feea6901e84a7",
+    "COMMAND-SECRETS.json": "8e42511af0082f3a8a2d7bc91a096f51a99e31b9fd3e0c405cbb03e3de46e9e9",
+    "COMMAND-STAGED-DIFF-CHECK-R02.json": "68da30657648da9d4804a37eed82de0dedd810170c00778ea95253d5e45f54a7",
+    "COMMAND-STAGED-DIFF-CHECK.json": "195fd8e15a745d95ed934461b0c19e2500373670a1ece0724ec4e031490db786"
+  },
+  "compatibility_proposal_status": "PROPOSED_UNAPPROVED",
+  "current_manifest_files": 1632,
+  "immutability_verification_sha256": "6c0811d92bcdf820bceb317d82b0efa10327ca7dd404d6ab329c482d9e224779",
+  "immutable_parent": "dde795c85f68d87578d3432576dac5d600794a32",
+  "independent_review_sha256": "e66981ca3401b1145799f24af738b6b6bbf931c4808a400d6f67cbaaa5ef0b75",
+  "offline_network_receipt": {
+    "credentials_inspected": 0,
+    "denied_network_attempts": 0,
+    "fpl_requests": 0,
+    "odds_requests": 0,
+    "openfootball_live_requests": 0,
+    "openligadb_requests": 0,
+    "provider_network_calls": 0,
+    "pytest_exit_code": 0,
+    "real_p01_scoring_performed": false
+  },
+  "p01_scored": false,
+  "production_active": false,
+  "provider_requests": 0,
+  "release_state": "READY_FOR_COMMIT_AND_EXACT_SHA_CI",
+  "resolved_checkpoint_failures": [
+    {
+      "command": "COMMAND-IMMUTABILITY.json",
+      "reason": "Offline verification helper used an incorrect review-binding directory name; corrected to retained review-bindings. No historical bytes or runtime policy changed.",
+      "resolved_by": "COMMAND-IMMUTABILITY-R02.json"
+    },
+    {
+      "command": "COMMAND-SECRETS.json",
+      "reason": "Independent stdout was UTF-16LE with BOM. Reviewer preserved the complete decoded text, codec, BOM and original byte hash in a recoverable UTF-8 receipt; normalized visible log, proved exact byte reconstruction and superseded command/review. Scanner unchanged; no secret match.",
+      "resolved_by": "COMMAND-SECRETS-R02.json"
+    }
+  ],
+  "reviewed_files_authenticated": 42,
+  "schema_version": "p01-a03-d2-final-local-audit-v1",
+  "sdist_byte_sha256": "347ebcedc1a478693466b0d36abfe72a2e7f797f09732edc8647b50f30855d97",
+  "semantic_sha256": "e28198367dd27c1bd98599d385c51cbf903e7d7088297e60cd1a8794bdcea460",
+  "wheel_byte_sha256": "e44d8938d9bcff5f6fa5c0b1643b3e5e02209d1d701e8a4ecb0ad82204918cfe"
+}

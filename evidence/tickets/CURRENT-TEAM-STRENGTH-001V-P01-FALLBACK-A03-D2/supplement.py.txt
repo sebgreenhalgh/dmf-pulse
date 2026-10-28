@@ -1,0 +1,18 @@
+import hashlib
+from pathlib import Path
+from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json
+w=Path(__file__).resolve().parents[1]
+paths=['config/evaluation/team_strength_p01_fallback_a02.json',
+       'config/evaluation/team_strength_p01_a02_consumption.json',
+       'src/dmf_pulse/evaluation/p01_fallback_context.py',
+       'src/dmf_pulse/evaluation/team_strength_prospective.py',
+       'src/dmf_pulse/evaluation/p01_a03_authority.py',
+       'src/dmf_pulse/ingestion/p01_a03_control.py',
+       'src/dmf_pulse/ingestion/p01_a03_execution.py',
+       'specs/manifests/authority_manifest.json',
+       'specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt']
+value={'schema_version':'p01-a03-d2-protected-files-supplement-v1',
+       'immutable_parent':'dde795c85f68d87578d3432576dac5d600794a32',
+       'files':{p:hashlib.sha256((w/p).read_bytes()).hexdigest() for p in paths}}
+value['semantic_sha256']=canonical_sha256(value)
+with (w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/PROTECTED-FILES-SUPPLEMENT.json').open('x',encoding='utf-8',newline='\n') as f:f.write(pretty_json(value))

@@ -1,0 +1,16 @@
+{
+  "files": {
+    "config/evaluation/team_strength_p01_a02_consumption.json": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+    "config/evaluation/team_strength_p01_fallback_a02.json": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+    "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/evaluation/p01_a03_authority.py": "89af6a582a080613859275f57fcca5c8674d9ce19a687679f9d4e5cb8e183347",
+    "src/dmf_pulse/evaluation/p01_fallback_context.py": "35df9b296213cd07239b94b506c81d62c5fecfb6e647d128a4a60b4ad6292762",
+    "src/dmf_pulse/evaluation/team_strength_prospective.py": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5",
+    "src/dmf_pulse/ingestion/p01_a03_control.py": "60eec3abda99ff1280c211876a318e7b0af093ca1021fb49e01b16a46a9a6c05",
+    "src/dmf_pulse/ingestion/p01_a03_execution.py": "8c16f4225bd120b386bd94e14d9ba36a18fdfacbaacdbb264bfffe1270146157"
+  },
+  "immutable_parent": "dde795c85f68d87578d3432576dac5d600794a32",
+  "schema_version": "p01-a03-d2-protected-files-supplement-v1",
+  "semantic_sha256": "7edbf7bc26aba2621929ab411d27a24ba0c5cf41e9315ee97288cab3627c1af7"
+}

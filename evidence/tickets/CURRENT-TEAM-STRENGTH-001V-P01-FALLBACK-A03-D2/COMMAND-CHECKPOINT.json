@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "review_pack/offline_pytest.py",
+    "tests/unit/evaluation/test_p01_fallback_d2.py",
+    "tests/unit/evaluation/test_p01_fallback_d1.py",
+    "tests/unit/evaluation/test_p01_fallback_a03.py",
+    "--basetemp",
+    "review_pack/d2-checkpoint",
+    "-p",
+    "no:cacheprovider",
+    "-q",
+    "--tb=short"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\001V-P01-FALLBACK-A03-D2",
+  "started_at": "2026-10-28T18:35:11.229493+00:00",
+  "finished_at": "2026-10-28T18:35:53.029277+00:00",
+  "exit_code": 0,
+  "output": "COMMAND-CHECKPOINT.log",
+  "output_byte_sha256": "3f04e79716d23fdc200f32340efffa0120382f37e2ca93964ad44fa99a66f775"
+}

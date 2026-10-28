@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 639,
+      "bytes": 788,
       "path": ".gitattributes",
-      "sha256": "1157de61d5b3997f85d57c67da49c0109dc98083207078394646a1fc75c32563"
+      "sha256": "45f706bac426c27f025476f7ba629c8398491ce700e6207eb22fa739cbbdafea"
     },
     {
       "bytes": 100,
@@ -166,9 +166,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 200918,
+      "bytes": 202488,
       "path": "PLANS.md",
-      "sha256": "1bd703d19de6b55a36b54d13dc909a45072195497b40d92f5b154355213c8d0f"
+      "sha256": "01c56e83cc7aa602319f3c5e56f3a8d48685079ce2498613c7ead58b1344a7f3"
     },
     {
       "bytes": 2761,
@@ -2671,9 +2671,9 @@
       "sha256": "c0644779ca59d23224fc43d176698ba4348ea132174089ee709b6d853afaa872"
     },
     {
-      "bytes": 8245,
+      "bytes": 9626,
       "path": "scripts/verify_p01_fallback_a02_wheel.py",
-      "sha256": "6f706df3a965306fdc62da973fa83abb99685f5d91bb23957b68041545fa3a39"
+      "sha256": "f6ee614c4bf2870a33e00f902fa27fdd899b1b6d6d57e3332cbdd95fedd54c5a"
     },
     {
       "bytes": 12612,
@@ -4066,9 +4066,9 @@
       "sha256": "8c16f4225bd120b386bd94e14d9ba36a18fdfacbaacdbb264bfffe1270146157"
     },
     {
-      "bytes": 18410,
+      "bytes": 17953,
       "path": "src/dmf_pulse/ingestion/p01_fallback.py",
-      "sha256": "63828cf47afdc2e0dfbec862f0ed41290a15f7ecac72f87c566c0cd3fb8fe064"
+      "sha256": "25094df18bd537e9853077192975ecd48d9bbf3e932a59bb8dddbfeeec81b44b"
     },
     {
       "bytes": 11762,
@@ -4081,14 +4081,19 @@
       "sha256": "cad023e5116be8836ba76b8157a8f74d9767b3235371c9f31f4dbf5aad7a7539"
     },
     {
-      "bytes": 13110,
+      "bytes": 15540,
       "path": "src/dmf_pulse/ingestion/p01_fallback_diagnostics.py",
-      "sha256": "d6f5221b93b2a6b30907641ab565b262d898c34f8c65c452f6fe101c30073e4f"
+      "sha256": "3cd81b4c5a2c8a0c78c6129fb7b2c23f9b463db10e820a10148911580ae653f8"
     },
     {
       "bytes": 4758,
       "path": "src/dmf_pulse/ingestion/p01_fallback_transport.py",
       "sha256": "8011e95534e9291d113f2bc27ae822a9514dd1aa28aaefa1e0caa46dda593b21"
+    },
+    {
+      "bytes": 2036,
+      "path": "src/dmf_pulse/ingestion/p01_match_metadata.py",
+      "sha256": "48d9d4f25421d0d5a02fba635950ecdac77a5407b76227c98d80e4ed655a47b1"
     },
     {
       "bytes": 608,
@@ -4944,6 +4949,11 @@
       "bytes": 18982,
       "path": "tests/fixtures/evaluation/a02_legacy_score_oracle.json",
       "sha256": "a2003796ab6bff04a253a75801ed6d472a3d8edfbb1982b40727f39ae2cc008e"
+    },
+    {
+      "bytes": 3020,
+      "path": "tests/fixtures/evaluation/a03_stopped_metadata_gate.json",
+      "sha256": "d683b15240cd2ff6216d4566442c21c868c822411771715068627bd33d42d30f"
     },
     {
       "bytes": 1972,
@@ -6074,6 +6084,11 @@
       "bytes": 25762,
       "path": "tests/unit/evaluation/test_p01_fallback_d1.py",
       "sha256": "ffb5213030d0027a8e9fffd06654f46d03e07e6caeb7d5a280b074d147cd1e6a"
+    },
+    {
+      "bytes": 11022,
+      "path": "tests/unit/evaluation/test_p01_fallback_d2.py",
+      "sha256": "d07de1f23698008584e81ac8207a31d6f347b192676134034cd99240362227d7"
     },
     {
       "bytes": 9125,
@@ -7601,6 +7616,21 @@
       "sha256": "43225c8a67e120da63b45d0e5c0691c4322f18c0710f96acd4a5e4c91e0c2ee5"
     },
     {
+      "bytes": 2881,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/ACCEPTANCE.md",
+      "sha256": "5603d7002eed23c12c1076ea1e9b4bd950fe363f9304a9d10d0e0cce5e3227eb"
+    },
+    {
+      "bytes": 5924,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/CONTRACT.md",
+      "sha256": "9d98a76c81a6d69cf18eac7ae7e579eb127b3b37b01a8406a48ba8f6f599eaa6"
+    },
+    {
+      "bytes": 583,
+      "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2/ticket.yaml",
+      "sha256": "5eb14e80eb33abd1fdb781c1e82f658136994d3c8190adfb014421b18e6ab088"
+    },
+    {
       "bytes": 3956,
       "path": "tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/ACCEPTANCE.md",
       "sha256": "499d42f8f24380ed3f9426c3c7042abff251afd261c2fd8c02a64d2c8312bb0e"
@@ -8138,5 +8168,5 @@
   ],
   "schema_version": "1.0",
   "scope": "repository-deliverables-excluding-generated-evidence",
-  "ticket_id": "CURRENT-TEAM-STRENGTH-001V-P01-A03"
+  "ticket_id": "CURRENT-TEAM-STRENGTH-001V-P01-D2"
 }

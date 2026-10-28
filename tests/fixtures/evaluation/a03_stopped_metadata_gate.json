@@ -1,0 +1,72 @@
+{
+  "attribution": "Contains OpenLigaDB information made available under ODbL 1.0: https://www.openligadb.de/ ; https://opendatacommons.org/licenses/odbl/1-0/",
+  "context_sha256": "6bb80a9c0b17b673044be5b5c53a2eda6c4e4110ef09f7a586e87e0d8432c259",
+  "diagnostics": {
+    "admitted_outcome_count": 0,
+    "finished_match_rows": 0,
+    "last_route_class": "MATCHDAY_DATA",
+    "projected_fact_count": 0,
+    "provider_match_rows": 10,
+    "provider_requests_attempted": 3,
+    "provider_requests_completed": 3,
+    "regulation_global_candidate_count": 1,
+    "regulation_league_candidate_count": 1,
+    "regulation_metadata_resolved": true,
+    "regulation_result_rows": 0,
+    "request_receipts": [
+      {
+        "content_type_class": "JSON",
+        "digest_scope": "OBSERVED_BYTES",
+        "http_status_code": 200,
+        "request_started_at": "2026-10-28T17:43:23.672234Z",
+        "response_bytes": 284,
+        "response_complete": true,
+        "response_received_at": "2026-10-28T17:43:24.259791Z",
+        "response_sha256": "1fb379fabddf0014559fe19d06e06b602b8b131af5049eec053ee53bdaeb4224",
+        "route_class": "GLOBAL_RESULT_TYPES",
+        "strict_json_valid": true
+      },
+      {
+        "content_type_class": "JSON",
+        "digest_scope": "OBSERVED_BYTES",
+        "http_status_code": 200,
+        "request_started_at": "2026-10-28T17:43:24.260667Z",
+        "response_bytes": 379,
+        "response_complete": true,
+        "response_received_at": "2026-10-28T17:43:24.733764Z",
+        "response_sha256": "5533321a0322ab23f2a76da53cf8a3bb38ede16f33a7b7d29ba396fbd2c4d962",
+        "route_class": "LEAGUE_RESULT_INFO",
+        "strict_json_valid": true
+      },
+      {
+        "content_type_class": "JSON",
+        "digest_scope": "OBSERVED_BYTES",
+        "http_status_code": 200,
+        "request_started_at": "2026-10-28T17:43:24.734653Z",
+        "response_bytes": 34613,
+        "response_complete": true,
+        "response_received_at": "2026-10-28T17:43:25.183465Z",
+        "response_sha256": "319a59c90839482f34aeb93f5d251c62569a34a69bc137920e616d225738be47",
+        "route_class": "MATCHDAY_DATA",
+        "strict_json_valid": true
+      }
+    ],
+    "uniquely_mapped_fixture_count": 0
+  },
+  "historical_a02_exact_cause": "NOT_RETAINED",
+  "internal_evidence_only": true,
+  "one_attempt_consumed": true,
+  "production_active": false,
+  "reason": "MATCHDAY_RESPONSE_INVALID",
+  "redistribution_permitted": false,
+  "rights_profile_id": "openligadb_public_final_score_labels_v1",
+  "rights_profile_sha256": "31261d9304c20a178d730e57e7d06c82423b68a816bac73d517887d58b3caaf2",
+  "schema_version": "public-team-strength-p01-fallback-stopped-diagnostic-v1",
+  "scoring_performed": false,
+  "semantic_sha256": "db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2",
+  "separate_fresh_human_authorization_required": true,
+  "source": "OpenLigaDB",
+  "stage": "PROJECT_FINAL_FACTS",
+  "started_at": "2026-10-28T17:43:00.995002Z",
+  "stopped_at": "2026-10-28T17:43:33.819453Z"
+}

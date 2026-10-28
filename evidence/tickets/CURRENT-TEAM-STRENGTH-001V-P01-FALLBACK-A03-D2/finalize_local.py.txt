@@ -1,0 +1,58 @@
+"""Authenticate all local D2 release evidence; no acquisition or scoring."""
+import hashlib
+import json
+import zipfile
+from datetime import UTC,datetime
+from pathlib import Path
+from dmf_pulse.assurance.canonical import canonical_sha256,pretty_json
+from dmf_pulse.assurance.manifests import RepositoryManifest,validate_repository_manifest
+w=Path(__file__).resolve().parents[1]
+e=w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2'
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def read_sealed(path):
+    value=json.loads(path.read_bytes());sha=value.pop('semantic_sha256')
+    assert canonical_sha256(value)==sha,path
+    return value,sha
+review,review_sha=read_sealed(e/'INDEPENDENT-REVIEW.json')
+# The independent review owns its report format; authenticate every byte binding.
+for row in review['files']:assert digest(w/row['path'])==row['byte_sha256'],row['path']
+historical,historical_sha=read_sealed(e/'IMMUTABILITY-VERIFICATION.json')
+assert historical['historical_files_authenticated']==67
+assert historical['protected_files_authenticated']==17
+assert historical['old_a03_review_rejected_for_d2']
+commands={}
+for p in e.glob('COMMAND-*.json'):
+    rec=json.loads(p.read_bytes())
+    assert rec['exit_code']==(1 if p.name in {'COMMAND-IMMUTABILITY.json','COMMAND-SECRETS.json'} else 0),p.name
+    assert digest(e/rec['output'])==rec['output_byte_sha256'],p.name
+    commands[p.name]=digest(p)
+required={'CHECKPOINT','FOCUSED-OFFLINE','FORMAT','LINT','MYPY','BUILD','FROZEN-SYNC',
+          'A02-D1-A03-D2-INSTALLED-WHEEL','LEGACY-U-INSTALLED-WHEEL','IMMUTABILITY-R02',
+          'REPOSITORY-R02','SECRETS-R02','DIFF-CHECK','STAGED-DIFF-CHECK-R02'}
+assert {'COMMAND-'+v+'.json' for v in required} <= set(commands)
+network=json.loads((w/'review_pack/OFFLINE-TEST-NETWORK-RECEIPT.json').read_bytes())
+assert network['pytest_exit_code']==network['denied_network_attempts']==network['provider_network_calls']==0
+with (e/'OFFLINE-TEST-NETWORK-RECEIPT.json').open('xb') as f:f.write((w/'review_pack/OFFLINE-TEST-NETWORK-RECEIPT.json').read_bytes())
+manifest=RepositoryManifest.model_validate_json((e/'current_manifest.json').read_bytes())
+assert not validate_repository_manifest(w,manifest)
+wheel=w/'dist/dmf_pulse-0.2.0-py3-none-any.whl'
+sourcefiles=['src/dmf_pulse/ingestion/'+p+'.py' for p in ('p01_fallback','p01_fallback_diagnostics','p01_match_metadata')]
+with zipfile.ZipFile(wheel) as z:
+    for p in sourcefiles:assert z.read(p.removeprefix('src/'))==(w/p).read_bytes(),p
+value={'schema_version':'p01-a03-d2-final-local-audit-v1','audited_at':datetime.now(UTC).isoformat(),
+       'immutable_parent':'dde795c85f68d87578d3432576dac5d600794a32',
+       'independent_review_sha256':review_sha,'immutability_verification_sha256':historical_sha,
+       'reviewed_files_authenticated':len(review['files']), 'current_manifest_files':len(manifest.files),
+       'command_record_byte_hashes':commands,'offline_network_receipt':network,
+       'wheel_byte_sha256':digest(wheel),'sdist_byte_sha256':digest(w/'dist/dmf_pulse-0.2.0.tar.gz'),
+       'provider_requests':0,'p01_scored':False,'a04_authority_created':False,'production_active':False,
+       'compatibility_proposal_status':'PROPOSED_UNAPPROVED',
+       'release_state':'READY_FOR_COMMIT_AND_EXACT_SHA_CI',
+       'resolved_checkpoint_failures':[{'command':'COMMAND-IMMUTABILITY.json',
+           'resolved_by':'COMMAND-IMMUTABILITY-R02.json',
+           'reason':'Offline verification helper used an incorrect review-binding directory name; corrected to retained review-bindings. No historical bytes or runtime policy changed.'},
+           {'command':'COMMAND-SECRETS.json','resolved_by':'COMMAND-SECRETS-R02.json',
+            'reason':'Independent stdout was UTF-16LE with BOM. Reviewer preserved the complete decoded text, codec, BOM and original byte hash in a recoverable UTF-8 receipt; normalized visible log, proved exact byte reconstruction and superseded command/review. Scanner unchanged; no secret match.'}]}
+value['semantic_sha256']=canonical_sha256(value)
+with (e/'FINAL-LOCAL-AUDIT.json').open('x',encoding='utf-8',newline='\n') as f:f.write(pretty_json(value))
+print(pretty_json(value),end='')

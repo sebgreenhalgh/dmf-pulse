@@ -2797,3 +2797,19 @@ reseal authority1b9cde4d72416dc0ada2c20bb60da097106046033d00b4ed28c95c88e7676400
 and preserve the failed scan and superseded review. Final secret scan is zero;
 149 affected A03/D1 tests independently pass again. Scanner, rights, source,
 numerical kernels and authority decision value remain unchanged.
+
+## CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2
+
+Immutable parent: `dde795c85f68d87578d3432576dac5d600794a32`.
+Offline implementation only; isolated worktree preserves unrelated Availability work.
+
+- [x] D2.01 Authenticate retained A03 stop, reconstruct metadata-before-finality path and retain Swagger contract pointers.
+- [x] D2.02 Document check purposes, unresolved exact field/value and PROPOSED_UNAPPROVED display-name proposal; preserve all admission policy.
+- [x] D2.03 Add finite value-free field/category diagnostics and backward-compatible omitted v1 extension.
+- [x] D2.04 Pass all 671 focused offline regressions, including field/type/finality/mapping matrix, A02/D1/A03 hashes and full synthetic numerical parity; zero network attempts.
+- [x] D2.05 Fresh twelve-question independent review clears all material findings and independently passes 198 tests. The final byte-bound INDEPENDENT-REVIEW.json and FINAL-LOCAL-AUDIT identify the accepted review SHA; superseded evidence-format revisions remain retained.
+- [ ] D2.06 Finish local release checks/manifests/capped pack; commit/push D2 only and require local/remote equality with exact-SHA twenty-job CI green. FINAL-LOCAL-AUDIT and append-only external publication receipts record completion without a circular commit-hash dependency.
+
+No provider access, real labels/P01 scoring, new acquisition authority, retries,
+model/scorer/rights/dependency/workflow changes, promotion, activation, PR, merge or tag.
+A02/A03 remain consumed; the A03 metadata gate says nothing about final-result availability.

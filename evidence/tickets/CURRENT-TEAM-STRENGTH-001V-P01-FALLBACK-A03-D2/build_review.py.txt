@@ -1,0 +1,33 @@
+"""Capped offline D2 review pack, excluding actual forecast/provider bodies."""
+import hashlib,io,json,subprocess,zipfile
+from pathlib import Path
+from dmf_pulse.assurance.canonical import canonical_sha256,pretty_json
+w=Path(__file__).resolve().parents[1]
+ticket='CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2'
+e=w/'evidence/tickets'/ticket
+members={'evidence/'+p.name:p.read_bytes() for p in e.iterdir() if p.is_file() and p.name!='REVIEW-PACK.json'}
+for p in (w/'tickets'/ticket).iterdir():
+    if p.is_file():members['ticket/'+p.name]=p.read_bytes()
+members['implementation.patch']=subprocess.run(['git','diff','--cached','--','.',' :(exclude)evidence/**'.strip()],cwd=w,capture_output=True,check=True,timeout=60).stdout
+coverage=w/'review_pack/d2-release-coverage.json'
+members['targeted-coverage-reference.json']=pretty_json({'byte_sha256':hashlib.sha256(coverage.read_bytes()).hexdigest(),'bytes':coverage.stat().st_size,'role':'Partial-source diagnostic; normal full exact-SHA CI enforces unchanged coverage gates.'}).encode()
+index={'schema_version':'p01-a03-d2-capped-review-v1','immutable_parent':'dde795c85f68d87578d3432576dac5d600794a32',
+       'members':[{'path':n,'bytes':len(data),'byte_sha256':hashlib.sha256(data).hexdigest()} for n,data in sorted(members.items())],
+       'per_member_cap_bytes':1048576,'total_cap_bytes':20971520,
+       'ci_gate':'PENDING_FINAL_EXACT_SHA','provider_requests':0,'p01_scored':False,'production_active':False}
+index['semantic_sha256']=canonical_sha256(index)
+members['REVIEW-MANIFEST.json']=pretty_json(index).encode()
+assert all(len(data)<=1048576 for data in members.values())
+buffer=io.BytesIO()
+with zipfile.ZipFile(buffer,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+    for name,data in sorted(members.items()):
+        info=zipfile.ZipInfo(name,date_time=(2026,10,28,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,data)
+payload=buffer.getvalue();assert len(payload)<=20971520
+path=w/'review_pack'/(ticket+'-REVIEW.zip')
+with path.open('xb') as f:f.write(payload)
+with zipfile.ZipFile(path) as z:assert z.testzip() is None
+value={'path':str(path.relative_to(w)),'byte_sha256':hashlib.sha256(payload).hexdigest(),
+       'bytes':len(payload),'member_count':len(members),'manifest_sha256':index['semantic_sha256'],
+       'per_member_cap_bytes':1048576,'total_cap_bytes':20971520}
+with (e/'REVIEW-PACK.json').open('x',encoding='utf-8',newline='\n') as f:f.write(pretty_json(value))
+print(pretty_json(value),end='')

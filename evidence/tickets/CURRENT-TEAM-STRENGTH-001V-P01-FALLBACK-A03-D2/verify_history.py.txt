@@ -1,0 +1,65 @@
+"""Offline byte/canonical authentication only; never construct the actual forecast model."""
+import hashlib
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+
+from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json
+from dmf_pulse.evaluation.p01_fallback_context import load_context, strict_json
+from dmf_pulse.evaluation.p01_a03_authority import authenticate_a03_review
+from dmf_pulse.ingestion.openfootball.team_strength_data import (
+    authenticate, StrengthEvidenceError,
+)
+from dmf_pulse.ingestion.p01_fallback_diagnostics import StoppedExecutionDiagnostic
+
+w=Path(__file__).resolve().parents[1]
+e=w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2'
+public=w.parents[1]/'artifacts/public-prospective'
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def read_sealed(path):
+    value=json.loads(path.read_bytes());sha=value.pop('semantic_sha256')
+    assert canonical_sha256(value)==sha,path
+    return value
+
+inventory=read_sealed(e/'HISTORICAL-INVENTORY.json')
+count=0
+for folder,files in inventory['original_artifacts'].items():
+    for name,expected in files.items():
+        assert digest(public/folder/name)==expected,(folder,name)
+        count+=1
+for name,expected in inventory['protected_files'].items():assert digest(w/name)==expected,name
+supplement=read_sealed(e/'PROTECTED-FILES-SUPPLEMENT.json')
+for name,expected in supplement['files'].items():assert digest(w/name)==expected,name
+context=load_context()
+path=public/'CURRENT-TEAM-STRENGTH-001V-P01/public-team-strength-prospective'/f'{context.forecast_sha256}.json'
+raw=path.read_bytes()
+assert hashlib.sha256(raw).hexdigest()==context.forecast_byte_sha256
+forecast=strict_json(raw)
+assert forecast.pop('semantic_sha256')==context.forecast_sha256
+assert canonical_sha256(forecast)==context.forecast_sha256
+del forecast,raw
+original=public/'CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/public-team-strength-p01-fallback-stopped-diagnostic-v1/db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2.json'
+record=authenticate(StoppedExecutionDiagnostic.model_validate_json(original.read_bytes()))
+assert record.model_dump(mode='json')==json.loads(original.read_bytes())
+assert record.diagnostics.metadata_failure is None
+old=w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/INDEPENDENT-REVIEW.json'
+bindings=list((public/'CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03').glob('review-bindings/*.json'))
+assert len(bindings)==1
+try:authenticate_a03_review(old,bindings[0],implementation_root=w)
+except StrengthEvidenceError as failure:
+    assert str(failure)=='A03 reviewed implementation differs'
+else:raise AssertionError('Old A03 review must not authorize D2 changed implementation')
+value={'schema_version':'p01-a03-d2-immutability-verification-v1',
+       'verified_at':datetime.now(UTC).isoformat(),'historical_files_authenticated':count,
+       'protected_files_authenticated':len(inventory['protected_files'])+len(supplement['files']),
+       'forecast_semantic_sha256':context.forecast_sha256,
+       'forecast_byte_sha256':context.forecast_byte_sha256,
+       'original_a03_diagnostic_authenticated':record.semantic_sha256,
+       'old_a03_review_rejected_for_d2':True,
+       'provider_requests':0,'actual_p01_model_constructed':False,'p01_scored':False,
+       'a02_consumed':True,'a03_consumed':True,'a04_authority_created':False,
+       'production_active':False}
+value['semantic_sha256']=canonical_sha256(value)
+path=e/'IMMUTABILITY-VERIFICATION.json'
+with path.open('x',encoding='utf-8',newline='\n') as f:f.write(pretty_json(value))
+print(pretty_json(value),end='')

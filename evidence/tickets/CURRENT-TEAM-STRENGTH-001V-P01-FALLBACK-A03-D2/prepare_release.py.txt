@@ -1,0 +1,19 @@
+import json
+from pathlib import Path
+from dmf_pulse.assurance.canonical import pretty_json
+from dmf_pulse.assurance.manifests import build_repository_manifest, validate_repository_manifest
+from dmf_pulse.ingestion.p01_fallback_diagnostics import SafeMetadataFailure, SafeDiagnostics, StoppedExecutionDiagnostic
+
+w=Path(__file__).resolve().parents[1]
+e=w/'evidence/tickets/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2'
+schemas={cls.__name__:cls.model_json_schema() for cls in (SafeMetadataFailure,SafeDiagnostics,StoppedExecutionDiagnostic)}
+with (e/'CONTRACT-SCHEMAS.json').open('x',encoding='utf-8',newline='\n') as f:f.write(pretty_json(schemas))
+for name in ('prepare_d2.py','supplement.py','verify_history.py','capture.py','offline_pytest.py','prepare_release.py','finalize_local.py','build_review.py','seal_release.py'):
+    path=w/'review_pack'/name
+    if path.exists():
+        with (e/(name+'.txt')).open('xb') as f:f.write(path.read_bytes())
+manifest=build_repository_manifest(w,ticket_id='CURRENT-TEAM-STRENGTH-001V-P01-D2')
+assert not validate_repository_manifest(w,manifest)
+for path in (e/'current_manifest.json',w/'evidence/tickets/PRC-013/current_manifest.json'):
+    path.write_text(pretty_json(manifest),encoding='utf-8',newline='\n')
+print(json.dumps({'manifest_files':len(manifest.files),'schema_types':list(schemas)}))

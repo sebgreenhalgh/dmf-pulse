@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\sebgr\Documents\dmf-pulse\review_pack\001V-P01-FALLBACK-A03-D2\review_pack\verify_history.py", line 50, in <module>
+    assert len(bindings)==1
+           ^^^^^^^^^^^^^^^^
+AssertionError

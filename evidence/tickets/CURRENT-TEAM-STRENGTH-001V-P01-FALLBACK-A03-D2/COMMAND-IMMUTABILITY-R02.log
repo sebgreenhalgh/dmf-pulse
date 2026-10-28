@@ -1,0 +1,18 @@
+{
+  "a02_consumed": true,
+  "a03_consumed": true,
+  "a04_authority_created": false,
+  "actual_p01_model_constructed": false,
+  "forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "forecast_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "historical_files_authenticated": 67,
+  "old_a03_review_rejected_for_d2": true,
+  "original_a03_diagnostic_authenticated": "db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2",
+  "p01_scored": false,
+  "production_active": false,
+  "protected_files_authenticated": 17,
+  "provider_requests": 0,
+  "schema_version": "p01-a03-d2-immutability-verification-v1",
+  "semantic_sha256": "6c0811d92bcdf820bceb317d82b0efa10327ca7dd404d6ab329c482d9e224779",
+  "verified_at": "2026-10-28T18:37:29.228291+00:00"
+}

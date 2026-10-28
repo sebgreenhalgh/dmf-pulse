@@ -1,0 +1,66 @@
+import hashlib
+import json
+from datetime import UTC, datetime
+from pathlib import Path
+
+from dmf_pulse.assurance.canonical import canonical_sha256, pretty_json
+
+w = Path(__file__).resolve().parents[1]
+ticket = 'CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2'
+e = w / 'evidence/tickets' / ticket
+e.mkdir(parents=True, exist_ok=True)
+public = w.parents[1] / 'artifacts/public-prospective'
+
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def write(name, value):
+    value['semantic_sha256'] = canonical_sha256(value)
+    with (e/name).open('x',encoding='utf-8',newline='\n') as f: f.write(pretty_json(value))
+
+folders = ['CURRENT-TEAM-STRENGTH-001V-P01' + suffix for suffix in
+           ('', '-FALLBACK-A01', '-FALLBACK-A02', '-FALLBACK-A02-D1', '-FALLBACK-A03')]
+inventory = {folder: {str(p.relative_to(public/folder)).replace('\\','/'):sha(p)
+                     for p in sorted((public/folder).rglob('*')) if p.is_file()}
+             for folder in folders}
+protected = ['config/evaluation/team_strength_p01_fallback.json',
+             'config/evaluation/team_strength_p01_fallback_a03.json',
+             'config/rights/openligadb_p01_fallback.json', 'uv.lock', 'pyproject.toml',
+             'src/dmf_pulse/evaluation/p01_fallback.py',
+             'src/dmf_pulse/evaluation/p01_frozen_view.py',
+             'src/dmf_pulse/evaluation/team_strength_scoring.py']
+# Resolve actual scorer path without inventing files.
+protected = [p for p in protected if (w/p).is_file()]
+protected += [str(p.relative_to(w)).replace('\\','/') for p in (w/'.github/workflows').rglob('*') if p.is_file()]
+write('HISTORICAL-INVENTORY.json', {'schema_version':'p01-a03-d2-historical-inventory-v1',
+      'captured_at':datetime.now(UTC).isoformat(), 'immutable_parent':'dde795c85f68d87578d3432576dac5d600794a32',
+      'original_artifacts':inventory, 'protected_files':{p:sha(w/p) for p in sorted(protected)}})
+source = public/'CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A01/rights-source-bytes/ca2eb416a4c68f234c1d0989302c0d9ee3ae5fffce175d02a05cdb599f44577b'
+assert sha(source) == source.name
+doc = json.loads(source.read_bytes())
+pointers = ['/components/schemas/Match/properties/'+key for key in
+            ('leagueId','leagueShortcut','leagueSeason','leagueName','group','matchIsFinished')]
+pointers += ['/components/schemas/Group/properties/groupOrderID',
+             '/components/schemas/League/properties/leagueSeason',
+             '/paths/~1getmatchdata~1{leagueShortcut}~1{leagueSeason}~1{groupOrderId}/get']
+def lookup(pointer):
+    value=doc
+    for part in pointer.split('/')[1:]: value=value[part.replace('~1','/').replace('~0','~')]
+    return value
+write('RETAINED-SCHEMA-EVIDENCE.json', {'schema_version':'p01-a03-d2-retained-schema-evidence-v1',
+      'examined_at':datetime.now(UTC).isoformat(), 'retrieved_during_d2':False,
+      'source_url':'https://api.openligadb.de/swagger/v1/swagger.json',
+      'retained_byte_sha256':sha(source), 'retained_bytes':source.stat().st_size,
+      'json_pointer_excerpts':{p:lookup(p) for p in pointers},
+      'interpretation':'Route shortcut/season/group and returned leagueId are governed identity checks. leagueName is nullable and not a route key; descriptive classification is an inference, not an observed A03 value or an immutability guarantee.',
+      'compatibility_proposal_status':'PROPOSED_UNAPPROVED',
+      'current_policy':'Preserve every existing equality/type guard including legacy exact display-name restriction.',
+      'unresolved':'Exact A03 mismatch field/value and current live response schema were not retained.'})
+request=Path('C:/Users/sebgr/.codex/attachments/1ba934f6-50d3-40d2-b480-82c917a96b84/Pasted text.txt')
+with (e/'HUMAN-AUTHORIZATION.txt').open('xb') as f:f.write(request.read_bytes())
+(e/'.gitattributes').write_text('*.log binary\nHUMAN-AUTHORIZATION.txt binary\n',encoding='utf-8',newline='\n')
+old=w.parent/'001V-P01-FALLBACK-A03/review_pack'
+for name in ('capture.py','offline_pytest.py'):
+    (w/'review_pack'/name).write_text((old/name).read_text().replace('CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03',ticket).replace('A03 release tests','D2 release tests'),encoding='utf-8',newline='\n')
+historic=public/'CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03/public-team-strength-p01-fallback-stopped-diagnostic-v1/db81ef1576046e5c5788830576aa44ce72ace03851cc4eb62106648aeb6c0cb2.json'
+dest=w/'tests/fixtures/evaluation/a03_stopped_metadata_gate.json'
+with dest.open('xb') as f:f.write(historic.read_bytes())
+print(json.dumps({'historical_files':sum(map(len,inventory.values())), 'protected_files':len(protected),'provider_requests':0}))
