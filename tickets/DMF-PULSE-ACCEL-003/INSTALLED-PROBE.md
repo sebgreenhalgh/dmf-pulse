@@ -44,6 +44,23 @@ comparison regression tests passed in 2.06 seconds. The initial installed driver
 and the two embedded screening hashes. All 200409 numerical fields in that result
 matched exactly; the raw failure remains in ignored
 `review_pack/installed-accel003-probe/`. Its 1GW comparison passed. A subsequent
-clean-wheel driver run includes the narrow traced custody handling and the actual
-cancellation tests; final acceptance is determined by the literal installed-wheel
+clean-wheel driver run passed in 259.21 seconds: 1GW 52.96 seconds with 67750 numeric
+fields, 3GW 170.75 seconds with 200409 numeric fields, no mismatches. Acquisition
+cancellation passed in 2.54 seconds after one attempt; modelling cancellation
+passed in 35.53 seconds after thirteen attempts. Both killed the actual child,
+closed its handle, withheld results and retained spent reservations. All seven
+parent/child audit guards self-tested once and observed zero unexpected network
+attempts. Owned evaluation scored eight targets with zero real cohort members;
+owned evidence matched all six players exactly. The unchanged repository secret
+scanner passed with zero findings after explicit ASGI response handling replaced
+six syntactic false positives; no scanner/allowlist change was made.
+
+The clean-wheel receipt is ignored
+`review_pack/installed-accel003-probe-v2/receipt.json`, SHA256
+`3c18da03327e1f6ba3c61ab96ba5a16d28fd18d8ab00d22c781d81271e91545d`.
+Its development wheel SHA256 is
+`76db84d76ec03d6f474ab198950e4906f2cfe887fb37b64527b6fc62e78995d3`.
+Full per-pointer parity inventories, including both custody values, are retained
+beside that receipt. This wheel predates the final parent current-result envelope
+binding change. Final acceptance is determined by the literal installed-wheel
 gate on the integrated product source, not this development receipt.
