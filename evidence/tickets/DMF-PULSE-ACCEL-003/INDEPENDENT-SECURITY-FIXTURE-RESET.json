@@ -1,0 +1,125 @@
+{
+  "checks": [
+    {
+      "case": "nonempty-seeded-qualification-and-control-custody",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-exact-three-exclusions",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-ordinary-before-setup",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-setup-clears-ordinary",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-setup-preserves-all-control-and-qualification-bytes",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-owned-case-writes-ordinary",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-teardown-clears-ordinary",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_odds_credentials_quota_retention.py-teardown-preserves-all-control-and-qualification-bytes",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-exact-three-exclusions",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-ordinary-before-setup",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-setup-clears-ordinary",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-setup-preserves-all-control-and-qualification-bytes",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-owned-case-writes-ordinary",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-teardown-clears-ordinary",
+      "pass": true
+    },
+    {
+      "case": "tests/security/test_fpl_rights_raw_retention.py-teardown-preserves-all-control-and-qualification-bytes",
+      "pass": true
+    },
+    {
+      "case": "core.refresh_control_ledger-UPDATE-still-rejected",
+      "pass": true
+    },
+    {
+      "case": "core.refresh_control_ledger-DELETE-still-rejected",
+      "pass": true
+    },
+    {
+      "case": "core.refresh_control_ledger-TRUNCATE-still-rejected",
+      "pass": true
+    },
+    {
+      "case": "core.refresh_control_event-UPDATE-still-rejected",
+      "pass": true
+    },
+    {
+      "case": "core.refresh_control_event-DELETE-still-rejected",
+      "pass": true
+    },
+    {
+      "case": "core.refresh_control_event-TRUNCATE-still-rejected",
+      "pass": true
+    },
+    {
+      "case": "all-guards-roll-back-and-preserve-original-custody",
+      "pass": true
+    },
+    {
+      "case": "every-other-test-table-remains-fully-reset",
+      "ordinary_tables": 73,
+      "pass": true
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_TEST_DATABASE_ONLY",
+  "created_separate_database": true,
+  "credentials_inspected": false,
+  "database": "dmf_pulse_fixture_review_a21c958140f3",
+  "observed_at": "2026-10-29T23:25:50.970539+00:00",
+  "port": 55434,
+  "preserved_original_rows": {
+    "core.refresh_control_event": {
+      "count": 1,
+      "sha256": "30224134161561e09a79ffd6291b564541e8c2eb1e2531a4a8958ab41c164ec9"
+    },
+    "core.refresh_control_ledger": {
+      "count": 1,
+      "sha256": "9034fda26e263bf58dad67177dd73d6a0374567ed59b1650a19e1d76fbee74ff"
+    },
+    "evaluation.qualified_source": {
+      "count": 6,
+      "sha256": "5cee4c5c77c4303856a2e1d9a3a3d57f93bed4f802ae4ce8a47b9b7faa5fb342"
+    }
+  },
+  "provider_calls": 0,
+  "schema_version": "accel003-independent-security-fixture-reset-v1",
+  "source_sha256": {
+    "tests/security/test_fpl_rights_raw_retention.py": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df",
+    "tests/security/test_odds_credentials_quota_retention.py": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
+  },
+  "status": "PASS",
+  "unchanged_product_fingerprint": "184c31258cfbb9d87ad7c6e462244d72ad0a4718"
+}

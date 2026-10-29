@@ -1,0 +1,26 @@
+{
+  "command": [
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+    "-c",
+    "import sys;sys.path.insert(0,'C:\\\\Users\\\\sebgr\\\\Documents\\\\dmf-pulse\\\\review_pack\\\\ACCEL-003\\\\src');import pytest;raise SystemExit(pytest.main(sys.argv[1:]))",
+    "tests/unit/ingestion/test_horizon_rights_approval.py",
+    "tests/unit/ingestion/test_operator_odds_transient.py",
+    "tests/unit/ingestion/test_one_command_odds_transient.py",
+    "tests/unit/ingestion/test_horizon_probe.py",
+    "-q",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\independent-legacy-freeze-tests"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET",
+  "exit_code": 0,
+  "finished_at": "2026-10-29T20:21:42.887007+00:00",
+  "log": "review_pack\\independent-legacy-freeze-tests.log",
+  "log_sha256": "d933d3bfe5848a73e529cde1513f74fd870c72f2b6210b560480dbbff5bcb279",
+  "output_tail": "........................................................................ [ 61%]\n..............................................                           [100%]\n118 passed in 3.35s\n",
+  "package": "Frozen integrated root/src first on sys.path; test-only MARKET342518a patch and fixtures",
+  "schema_version": "accel003-independent-legacy-freeze-tests-v1",
+  "started_at": "2026-10-29T20:21:38.612782+00:00"
+}

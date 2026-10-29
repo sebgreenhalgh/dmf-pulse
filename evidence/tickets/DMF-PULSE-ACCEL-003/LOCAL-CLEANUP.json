@@ -1,0 +1,13 @@
+{
+  "note": "Only Wave00355433/55434 and owned dashboard8766 are completion gates. Other observed service ports are not stopped or modified by this programme.",
+  "observed_closed_loopback_ports": {
+    "55432": true,
+    "55433": true,
+    "55434": true,
+    "8765": true,
+    "8766": true
+  },
+  "owned_services_stopped": true,
+  "recorded_at": "2026-10-29T23:29:50.107144+00:00",
+  "status": "PASS"
+}

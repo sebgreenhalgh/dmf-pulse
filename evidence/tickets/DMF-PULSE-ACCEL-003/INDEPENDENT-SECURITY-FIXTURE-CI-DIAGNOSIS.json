@@ -1,0 +1,101 @@
+{
+  "all_shard_count": 16,
+  "conclusion": "failure",
+  "credentials_inspected": false,
+  "diagnosis": "All16 source-checkpoint shards completed.13 pass; shard9 exact old transient hash mismatch and shards6/15 module-local Odds/FPL blanket cleanup hitting protected control-table truncate triggers account for all failed shards. Aggregate quality fails; combined/post stages are skipped. These failures are retained; final new exact-SHA20/20 is required.",
+  "failed_shards": [
+    {
+      "conclusion": "failure",
+      "id": 123697896415,
+      "name": "Coverage shard 9 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123697896454,
+      "name": "Coverage shard 6 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123697896589,
+      "name": "Coverage shard 15 of 16",
+      "status": "completed"
+    }
+  ],
+  "fixture_failures": [
+    {
+      "append_only_error_present": true,
+      "blanket_truncate_includes_control_pair": true,
+      "job_id": 123697896454,
+      "log_sha256": "719f7ab236b2b797b645de5eb0c90a1c160adcfa036479dd6634a4321be92a45",
+      "setup_error_count": 4,
+      "setup_headers": [
+        "2026-10-29T20:22:07.3147796Z _ ERROR at setup of test_http_failure_attempt_and_quota_are_retained_without_raw_body _",
+        "2026-10-29T20:22:07.3291665Z ____ ERROR at setup of test_odds_and_quota_evidence_are_database_immutable _____",
+        "2026-10-29T20:22:07.3417974Z _ ERROR at setup of test_persisted_quota_depletion_blocks_next_credential_and_transport_call _",
+        "2026-10-29T20:22:07.3515561Z _ ERROR at setup of test_raw_forbidden_success_persists_only_hash_metadata_and_quota _"
+      ],
+      "summary": [
+        "2026-10-29T20:22:07.7820208Z =========== 286 passed, 24 warnings, 4 errors in 1334.72s (0:22:14) ============"
+      ]
+    },
+    {
+      "append_only_error_present": true,
+      "blanket_truncate_includes_control_pair": true,
+      "job_id": 123697896589,
+      "log_sha256": "9629fd765a8bedd67b65a432de7740bcab13274d87b2f5624617e82fec6a4651",
+      "setup_error_count": 6,
+      "setup_headers": [
+        "2026-10-29T20:34:14.6543497Z _ ERROR at setup of test_database_rejects_raw_storage_under_denied_profile_and_retains_only_hashes _",
+        "2026-10-29T20:34:14.6777445Z _ ERROR at setup of test_exhausted_manual_validation_retry_is_terminal_and_keeps_no_raw_body _",
+        "2026-10-29T20:34:14.6866520Z _ ERROR at setup of test_official_manual_validation_leaves_no_raw_body_or_secret_in_result_or_logs _",
+        "2026-10-29T20:34:14.6951514Z _ ERROR at setup of test_official_manual_validation_retries_in_memory_then_reaches_terminal_rejection _",
+        "2026-10-29T20:34:14.7039500Z _ ERROR at setup of test_raw_storage_tombstone_hides_object_and_prevents_reuse _",
+        "2026-10-29T20:34:14.7102697Z ___________ ERROR at setup of test_rights_profile_rows_are_immutable ___________"
+      ],
+      "summary": [
+        "2026-10-29T20:34:16.1016453Z ================== 823 passed, 6 errors in 2055.97s (0:34:15) =================="
+      ]
+    }
+  ],
+  "head_sha": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "job_state_counts": {
+    "completed:failure": 4,
+    "completed:skipped": 2,
+    "completed:success": 14
+  },
+  "metadata_sha256": "25562c33aeb6ed07d81f427eeaba0fbf2add3bfac8b08c18b906452413d9a125",
+  "observed_at": "2026-10-29T23:27:18.282074+00:00",
+  "other_mandatory_jobs": [
+    {
+      "conclusion": "success",
+      "id": 123697243198,
+      "name": "Pre-flight",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123719743612,
+      "name": "Python 3.13 / Ubuntu",
+      "status": "completed"
+    },
+    {
+      "conclusion": "skipped",
+      "id": 123719744567,
+      "name": "Combined coverage gate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "skipped",
+      "id": 123719746283,
+      "name": "Post-coverage acceptance",
+      "status": "completed"
+    }
+  ],
+  "provider_calls": 0,
+  "run_status": "completed",
+  "schema_version": "accel003-independent-completed-checkpoint-ci-diagnosis-v1",
+  "status": "DIAGNOSIS_CONFIRMED",
+  "successful_shard_count": 13
+}

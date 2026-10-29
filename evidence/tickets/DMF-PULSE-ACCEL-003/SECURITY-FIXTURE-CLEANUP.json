@@ -1,0 +1,19 @@
+{
+  "all_author_and_reviewer_connections_disposed": true,
+  "author_worktree_clean": true,
+  "cluster": "ACCEL-003/review_pack/pgdata-utf8",
+  "credentials_read": 0,
+  "independent_actual_reset_guard_checks_passed": 23,
+  "independent_review_sha256": "e200d7f67fd9ffb4622f6e65570b661d38a6f0e0898306bc5f644cb7fed8131a",
+  "independent_targeted_tests_passed": 41,
+  "only_owned_service_stopped": true,
+  "original_availability_mutated": false,
+  "owned_port": 55434,
+  "port_closed": true,
+  "postmaster_pid_removed": true,
+  "provider_calls": 0,
+  "recorded_at": "2026-10-29T23:29:30.030548+00:00",
+  "schema_version": "accel003-control-fixture-cleanup-v1",
+  "shutdown": "pg_ctl fast wait exited0 after shutdown checkpoint",
+  "status": "PASS"
+}

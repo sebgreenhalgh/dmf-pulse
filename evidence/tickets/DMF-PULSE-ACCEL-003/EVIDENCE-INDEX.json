@@ -6,6 +6,11 @@
       "sha256": "659dfc90d4108489f08fa1dbc087e6e490ba13c57340c7892c841f3b975e232c"
     },
     {
+      "bytes": 5548,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CHECKPOINT-CI-FAILURES.json",
+      "sha256": "19610062cdbdc26b22c603f77df4643f9a80ea328c0f941ebc011bf9a5a75316"
+    },
+    {
       "bytes": 4769,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CHECKPOINT-DIAGNOSTIC-INVENTORY.json",
       "sha256": "ef200990501a3802143cbe91e9bc93137b4a8fe0844d28e3731323c93e0461c4"
@@ -106,6 +111,46 @@
       "sha256": "a412dc58e683fe32d46a7877b3ce8cf6ef71bbeaa0fbdac0c77cac83c78489da"
     },
     {
+      "bytes": 0,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-DIFF-CHECK.LOG",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 29,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-FORMAT.LOG",
+      "sha256": "509a079f767f1e45e1cbd35e7bcf9cc076889895357f39ab4b2cdfac71708ed1"
+    },
+    {
+      "bytes": 180,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-LEGACY-TESTS.LOG",
+      "sha256": "83d02eb18a326765e820f3b95b92b70b37fe43c798ad69d8d918f15ceecbeb12"
+    },
+    {
+      "bytes": 19,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-LINT.LOG",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 4164,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-LOCAL-GATES.json",
+      "sha256": "a88db21a05bfe7b7aeed18bbdc0a7e7fd8390cf3f1f9c1794dcecba82a624a89"
+    },
+    {
+      "bytes": 63,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-SECRET-SCAN.LOG",
+      "sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+    },
+    {
+      "bytes": 197,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-SUPERSEDED-UV-CACHE.LOG",
+      "sha256": "a737b7967cfcdfd2a772f14fc63a23ef2cc912892854493b6d16147f6298f1e8"
+    },
+    {
+      "bytes": 45,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-TYPING.LOG",
+      "sha256": "f3eae03b5d08ff9e522bf62f15991a536feec9b6c2c7e55d23f11b1a8a241de0"
+    },
+    {
       "bytes": 99,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CURRENT-CLI-16-PASS.log",
       "sha256": "e83003f61db32d90967a381cb41c9abfc094dfe1198dc6809dde2a817e3f03ba"
@@ -156,6 +201,51 @@
       "sha256": "342fedfdcdf28179b0fde93dcc026b73ef4f96eff5207fa7387aabbe7d092ccf"
     },
     {
+      "bytes": 13474,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-INSTALLED-WHEEL-CANONICAL.LOG",
+      "sha256": "089460d52fe7daaf38501d283b4d2e0dadaf114c3ba78f546b689323beb7203e"
+    },
+    {
+      "bytes": 89,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-INSTALLED-WHEEL.LOG",
+      "sha256": "2826384aa3edb91d38e5df06ae98e859b87bc7d7871d309e817b7c54e4cd0fb4"
+    },
+    {
+      "bytes": 4692,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-LOG-PROVENANCE.json",
+      "sha256": "6b4fe188c4a3b6f411399a9baa697ea69d0ef957a0882a197393c9f8201b6567"
+    },
+    {
+      "bytes": 683,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-PERFORMANCE.LOG",
+      "sha256": "d28042b9f305efab6970f644084633a81fedb793e9713f4a7cabe4b2e0df2762"
+    },
+    {
+      "bytes": 99,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFIER-TESTS-CORRECTED.LOG",
+      "sha256": "969a514c3c7073b5a6a17a5c13a4a227eaf70104c39f850e48ffbdb1a20009d8"
+    },
+    {
+      "bytes": 688,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_GCS008_WHEEL.LOG",
+      "sha256": "0815fc7dca2b597ad07939ca721ed279fba8b8ce65c692f675892e89b72b1c22"
+    },
+    {
+      "bytes": 616,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_P01_FALLBACK_A02_WHEEL.LOG",
+      "sha256": "7f64d3b25e4f0b1bb67fe977293e75d7d3134e1d7ab24c4c15bd099a39af207f"
+    },
+    {
+      "bytes": 308,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_TEAM_STRENGTH_L1_WHEEL.LOG",
+      "sha256": "d70453a9c481d54e46a0ac5c0df3fce719c563bdef7fdeca21ebf7cea708feba"
+    },
+    {
+      "bytes": 246,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_TEAM_STRENGTH_U_WHEEL.LOG",
+      "sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0"
+    },
+    {
       "bytes": 905,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-EXPRESSION-DELTA.json",
       "sha256": "3243efbe7aacd0d435d85d9c386e9ce00139145111eb0e8f25b60aba0ecdad9f"
@@ -164,6 +254,26 @@
       "bytes": 23780,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-INTEGRATION.json",
       "sha256": "186105735c284b3504637658c956d1af58200311a6581a33476af5d29cba7841"
+    },
+    {
+      "bytes": 3214,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-LEGACY-DEFAULT-EQUIVALENCE.json",
+      "sha256": "ca3fc107d3571bb37190d408bfef0c15b1484e51b867df01ba3237efe2773d42"
+    },
+    {
+      "bytes": 4282,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-LEGACY-FREEZE-ATTACKS.json",
+      "sha256": "af9a39141184119c748577539ee5a22298b0ad760c915a2ed2024859583e5c03"
+    },
+    {
+      "bytes": 6992,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-LEGACY-FREEZE-REVIEW.json",
+      "sha256": "97e9303feb627ac965b21c9e38c360d397aecaeae2f8bca36a4226552cabd5ff"
+    },
+    {
+      "bytes": 1490,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-LEGACY-FREEZE-TESTS.json",
+      "sha256": "01112d5c8b61e2d6cb3405819365ed4e1dd0e37f53447f3c00325249c6f2f743"
     },
     {
       "bytes": 1565141,
@@ -184,6 +294,56 @@
       "bytes": 3312,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-PUBLICATION-3GW.json",
       "sha256": "b85372d35be21f38ab5ea3a28fcef597d12e4cdced0bb479ae44536ec48048b2"
+    },
+    {
+      "bytes": 4298,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-SECURITY-FIXTURE-CI-DIAGNOSIS.json",
+      "sha256": "2eaa1ef8e61919414182b62646506173e70c633690afe68b64e6ce81cf888237"
+    },
+    {
+      "bytes": 4121,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-SECURITY-FIXTURE-RESET.json",
+      "sha256": "7a7217fabe82f12d758cd242bf58c24348e2030b9650532728e8a7d8b9f1ba7f"
+    },
+    {
+      "bytes": 4938,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-SECURITY-FIXTURE-REVIEW.json",
+      "sha256": "e200d7f67fd9ffb4622f6e65570b661d38a6f0e0898306bc5f644cb7fed8131a"
+    },
+    {
+      "bytes": 1433,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-SECURITY-FIXTURE-TESTS.json",
+      "sha256": "1fe90344d610f6eedcf8094573efe032794d9a0212f563fb5018abb491d27afd"
+    },
+    {
+      "bytes": 13474,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-FPL-ODDS.json",
+      "sha256": "089460d52fe7daaf38501d283b4d2e0dadaf114c3ba78f546b689323beb7203e"
+    },
+    {
+      "bytes": 419110,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-PARITY-1.json",
+      "sha256": "1e552114335a4d7b4529a9e0b8150eab651a0429d184016a9cb4d389a86db1e8"
+    },
+    {
+      "bytes": 841051,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-PARITY-3.json",
+      "sha256": "37fb6fa420da3dcebabd4853e63cf3298961787e5aeabd468f45778e9d6a3f60"
+    },
+    {
+      "bytes": 5190,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-REAL-HTTP.json",
+      "sha256": "a83cac2872f620fbceb2448575137a620b202c210470b6b30bac2cf0f67fd727"
+    },
+    {
+      "bytes": 11573,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-WHEEL.json",
+      "sha256": "2e1e43fd7b40a71c4e42d1e9d9ff0e98346ab559cedbe0badcf7d02dbb45a028"
+    },
+    {
+      "bytes": 404,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-CLEANUP.json",
+      "sha256": "95cb51d6733eac1cd67aad6dabf317925d3397709bebd149fc103011cfa5ceae"
     },
     {
       "bytes": 3980,
@@ -241,9 +401,59 @@
       "sha256": "683e88beaff49e27a6e910f872c9762bce64ccd1dcd10e5ac1851043ca353e06"
     },
     {
+      "bytes": 5448,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/PROTECTED-AUDIT-SOURCE-CHECKPOINT.json",
+      "sha256": "24f5a4ec9b3e671c2b81f2f1cb574913b23670efb8f71c8ba0e67af46344adab"
+    },
+    {
+      "bytes": 10663,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/RELEASE-HANDOFF.md",
+      "sha256": "21a3b71762aac0e46dac09d5015a55e0d6d9640760630e99ffdd9e42f5d17c3e"
+    },
+    {
+      "bytes": 117651,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/RELEASE-PACKAGE-CUSTODY.json",
+      "sha256": "827601225d1bcc435a13e8d059302ba117f887bdb322d78b8925ea8d3ea20bf2"
+    },
+    {
+      "bytes": 2606,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/REMAINING-WHEEL-COMMANDS.json",
+      "sha256": "ee7200ff400cbe4e29c2ce3f7860563ea0896c562785d3858deea258dec4d5ee"
+    },
+    {
+      "bytes": 4554,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-CHECKS.json",
+      "sha256": "f12ab56e2debc4ba2b2b1d4ffadb1a8709b4cad1a95e62d048619b4878e6b782"
+    },
+    {
+      "bytes": 4236,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-HANDOFF.json",
+      "sha256": "c379b742417100c3d6d3cfc41057f78d265558cd402312d649cb2394286f4ba6"
+    },
+    {
+      "bytes": 746,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-CLEANUP.json",
+      "sha256": "729c40e610fe6e4bdd4471c41a972eb92af491f52c55b74f3817c129660ea7bc"
+    },
+    {
+      "bytes": 378,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-PROVENANCE.json",
+      "sha256": "e7c29bcd6b2444fde419e43a856590710edb5ab5f65d4aaf13c355a53e0b7b2b"
+    },
+    {
       "bytes": 1537,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SUPERSEDED-LINT-GATE.json",
       "sha256": "6e63d8600e4705537b72213b678a7a223043f419b0d8c12d7518f46b59383e1c"
+    },
+    {
+      "bytes": 3793,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SUPERSEDED-SECRET-EXPRESSION-FINDINGS.json",
+      "sha256": "0482d43c25c1ef4525203b296564a5e979a57e8335f0b80f31a600763e825df7"
+    },
+    {
+      "bytes": 767,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SUPERSEDED-WHEEL-MISSING-BUILD.json",
+      "sha256": "b35989a573d90da2e45b8eee5de714903bff9bfc148b8a530381849cdf0244b7"
     }
   ],
   "schema_version": "accel003-evidence-index-v1",

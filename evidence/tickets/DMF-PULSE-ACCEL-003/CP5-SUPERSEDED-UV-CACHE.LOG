@@ -1,0 +1,2 @@
+error: Failed to initialize cache at `C:\Users\sebgr\AppData\Local\uv\cache`
+  Caused by: failed to open file `C:\Users\sebgr\AppData\Local\uv\cache\sdists-v9\.git`: Access is denied. (os error 5)

@@ -1,0 +1,132 @@
+{
+  "changed_files": [
+    "tests/security/test_fpl_rights_raw_retention.py",
+    "tests/security/test_odds_credentials_quota_retention.py"
+  ],
+  "checks": [
+    {
+      "byte_semantic_snapshots_unchanged": true,
+      "fixture": "test_odds_credentials_quota_retention",
+      "qualified_config_and_control_history_sha256": "ad1acbd6159f60d96746c2513acf5b9a9a3e35423e0b5d4d95a2c3e653df85a0",
+      "setup_ordinary_canary_removed": true,
+      "teardown_ordinary_canary_removed": true
+    },
+    {
+      "byte_semantic_snapshots_unchanged": true,
+      "fixture": "test_fpl_rights_raw_retention",
+      "qualified_config_and_control_history_sha256": "ad1acbd6159f60d96746c2513acf5b9a9a3e35423e0b5d4d95a2c3e653df85a0",
+      "setup_ordinary_canary_removed": true,
+      "teardown_ordinary_canary_removed": true
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "tests/security/test_odds_credentials_quota_retention.py",
+        "tests/security/test_fpl_rights_raw_retention.py"
+      ],
+      "exit_code": 0,
+      "log": "control-fixture-check-0.log",
+      "log_sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938",
+      "seconds": 0.092,
+      "started_at": "2026-10-29T20:26:47.787814+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "tests/security/test_odds_credentials_quota_retention.py",
+        "tests/security/test_fpl_rights_raw_retention.py"
+      ],
+      "exit_code": 0,
+      "log": "control-fixture-check-1.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "seconds": 0.096,
+      "started_at": "2026-10-29T20:26:47.880685+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/security/test_odds_credentials_quota_retention.py",
+        "tests/security/test_fpl_rights_raw_retention.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "-q",
+        "--tb=short",
+        "--basetemp",
+        "review_pack/pytest-control-fixture-compat",
+        "-o",
+        "cache_dir=review_pack/pytest-cache-control-fixture-compat"
+      ],
+      "exit_code": 0,
+      "log": "control-fixture-check-2.log",
+      "log_sha256": "d07e837b07252f125cf4ffdbc2bb4d3b8489207a787b8692827abf3ceab6e5e3",
+      "seconds": 42.576,
+      "started_at": "2026-10-29T20:26:47.977717+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "control-fixture-check-3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "seconds": 0.08,
+      "started_at": "2026-10-29T20:27:30.554726+00:00"
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_DATABASE_TEST_FIXTURES_ONLY",
+  "finished_at": "2026-10-29T20:27:30.708357+00:00",
+  "guard_mutation_denials": [
+    {
+      "denied_and_rolled_back": true,
+      "operation": "UPDATE",
+      "table": "core.refresh_control_ledger"
+    },
+    {
+      "denied_and_rolled_back": true,
+      "operation": "DELETE",
+      "table": "core.refresh_control_ledger"
+    },
+    {
+      "denied_and_rolled_back": true,
+      "operation": "TRUNCATE",
+      "table": "core.refresh_control_ledger"
+    },
+    {
+      "denied_and_rolled_back": true,
+      "operation": "UPDATE",
+      "table": "core.refresh_control_event"
+    },
+    {
+      "denied_and_rolled_back": true,
+      "operation": "DELETE",
+      "table": "core.refresh_control_event"
+    },
+    {
+      "denied_and_rolled_back": true,
+      "operation": "TRUNCATE",
+      "table": "core.refresh_control_event"
+    }
+  ],
+  "isolation_proof": "PASS",
+  "parent": "58ae73f4ea42c2a3b0fac17a611beca4c863fb8a",
+  "product_or_migration_or_guard_edits": 0,
+  "provider_calls": 0,
+  "real_credential_reads": 0,
+  "schema_version": "accel003-control-fixture-compat-v1",
+  "source_sha256": {
+    "tests/security/test_fpl_rights_raw_retention.py": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df",
+    "tests/security/test_odds_credentials_quota_retention.py": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
+  },
+  "started_at": "2026-10-29T20:26:45.296666+00:00",
+  "status": "PASS"
+}

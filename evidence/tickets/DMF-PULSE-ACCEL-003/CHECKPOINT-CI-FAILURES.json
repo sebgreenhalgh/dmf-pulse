@@ -1,0 +1,178 @@
+{
+  "disposition": "Actual failures retained; targeted independently reviewed test-only remediation requires a new full exact-SHA CI run. No workflow or production guard is weakened.",
+  "full_observation": {
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "id": 123697243198,
+        "name": "Pre-flight",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896299,
+        "name": "Coverage shard 0 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896311,
+        "name": "Coverage shard 4 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896315,
+        "name": "Coverage shard 14 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896338,
+        "name": "Coverage shard 3 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896339,
+        "name": "Coverage shard 10 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896358,
+        "name": "Coverage shard 1 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896386,
+        "name": "Coverage shard 8 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896407,
+        "name": "Coverage shard 11 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "id": 123697896415,
+        "name": "Coverage shard 9 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "id": 123697896454,
+        "name": "Coverage shard 6 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896459,
+        "name": "Coverage shard 13 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896482,
+        "name": "Coverage shard 2 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896484,
+        "name": "Coverage shard 5 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896485,
+        "name": "Coverage shard 12 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 123697896512,
+        "name": "Coverage shard 7 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "id": 123697896589,
+        "name": "Coverage shard 15 of 16",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "id": 123719743612,
+        "name": "Python 3.13 / Ubuntu",
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "id": 123719744567,
+        "name": "Combined coverage gate",
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "id": 123719746283,
+        "name": "Post-coverage acceptance",
+        "status": "completed"
+      }
+    ],
+    "path": "review_pack/ci-source-completed.json",
+    "sha256": "25562c33aeb6ed07d81f427eeaba0fbf2add3bfac8b08c18b906452413d9a125",
+    "status": "completed"
+  },
+  "head_sha": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "jobs": [
+    {
+      "conclusion": "failure",
+      "diagnosis": "Historical exact-byte freeze requires the one authorized wrapper exception.",
+      "job_id": 123697896415,
+      "job_name": "Coverage shard 9 of 16",
+      "normalized_log_sha256": "4bb1049e2b712c3057a69504c10296d94f59b704b96ae0923f42bc84a54aa5be",
+      "original_log": {
+        "bytes": 152640,
+        "path": "review_pack/ci-job-123697896415.log",
+        "sha256": "1d0e4d72ff9948b2b61bc800e32de7fcbd5b9242815f71331f40e1a61109fb37"
+      },
+      "test_result": "1 failed, 274 passed in 960.63s"
+    },
+    {
+      "conclusion": "failure",
+      "diagnosis": "Inherited test reset blanket TRUNCATE is rejected by the new append-only control trigger.",
+      "job_id": 123697896454,
+      "job_name": "Coverage shard 6 of 16",
+      "normalized_log_sha256": "57d94c4a6269de4827b6b3919ef0bce897d5033692d142dafca861f71d41717c",
+      "original_log": {
+        "bytes": 344876,
+        "path": "review_pack/ci-job-123697896454.log",
+        "sha256": "719f7ab236b2b797b645de5eb0c90a1c160adcfa036479dd6634a4321be92a45"
+      },
+      "test_result": "286 passed, 4 errors in 1334.72s"
+    },
+    {
+      "conclusion": "failure",
+      "diagnosis": "Inherited test reset blanket TRUNCATE is rejected by the new append-only control trigger.",
+      "job_id": 123697896589,
+      "job_name": "Coverage shard 15 of 16",
+      "normalized_log_sha256": "77cfc3c62237a453d900f62b1c48cfe519a4a5804b62dec27cb064441b857fb1",
+      "original_log": {
+        "bytes": 463376,
+        "path": "review_pack/ci-job-123697896589.log",
+        "sha256": "9629fd765a8bedd67b65a432de7740bcab13274d87b2f5624617e82fec6a4651"
+      },
+      "test_result": "823 passed, 6 errors in 2055.97s"
+    }
+  ],
+  "raw_log_exclusion_reason": "Repeated trace bodies are bounded by hashes; no provider-shaped source bodies are copied.",
+  "raw_logs_in_capped_pack": false,
+  "run_id": 40944800918,
+  "schema_version": "accel003-checkpoint-ci-history-v1",
+  "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40944800918"
+}

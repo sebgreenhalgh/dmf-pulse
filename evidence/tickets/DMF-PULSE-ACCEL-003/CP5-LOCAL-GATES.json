@@ -1,0 +1,110 @@
+{
+  "final_exact_sha_ci_required": true,
+  "invocation_note": "Final static/targeted commands use the existing frozen environment directly after a helper subprocess was denied access to the global uv cache. Initial failure is retained; earlier literal frozen uv sync/build and installed-wheel commands passed.",
+  "new_real_provider_calls": 0,
+  "package_changes_since_installed_wheel": false,
+  "records": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "duration_seconds": 0.412,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T23:26:46.299953+00:00",
+      "label": "FORMAT",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-FORMAT.LOG",
+      "log_sha256": "509a079f767f1e45e1cbd35e7bcf9cc076889895357f39ab4b2cdfac71708ed1",
+      "started_at": "2026-10-29T23:26:45.888029+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "duration_seconds": 0.239,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T23:26:46.539350+00:00",
+      "label": "LINT",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-LINT.LOG",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-29T23:26:46.300425+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "duration_seconds": 0.634,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T23:26:47.173580+00:00",
+      "label": "TYPING",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-TYPING.LOG",
+      "log_sha256": "f3eae03b5d08ff9e522bf62f15991a536feec9b6c2c7e55d23f11b1a8a241de0",
+      "started_at": "2026-10-29T23:26:46.539700+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/ingestion/test_horizon_rights_approval.py",
+        "tests/unit/ingestion/test_operator_odds_transient.py",
+        "tests/unit/ingestion/test_one_command_odds_transient.py",
+        "tests/unit/ingestion/test_horizon_probe.py",
+        "-q",
+        "--basetemp",
+        "review_pack/pytest-cp5-legacy-captured-final",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "duration_seconds": 10.445,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T23:26:57.619423+00:00",
+      "label": "LEGACY-TESTS",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-LEGACY-TESTS.LOG",
+      "log_sha256": "83d02eb18a326765e820f3b95b92b70b37fe43c798ad69d8d918f15ceecbeb12",
+      "started_at": "2026-10-29T23:26:47.173983+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "scripts/scan_secrets.py"
+      ],
+      "duration_seconds": 80.753,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T23:28:18.373354+00:00",
+      "label": "SECRET-SCAN",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-SECRET-SCAN.LOG",
+      "log_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7",
+      "started_at": "2026-10-29T23:26:57.619917+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "duration_seconds": 0.169,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T23:28:18.543262+00:00",
+      "label": "DIFF-CHECK",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/CP5-DIFF-CHECK.LOG",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-29T23:28:18.373902+00:00"
+    }
+  ],
+  "schema_version": "accel003-final-test-evidence-gates-v1",
+  "source_checkpoint": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "status": "PASS",
+  "test_only_compatibility_delta": true
+}

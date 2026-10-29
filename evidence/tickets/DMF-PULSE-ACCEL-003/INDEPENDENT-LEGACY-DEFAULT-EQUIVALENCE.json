@@ -1,0 +1,113 @@
+{
+  "checks": [
+    {
+      "calls": [
+        [
+          "credential-configured"
+        ],
+        [
+          "profile-loader"
+        ],
+        [
+          "client",
+          "the_odds_api_private_analytics_v1",
+          [
+            "clock",
+            "credential_provider"
+          ]
+        ],
+        [
+          "fetch",
+          [
+            [
+              "commence_from",
+              "2026-08-20T12:05:00+00:00"
+            ],
+            [
+              "commence_to",
+              "2026-08-23T00:00:00+00:00"
+            ]
+          ]
+        ]
+      ],
+      "calls_equal": true,
+      "case": "happy",
+      "error_code": null,
+      "pass": true,
+      "result_byte_identity": "d40b2cc5046353f60ef0bcdb17a1c2ab63542aa54c41006887578ef41b4f0a38"
+    },
+    {
+      "calls": [
+        [
+          "credential-configured"
+        ]
+      ],
+      "calls_equal": true,
+      "case": "missing-credential",
+      "error_code": "CREDENTIAL_UNAVAILABLE",
+      "pass": true,
+      "result_byte_identity": "d0654ee9dde1c88f7a84fdc64b05cdee6cb0f7e8bba28c0042ea0164a81faec6"
+    },
+    {
+      "calls": [
+        [
+          "credential-configured"
+        ],
+        [
+          "profile-loader"
+        ],
+        [
+          "client",
+          "the_odds_api_private_analytics_v1",
+          [
+            "clock",
+            "credential_provider"
+          ]
+        ],
+        [
+          "fetch",
+          [
+            [
+              "commence_from",
+              "2026-08-20T12:05:00+00:00"
+            ],
+            [
+              "commence_to",
+              "2026-08-23T00:00:00+00:00"
+            ]
+          ]
+        ]
+      ],
+      "calls_equal": true,
+      "case": "invalid-json",
+      "error_code": "MALFORMED_JSON",
+      "pass": true,
+      "result_byte_identity": "d9b2e30091d1e7225735a9254f48e05fbc3e9d7cc89968ddfcf5191bdcda4ba4"
+    },
+    {
+      "calls": [],
+      "calls_equal": true,
+      "case": "naive-cutoff",
+      "error_code": "VALIDATION_FAILED",
+      "pass": true,
+      "result_byte_identity": "0186dd35141c3bbb41121c14c68176448b282f32652a7b003903c7be18c5cf59"
+    },
+    {
+      "calls": [],
+      "calls_equal": true,
+      "case": "empty-range",
+      "error_code": "VALIDATION_FAILED",
+      "pass": true,
+      "result_byte_identity": "0186dd35141c3bbb41121c14c68176448b282f32652a7b003903c7be18c5cf59"
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "credentials_accessed": false,
+  "current_source_sha256": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
+  "method": "Authenticated parent source class and current class execute same owned fixture/fetched metadata/fake client/credential checker/clock; exact model JSON, constructor/fetch kwargs and event ordering compared. No option, profile, quota, retry or rights default introduced.",
+  "old_source_sha256": "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e",
+  "provider_calls": 0,
+  "reviewed_at": "2026-10-29T20:19:12.742972+00:00",
+  "schema_version": "accel003-independent-legacy-default-equivalence-v1",
+  "status": "PASS"
+}

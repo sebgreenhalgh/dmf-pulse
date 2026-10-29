@@ -17,8 +17,9 @@ provider rights, retention, training, model promotion and activation are separat
   compatibility proposal, future cohort plan and Model Performance integration.
 - [x] CP4 typed temporal starts/minutes evidence, identity/revisions/missingness,
   licensed/open source assessment and chronological holdout plan.
-- [ ] CP5 adversarial independent review, parity, all unchanged release gates,
-  clean installed wheel, capped pack, final pushed SHA and complete 20/20 CI.
+- [x] CP5 local adversarial review, numerical parity, static/targeted gates and
+  all five clean installed-wheel commands, including actual loopback acceptance.
+- [ ] CP5 publication: capped pack, final pushed SHA and complete 20/20 CI.
 
 No real provider requests or credentials during this programme. The production
 refresh registry remains unapproved; real cohort size stays zero unless all
@@ -29,15 +30,33 @@ CP2/CP4 independent reviews clear their scoped implementations. Canonical
 control migration0008 satisfies accepted ADR-DATA-002; SQL concurrency, restart,
 rollback and append-only checks are clear. The shared grant-window defect and
 immediate expired-browser-session cleanup defect were reproduced and fixed.
-Final current-mode integration/numerical review, installed-wheel acceptance and
-exact-SHA CI remain required; checkpoint publication is not human acceptance.
+Final current-mode integration/numerical review and installed-wheel acceptance
+are complete; exact-SHA CI remains required. Checkpoint publication is not human
+acceptance.
 
 CP1 source freeze: 45 full current-mode cases, 29 independent publication attacks,
 complete one-/three-GW numerical comparison and final 20-scope independent review
 clear. The full-presentation IPC binding defect is fixed with an authenticated
 grant/decision/presentation/actionability envelope and repeated publication checks.
 Ruff, mypy377, frozen sync/build, 191 targeted cohort/evidence cases and secret scan
-pass. Installed-wheel release proof and final exact-SHA CI remain external gates.
+pass. All five literal installed-wheel commands and four performance tests pass.
+The clean runtime-only installation also completes actual console/uvicorn/pairing/
+Refresh/default-spawn/browser-view acceptance over loopback with no external
+provider access. Package custody binds all 476 installed code/resource files to
+the reviewed source checkpoint. Final exact-SHA CI and the capped archive remain
+external gates.
+
+CP5 checkpoint CI40944800918 exposed two test-compatibility defects in three shards: the legacy
+R8B exact-byte freeze did not record the authorized transient injection seam,
+and a blanket database test reset included the new append-only control tables.
+The initial failures remain retained. The R8B fix preserves its historical map
+and permits only the independently reviewed exact path/hash; default behavior
+matches the parent in five cases. Both security cleanup helpers now preserve
+the exact three immutable tables, consistent with the integration fixture.
+Independent actual-fixture checks prove ordinary table reset, custody equality
+and all six control-mutation denials; all 41 focused security/PostgreSQL tests
+pass independently. Neither correction changes package source,
+active rights, numerical kernels, the workflow or coverage requirements.
 
 ## DMF-PULSE-ACCEL-002 — Seb's Desk
 

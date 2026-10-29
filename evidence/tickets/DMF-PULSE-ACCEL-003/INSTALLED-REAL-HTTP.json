@@ -1,0 +1,116 @@
+{
+  "audit_hook_sha256": "f380b8cade036e7cd01d02ed26b607d300e2a056ed6b5d7bad0dcf6081c35c81",
+  "bound_seconds": 900,
+  "checks": {
+    "actual_default_spawn_and_inherited_loopback_guard": true,
+    "actual_installed_console_server_listening": true,
+    "duplicate_click_same_job_singleflight": true,
+    "http_pairing_private_cookie_and_current_owned_context": true,
+    "logout_revokes_presentation": true,
+    "performance_owned_reports_real_cohort_zero": true,
+    "reload_navigation_no_new_reservation": true,
+    "same_job_desk_team_decision_player_comparison": true
+  },
+  "classification": "OWNED_SYNTHETIC_CURRENT_MODE_NO_REAL_PROVIDER_EXECUTION",
+  "cleanup": {
+    "console_process_reaped": true,
+    "external_temp_environment_removed": true,
+    "owned_process_tree_stop_exit": 0,
+    "owned_processes_still_alive": 0,
+    "port_8766_closed": true
+  },
+  "control_event_counts": {
+    "ATTEMPT": 13,
+    "CHECK": 4,
+    "CLAIM": 1,
+    "RESERVATION": 1
+  },
+  "desk": {
+    "blocked_count": 1,
+    "body_sha256": "fb886840a0623e7d0a76ec87a5a4944244260ddbee58698a8066aaa3d03a6b53",
+    "catalogue_count": 121,
+    "current_squad_count": 15,
+    "dataset_mode": "SYNTHETIC_CURRENT_MODE",
+    "horizon_gameweeks": 1,
+    "job_sha256": "a65513a7fa1df591aa48c5db4fba1d0007df7c1bd7a5f8feba5f0aadacb68b95",
+    "projected_count": 120
+  },
+  "elapsed_seconds": 75.551,
+  "finished_at": "2026-10-29T20:05:11.911610+00:00",
+  "harness_remediation": "Create the explicitly selected owned control parent before CLI launch; ledger initializes its child only. First two attempts omitted this input-directory precondition and exited before pairing. Package bytes unchanged.",
+  "head_sha_at_start": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "helper_sha256": "7600f34565e0b200b7492aae32b953925a88e14ed55451f063c153ca2d0d146c",
+  "installed_runtime": {
+    "console_entrypoint": "dmf_pulse.cli.app:main",
+    "dev_imports_absent": true,
+    "package_under_external_venv": true,
+    "version": "0.2.0"
+  },
+  "model_or_source_values_retained": false,
+  "network_guard": {
+    "audit_records_sha256": "c9ad345c36608914782f0dac0c0d3f7450b5e3692dc7e5026910d85cadcf0a06",
+    "events": {
+      "socket.bind": 2,
+      "socket.connect": 3,
+      "socket.getaddrinfo": 2
+    },
+    "external_connect_canary_denials": 2,
+    "external_dns_canary_denials": 2,
+    "guarded_python_processes": 2,
+    "pre_package_hook_in_every_process": true,
+    "server_and_spawn_child_observed": true,
+    "unexpected_external_attempts": 0
+  },
+  "pairing_code_or_cookie_retained": false,
+  "performance": {
+    "body_sha256": "9995b492bf284ece2e7d31d632e43a5dbb328a2700f64b6d843287ea338e14f3",
+    "owned_reports_present": 3,
+    "real_qualified_cohort_count": 0,
+    "relation": "Owned evaluation is separate from the coherent recommendation job; no empirical gain or real cohort claimed."
+  },
+  "player_compare_sha256": "98ec7ea504155da8d50a2527ab50e072482ee5716efe10b37b68d678c7a4ce91",
+  "player_detail_sha256": "94ef72f01a18e7ef3c2fc554acba9dffaf22d6b97913dbf327fac7718eab31f2",
+  "port": 8766,
+  "raw_cli_output_retained": false,
+  "real_credential_reads": 0,
+  "real_provider_calls": 0,
+  "refresh_seconds": 64.246,
+  "retained_failure_receipt_sha256": {
+    "accel003-real-loopback-installed-first-failure.json": "dd4cbd65cd4c6c0b411e7220edaeecf3db6639cd6a9d6ae2c7f549ba1a69414f",
+    "accel003-real-loopback-installed-second-failure.json": "0645727cd9b74afdeeed9ca02a72b28afaf97ebfb381da30cf49b4673e8561f4",
+    "accel003-real-loopback-installed-third-failure.json": "6d753b258346ad18370c53711ebef4ffb395680238981566bda8b61416f7de6e"
+  },
+  "schema_version": "accel003-real-loopback-installed-v1",
+  "second_superseded_attempt": "accel003-real-loopback-installed-second-failure.json",
+  "setup": [
+    {
+      "exit_code": 0,
+      "purpose": "runtime_venv",
+      "seconds": 0.039,
+      "stderr_sha256": "618503e02470852e2fc66a23d56d2be942e091878936799963d1a0e9c025c45d",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "exit_code": 0,
+      "purpose": "frozen_runtime_sync",
+      "seconds": 0.776,
+      "stderr_sha256": "df7cb54aa7d95c409a41cde74e4412be1a5041725e04f5fdcaf91335c8c594a9",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "exit_code": 0,
+      "purpose": "wheel_no_deps_install",
+      "seconds": 0.217,
+      "stderr_sha256": "5b9b86f93d5f63f8cde41b67ea74da003d0a26ffe2b6319035089a58db5ceb4c",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "started_at": "2026-10-29T20:03:56.360953+00:00",
+  "status": "PASS",
+  "superseded_attempt": "accel003-real-loopback-installed-first-failure.json",
+  "third_attempt_remediation": "Probe-only HTTP helper no longer shadows the http.client module. Cleanup now waits for terminating owned descendants to disappear before its final snapshot.",
+  "third_superseded_attempt": "accel003-real-loopback-installed-third-failure.json",
+  "tracked_code_edits": 0,
+  "wheel_bytes": 1708200,
+  "wheel_sha256": "f20ae6b69191488f90c4dd5eec61d4ca42f15afbd89d52216c855c4e2521eda4"
+}

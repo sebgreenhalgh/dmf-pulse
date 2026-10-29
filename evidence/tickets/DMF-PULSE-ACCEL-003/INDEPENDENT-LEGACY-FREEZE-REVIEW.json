@@ -1,0 +1,93 @@
+{
+  "authority": {
+    "locators": [
+      "REQUEST.txt section5.4 source acquisition/client reuse and coherent information set",
+      "REQUEST.txt section6.2 exact account/request/quota/freshness/secret gates for inactive refresh readiness",
+      "CONTRACT.md Permitted implementation boundaries: narrow injection seams in existing private one-command and source clients",
+      "Existing independent CP2 receipt: exact transient whole-file SHA3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50 already reviewed"
+    ],
+    "qualification": "Authorizes offline engineering and this recorded test exception; does not authorize any live pilot, expand account rights, refresh consumed approval, or change retained-data admission.",
+    "request_sha256": "98da8cf3c9b9c38696e4ff8bbf63a9d00faadfa97c2eb2088f819d69af6ddbb2"
+  },
+  "checks": {
+    "exception_adversarial": {
+      "count": 22,
+      "passed": 22,
+      "receipt": {
+        "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\accel003-independent-legacy-freeze-attacks.json",
+        "sha256": "af9a39141184119c748577539ee5a22298b0ad760c915a2ed2024859583e5c03"
+      }
+    },
+    "focused_tests": {
+      "exit_code": 0,
+      "log": {
+        "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\independent-legacy-freeze-tests.log",
+        "sha256": "d933d3bfe5848a73e529cde1513f74fd870c72f2b6210b560480dbbff5bcb279"
+      },
+      "receipt": {
+        "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\accel003-independent-legacy-freeze-tests.json",
+        "sha256": "01112d5c8b61e2d6cb3405819365ed4e1dd0e37f53447f3c00325249c6f2f743"
+      },
+      "result": "118 passed in3.35s"
+    },
+    "legacy_default_equivalence": {
+      "count": 5,
+      "passed": 5,
+      "receipt": {
+        "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\accel003-independent-legacy-default-equivalence.json",
+        "sha256": "ca3fc107d3571bb37190d408bfef0c15b1484e51b867df01ba3237efe2773d42"
+      }
+    }
+  },
+  "credentials_inspected": false,
+  "file_bindings": {
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "d4f332fb6de3e8857bf1d5743c77fa7672cdb8d2b7560d32c2e3f9fbf808852e",
+    "tests/unit/ingestion/test_operator_odds_transient.py": "474795e023a4b37e458090cb3441f481e959664fead40a0396739015b59a0c56",
+    "tickets/DMF-PULSE-ACCEL-003/TRANSIENT-FREEZE-EXCEPTION.md": "268f5a4329044d89240e412d31bfd78509a49a5c15101e5e8cb68bccead1ce86"
+  },
+  "findings": [],
+  "implementation_authorship": false,
+  "implementation_fingerprint": "184c31258cfbb9d87ad7c6e462244d72ad0a4718",
+  "initial_ci_failure": {
+    "conclusion_at_capture": "failure",
+    "disposition": "Actual CI failure retained. The old R8B assertion correctly detected the intentional reviewed wrapper-byte change; the test-only remediation records one exact authorized change rather than claiming the old bytes remained unchanged.",
+    "head_sha": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+    "job_id": 123697896415,
+    "job_name": "Coverage shard 9 of 16",
+    "log_binding": {
+      "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\ci-job-123697896415.log",
+      "sha256": "1d0e4d72ff9948b2b61bc800e32de7fcbd5b9242815f71331f40e1a61109fb37"
+    },
+    "metadata_binding": {
+      "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\ci-source-midpoint.json",
+      "sha256": "b3da7ebd6ea18a1e4525b811aa16a8547796b0585e1aff70c871f69d52901784"
+    },
+    "run_id": 40944800918,
+    "selected_failure_evidence": [
+      "2026-10-29T20:15:55.3334230Z E             - 6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e",
+      "2026-10-29T20:15:55.3335109Z E             + 3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
+      "2026-10-29T20:15:55.3335839Z tests/unit/ingestion/test_horizon_rights_approval.py:186: AssertionError",
+      "2026-10-29T20:15:55.3351667Z   - 6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e",
+      "2026-10-29T20:15:55.3352314Z   + 3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
+      "2026-10-29T20:15:55.3352925Z ============ 1 failed, 274 passed, 7 warnings in 960.63s (0:16:00) ============="
+    ]
+  },
+  "production_registry_empty": true,
+  "provider_calls": 0,
+  "release_limit": "This clears the exact test-only delta for cherry-pick/CP5 checkpoint. It does not turn the failed source-checkpoint CI into success. Full unchanged20-job CI must pass at the final exact release SHA; no job omission, selective retry, coverage lowering or package/wheel parity claim is created by this receipt.",
+  "review_conclusions": [
+    "Historical eight-entry map literal and all values are unchanged. The old transient6dc8\u2026 pin remains. The A1/A2 exclusions and original FPL registry digest assertion remain intact.",
+    "The separate exception admits only ingestion/odds/transient.py at exact whole-file3d457\u2026SHA; no wildcard, suffix, normalization or broad hash/lineage exemption. The renamed test honestly declares historical-or-reviewed-seam behavior.",
+    "Independent22 checks reject a byte append and syntax-equivalent unreviewed transient edit, mutations of every other seven protected paths, legacy registry mutation, exception expansion, wrong exception digest and historical transient rebaseline. Both exact historical/current variants and restored fixtures pass.",
+    "Independent5-case execution compares authenticated parent class versus reviewed current defaults: exact model JSON and credential/profile/client/fetch ordering/kwargs agree for happy, missing credential, malformedJSON, naive cutoff and empty range. Optional profile/quota/one-attempt narrowing does not change default calls.",
+    "Independent118 focused tests pass against the frozen integrated root package, including unchanged R8A parser/client freezes, R8B approval/registry boundaries, real parser/current-builder path and new default forwarding proof.",
+    "Product fingerprint remains184c31258cfbb9d87ad7c6e462244d72ad0a4718 and production approval registry remains empty. Prior full integration review remains applicable to unchanged package bytes."
+  ],
+  "reviewed_at": "2026-10-29T20:22:55.354870+00:00",
+  "reviewed_commit": "342518a1b55e6aa31441fb54b75b65fb34bca8f2",
+  "reviewer": "/root/accel003_evaluation_review",
+  "schema_version": "accel003-independent-legacy-freeze-review-v1",
+  "scope": "Exactly two tests and one governance note; narrow historical source-freeze exception for an already reviewed optional source-client injection seam. No product source, rights, historical artifact, dependency, workflow, coverage or scanner changes.",
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "tracked_edits_by_reviewer": false
+}

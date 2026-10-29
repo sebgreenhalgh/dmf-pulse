@@ -1,0 +1,27 @@
+{
+  "command": [
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+    "-c",
+    "import sys;sys.path.insert(0,'C:\\\\Users\\\\sebgr\\\\Documents\\\\dmf-pulse\\\\review_pack\\\\ACCEL-003\\\\src');import pytest;raise SystemExit(pytest.main(sys.argv[1:]))",
+    "tests/security/test_odds_credentials_quota_retention.py",
+    "tests/security/test_fpl_rights_raw_retention.py",
+    "tests/integration/dashboard/test_postgres_authorization.py",
+    "-q",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\independent-fixture-compat-tests"
+  ],
+  "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-CONTROL",
+  "database": "dmf_pulse_fixture_review_a21c958140f3",
+  "exit_code": 0,
+  "finished_at": "2026-10-29T23:28:10.359302+00:00",
+  "log": "review_pack\\independent-fixture-compat-tests.log",
+  "log_sha256": "d4749e16e63d940e74485a055e84e843689cc4b6783e55c2da6dea13826e6f6a",
+  "output_tail": ".........................................                                [100%]\n41 passed in 95.19s (0:01:35)\n",
+  "port": 55434,
+  "schema_version": "accel003-independent-fixture-compat-tests-v1",
+  "source": "Frozen integrated root package and final CONTROL fixture-only commitdac446f",
+  "started_at": "2026-10-29T23:26:32.732250+00:00"
+}

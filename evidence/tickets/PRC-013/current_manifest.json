@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 1629,
+      "bytes": 2157,
       "path": ".gitattributes",
-      "sha256": "9795d3d2f1323d3a64d6bc481826c1116932c65848cfe276614babe79825d217"
+      "sha256": "6260efb5d0147a1c1d2576087cef71ff653e94168ebb395b426d6d6997a1bf8c"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 209879,
+      "bytes": 211166,
       "path": "PLANS.md",
-      "sha256": "6ff74f67c33547619ce08f84cee80c7e0bb611107369be8cac997f6c2183c166"
+      "sha256": "f67f6c87dd28d1809e125d40d068b689f4dd42136f77c1dd0a7c0cd40e49f09f"
     },
     {
       "bytes": 2761,
@@ -5996,9 +5996,9 @@
       "sha256": "e087bb7037c1b13f11bf57760a28ea29bb42aff81646f70234ab632cced26ed4"
     },
     {
-      "bytes": 21693,
+      "bytes": 22051,
       "path": "tests/security/test_fpl_rights_raw_retention.py",
-      "sha256": "e0af0277dc9ad08324352371e910c7568110dd376d9a5eca0f94e0bb8a33c700"
+      "sha256": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df"
     },
     {
       "bytes": 1834,
@@ -6016,9 +6016,9 @@
       "sha256": "2b36b60c5833da6ed9e21e1729c5519d3f17de80cd0c86201d2a643477a40145"
     },
     {
-      "bytes": 17868,
+      "bytes": 18226,
       "path": "tests/security/test_odds_credentials_quota_retention.py",
-      "sha256": "f569ef1d41b79d79befd86f32e06eeec9ec7c2d2916caea0a1e1f2a05198fab6"
+      "sha256": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
     },
     {
       "bytes": 60,
@@ -7016,9 +7016,9 @@
       "sha256": "333534df4233f50c990a4db99d0ca2bcdd2f1052ca04de64bdae3c068c96c4ec"
     },
     {
-      "bytes": 8527,
+      "bytes": 9355,
       "path": "tests/unit/ingestion/test_horizon_rights_approval.py",
-      "sha256": "9f5327de083077de0f5cd59bb76c9f5b2a02040243eb8132640965e6aa83d2fd"
+      "sha256": "d4f332fb6de3e8857bf1d5743c77fa7672cdb8d2b7560d32c2e3f9fbf808852e"
     },
     {
       "bytes": 11477,
@@ -7086,9 +7086,9 @@
       "sha256": "da8a795243f4919b74e8941c6c19e3767329c38bac0d2258fa46ef176778e939"
     },
     {
-      "bytes": 3832,
+      "bytes": 4961,
       "path": "tests/unit/ingestion/test_operator_odds_transient.py",
-      "sha256": "325ca8aea25c0243c3ca918476e5b710de6ed5d312e7c0f6412a5c4ce29d210e"
+      "sha256": "474795e023a4b37e458090cb3441f481e959664fead40a0396739015b59a0c56"
     },
     {
       "bytes": 16990,
@@ -8324,6 +8324,11 @@
       "bytes": 30780,
       "path": "tickets/DMF-PULSE-ACCEL-003/REQUEST.txt",
       "sha256": "98da8cf3c9b9c38696e4ff8bbf63a9d00faadfa97c2eb2088f819d69af6ddbb2"
+    },
+    {
+      "bytes": 4508,
+      "path": "tickets/DMF-PULSE-ACCEL-003/TRANSIENT-FREEZE-EXCEPTION.md",
+      "sha256": "268f5a4329044d89240e412d31bfd78509a49a5c15101e5e8cb68bccead1ce86"
     },
     {
       "bytes": 724,

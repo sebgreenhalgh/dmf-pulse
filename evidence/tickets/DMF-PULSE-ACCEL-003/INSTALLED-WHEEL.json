@@ -1,0 +1,396 @@
+{
+  "clean_environment_outside_repository": true,
+  "cleaned_up": true,
+  "doctor_nvidia_status": "TIMEOUT",
+  "doctor_status": "HEALTHY",
+  "installed_accel003_current_mode": {
+    "all_numeric_projection_and_decision_fields_exact": true,
+    "cancellations": [
+      {
+        "actual_spawn_child_pid": 46268,
+        "owned_attempts_before_cancellation": 1,
+        "pause_marker_observed": true,
+        "phase": "acquisition",
+        "reservation_still_spent": true,
+        "result_withheld": true,
+        "seconds": 2.1769407000392675,
+        "terminated_and_handle_closed": true
+      },
+      {
+        "actual_spawn_child_pid": 41868,
+        "owned_attempts_before_cancellation": 13,
+        "pause_marker_observed": true,
+        "phase": "modelling",
+        "reservation_still_spent": true,
+        "result_withheld": true,
+        "seconds": 31.07473100000061,
+        "terminated_and_handle_closed": true
+      }
+    ],
+    "cases": [
+      {
+        "actual_spawn_child_pid": 6200,
+        "all_numeric_projection_and_decision_fields_exact": true,
+        "blocked": 1,
+        "case_seconds": 63.7149875999894,
+        "catalogue": 121,
+        "checked_fields": 84053,
+        "cleanup": "CONFIRMED",
+        "custody_exclusion_count": 512,
+        "custody_inventory_sha256": "1e552114335a4d7b4529a9e0b8150eab651a0429d184016a9cb4d389a86db1e8",
+        "default_process_worker": true,
+        "external_provider_requests": 0,
+        "horizon": 1,
+        "numeric_fields": 67750,
+        "owned_transport_attempts": {
+          "FPL": 8,
+          "ODDS": 1,
+          "OPENFOOTBALL": 4
+        },
+        "player_gameweek_details_equal": 120,
+        "projected": 120,
+        "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+        "reference_spawn_child_pid": 13216,
+        "same_run_browser_decision_equal": true,
+        "worker_seconds": 63.55350789998192
+      },
+      {
+        "actual_spawn_child_pid": 30168,
+        "all_numeric_projection_and_decision_fields_exact": true,
+        "blocked": 1,
+        "case_seconds": 192.2968050999334,
+        "catalogue": 121,
+        "checked_fields": 249449,
+        "cleanup": "CONFIRMED",
+        "custody_exclusion_count": 1007,
+        "custody_inventory_sha256": "37fb6fa420da3dcebabd4853e63cf3298961787e5aeabd468f45778e9d6a3f60",
+        "default_process_worker": true,
+        "external_provider_requests": 0,
+        "horizon": 3,
+        "numeric_fields": 200409,
+        "owned_transport_attempts": {
+          "FPL": 8,
+          "ODDS": 1,
+          "OPENFOOTBALL": 4
+        },
+        "player_gameweek_details_equal": 360,
+        "projected": 120,
+        "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+        "reference_spawn_child_pid": 31588,
+        "same_run_browser_decision_equal": true,
+        "worker_seconds": 191.85106849996373
+      }
+    ],
+    "classification": "OWNED_SYNTHETIC_ENGINEERING_ONLY",
+    "cleanup": "CONFIRMED",
+    "custody_patterns": [
+      "/decision/run_id",
+      "/decision/semantic_sha256",
+      "/decision/lineage/code_sha",
+      "/decision/lineage/current_state_sha256",
+      "/decision/lineage/current_manager_state_sha256",
+      "/decision/lineage/market_constraints_sha256",
+      "/decision/lineage/score_prior_sha256_by_fixture/*",
+      "/decision/lineage/stage8_result_sha256_by_fixture/*",
+      "/decision/lineage/stage9_result_sha256",
+      "/decision/lineage/private_rules_authority_sha256",
+      "/decision/lineage/execution_input_sha256",
+      "/decision/lineage/optimiser_request_sha256",
+      "/decision/lineage/optimiser_result_sha256",
+      "/decision/lineage/rolling_execution_input_sha256",
+      "/decision/lineage/current_execution_input_sha256",
+      "/decision/lineage/stage8_distribution_sha256_by_gameweek/*/*",
+      "/decision/lineage/fixture_projection_sha256_by_gameweek/*/*",
+      "/decision/lineage/gameweek_projection_sha256_by_gameweek/*",
+      "/decision/lineage/future_gameweek_input_sha256_by_gameweek/*",
+      "/decision/lineage/scenario_tree_sha256",
+      "/decision/lineage/one_gameweek_optimiser_result_sha256",
+      "/decision/transfer_frontier/semantic_sha256",
+      "/decision/transfer_frontier/optimiser_request_sha256",
+      "/decision/transfer_frontier/optimiser_result_sha256",
+      "/decision/transfer_frontier/stage9_projection_sha256",
+      "/decision/transfer_frontier/points/*/semantic_sha256",
+      "/decision/transfer_frontier/points/*/stage11_plan_sha256",
+      "/decision/do_now/tactical_plan_sha256",
+      "/decision/by_gameweek/*/tactical_plan_sha256",
+      "/decision/future_plan/*/tactical_plan_sha256",
+      "/presentation/fixtures/*/result_sha256",
+      "/presentation/fixtures/*/summaries/*/source_bundle_ids",
+      "/presentation/fixtures/*/summaries/*/upstream_stage8_sha256",
+      "/presentation/gameweeks/*/result_sha256",
+      "/presentation/gameweeks/*/summaries/*/source_bundle_ids",
+      "/presentation/gameweeks/*/summaries/*/upstream_stage8_sha256s",
+      "/presentation/source_vintages/*/identity_sha256"
+    ],
+    "disclosure_token_paths": [
+      "/decision/action_space_disclosure",
+      "/decision/transfer_frontier/action_space_disclosure"
+    ],
+    "external_provider_requests": 0,
+    "horizons": [
+      1,
+      3
+    ],
+    "installed_cli": {
+      "cohort_freeze_labels_score": "PASS",
+      "player_evidence_exact_service_equality": true,
+      "player_evidence_players": 6,
+      "real_cohort_size": 0,
+      "report_exact_service_equality": true,
+      "scored_targets": 8
+    },
+    "network_guards": [
+      {
+        "pid": 13216,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 30168,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 31588,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 41868,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 46268,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 6200,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 6496,
+        "role": "__main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      }
+    ],
+    "no_full_semantic_hash_parity_claim": true,
+    "status": "PASS"
+  },
+  "installed_accel003_parity_artifacts": [
+    {
+      "bytes": 419110,
+      "horizon": 1,
+      "path": "review_pack/accel003-installed-parity-f20ae6b69191488f/parity-1-1e552114335a4d7b4529a9e0b8150eab651a0429d184016a9cb4d389a86db1e8.json",
+      "sha256": "1e552114335a4d7b4529a9e0b8150eab651a0429d184016a9cb4d389a86db1e8",
+      "wheel_sha256": "f20ae6b69191488f90c4dd5eec61d4ca42f15afbd89d52216c855c4e2521eda4"
+    },
+    {
+      "bytes": 841051,
+      "horizon": 3,
+      "path": "review_pack/accel003-installed-parity-f20ae6b69191488f/parity-3-37fb6fa420da3dcebabd4853e63cf3298961787e5aeabd468f45778e9d6a3f60.json",
+      "sha256": "37fb6fa420da3dcebabd4853e63cf3298961787e5aeabd468f45778e9d6a3f60",
+      "wheel_sha256": "f20ae6b69191488f90c4dd5eec61d4ca42f15afbd89d52216c855c4e2521eda4"
+    }
+  ],
+  "installed_dashboard_option_parser": {
+    "demo": true,
+    "no_demo": false,
+    "unknown_option_rejected": true
+  },
+  "installed_data_model": {
+    "as_of_assertions": 8,
+    "database_status": "HEALTHY",
+    "demo_assertions": 8,
+    "schema_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f"
+  },
+  "installed_module_path": "<temporary-environment>/site-packages/dmf_pulse/__init__.py",
+  "installed_runtime_distributions": [
+    {
+      "name": "alembic",
+      "version": "1.18.5"
+    },
+    {
+      "name": "annotated-doc",
+      "version": "0.0.4"
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.7.0"
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1"
+    },
+    {
+      "name": "click",
+      "version": "8.5.0"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6"
+    },
+    {
+      "name": "dmf-pulse",
+      "version": "0.2.0"
+    },
+    {
+      "name": "fastapi",
+      "version": "0.162.0"
+    },
+    {
+      "name": "greenlet",
+      "version": "3.5.4"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "name": "idna",
+      "version": "3.20"
+    },
+    {
+      "name": "mako",
+      "version": "1.3.12"
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0"
+    },
+    {
+      "name": "markupsafe",
+      "version": "3.0.3"
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2"
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.1"
+    },
+    {
+      "name": "psycopg",
+      "version": "3.3.4"
+    },
+    {
+      "name": "psycopg-binary",
+      "version": "3.3.4"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.4"
+    },
+    {
+      "name": "pydantic-core",
+      "version": "2.46.4"
+    },
+    {
+      "name": "pygments",
+      "version": "2.20.0"
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3"
+    },
+    {
+      "name": "rich",
+      "version": "15.0.0"
+    },
+    {
+      "name": "shellingham",
+      "version": "1.5.4"
+    },
+    {
+      "name": "sqlalchemy",
+      "version": "2.0.51"
+    },
+    {
+      "name": "starlette",
+      "version": "1.10.0"
+    },
+    {
+      "name": "typer",
+      "version": "0.27.0"
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.2"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.3"
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.54.0"
+    }
+  ],
+  "installed_sebs_desk": {
+    "all_stage9_summaries_equal": true,
+    "blocked": 1,
+    "catalogue": 121,
+    "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+    "evaluation_pairs": 8,
+    "live_refresh": "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED",
+    "packaged_assets": [
+      "index.html",
+      "desk.js",
+      "desk.css"
+    ],
+    "projected": 120,
+    "provider_calls": 0,
+    "stage9_snapshot_pairs": 1,
+    "status": "PASS"
+  },
+  "installed_version_output": "dmf 0.2.0",
+  "installed_zoneinfo_fallback": true,
+  "locked_runtime_manifest_sha256": "53450929df2e7e470e618fcb96262688056b06c2dca37fe555e5efa44151a069",
+  "network_fetch_disabled": true,
+  "platform": {
+    "architecture": "AMD64",
+    "operating_system": "Windows",
+    "python": "3.13.5"
+  },
+  "status": "PASS",
+  "toolchain": {
+    "build": "1.5.0",
+    "build_backend": "hatchling",
+    "hatchling": "1.31.0"
+  },
+  "uv_build_distributions": [
+    {
+      "bytes": 1708200,
+      "name": "dmf_pulse-0.2.0-py3-none-any.whl",
+      "sha256": "f20ae6b69191488f90c4dd5eec61d4ca42f15afbd89d52216c855c4e2521eda4"
+    },
+    {
+      "bytes": 14084895,
+      "name": "dmf_pulse-0.2.0.tar.gz",
+      "sha256": "1fa39c44ef918c772f7526c17910928c57dd57279d26c5cd73144fdbf5071385"
+    }
+  ],
+  "uv_version": "uv 0.11.26 (396ef7ce4 2026-06-30 x86_64-pc-windows-msvc)",
+  "wheel": {
+    "bytes": 1708200,
+    "contains_py_typed": true,
+    "file_count": 481,
+    "name": "dmf_pulse-0.2.0-py3-none-any.whl",
+    "sha256": "f20ae6b69191488f90c4dd5eec61d4ca42f15afbd89d52216c855c4e2521eda4",
+    "zoneinfo_fallback_sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+  }
+}

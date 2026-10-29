@@ -1,0 +1,51 @@
+{
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "records": [
+    {
+      "command": "uv run python scripts/verify_gcs008_wheel.py",
+      "cwd": "COMMITTED_EXPORT_41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+      "duration_seconds": 12.567,
+      "equivalent_frozen_interpreter": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+      "exit_code": 0,
+      "finished_at": "2026-10-29T20:04:37.080961+00:00",
+      "log": "review_pack/final-verify_gcs008_wheel.log",
+      "log_sha256": "0815fc7dca2b597ad07939ca721ed279fba8b8ce65c692f675892e89b72b1c22",
+      "started_at": "2026-10-29T20:04:24.514053+00:00"
+    },
+    {
+      "command": "uv run python scripts/verify_team_strength_u_wheel.py",
+      "cwd": "COMMITTED_EXPORT_41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+      "duration_seconds": 61.007,
+      "equivalent_frozen_interpreter": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+      "exit_code": 0,
+      "finished_at": "2026-10-29T20:05:38.088738+00:00",
+      "log": "review_pack/final-verify_team_strength_u_wheel.log",
+      "log_sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0",
+      "started_at": "2026-10-29T20:04:37.082136+00:00"
+    },
+    {
+      "command": "uv run python scripts/verify_p01_fallback_a02_wheel.py",
+      "cwd": "COMMITTED_EXPORT_41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+      "duration_seconds": 47.394,
+      "equivalent_frozen_interpreter": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+      "exit_code": 0,
+      "finished_at": "2026-10-29T20:06:25.483906+00:00",
+      "log": "review_pack/final-verify_p01_fallback_a02_wheel.log",
+      "log_sha256": "7f64d3b25e4f0b1bb67fe977293e75d7d3134e1d7ab24c4c15bd099a39af207f",
+      "started_at": "2026-10-29T20:05:38.089885+00:00"
+    },
+    {
+      "command": "uv run python scripts/verify_team_strength_l1_wheel.py",
+      "cwd": "COMMITTED_EXPORT_41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+      "duration_seconds": 9.241,
+      "equivalent_frozen_interpreter": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+      "exit_code": 0,
+      "finished_at": "2026-10-29T20:06:34.725709+00:00",
+      "log": "review_pack/final-verify_team_strength_l1_wheel.log",
+      "log_sha256": "d70453a9c481d54e46a0ac5c0df3fce719c563bdef7fdeca21ebf7cea708feba",
+      "started_at": "2026-10-29T20:06:25.484680+00:00"
+    }
+  ],
+  "source_checkpoint": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "status": "PASS"
+}

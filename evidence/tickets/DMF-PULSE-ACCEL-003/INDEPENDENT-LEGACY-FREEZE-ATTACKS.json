@@ -1,0 +1,123 @@
+{
+  "changed_paths": [
+    "tests/unit/ingestion/test_horizon_rights_approval.py",
+    "tests/unit/ingestion/test_operator_odds_transient.py",
+    "tickets/DMF-PULSE-ACCEL-003/TRANSIENT-FREEZE-EXCEPTION.md"
+  ],
+  "checks": [
+    {
+      "case": "only-three-test-document-paths-changed",
+      "pass": true
+    },
+    {
+      "case": "historical-eight-entry-map-literal-and-values-unchanged",
+      "pass": true
+    },
+    {
+      "case": "exception-is-one-exact-reviewed-whole-file-hash",
+      "pass": true
+    },
+    {
+      "case": "exception-matches-original-independent-cp2-reviewed-source",
+      "pass": true
+    },
+    {
+      "case": "explicit-request-authority-hash-exact",
+      "pass": true
+    },
+    {
+      "case": "product-transient-unchanged-and-matches-reviewed-hash",
+      "pass": true
+    },
+    {
+      "case": "exact-current-source-and-unrelated-freezes-pass",
+      "pass": true
+    },
+    {
+      "case": "original-historical-transient-still-frozen-valid",
+      "pass": true
+    },
+    {
+      "case": "one-byte-extra-transient-rejected",
+      "pass": true
+    },
+    {
+      "case": "syntax-equivalent-but-unreviewed-transient-rejected",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-ingestion/current_state.py",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-ingestion/odds/automatic_mapping.py",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-ingestion/odds/current.py",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-ingestion/odds/identity.py",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-markets/current.py",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-private_v1/horizon_markets.py",
+      "pass": true
+    },
+    {
+      "case": "unrelated-protected-path-rejects-private_v1/rolling_models.py",
+      "pass": true
+    },
+    {
+      "case": "legacy-fpl-registry-check-remains-exact",
+      "pass": true
+    },
+    {
+      "case": "exception-cannot-expand-to-second-path",
+      "pass": true
+    },
+    {
+      "case": "unreviewed-exception-digest-rejected",
+      "pass": true
+    },
+    {
+      "case": "historical-transient-digest-cannot-be-rebaselined",
+      "pass": true
+    },
+    {
+      "case": "all-fixture-attacks-restored-to-pass",
+      "pass": true
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "credentials_accessed": false,
+  "exact_exception": {
+    "ingestion/odds/transient.py": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50"
+  },
+  "historical_map": {
+    "ingestion/current_state.py": "03a97b7fc9aef3536d01542d34a39bda5b2fcb29cfc3b67b4b637612947277e6",
+    "ingestion/odds/automatic_mapping.py": "e45e09e5c6aef2b4b7693a132a26571a5fe38d47b6fc9ff65b55d4187b13d182",
+    "ingestion/odds/current.py": "f8e131d2413bcccc2b78959779f0dae0618800f188b524fd2ea5b5299c47e5a9",
+    "ingestion/odds/identity.py": "0c4fd04c32bade5a447d151208d464727854cdc717b81170c94c0cbcaaa5ae2b",
+    "ingestion/odds/transient.py": "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e",
+    "markets/current.py": "5e018a571ebf0bf0a33da7b8e87894f7bb31eb14b93b5b31102d586ba9924b17",
+    "private_v1/horizon_markets.py": "0696abaf10f73f24d56db6e18fc52fe473b046a00708244d5fd0342e5ada6554",
+    "private_v1/rolling_models.py": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc"
+  },
+  "provider_calls": 0,
+  "reviewed_at": "2026-10-29T20:21:20.508943+00:00",
+  "reviewed_commit": "342518a1b55e6aa31441fb54b75b65fb34bca8f2",
+  "reviewed_files_sha256": {
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "d4f332fb6de3e8857bf1d5743c77fa7672cdb8d2b7560d32c2e3f9fbf808852e",
+    "tests/unit/ingestion/test_operator_odds_transient.py": "474795e023a4b37e458090cb3441f481e959664fead40a0396739015b59a0c56",
+    "tickets/DMF-PULSE-ACCEL-003/TRANSIENT-FREEZE-EXCEPTION.md": "268f5a4329044d89240e412d31bfd78509a49a5c15101e5e8cb68bccead1ce86"
+  },
+  "schema_version": "accel003-independent-legacy-freeze-attacks-v1",
+  "status": "PASS",
+  "tracked_edits_by_reviewer": false
+}

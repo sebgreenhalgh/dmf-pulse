@@ -1,0 +1,100 @@
+{
+  "a02_a03_consumption_configs_unchanged": true,
+  "a04_authority_added": false,
+  "authority_manifest_sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+  "authority_matches": true,
+  "captured_at": "2026-10-29T20:06:35.145620+00:00",
+  "changed_numerical_paths": [],
+  "classification": "READ_ONLY_FINAL_FREEZE_AUDIT",
+  "credential_reads": 0,
+  "final_audit_ready": true,
+  "numerical_baseline_python_files_checked": 157,
+  "numerical_manifest_sha256": "768725f1a0bd2e8c0440df07bae76fed2ec02d2dc7ce44511cde54a4cd705435",
+  "original_dirty_file_bytes_not_baselined": true,
+  "original_head": "4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb",
+  "original_head_matches": true,
+  "original_status_matches": true,
+  "original_status_sha256": "f4b88b6a4cf32618a9c192b7addace05e2520802b6f696d0cfb94a292bb84abd",
+  "original_worktree_limit": "CP0 binds HEAD and status, not every pre-existing dirty file byte. Matching status does not prove byte equality of all dirty files.",
+  "p01": {
+    "actions": "READ_BYTES_AND_STORED_IDENTITY_ONLY_NO_VALIDATOR_NO_MODEL_NO_SCORE",
+    "byte_match": true,
+    "byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+    "semantic_match": true,
+    "stored_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a"
+  },
+  "protected_all_match": true,
+  "protected_paths": {
+    ".github/workflows/ci.yml": {
+      "expected": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+      "head_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+      "matches": true,
+      "working_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392"
+    },
+    ".secret-scan-allowlist.json": {
+      "expected": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad",
+      "head_sha256": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad",
+      "matches": true,
+      "working_sha256": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad"
+    },
+    "config/evaluation/team_strength_p01_a02_consumption.json": {
+      "expected": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+      "head_sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+      "matches": true,
+      "working_sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486"
+    },
+    "config/evaluation/team_strength_p01_fallback_a02.json": {
+      "expected": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+      "head_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+      "matches": true,
+      "working_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32"
+    },
+    "config/evaluation/team_strength_p01_fallback_a03.json": {
+      "expected": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+      "head_sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+      "matches": true,
+      "working_sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c"
+    },
+    "config/models/current_team_strength_governance.json": {
+      "expected": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+      "head_sha256": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+      "matches": true,
+      "working_sha256": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3"
+    },
+    "config/rights/fpl_profiles.json": {
+      "expected": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+      "head_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+      "matches": true,
+      "working_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57"
+    },
+    "config/rights/odds_profiles.json": {
+      "expected": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+      "head_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+      "matches": true,
+      "working_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc"
+    },
+    "config/rights/openfootball_profiles.json": {
+      "expected": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+      "head_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+      "matches": true,
+      "working_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545"
+    },
+    "config/rights/openligadb_p01_fallback.json": {
+      "expected": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+      "head_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+      "matches": true,
+      "working_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24"
+    },
+    "scripts/verify_team_strength_coverage.py": {
+      "expected": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a",
+      "head_sha256": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a",
+      "matches": true,
+      "working_sha256": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a"
+    }
+  },
+  "provider_calls": 0,
+  "root_head": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "root_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "root_worktree_clean": true,
+  "tracked_mutations_by_reviewer": 0
+}

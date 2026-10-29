@@ -1,0 +1,81 @@
+{
+  "all_metadata_table_count": 76,
+  "author_direct_mutation_denials": 6,
+  "author_fixture_isolation_pass": true,
+  "author_receipts": {
+    "control-fixture-check-2.log": "d07e837b07252f125cf4ffdbc2bb4d3b8489207a787b8692827abf3ceab6e5e3",
+    "control-fixture-checks.json": "f12ab56e2debc4ba2b2b1d4ffadb1a8709b4cad1a95e62d048619b4878e6b782",
+    "control-fixture-superseded-helper-failure.json": "80cd65a0bd5d9531d89fcb576aaf40778ca1d21a14385f1e4ad5f7bc50d23c6f"
+  },
+  "blanket_reset_inventory": [
+    {
+      "path": "tests/integration/conftest.py",
+      "status": "already compatible exact same3exclusions"
+    },
+    {
+      "path": "tests/security/test_odds_credentials_quota_retention.py",
+      "status": "fixed both setup and teardown via existing shared statement"
+    },
+    {
+      "path": "tests/security/test_fpl_rights_raw_retention.py",
+      "status": "fixed both setup and teardown via existing shared statement"
+    }
+  ],
+  "ci_failure": {
+    "encoding": "UTF16 BOM",
+    "job_id": 123697896454,
+    "raw_log_sha256": "719f7ab236b2b797b645de5eb0c90a1c160adcfa036479dd6634a4321be92a45",
+    "relevant_summaries": [
+      "2026-10-29T20:22:07.3634205Z ERROR tests/security/test_odds_credentials_quota_retention.py::test_http_failure_attempt_and_quota_are_retained_without_raw_body - sqlalchemy.exc.ProgrammingError: (psycopg.errors.RaiseException) REFRESH_CONTROL_APPEND_ONLY",
+      "2026-10-29T20:22:07.3654112Z ERROR tests/security/test_odds_credentials_quota_retention.py::test_odds_and_quota_evidence_are_database_immutable - sqlalchemy.exc.ProgrammingError: (psycopg.errors.RaiseException) REFRESH_CONTROL_APPEND_ONLY",
+      "2026-10-29T20:22:07.3674511Z ERROR tests/security/test_odds_credentials_quota_retention.py::test_persisted_quota_depletion_blocks_next_credential_and_transport_call - sqlalchemy.exc.ProgrammingError: (psycopg.errors.RaiseException) REFRESH_CONTROL_APPEND_ONLY",
+      "2026-10-29T20:22:07.3694628Z ERROR tests/security/test_odds_credentials_quota_retention.py::test_raw_forbidden_success_persists_only_hash_metadata_and_quota - sqlalchemy.exc.ProgrammingError: (psycopg.errors.RaiseException) REFRESH_CONTROL_APPEND_ONLY",
+      "2026-10-29T20:22:07.7820208Z =========== 286 passed, 24 warnings, 4 errors in 1334.72s (0:22:14) ============"
+    ]
+  },
+  "cleanup": {
+    "owned55434_stopped_and_port_closed": true,
+    "receipt": "control-fixture-cleanup.json",
+    "sha256": "729c40e610fe6e4bdd4471c41a972eb92af491f52c55b74f3817c129660ea7bc",
+    "status": "PASS"
+  },
+  "commit": "dac446fece54911021477d1886c7ea19435d70f7",
+  "credential_reads": 0,
+  "independent_actual_fixture_checks_passed": 23,
+  "independent_full_test_confirmation": "41PASS95.19s;23independentfixture/custody/mutationchecksPASS",
+  "independent_review_sha256": "e200d7f67fd9ffb4622f6e65570b661d38a6f0e0898306bc5f644cb7fed8131a",
+  "ordinary_reset_table_count": 73,
+  "other_matches": [
+    {
+      "path": "tests/integration/ingestion/test_fpl_bundle_rights_quality_gate.py",
+      "status": "targeted rights_decision negative test; not blanket reset; unchanged"
+    },
+    {
+      "path": "tests/integration/dashboard/test_postgres_authorization.py",
+      "status": "explicit append-only TRUNCATE denial attacks; unchanged"
+    },
+    {
+      "path": "tests/integration/migrations/test_migrations.py",
+      "status": "metadata catalog enumeration; no reset helper; unchanged"
+    }
+  ],
+  "parent": "58ae73f4ea42c2a3b0fac17a611beca4c863fb8a",
+  "preserved_exact_tables": [
+    "core.refresh_control_event",
+    "core.refresh_control_ledger",
+    "evaluation.qualified_source"
+  ],
+  "product_source_diff_count": 0,
+  "provider_calls": 0,
+  "recorded_at": "2026-10-29T23:26:49.515647+00:00",
+  "schema_version": "accel003-control-fixture-handoff-v1",
+  "source_paths": [
+    "tests/security/test_fpl_rights_raw_retention.py",
+    "tests/security/test_odds_credentials_quota_retention.py"
+  ],
+  "source_sha256": {
+    "tests/security/test_fpl_rights_raw_retention.py": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df",
+    "tests/security/test_odds_credentials_quota_retention.py": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
+  },
+  "targeted_tests_passed": 41
+}

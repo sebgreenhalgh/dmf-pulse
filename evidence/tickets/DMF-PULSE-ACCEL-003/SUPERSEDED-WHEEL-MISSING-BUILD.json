@@ -1,0 +1,18 @@
+{
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "records": [
+    {
+      "command": "uv run python scripts/verify_gcs008_wheel.py",
+      "cwd": "COMMITTED_EXPORT_41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+      "duration_seconds": 0.094,
+      "equivalent_frozen_interpreter": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+      "exit_code": 1,
+      "finished_at": "2026-10-29T20:01:53.245176+00:00",
+      "log": "review_pack/final-verify_gcs008_wheel.log",
+      "log_sha256": "58a1b846414d624fb1933ebfad05335dd06ed47efba5caca4d3785df508024a0",
+      "started_at": "2026-10-29T20:01:53.151518+00:00"
+    }
+  ],
+  "source_checkpoint": "41999b68ded05eb692ccfafc416b0e9ad53b9d18",
+  "status": "INCOMPLETE_OR_FAILED"
+}

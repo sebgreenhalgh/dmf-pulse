@@ -1,0 +1,76 @@
+{
+  "changed_paths": [
+    "tests/security/test_fpl_rights_raw_retention.py",
+    "tests/security/test_odds_credentials_quota_retention.py"
+  ],
+  "credentials_inspected": false,
+  "evidence": [
+    {
+      "path": "review_pack/accel003-independent-security-fixture-reset.json",
+      "sha256": "7a7217fabe82f12d758cd242bf58c24348e2030b9650532728e8a7d8b9f1ba7f"
+    },
+    {
+      "path": "review_pack/accel003-independent-fixture-compat-tests.json",
+      "sha256": "1fe90344d610f6eedcf8094573efe032794d9a0212f563fb5018abb491d27afd"
+    },
+    {
+      "path": "review_pack/independent-fixture-compat-tests.log",
+      "sha256": "d4749e16e63d940e74485a055e84e843689cc4b6783e55c2da6dea13826e6f6a"
+    },
+    {
+      "path": "review_pack/accel003-independent-completed-checkpoint-ci-diagnosis.json",
+      "sha256": "2eaa1ef8e61919414182b62646506173e70c633690afe68b64e6ce81cf888237"
+    }
+  ],
+  "file_bindings": {
+    "tests/security/test_fpl_rights_raw_retention.py": {
+      "integrated_sha256": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df",
+      "matches": true,
+      "reviewed_sha256": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df"
+    },
+    "tests/security/test_odds_credentials_quota_retention.py": {
+      "integrated_sha256": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768",
+      "matches": true,
+      "reviewed_sha256": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
+    }
+  },
+  "findings": [],
+  "implementation_fingerprint": "184c31258cfbb9d87ad7c6e462244d72ad0a4718",
+  "independent_checks": {
+    "actual_fixture_passed": 23,
+    "actual_fixture_reset_mutation_checks": 23,
+    "targeted_pytest_result": ".........................................                                [100%]\n41 passed in 95.19s (0:01:35)",
+    "test_exit_code": 0
+  },
+  "initial_failure": "Source-checkpoint CI41999b6 run40944800918 shard6 had286 passed/4 setup errors; shard15 had823 passed/6 setup errors. Both inherited blanket fixture resets included append-only control tables. Original logs and completed checkpoint metadata retained and independently authenticated; shard9 separately corrected exact reviewed hash mismatch.",
+  "integrated_cherry_pick": "520db69",
+  "limit": "Clears only the exact fixture-only compatibility delta for CP5 publication. It preserves failed checkpoint evidence and does not turn that run green. Final release requires a fresh complete unchanged20-job CI at the exact final SHA and final owned-service cleanup audit.",
+  "owned_database": {
+    "created_separate_database": true,
+    "independent_connections_disposed": true,
+    "name": "dmf_pulse_fixture_review_a21c958140f3",
+    "other_databases_modified": false,
+    "owner_notified_to_stop_owned_cluster": true,
+    "port": 55434
+  },
+  "product_or_migration_or_guard_edits": 0,
+  "protected_source_sha256": {
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "a384a4d81b400a0f9cd8580786a2b2452135f7f24c1f15a8a5a48c8ef3a592d2",
+    "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c"
+  },
+  "provider_calls": 0,
+  "reviewed_at": "2026-10-29T23:29:03.252134+00:00",
+  "reviewed_commit": "dac446fece54911021477d1886c7ea19435d70f7",
+  "reviewer": "/root/accel003_evaluation_review",
+  "schema_version": "accel003-independent-security-fixture-review-v1",
+  "scope_conclusions": [
+    "Both fixture changes match the existing central integration cleanup policy exactly: preserve evaluation.qualified_source, core.refresh_control_ledger and core.refresh_control_event; reset all73 ordinary metadata tables before and after each security test. No pattern/suffix or broad immutable-table exemption.",
+    "No source, migration, SQL trigger, active rights, provider route, quota/admission, workflow or coverage policy changes. The correct append-only rejection caused the old fixture failures; the product guard remains enforced.",
+    "Independent actual fixture setup and teardown preserve byte/semantic snapshots of all3 nonempty configuration/control tables, remove ordinary canaries both times and leave every ordinary table empty.",
+    "All6 direct UPDATE/DELETE/TRUNCATE operations on the2 control tables still raise REFRESH_CONTROL_APPEND_ONLY and leave original custody unchanged.",
+    "Independent41 targeted security and PostgreSQL tests pass without skips against the frozen integrated root package; this includes the originally failing Odds/FPL setup paths and immutable control tests.",
+    "Only the2 named security fixture files differ in reviewed commit; integrated root file bytes exactly match author commit. Package fingerprint stays184c31258cfbb9d87ad7c6e462244d72ad0a4718."
+  ],
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "tracked_edits_by_reviewer": false
+}

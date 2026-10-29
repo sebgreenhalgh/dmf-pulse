@@ -1,0 +1,77 @@
+{
+  "files": [
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 683,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-PERFORMANCE.LOG",
+      "normalized_sha256": "d28042b9f305efab6970f644084633a81fedb793e9713f4a7cabe4b2e0df2762",
+      "original_bytes": 1386,
+      "original_path": "review_pack/final-performance.log",
+      "original_sha256": "742f903671b354ad8c6de2c9805400747c6445652a2a50106bfaca1d5285da1a"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 13474,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-INSTALLED-WHEEL-CANONICAL.LOG",
+      "normalized_sha256": "089460d52fe7daaf38501d283b4d2e0dadaf114c3ba78f546b689323beb7203e",
+      "original_bytes": 27834,
+      "original_path": "review_pack/final-installed-wheel-canonical.log",
+      "original_sha256": "9118fca634933a2ce6ade739835c34beb85d70afca1f45f3516d3f57e12a7a7d"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 89,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-INSTALLED-WHEEL.LOG",
+      "normalized_sha256": "2826384aa3edb91d38e5df06ae98e859b87bc7d7871d309e817b7c54e4cd0fb4",
+      "original_bytes": 182,
+      "original_path": "review_pack/final-installed-wheel.log",
+      "original_sha256": "fe763deb613e3fe684a23063bd6d59c47bfa63c003f6f24803b872df331ec122"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 99,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFIER-TESTS-CORRECTED.LOG",
+      "normalized_sha256": "969a514c3c7073b5a6a17a5c13a4a227eaf70104c39f850e48ffbdb1a20009d8",
+      "original_bytes": 204,
+      "original_path": "review_pack/final-verifier-tests-corrected.log",
+      "original_sha256": "c7ebc4c7dcfa2f335f4a8f01476eb838aec659a25b3c8ba353c521c6d6859da4"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 688,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_GCS008_WHEEL.LOG",
+      "normalized_sha256": "0815fc7dca2b597ad07939ca721ed279fba8b8ce65c692f675892e89b72b1c22",
+      "original_bytes": 688,
+      "original_path": "review_pack/final-verify_gcs008_wheel.log",
+      "original_sha256": "0815fc7dca2b597ad07939ca721ed279fba8b8ce65c692f675892e89b72b1c22"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 246,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_TEAM_STRENGTH_U_WHEEL.LOG",
+      "normalized_sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0",
+      "original_bytes": 246,
+      "original_path": "review_pack/final-verify_team_strength_u_wheel.log",
+      "original_sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 616,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_P01_FALLBACK_A02_WHEEL.LOG",
+      "normalized_sha256": "7f64d3b25e4f0b1bb67fe977293e75d7d3134e1d7ab24c4c15bd099a39af207f",
+      "original_bytes": 616,
+      "original_path": "review_pack/final-verify_p01_fallback_a02_wheel.log",
+      "original_sha256": "7f64d3b25e4f0b1bb67fe977293e75d7d3134e1d7ab24c4c15bd099a39af207f"
+    },
+    {
+      "normalization": "Decode UTF16 BOM or UTF8; normalize CRLF to LF and encode UTF8. Raw originals retained unchanged in ignored review_pack.",
+      "normalized_bytes": 308,
+      "normalized_path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFY_TEAM_STRENGTH_L1_WHEEL.LOG",
+      "normalized_sha256": "d70453a9c481d54e46a0ac5c0df3fce719c563bdef7fdeca21ebf7cea708feba",
+      "original_bytes": 308,
+      "original_path": "review_pack/final-verify_team_strength_l1_wheel.log",
+      "original_sha256": "d70453a9c481d54e46a0ac5c0df3fce719c563bdef7fdeca21ebf7cea708feba"
+    }
+  ],
+  "schema_version": "accel003-log-normalization-v1"
+}
