@@ -99,6 +99,32 @@ def test_single_attempt_and_known_quota_are_forwarded_to_existing_client():
     assert seen["fetch"]["quota"] == _quota()
 
 
+def test_legacy_defaults_preserve_exact_existing_client_and_fetch_arguments():
+    seen = {}
+    credentials = EnvironmentOddsCredentialProvider(environment={"THE_ODDS_API_KEY": "placeholder"})
+
+    def clock():
+        return NOW
+
+    class Client:
+        def __init__(self, selected_profile, **kwargs):
+            seen["profile"] = selected_profile
+            seen["construction"] = kwargs
+
+        def fetch(self, **kwargs):
+            seen["fetch"] = kwargs
+            raise IngestionError("SOURCE_UNAVAILABLE", "owned default compatibility sentinel")
+
+    service = CurrentOddsTransientService(
+        credential_provider=credentials, client_factory=Client, clock=clock
+    )
+    with pytest.raises(IngestionError, match="owned default compatibility sentinel"):
+        service.acquire(information_cutoff=NOW, commence_to=NOW + timedelta(days=1))
+    assert seen["profile"] == load_rights_profiles()["the_odds_api_private_analytics_v1"]
+    assert seen["construction"] == {"credential_provider": credentials, "clock": clock}
+    assert seen["fetch"] == {"commence_from": NOW, "commence_to": NOW + timedelta(days=1)}
+
+
 @pytest.mark.parametrize("attempts", [0, 2, True])
 def test_new_seam_never_expands_retry_policy(attempts):
     with pytest.raises(ValueError, match="single-attempt"):

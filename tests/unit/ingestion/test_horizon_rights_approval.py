@@ -47,6 +47,12 @@ _R8B_UNMODIFIED_EXECUTABLE_HASHES = {
     # A1 intentionally evolves private_v1/rolling.py through its private seam.
     "private_v1/rolling_models.py": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc",
 }
+# REQUEST.txt sections 5.4/6.2 and CONTRACT.md permit this reviewed injection
+# seam. Preserve the historical map above; authorize only these exact file bytes.
+# Review/default proof: tickets/DMF-PULSE-ACCEL-003/TRANSIENT-FREEZE-EXCEPTION.md.
+_ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS = {
+    "ingestion/odds/transient.py": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
+}
 
 
 @pytest.fixture
@@ -177,15 +183,18 @@ def test_missing_required_capability_rejected_by_schema(governed_gate, capabilit
         RightsProfile.model_validate(raw)
 
 
-def test_r8b_provider_boundaries_and_a2_unmodified_executables_remain_parent_identical(
+def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_accel003_reviewed_seam(
     repository_root,
 ) -> None:
     import hashlib
 
     for relative, digest in _R8B_UNMODIFIED_EXECUTABLE_HASHES.items():
-        assert (
-            hashlib.sha256((repository_root / "src/dmf_pulse" / relative).read_bytes()).hexdigest()
-            == digest
+        actual = hashlib.sha256(
+            (repository_root / "src/dmf_pulse" / relative).read_bytes()
+        ).hexdigest()
+        assert actual == digest or (
+            relative in _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS
+            and actual == _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
         )
     assert (
         hashlib.sha1(
@@ -199,3 +208,8 @@ def test_static_guard_excludes_intentionally_evolving_a1_rolling_and_a2_one_comm
     assert "private_v1/rolling.py" not in _R8B_UNMODIFIED_EXECUTABLE_HASHES
     assert "private_v1/one_command.py" not in _R8B_UNMODIFIED_EXECUTABLE_HASHES
     assert len(_R8B_UNMODIFIED_EXECUTABLE_HASHES) == 8
+    assert set(_ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS) == {"ingestion/odds/transient.py"}
+    assert (
+        _R8B_UNMODIFIED_EXECUTABLE_HASHES["ingestion/odds/transient.py"]
+        == "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e"
+    )
