@@ -68,6 +68,108 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _require_accel003_acceptance(value: object) -> dict[str, object]:
+    """Reject partial or synthetic-unit-only claims from the installed process probe."""
+    if not isinstance(value, dict) or any(
+        value.get(key) != expected
+        for key, expected in {
+            "status": "PASS",
+            "classification": "OWNED_SYNTHETIC_ENGINEERING_ONLY",
+            "horizons": [1, 3],
+            "cleanup": "CONFIRMED",
+        }.items()
+    ):
+        raise VerificationError("installed ACCEL003 process acceptance is incomplete")
+    if (
+        value.get("all_numeric_projection_and_decision_fields_exact") is not True
+        or value.get("no_full_semantic_hash_parity_claim") is not True
+        or type(value.get("external_provider_requests")) is not int
+        or value["external_provider_requests"] != 0
+    ):
+        raise VerificationError("installed ACCEL003 numerical/network claims failed")
+    cases = value.get("cases")
+    if not isinstance(cases, list) or [
+        row.get("horizon") for row in cases if isinstance(row, dict)
+    ] != [1, 3]:
+        raise VerificationError("installed ACCEL003 horizons are incomplete")
+    for case in cases:
+        if (
+            not isinstance(case, dict)
+            or any(
+                case.get(key) is not True
+                for key in (
+                    "default_process_worker",
+                    "same_run_browser_decision_equal",
+                    "all_numeric_projection_and_decision_fields_exact",
+                )
+            )
+            or (case.get("catalogue"), case.get("projected"), case.get("blocked")) != (121, 120, 1)
+            or case.get("player_gameweek_details_equal") != 120 * case["horizon"]
+            or case.get("owned_transport_attempts") != {"FPL": 8, "ODDS": 1, "OPENFOOTBALL": 4}
+            or case.get("external_provider_requests") != 0
+            or case.get("cleanup") != "CONFIRMED"
+            or case.get("reference_service") != "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC"
+        ):
+            raise VerificationError("installed ACCEL003 current worker contract failed")
+    cancellations = value.get("cancellations")
+    if not isinstance(cancellations, list) or [
+        row.get("phase") for row in cancellations if isinstance(row, dict)
+    ] != ["acquisition", "modelling"]:
+        raise VerificationError("installed ACCEL003 process cancellation proof missing")
+    for case in cancellations:
+        if (
+            not isinstance(case, dict)
+            or any(
+                case.get(key) is not True
+                for key in (
+                    "pause_marker_observed",
+                    "terminated_and_handle_closed",
+                    "result_withheld",
+                    "reservation_still_spent",
+                )
+            )
+            or case.get("owned_attempts_before_cancellation")
+            != (1 if case["phase"] == "acquisition" else 13)
+        ):
+            raise VerificationError("installed ACCEL003 process cancellation failed")
+    cli = value.get("installed_cli")
+    if (
+        not isinstance(cli, dict)
+        or cli.get("cohort_freeze_labels_score") != "PASS"
+        or cli.get("report_exact_service_equality") is not True
+        or cli.get("player_evidence_exact_service_equality") is not True
+        or cli.get("real_cohort_size") != 0
+    ):
+        raise VerificationError("installed ACCEL003 operational CLI acceptance failed")
+    guards = value.get("network_guards")
+    if (
+        not isinstance(guards, list)
+        or not guards
+        or any(
+            not isinstance(row, dict)
+            or row.get("unexpected_denials") != 0
+            or row.get("self_test_denials") != 1
+            for row in guards
+        )
+    ):
+        raise VerificationError("installed ACCEL003 network guard proof failed")
+    for case in [*cases, *cancellations]:
+        if not any(
+            row.get("pid") == case.get("actual_spawn_child_pid")
+            and row.get("role") == "__mp_main__"
+            for row in guards
+        ):
+            raise VerificationError("installed ACCEL003 child network guard missing")
+    for case in cases:
+        if not any(
+            row.get("pid") == case.get("reference_spawn_child_pid")
+            and row.get("role") == "__mp_main__"
+            for row in guards
+        ):
+            raise VerificationError("installed ACCEL003 reference child network guard missing")
+    return value
+
+
 def _run(
     command: Sequence[str],
     *,
@@ -582,6 +684,26 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         if desk_acceptance.get("status") != "PASS":
             raise VerificationError("installed Seb's Desk acceptance failed")
 
+        current_probe = temporary_path / "accel003_wheel_probe.py"
+        shutil.copyfile(REPOSITORY_ROOT / "scripts/accel003_wheel_probe.py", current_probe)
+        current_result = _run(
+            [
+                str(environment_python),
+                "-I",
+                str(current_probe),
+                "--control-root",
+                str(temporary_path / "accel003-owned-controls"),
+            ],
+            cwd=temporary_path,
+            step="installed ACCEL003 paired ASGI current process, numerical parity and operational CLI",
+            timeout_seconds=900,
+            environment=clean_environment,
+        )
+        try:
+            current_acceptance = _require_accel003_acceptance(json.loads(current_result.stdout))
+        except json.JSONDecodeError as exc:
+            raise VerificationError("installed ACCEL003 probe did not emit safe JSON") from exc
+
         distributions_result = _run(
             [
                 str(environment_python),
@@ -629,6 +751,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             "locked_runtime_manifest_sha256": _sha256(RUNTIME_MANIFEST),
             "installed_zoneinfo_fallback": True,
             "installed_sebs_desk": desk_acceptance,
+            "installed_accel003_current_mode": current_acceptance,
             "installed_dashboard_option_parser": desk_parser,
             "platform": {
                 "architecture": platform.machine(),
