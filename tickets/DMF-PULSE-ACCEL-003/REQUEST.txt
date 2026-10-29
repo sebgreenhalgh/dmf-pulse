@@ -1,0 +1,1009 @@
+# DMF PULSE — ACCELERATION WAVE 003
+## REAL DATA, LIVE DASHBOARD INTEGRATION, PROSPECTIVE EVALUATION AND PLAYER-EVIDENCE ADVANCEMENT
+### FULL IMPLEMENTATION — GIT-FIRST / RESUMABLE / AMBITIOUS / INDEPENDENTLY REVIEWED
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Immutable ACCEL-002 engineering parent:
+`8b74d5f3dc41eb1246ae82388ec6aab3743241b8`
+
+Current release branch:
+`readiness/DMF-PULSE-ACCEL-002-sebs-desk`
+
+Verified exact-SHA CI:
+https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40886756682
+
+Programme:
+`DMF-PULSE-ACCEL-003`
+
+Preferred implementation branch:
+`readiness/DMF-PULSE-ACCEL-003-live-data-evaluation`
+
+## 1. THE MISSION
+
+DMF Pulse now has a functional local dashboard.
+
+Sebastian has reviewed the dashboard and considers it a satisfactory MVP.
+
+The next priority is no longer visual design.
+
+**The mission is to turn Seb's Desk into a genuinely useful current-season FPL decision workspace, while establishing the first scientifically valid player-level evaluation process.**
+
+We want to move toward:
+
+**Open dashboard → Refresh → retrieve eligible current information → calculate actual model projections → show Sebastian's real team and recommendations → freeze qualified forecasts → compare them with subsequently finalized outcomes.**
+
+This is a major implementation programme.
+
+Do not finish with only a research report, architecture proposal, risk register or additional synthetic demonstration.
+
+Implement complete, integrated, independently testable capabilities.
+
+Advance every workstream that can proceed under existing authority, even if one provider approval remains blocked.
+
+Avoid spending the entire session on one narrow technical issue.
+
+Use durable checkpoints, Git publication, complete tests and exact-SHA CI.
+
+---
+
+# 2. VERIFIED STARTING POINT
+
+ACCEL-002 delivered:
+
+- FastAPI-based local dashboard;
+- authenticated browser pairing;
+- real Stage-7/8/9/10/11 synthetic model execution;
+- single-flight disposable worker;
+- secure local-only presentation;
+- My Team;
+- Players;
+- Decisions;
+- Model Performance;
+- Data Health;
+- all-player projection presentation;
+- 13-component FPL points breakdown;
+- one-/three-GW expected-point views;
+- synthetic forecast/outcome custody;
+- qualified-source PostgreSQL research ledger;
+- strict synthetic Gameweek-wide actuals adapter;
+- independent reviews;
+- 6,142 passing CI tests;
+- 20/20 mandatory CI jobs;
+- 92.31% overall statement-and-branch coverage.
+
+The user has confirmed the UI is sufficient as an initial product.
+
+**Preserve the dashboard's existing functional interface. Do not spend disproportionate effort redesigning CSS, navigation or branding.**
+
+The most important current limitations are:
+
+1. Live dashboard Refresh is blocked before any worker starts.
+2. The existing market-rights profile is bound to a consumed, earlier one-shot observation.
+3. The demo worker is implemented; a genuine rights-gated live worker is not.
+4. Real current player projections have not been demonstrated through the dashboard.
+5. The historical player-evaluation ledger admits only qualified synthetic evidence.
+6. No genuine prospective player-level forecast cohort is yet available.
+7. Current player allocation still relies on weak historical Grade-E evidence and stale carry-forward assumptions.
+8. Stage-13 prices, Stage-14 chips and Stage-15 rank remain outside ordinary private rolling decisions.
+
+Treat these as starting facts to verify in current code.
+
+---
+
+# 3. NON-NEGOTIABLE AUTHORITY BOUNDARIES
+
+This prompt authorizes substantial software engineering, offline tests, repository research and normal branch publication.
+
+It does **not**, by itself, grant new provider rights.
+
+Do not use this prompt as authority for:
+
+- a new live FPL endpoint;
+- expanded Odds API acquisitions;
+- recurring provider polling;
+- persistent private FPL data collection;
+- new football-provider subscriptions;
+- automated FPL account changes;
+- model promotion;
+- production activation;
+- A04 acquisition;
+- a retry of A02 or A03.
+
+No credential inspection.
+
+No real provider requests during automated tests.
+
+No assumption that public JSON accessibility equals permission.
+
+No circumventing rate limits, authentication, anti-automation controls or terms.
+
+A newly proposed rights profile must remain inactive until the applicable source rights and separate human approval are established.
+
+Where an existing approved, unconsumed capability genuinely authorizes an action, use it only within its exact scope. Do not reinterpret a consumed one-shot approval as recurring permission.
+
+A provider's terms and DMF's internal owner approval are separate requirements.
+
+**No live pilot unless separately and explicitly authorized for the exact source, account, routes, request budget, purpose and implementation SHA.**
+
+Do not allow a synthetic test result to grant such permission.
+
+---
+
+# 4. CHECKPOINT 0 — RECONSTRUCT AND LOCK THE RELEASE BASELINE
+
+Fetch GitHub and inspect:
+
+- `main`;
+- ACCEL-001;
+- ACCEL-002 final SHA;
+- all applicable source-rights profiles;
+- current private one-command integration;
+- dashboard runtime and browser APIs;
+- current Odds API source acquisition;
+- current OpenFootball score-prior source;
+- current player evidence and Stage-9 outputs;
+- current prospective evaluation ledger;
+- actuals ingestion adapter;
+- accepted DMFP-16/18 boundaries;
+- active authority manifest;
+- immutable historical evidence and consumed attempts.
+
+Read:
+
+- `AGENTS.md`;
+- `PLANS.md`;
+- `config/rights/fpl_profiles.json`;
+- `config/rights/odds_profiles.json`;
+- `src/dmf_pulse/dashboard/runtime.py`;
+- `src/dmf_pulse/dashboard/app.py`;
+- `src/dmf_pulse/dashboard/views.py`;
+- `src/dmf_pulse/private_v1/one_command.py`;
+- `src/dmf_pulse/private_v1/service.py`;
+- `src/dmf_pulse/ingestion/odds/transient.py`;
+- `src/dmf_pulse/player_lab/`;
+- relevant Stage-7/8/9/12 tests and contracts.
+
+Verify actual branch ancestry, acceptance status and current rights.
+
+Create a clean isolated worktree.
+
+Record protected-file hashes and current numerical regression baselines.
+
+Freeze a bounded programme contract before implementation.
+
+Do not modify the original dirty Availability worktree.
+
+---
+
+# 5. WORKSTREAM A — REAL DASHBOARD REFRESH EXECUTION
+
+This is the highest-priority implementation workstream.
+
+## 5.1 Implement the real worker
+
+Currently `DeskRuntime.refresh()` blocks the non-demo path with:
+
+`RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED`
+
+The existing `ProcessWorker` invokes the synthetic worker.
+
+Implement a complete rights-gated live-capable worker using the existing:
+
+`PrivateV1OneCommandService`
+
+The architecture must support two clearly distinct modes:
+
+**DEMO**
+
+- packaged synthetic sources;
+- actual prediction/optimisation services;
+- no provider access;
+- explicit synthetic labels.
+
+**PRIVATE CURRENT**
+
+- authorized operator-initiated current sources;
+- existing private FPL/current state;
+- eligible market and score-prior sources;
+- authenticated real manager state;
+- existing Stage-7/8/9/10/11 pipeline;
+- real model-derived player projections;
+- no persistence;
+- no account writes.
+
+Do not replace the accepted recommendation engine.
+
+Do not create an alternative simplified optimiser.
+
+## 5.2 Authorization before transport
+
+Create an independently reviewable authorization boundary that verifies, before starting the real worker:
+
+- current eligible rights profile;
+- exact permitted purpose;
+- source routes;
+- operator account scope;
+- request budget;
+- one-shot or recurring status;
+- consumption state;
+- code/review identity;
+- required source freshness;
+- provider plan eligibility;
+- any relevant expiry.
+
+If requirements are absent, fail closed with a meaningful typed reason.
+
+Do not quietly downgrade a missing approval to permission.
+
+Retain a clear distinction between:
+
+`ENGINEERING_READY`
+
+`RIGHTS_APPROVAL_REQUIRED`
+
+`SOURCE_NOT_AVAILABLE`
+
+`REAL_RUN_AUTHORIZED`
+
+`REAL_RUN_COMPLETED`
+
+`BLOCKED`
+
+`EXPIRED`
+
+Do not claim real execution merely because an offline integration test passes.
+
+## 5.3 Worker security
+
+The real worker must preserve:
+
+- loopback-only dashboard;
+- authenticated browser pairing;
+- server-side credential handling;
+- no token in browser payload;
+- no token in URLs/logs/evidence;
+- finite memory lifetime;
+- process cancellation and cleanup;
+- single-flight execution;
+- bounded request counts;
+- deadline checks;
+- clock monotonicity;
+- old-result invalidation.
+
+Avoid serializing credentials through an exposed worker interface.
+
+Do not create hidden credential persistence.
+
+The existing terminal-based secure credential mechanism may be reused where appropriate.
+
+Browser Refresh must never trigger an FPL transfer, captain change or chip activation.
+
+## 5.4 Source acquisition and execution
+
+Reuse accepted FPL, Odds and OpenFootball clients.
+
+Do not multiply existing provider requests just because the dashboard has multiple pages.
+
+One valid refresh must generate one coherent information set.
+
+My Team, Players and Decisions must all reference the same completed model run.
+
+Ensure:
+
+- exact source identity;
+- one information cutoff;
+- current manager-state consistency;
+- correct fixture and season mapping;
+- no stale previous-GW squad substitution;
+- correct current prices and bank;
+- correct horizon inputs;
+- no incomplete player catalogue masquerading as full coverage;
+- current official deadline enforcement.
+
+The user's browser reload must not silently initiate another provider request.
+
+Explicit Refresh remains the operator trigger.
+
+## 5.5 Actual-stack integration tests
+
+Build injected-provider tests using the same worker interface as the eventual private current mode.
+
+Demonstrate:
+
+- successful real-mode architecture with authorized synthetic test sources;
+- missing market approval;
+- expired approval;
+- consumed one-shot;
+- absent credential;
+- invalid manager state;
+- invalid fixture mapping;
+- exhausted quota;
+- incomplete market coverage;
+- deadline crossing;
+- source failure;
+- cancellation during acquisition;
+- cancellation during model execution;
+- repeat click while running;
+- cleanup after failure;
+- session expiry.
+
+No external provider calls during these tests.
+
+**Do not stop at synthetic unit tests of an isolated worker. Demonstrate the full dashboard → worker → application service → Stage-9 projections → optimizer → browser-view contract.**
+
+---
+
+# 6. WORKSTREAM B — RESOLVE THE MARKET DATA BOTTLENECK
+
+The current market-rights restriction is the immediate blocker to a genuinely useful dashboard.
+
+Investigate it thoroughly and implement the maximum appropriate offline readiness.
+
+## 6.1 Reassess The Odds API rights
+
+The project's current profile remains tied to the earlier one-shot team-strength observation.
+
+Review the current primary-source terms:
+
+https://the-odds-api.com/terms-and-conditions.html
+
+The publicly posted terms, last updated 31 August 2026, expressly discuss:
+
+- analytical dashboards;
+- derived metrics;
+- historical retention;
+- model training;
+- limits on raw-data redistribution.
+
+Verify the exact current text and applicable account plan.
+
+Do not infer that the existing account is entitled to every market, sport, request volume or purpose.
+
+Distinguish:
+
+1. vendor terms;
+2. plan/API quota;
+3. project rights profile;
+4. human-approved purpose;
+5. accepted implementation;
+6. operator runtime authorization.
+
+## 6.2 Design an eligible ongoing operator-refresh profile
+
+Prepare a narrowly scoped, versioned rights/usage proposal for:
+
+**Sebastian's private, manually triggered FPL recommendations.**
+
+Specify:
+
+- account and provider identity;
+- current-season EPL only;
+- required H2H/totals markets;
+- one-GW and three-GW information needs;
+- event/fixture coverage;
+- maximum requests per refresh;
+- daily and monthly budgets;
+- valid cutoff/freshness window;
+- retry/backoff rules;
+- 429 and quota behavior;
+- secret handling;
+- permitted transient use;
+- data retention/training status;
+- user-initiated rather than scheduled execution;
+- no redistribution;
+- no FPL account write.
+
+Do not select arbitrary request caps without tracing the actual client and provider quota model.
+
+Where appropriate, prepare separate profiles for:
+
+- transient recommendation execution;
+- independently qualified retained market research.
+
+Do not conflate those purposes.
+
+## 6.3 Approval gate
+
+Create a draft owner authorization checklist and any necessary non-active candidate configuration.
+
+**This programme does not itself approve the new profile.**
+
+Until approved, real dashboard Refresh must remain blocked.
+
+Once separately approved, the production code should be able to use the exact authenticated profile without another architectural rewrite.
+
+Do not introduce a `force`, `ignore-rights`, `unsafe` or equivalent bypass.
+
+## 6.4 Market-independent alternative
+
+Independently assess whether the existing accepted Stage-8 score-prior-only capability could support a deliberately degraded but useful current recommendation without Odds API acquisition.
+
+This is a potentially valuable operational fallback.
+
+Do not assume it is already accepted for the real private workflow.
+
+Investigate:
+
+- fixture mapping without Odds market identities;
+- score-prior source freshness and authority;
+- Stage-7/8/9 compatibility;
+- missing market constraints;
+- forecast degradation;
+- one-/three-GW support;
+- numerical and decision parity;
+- confidence disclosures.
+
+If a valid alternative can be implemented offline, produce a separately versioned, **inactive candidate** with complete synthetic tests.
+
+It must never silently substitute for the market-primary mode.
+
+An operator should be able to distinguish:
+
+`MARKET_PRIMARY`
+
+from:
+
+`GOVERNED_PRIOR_ONLY`
+
+and understand the limitations.
+
+Any new active policy requires its own acceptance.
+
+Avoid fictitious probabilities or arbitrary fallback constants.
+
+---
+
+# 7. WORKSTREAM C — FIRST GENUINE PLAYER PROSPECTIVE EVALUATION
+
+This is the second major product priority.
+
+ACCEL-002 already implemented:
+
+- frozen player forecasts;
+- player actuals contracts;
+- source custody;
+- PostgreSQL ledger;
+- append-only corrections;
+- Stage-12 scoring;
+- Model Performance dashboard;
+- synthetic paired holdouts.
+
+Now advance this toward real future evaluation.
+
+## 7.1 Design the first eligible cohort
+
+Define a concrete prospective player-level experiment for the next future eligible Gameweek.
+
+It must specify before outcomes:
+
+- season and Gameweek;
+- eligible player population;
+- inclusion/exclusion policy;
+- fixture assignment;
+- forecast origin and deadline;
+- source cutoff;
+- model/rules versions;
+- expected points and PMFs;
+- minutes/start estimates;
+- component forecasts;
+- completeness requirements;
+- benchmarks;
+- evaluation metrics;
+- outcome-finalization rule;
+- correction handling;
+- missingness and attrition;
+- minimum reporting requirements.
+
+Do not choose an already completed Gameweek and call it prospective.
+
+Do not tune after seeing the target labels.
+
+## 7.2 Qualification of all retained dependencies
+
+Inspect the exact lineage of every proposed retained player forecast.
+
+A forecast's storage permission does not arise solely from an authorized final-result source.
+
+Classify its dependencies:
+
+- FPL player/catalogue/fixture data;
+- private manager state where relevant;
+- market evidence;
+- historical score priors;
+- starts/minutes;
+- player allocation;
+- rules;
+- model parameters;
+- generated scenarios;
+- transformed features.
+
+For each, establish:
+
+- source;
+- owner;
+- version;
+- intended use;
+- acquisition permission;
+- retention permission;
+- derived-data permission;
+- training/evaluation permission;
+- display restrictions.
+
+No invented source qualification.
+
+No laundering a forbidden source through a synthetic wrapper or derived hash.
+
+If retention is not permitted, do not write the forecast or derived observations.
+
+The existing database must continue to reject forbidden writes.
+
+## 7.3 Real final-player-label integration
+
+Inspect the ACCEL-002 GW-wide actuals adapter:
+
+`src/dmf_pulse/player_lab/actuals.py`
+
+and the governing source registry.
+
+Compare it with current documented FPL Gameweek result conventions.
+
+Investigate:
+
+- actual component availability;
+- current season scoring;
+- finality;
+- bonus settlement;
+- corrections;
+- double Gameweeks;
+- blank Gameweeks;
+- transfers between teams;
+- player identity continuity;
+- partial/sparse fields;
+- result source timing.
+
+Do not assume the synthetic schema is a verified representation of live data.
+
+Develop a versioned compatibility proposal and adversarial tests.
+
+A future live schema observation requires its own provider authority.
+
+Where no eligible real source exists, preserve:
+
+`NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT`
+
+## 7.4 Make evaluation operational
+
+Implement a reproducible service/command that can:
+
+1. Authenticate an eligible frozen forecast cohort.
+2. Authenticate later finalized labels.
+3. Validate exact joins and timestamps.
+4. Score forecasts.
+5. Compute proper probabilistic metrics.
+6. Compare with predeclared benchmarks.
+7. Separate mean error, calibration, minutes error and component-level diagnostics.
+8. Generate a versioned evaluation report.
+9. Expose the report through Model Performance.
+
+Reuse existing Stage-12 numerical kernels.
+
+No duplicate statistical evaluator.
+
+No false benchmark success when samples are tiny.
+
+If real data are unavailable, demonstrate the same full path using independently qualified synthetic fixtures while retaining explicit synthetic classification.
+
+## 7.5 Model improvement discipline
+
+Prepare champion/challenger evaluation without activating a challenger.
+
+Prioritize eventual validation of:
+
+- probability of starting;
+- expected minutes;
+- 60-minute threshold;
+- goals/assists allocation;
+- clean-sheet contribution;
+- bonus/defensive contributions.
+
+Use chronological splits and untouched holdouts.
+
+Report uncertainty and cohort coverage.
+
+No parameter promotion from synthetic results or P01 hindsight.
+
+---
+
+# 8. WORKSTREAM D — IMPROVE CURRENT PLAYER EVIDENCE
+
+This is a substantive research-and-implementation workstream, not optional background reading.
+
+The largest remaining predictive limitation is the quality of player-specific evidence.
+
+ACCEL-002's dashboard exposes the uncertainty. ACCEL-003 should make practical progress toward reducing it.
+
+## 8.1 Data-source shortlist
+
+Evaluate source options for:
+
+- starts;
+- substituted-on/off minutes;
+- injuries/availability;
+- tactical roles;
+- goals/assists;
+- shots;
+- xG/xA;
+- penalties and set pieces;
+- saves;
+- defensive contributions;
+- historical FPL points.
+
+Review independently licensed and open datasets.
+
+Do not rely exclusively on FPL API endpoint accessibility.
+
+Evaluate full EPL season coverage and licence terms, not just advertised pricing.
+
+## 8.2 Data contracts
+
+Implement at least one high-value typed, independently testable player-evidence vertical slice where licensing and data coverage can be supported.
+
+Prefer starts/minutes evidence first because these estimates affect almost every player projection.
+
+Where real eligible data cannot yet be acquired, implement:
+
+- source contract;
+- canonical identity mapping;
+- historical feature construction;
+- temporal cutoffs;
+- missingness;
+- provenance;
+- offline synthetic acceptance;
+- future eligibility gates.
+
+Do not invent historical player values.
+
+## 8.3 Future calibration
+
+Define the actual measurable tests needed to establish whether new player evidence improves predictions.
+
+Compare:
+
+- current historical Grade-E prior;
+- position/role fallback;
+- candidate evidence-supported model.
+
+Use predeclared metrics and chronological holdouts.
+
+Do not activate a new player model solely because it improves a synthetic fixture.
+
+---
+
+# 9. WORKSTREAM E — OPERATIONAL AND UI COMPLETION
+
+Keep the existing dashboard design.
+
+Focus on operational usability.
+
+Improve only where justified:
+
+- real/demo distinction;
+- provider eligibility status;
+- source freshness;
+- quota visibility;
+- time to FPL deadline;
+- typed refresh failures;
+- run progress;
+- cancellation;
+- blocked coverage/missingness;
+- current model confidence;
+- actual versus synthetic performance status.
+
+A user should immediately understand whether:
+
+- a recommendation is real or synthetic;
+- a refresh is permitted;
+- inputs are current;
+- the model is complete;
+- the deadline has passed;
+- any missing data degraded the result.
+
+Do not spend significant resources on new charts or animations unless necessary to use the operational capabilities.
+
+Preserve no-store and private transient presentation restrictions.
+
+---
+
+# 10. WORKSTREAM F — ENGINEERING AND CI PERFORMANCE
+
+ACCEL-002's full CI passed with 6,142 tests, zero skips, sixteen coverage shards and twenty mandatory jobs.
+
+The 112-test D4 module required approximately 42 minutes.
+
+Preserve all mandatory gates.
+
+Profile the slow population and identify:
+
+- repeated expensive setup;
+- reusable immutable synthetic computations;
+- unnecessary repeated full-stack generation;
+- test isolation problems;
+- deterministic partition opportunities;
+- excessive fixture size;
+- performance regressions.
+
+Where technically justified, implement a bounded performance improvement with independent parity tests.
+
+Do not:
+
+- delete tests;
+- weaken assertions;
+- remove coverage;
+- mark previously required tests as optional;
+- hide runtime failures with retries;
+- increase timeout ceilings without evidence.
+
+Prefer to complete A–D before optional CI optimization if engineering time is constrained.
+
+---
+
+# 11. ACCEPTANCE DEMONSTRATIONS
+
+The programme must produce real executable demonstrations.
+
+## Demonstration A — Current-mode dashboard architecture
+
+From a clean installed wheel:
+
+- start the private dashboard;
+- authenticate the browser;
+- initiate a current-mode refresh;
+- verify rights before provider access;
+- use fully injected synthetic source transports with the same real-mode worker architecture;
+- run the existing private decision service;
+- display player projections and recommendation;
+- confirm numerical parity with the accepted CLI;
+- prove failure when current market authorization is absent.
+
+No claim of actual provider execution without separate authorization.
+
+## Demonstration B — Provider eligibility
+
+Show a complete approval decision:
+
+- eligible profile;
+- expired/consumed profile;
+- wrong account;
+- wrong source purpose;
+- wrong market;
+- over budget;
+- missing credential;
+- invalid response;
+- stale timestamp;
+- revoked authorization.
+
+All rejected cases must make zero unauthorized network requests.
+
+## Demonstration C — Alternative score-prior mode, if justified
+
+With synthetic inputs, demonstrate an explicitly selected candidate market-independent mode without fake odds or probabilities.
+
+Show its outputs and its limitations separately from market-primary.
+
+Do not activate it under an unapproved policy.
+
+## Demonstration D — Prospective evaluation
+
+Freeze a full synthetic player cohort before a deadline.
+
+Generate no post-hoc forecasts.
+
+Later supply synthetic finalized outcomes.
+
+Match, score and report the complete cohort.
+
+Include wrong-player, wrong-season, wrong-GW, incomplete-finality, duplicate and post-cutoff attacks.
+
+Demonstrate the same view contracts needed for an eventual real cohort.
+
+## Demonstration E — Historical player evidence
+
+Use an admissible offline source or owned synthetic fixture to construct a starts/minutes evidence set.
+
+Exercise canonical player mapping, revisions, cutoffs, uncertainty and missingness.
+
+Demonstrate that unsupported or unauthorized source data cannot silently enter player priors.
+
+---
+
+# 12. EXECUTION CHECKPOINTS
+
+Use one ambitious programme with durable, independently reviewed checkpoints.
+
+**CP0 — Git/authority baseline**
+
+Exact refs, rights, numerical baseline, branch/worktree and frozen acceptance plan.
+
+**CP1 — Live-capable dashboard worker**
+
+Real-mode architecture, transport guards, same-run UI integration and end-to-end injected tests.
+
+**CP2 — Market eligibility and source-policy readiness**
+
+The Odds API terms/account/source assessment, proposed versioned operator profile, quota and approval gates; explicit future human decision.
+
+**CP3 — Forecast/outcome operational pipeline**
+
+Real-ready player forecast and label contracts, first prospective cohort design, evaluation runner and dashboard integration.
+
+**CP4 — Player-evidence improvement**
+
+Qualified data research, typed evidence slice, temporal/model integration readiness and offline validation.
+
+**CP5 — Hardening and publication**
+
+Adversarial review, remediation, full accepted regression suite, build/wheel/CI, exact local and remote SHA, final handoff.
+
+Where implementation workstreams do not share source files, use separate worktrees or isolated reviewers.
+
+Preserve completed checkpoints even if later tasks cannot finish.
+
+Do not use a monolithic unreviewable commit.
+
+---
+
+# 13. INDEPENDENT ADVERSARIAL REVIEW
+
+Review at least:
+
+1. Source-rights correctness.
+2. One-shot authority consumption.
+3. Credential isolation.
+4. Worker lifecycle and cancellation.
+5. FPL deadline expiry.
+6. Single-run coherent player projections.
+7. Actual-versus-synthetic labeling.
+8. Source cutoff and future leakage.
+9. Forecast/label custody.
+10. Player identity and season mapping.
+11. Numerical parity with existing CLI.
+12. No silent prior-only substitution.
+13. No unauthorized storage or training.
+14. No private provider data in Git.
+15. No production/model activation.
+16. No P01 or historical artifact mutation.
+17. Full CI and packaging.
+18. Correct handling of missing results.
+19. Any assumption of provider rights not supported by terms/account evidence.
+20. Any false claim of real predictive accuracy.
+
+Resolve all P0/P1 and material P2 findings.
+
+Keep review history and remediation evidence visible.
+
+Run the full unchanged twenty-job CI workflow and require exact-SHA success.
+
+No PR, merge or tag.
+
+---
+
+# 14. REQUIRED FINAL HANDOFF
+
+Provide:
+
+### A. Live dashboard status
+
+- What works now?
+- What works only with synthetic sources?
+- What new real-data integration is implemented?
+- What exact market/FPL permissions still block it?
+- What is the first safe, separately authorized live pilot?
+- What operator steps will be required?
+
+### B. Data-rights decision
+
+A concise, actionable approval matrix for:
+
+- existing private FPL state;
+- expanded FPL outcome routes;
+- recurring private Odds refresh;
+- OpenFootball score priors;
+- alternative historical player providers;
+- forecast storage;
+- actual-label storage;
+- derived training datasets.
+
+State exactly what can be approved internally, what depends on third-party permission, and what remains unavailable.
+
+Do not represent owner risk acceptance as a licence grant.
+
+### C. Prospective evaluation
+
+- completed cohort contracts;
+- expected source population;
+- forecast-freezing mechanism;
+- outcome-finality process;
+- scoring and diagnostic services;
+- actual real cohort size;
+- evidence gaps;
+- next valid deadline;
+- requirements to begin the first genuine real cohort.
+
+### D. Player evidence
+
+- datasets examined;
+- rights status;
+- accepted features;
+- implemented contracts;
+- remaining calibration weaknesses;
+- possible effect on current Stage-7/9 model quality;
+- next actual holdout plan.
+
+### E. Engineering publication
+
+- branches and SHAs;
+- files changed;
+- acceptance tests;
+- independent-review findings;
+- final 20-job exact-SHA CI;
+- numerical parity;
+- installed-wheel verification;
+- performance evidence;
+- protected-file audit.
+
+### F. Exact next owner decisions
+
+Separate:
+
+1. ACCEL-003 technical acceptance.
+2. New private market-refresh authorization.
+3. FPL data access/retention permissions.
+4. New historical supplier expenditure.
+5. First real prospective-cohort authorization.
+6. Later model promotion.
+7. Production activation.
+
+Do not conflate any of them.
+
+---
+
+# 15. SUCCESS CRITERIA
+
+Minimum engineering target:
+
+- Live-capable dashboard worker implemented.
+- Full current-mode stack tested with injected transports.
+- Rights and quota boundaries validated.
+- Recurring private market usage proposal ready for owner decision.
+- Current FPL/player source eligibility mapped.
+- Player actuals compatibility advanced.
+- Executable prospective evaluation runner and full cohort test.
+- At least one substantive starts/minutes/player-evidence implementation.
+- Existing dashboard remains functional.
+- No numerical regression.
+- Independent review cleared.
+- Exact-SHA CI green.
+
+Stretch target:
+
+- An independently qualified market-free alternative for current private recommendations.
+- A separately approved private market mode ready for limited manual live piloting.
+- More comprehensive current-player evidence coverage.
+- A first authorized, pre-deadline frozen real player forecast cohort, **only if all source, retention and execution permissions have been separately granted before collection**.
+- Improved CI runtime without loss of coverage.
+
+If authorization does not exist, do not attempt real provider calls merely to achieve the stretch target.
+
+**A technically complete integration that remains honestly rights-blocked is preferable to an unauthorized live demo.**
+
+But do not let the missing authorization prevent completion of the worker, source contracts, evaluation tooling, player-evidence interfaces and offline end-to-end tests.
+
+The final engineering goal is:
+
+**Move Seb's Desk as close as possible to a real-data, one-click FPL recommendation product, and make it capable of measuring its own player predictions scientifically once a qualified prospective cohort becomes available.**
+
+Finish with:
+
+`DMF_PULSE_ACCELERATION_WAVE_003_FINAL_HANDOFF`

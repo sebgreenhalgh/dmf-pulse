@@ -1,0 +1,147 @@
+{
+  "schema_version": "accel003-independent-player-evidence-assessment-v1",
+  "reviewer_scope": "CP0 read-only player starts/minutes evidence assessment",
+  "engineering_parent_sha": "8b74d5f3dc41eb1246ae82388ec6aab3743241b8",
+  "retrieved_at_utc": "2026-10-29T18:43:11Z",
+  "retrieval_time_precision": "Public documentation research batch receipt; not an assertion of per-page HTTP response time",
+  "provider_json_requests": 0,
+  "provider_accounts_or_credentials_inspected": false,
+  "real_data_acquired": false,
+  "model_fit_or_activation": false,
+  "tracked_edits": false,
+  "local_bindings": {
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/private_v1/automatic_inputs.py": "53c390789905f8e053dbaca9eacb21dbbdc3d375b34caf48a55272872f57553f",
+    "src/dmf_pulse/ingestion/fpl/current_player_history.py": "20fea68f46cb67d4fef68af8ff1512536ed824e59cf5e587d72e18668daea8fd",
+    "config/models/gw1_private_player_allocation_acceptance_v1.json": "67b69a2c04171ceacd8bcc3667d058e4b2d1864442dc95f3e1c9371f9cd58224"
+  },
+  "sources": [
+    {
+      "identity": "Pappalardo et al. (2019), Scientific Data, original dataset author paper",
+      "url": "https://www.nature.com/articles/s41597-019-0247-7",
+      "alternate_primary_author_copy": "https://iris.cnr.it/bitstream/20.500.14243/362201/1/prod_412387-doc_145167.pdf",
+      "method": "Primary paper search-rendered excerpt and author-repository PDF search excerpt; direct Nature open redirected to inaccessible identity endpoint",
+      "supported_claims": ["Released datasets cover 2017/18 English first division and four other domestic leagues plus two international competitions", "Dataset authors declare release under CC BY 4.0"],
+      "qualification": "CANDIDATE_HISTORICAL_RESEARCH_ONLY_NO_ACQUISITION"
+    },
+    {
+      "identity": "Pappalardo/Massucco Figshare collection, version 2",
+      "url": "https://figshare.com/collections/Soccer_match_event_dataset/4415000/2",
+      "method": "Public HTML metadata page",
+      "supported_claims": ["Collection authored by dataset contributors", "All matches of an entire season in seven competitions described", "Links to Matches and Players item documentation"],
+      "qualification": "DOCUMENTATION_ONLY"
+    },
+    {
+      "identity": "Figshare Matches item 7770422",
+      "url": "https://figshare.com/articles/dataset/Matches/7770422",
+      "method": "Public HTML metadata and schema description, no download",
+      "supported_claims": ["Item explicitly CC BY 4.0", "Lineup, bench, substitutions with minute and hasFormation documented", "Source competition/season/team/match IDs and match status documented"],
+      "qualification": "CANDIDATE_HISTORICAL_RESEARCH_ONLY_NO_ACQUISITION"
+    },
+    {
+      "identity": "Figshare Players item 7765196, version 3",
+      "url": "https://figshare.com/articles/dataset/Players/7765196",
+      "method": "Public HTML metadata and schema description, no download",
+      "supported_claims": ["Item explicitly CC BY 4.0", "Source player ID and role described", "Current team field is documented and does not prove historical membership"],
+      "qualification": "CANDIDATE_HISTORICAL_RESEARCH_ONLY_NO_ACQUISITION"
+    },
+    {
+      "identity": "Creative Commons Attribution 4.0 International deed",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "method": "Primary licence page",
+      "supported_claims": ["Attribution, licence link and changes notice obligations", "Other rights may still limit use; no warranty inferred"],
+      "qualification": "LICENCE_RESEARCH_NOT_PROJECT_APPROVAL"
+    },
+    {
+      "identity": "Hudl StatsBomb open-data README",
+      "url": "https://github.com/hudl/open-data",
+      "requested_url": "https://github.com/statsbomb/open-data",
+      "method": "Primary README HTML; old organization redirects to Hudl",
+      "supported_claims": ["Research/analytics open-data purpose", "Published analyses require StatsBomb source attribution and logo", "JSON events/lineups structure documented but no JSON requested"],
+      "qualification": "CANDIDATE_PENDING_FULL_USER_AGREEMENT"
+    },
+    {
+      "identity": "StatsBomb original 2015/16 EPL free-release announcement, 2023-07-04",
+      "url": "https://blogarchive.statsbomb.com/news/the-2015-16-big-5-leagues-free-data-release-premier-league/",
+      "requested_url": "https://statsbomb.com/news/the-2015-16-big-5-leagues-free-data-release-premier-league/",
+      "method": "Primary official article archive",
+      "supported_claims": ["Full 2015/16 EPL release", "Competition ID 2 / season ID 27"],
+      "qualification": "HISTORICAL_COVERAGE_DOCUMENTATION_ONLY"
+    },
+    {
+      "identity": "StatsBomb Invincibles original announcement, 2020-06-01",
+      "url": "https://www.hudl.com/blog/invincibles-project-classics-data-pack-1",
+      "method": "Primary official article",
+      "supported_claims": ["Only 32 of Arsenal's 38 2003/04 fixtures in original release", "Standard non-commercial fan-analysis/academic licence stated; commercial use requires discussion"],
+      "qualification": "HISTORICAL_SELECTED_FIXTURES_NOT_FULL_EPL"
+    },
+    {
+      "identity": "StatsBomb repository LICENSE.pdf",
+      "url": "https://github.com/hudl/open-data/blob/master/LICENSE.pdf",
+      "method": "Primary file identity page read; raw PDF browser parsing failed due application/octet-stream",
+      "supported_claims": ["Separate 161 KB licence exists"],
+      "unverified": ["Complete user-agreement terms were not parsed"],
+      "qualification": "FULL_LICENCE_UNVERIFIED_FAIL_CLOSED"
+    },
+    {
+      "identity": "API-Football terms, page states last updated May 21 2025",
+      "url": "https://www.api-football.com/terms",
+      "method": "Primary terms page",
+      "supported_claims": ["Application and fantasy-project use contemplated", "Data resale restricted", "Provider expressly does not grant publication or competition licences and user must obtain applicable third-party permissions", "Account/plan quotas and variable coverage remain separate"],
+      "qualification": "NO_ACCOUNT_PLAN_OR_RESEARCH_PERMISSION_ESTABLISHED"
+    },
+    {
+      "identity": "API-Football coverage, page dated 2026-10-29",
+      "url": "https://www.api-football.com/coverage",
+      "method": "Primary coverage HTML",
+      "supported_claims": ["EPL listed", "Coverage explicitly varies by season and fixture"],
+      "qualification": "EXACT_EPL_SEASON_FIELD_COMPLETENESS_UNVERIFIED"
+    },
+    {
+      "identity": "API-Football v3.9.3 documentation",
+      "url": "https://www.api-football.com/documentation_v3",
+      "method": "Primary documentation page including example schemas; no API requests",
+      "supported_claims": ["Fixture starting XI and substitutes", "Fixture events and per-player statistics", "Lineup publication delay varies by competition"],
+      "qualification": "SCHEMA_DOCUMENTATION_NOT_LIVE_COMPATIBILITY"
+    },
+    {
+      "identity": "Sportmonks terms of service",
+      "url": "https://www.sportmonks.com/terms-of-service/",
+      "method": "Primary terms page",
+      "supported_claims": ["Data storage/transfer/distribution permitted within product", "Unapproved resale prohibited", "Coverage completeness not guaranteed", "Explicit training and post-termination terms require clarification for project qualification"],
+      "qualification": "NO_ACCOUNT_PLAN_OR_PROJECT_APPROVAL_ESTABLISHED"
+    },
+    {
+      "identity": "Sportmonks integrity support, reviewed August 2026",
+      "url": "https://www.sportmonks.com/integrity-support/",
+      "method": "Primary provider rights/provenance explanation",
+      "supported_claims": ["Own scout network and specialist partners described", "Provider expressly disclaims official competition rights", "Terms govern permitted product storage"],
+      "qualification": "OFFICIAL_LEAGUE_RIGHTS_NOT_GRANTED"
+    },
+    {
+      "identity": "Sportmonks current FAQ",
+      "url": "https://www.sportmonks.com/faq/",
+      "method": "Primary provider FAQ",
+      "supported_claims": ["EPL requires paid plan", "Historical covered EPL seasons advertised without exact completeness proof", "xG add-on and trial requirements differ across current pages"],
+      "qualification": "RESOLVE_PLAN_AND_FIELD_SCOPE_BEFORE_PURCHASE"
+    },
+    {
+      "identity": "Sportmonks v3 lineups documentation",
+      "url": "https://docs.sportmonks.com/v3/tutorials-and-guides/tutorials/includes/lineups",
+      "method": "Primary documentation page; no API requests",
+      "supported_claims": ["Fixture source player/team identities", "Starter/substitute type IDs 11/12", "Player minute statistics require details type and events provide substitution context"],
+      "qualification": "SCHEMA_DOCUMENTATION_NOT_LIVE_COMPATIBILITY"
+    },
+    {
+      "identity": "Sportmonks historical squad glossary, 2026-03-16",
+      "url": "https://www.sportmonks.com/glossary/squads/",
+      "method": "Primary provider documentation",
+      "supported_claims": ["Historical squad data advertised from 2005", "Provider explicitly says coverage incomplete for some competitions"],
+      "qualification": "NO_FULL_EPL_SEASON_FIELD_GUARANTEE"
+    }
+  ],
+  "recommended_implementation_scope": "Pure fixture-level participation evidence and temporal descriptive features, owned synthetic custody only; inactive future Stage-7 seam; no model change",
+  "real_eligible_source_count": 0,
+  "real_predictive_improvement_claim": false,
+  "remaining_approvals": ["Exact real source/versions/purpose qualification", "Rights and provenance of temporal identity maps", "Historical retention and derived/research/training permissions", "Separate acquisition budget and exact implementation SHA", "Preregistered chronological holdout", "Later independent model acceptance and activation"]
+}

@@ -1,0 +1,36 @@
+{
+  "files": [
+    {
+      "bytes": 46286,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP0-BASELINE.json",
+      "sha256": "2c3696e06bc65dd05504be03ee3296c8a55c5db9ee18e5d63b767c485f1a6214"
+    },
+    {
+      "bytes": 6293,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/EVALUATION-ASSESSMENT.JSON",
+      "sha256": "cd6ff228f97168bcbfd1145ecd497a4bba8e714929fd5b8cf7b19da02935e228"
+    },
+    {
+      "bytes": 13612,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/EVALUATION-ASSESSMENT.MD",
+      "sha256": "faa17366659f73f17a25ae74b201611566deab8aae4ba1797c8ce553ad184395"
+    },
+    {
+      "bytes": 9864,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/EVIDENCE-ASSESSMENT.JSON",
+      "sha256": "80a306fcc085514097e143b7cec38ecaa2915941261652beccf1058dd4e4a66f"
+    },
+    {
+      "bytes": 14666,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/EVIDENCE-ASSESSMENT.MD",
+      "sha256": "342fedfdcdf28179b0fde93dcc026b73ef4f96eff5207fa7387aabbe7d092ccf"
+    },
+    {
+      "bytes": 17399,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/MARKET-ASSESSMENT.JSON",
+      "sha256": "5f37d05e6289bfe0be06b200c47c3281c72a00618764115d9381df7051313ec7"
+    }
+  ],
+  "schema_version": "accel003-evidence-index-v1",
+  "source": "GIT_INDEX_BYTES"
+}

@@ -1,0 +1,194 @@
+{
+  "schema_version": "accel003-market-assessment-v1",
+  "classification": "INDEPENDENT_READ_ONLY_CP0_DESIGN_NOT_APPROVAL",
+  "created_at": "2026-10-29T18:45:04.357773Z",
+  "immutable_parent": "8b74d5f3dc41eb1246ae82388ec6aab3743241b8",
+  "scope": "ACCEL-003 workstream B: market authorization and inactive prior-only compatibility",
+  "network_scope": "Public primary documentation HTML only. No provider API/JSON/account/credential requests.",
+  "source_receipts": [
+    {
+      "identity": "The Odds API Pty Ltd terms, section Restrictions/API Key Responsibility",
+      "url": "https://the-odds-api.com/terms-and-conditions.html",
+      "retrieved_at": "2026-10-29T18:44:56Z",
+      "retrieval_time_precision": "UTC clock recorded immediately after combined public browser retrieval; no raw HTML byte hash captured",
+      "displayed_updated": "31 August 2026",
+      "finding": "Terms expressly allow indefinite storage, statistical/ML training, research, dashboards and derived-value display. Standalone raw-data redistribution is restricted; attribution is optional. Keys must remain private. This changes vendor-level eligibility, not the old internal purpose or account entitlement. No account plan was inspected."
+    },
+    {
+      "identity": "The Odds API v4 guide: GET odds, quota headers/costs, More info, Rate Limiting",
+      "url": "https://the-odds-api.com/liveapi/guides/v4/",
+      "retrieved_at": "2026-10-29T18:44:56Z",
+      "retrieval_time_precision": "UTC clock recorded immediately after combined public browser retrieval; no raw HTML byte hash captured",
+      "finding": "Sport-wide odds cost equals requested markets times requested regions. Returned events depend on bookmaker availability, usually the current round. Response headers expose remaining/used/last credits. Empty responses do not cost quota. HTTP 429 requires spacing requests. These docs do not establish actual EPL event coverage or this user's balance."
+    },
+    {
+      "identity": "The Odds API public Get Access plan table",
+      "url": "https://the-odds-api.com/#pricing",
+      "retrieved_at": "2026-10-29T18:44:56Z",
+      "retrieval_time_precision": "UTC clock recorded immediately after combined public browser retrieval; no raw HTML byte hash captured",
+      "finding": "Public Starter table lists 500 credits/month, most bookmakers and no historical odds. This is a public offering, not a verified account plan. Public paid tiers exist; no purchase, subscription or plan entitlement is inferred."
+    }
+  ],
+  "authority": [
+    "Manifest precedence retains controlling terms first, accepted ADRs second, most-specific accepted modules third; user programme explicitly requires new profiles inactive and no live pilot.",
+    "DMFP-20 ADR-SRC-002 at line686 is ACCEPTED: match markets anchor team outcomes; missing player props stay missing.",
+    "DMFP-20 ADR-EVT-001 at line1050 is ACCEPTED: coherent joint team scores then conditional player allocations.",
+    "ADR-EVT-002 soft-KL at line1078 is PROVISIONAL, not silently promoted; the existing separately implemented Stage8 policy remains the engineering reference.",
+    "ADR-EVT-003 at line1106 is ACCEPTED: Poisson/team-strength baseline; alternative count families require out-of-time promotion evidence."
+  ],
+  "existing_client": {
+    "route": "GET https://api.the-odds-api.com/v4/sports/soccer_epl/odds",
+    "fixed_parameters": {
+      "regions": "uk",
+      "markets": "h2h,totals",
+      "oddsFormat": "decimal",
+      "dateFormat": "iso"
+    },
+    "horizon_parameters": "commenceTimeFrom=information cutoff, commenceTimeTo=latest officially assigned horizon kickoff+1second; aware UTC whole seconds",
+    "requests_per_coherent_refresh": 1,
+    "maximum_credits_per_attempt": 2,
+    "formula": "2 markets x 1 region; event count and 1GW/3GW horizon do not multiply this sport-wide request cost",
+    "coverage": "Root fixtures require exact H2H coverage. Three-GW calls request the full interval once and classify future fixtures from that complete original response; market coverage is not promised by vendor.",
+    "client_default": "At most2 attempts inside one30s total budget; connect10s/read20s bounded by remaining total. Accepted 429 retry honors integer1..60s or1s default, but never beyond remaining total. Missing/partial/invalid quota headers fail closed.",
+    "one_shot_narrowing": "OddsClient(maximum_attempts=1) already exists. L8 wraps transport; first attempted private FPL/Odds send consumes, including failure. Old L1..L8/one-shot authority must not be reused.",
+    "security": "Opaque transient response body, credential-free request identity/sanitized target, allowlisted host/path/query, redirect denial, credential frames removed before exported typed errors. Actual wire authentication follows provider apiKey query; never serialize its full request target.",
+    "important_gap": "Generic require_rights only tests HUMAN_APPROVED+capability ALLOW. Current transient service loads fixed old profile; it does not enforce approved purpose, expiry, account scope, consumed status or known balance. New boundary must enforce all before factory/credentials/transport."
+  },
+  "proposed_transient_candidate": {
+    "profile_id": "the_odds_api_operator_refresh_transient_candidate_v1",
+    "status": "PROPOSED_INACTIVE",
+    "purpose": "Sebastian's private manually triggered current-season EPL FPL recommendations; MARKET_PRIMARY; current manager state; no FPL account writes",
+    "vendor_terms": "2026-08-31 terms URL plus retrieved/authenticated evidence identity; provider The Odds API Pty Ltd",
+    "required_approval_fields": [
+      "profile schema/id/version/semantic SHA and PROPOSED_INACTIVE vs separately APPROVED state",
+      "exact non-secret provider account reference, owner/operator reference, geography, current season, purpose, mode, allowed1or3GW horizons",
+      "exact allowed method/host/path/markets/region/formats and provider-config semantic SHA",
+      "terms evidence identity/hash, plan evidence reference, plan name/id and entitlement, monthly plan credits, reset window, observed remaining/used credits and evidence timestamp",
+      "human approval id, approved_by/at, implementation Git SHA, independent review receipt SHA, execution contract SHA, not_before/expires_at",
+      "one-shot grant id or explicitly recurring operator-only status; durable consumption/control-ledger identity; acquisition reservation state",
+      "max1 Odds transport attempt per refresh, max2 reserved credits, daily/monthly refresh and credit ceilings, UTC budget windows, quota snapshot freshness and approved safety reserve",
+      "current FPL source rights/route/account approval references and each separate source budget; pinned OpenFootball source identity; no source approval inferred from Odds approval",
+      "source cutoff policy, official deadline, accepted market normalization-policy hash/1800s stale threshold and accepted grades, dashboard run expiry/deadline policy",
+      "secret-reference identifier only; terminal/server-side resolution after authorization; no token/browser/approval-artifact serialization",
+      "transient retention0, raw/derived/cache/backup/training/public-display/redistribution DENY for this proposal; explicit secret-safe control metadata permission if durable budget counters are permitted"
+    ],
+    "budget_resolution": {
+      "per_refresh": "1 attempt/2-credit worst-case reservation follows existing one-fetch client and vendor cost, not an arbitrary cap; automatic retries0 is a deliberate narrower candidate than client default.",
+      "daily_monthly": "UNRESOLVED until owner supplies account plan, other-use allowance and desired operator limits. Require explicit positive approved values; fail closed if missing. Enforce daily refreshes<=daily_requests and2*daily_refreshes<=daily_credit_cap; monthly equivalent; caps<=verified plan/balance allocation less safety reserve.",
+      "illustration_not_approval": "At500 credits and no other usage/reserve, floor(500/2)=250 full-cost refreshes/month. This arithmetic is not an assigned account budget or recommended polling frequency.",
+      "reservation": "Reserve1 request and2 credits atomically before send. Count attempted sends conservatively even if response absent. Reconcile trustworthy last/remaining/used headers without refunding an uncertain attempt; reject mismatched scope/period/clock. Cross-process/restart limits need authenticated durable non-source counters or one-time owner grants; volatile memory alone cannot promise daily/monthly enforcement.",
+      "rate_limit": "429 terminates this grant, records typed sanitized reason, does not silently retry. A later explicit Refresh needs a fresh grant/budget and respects approved cooldown. No new free quota-check routes are added."
+    },
+    "distinct_retained_research": "Separate proposed profile required for vendor-permitted retention/training: approved storage fields/lineage, purpose, timeframe, corrections, deletion/security and account eligibility. Do not turn transient profile into retained evaluation authority. FPL/other dependency retention remains separately denied/unqualified."
+  },
+  "prior_only_assessment": {
+    "mathematical_capability": "ScoreDistributionService with empty MarketConstraintSet returns accepted statistical prior grid exactly: projection status PRIOR_ONLY,0iterations,0KL; existing confidence D and NO_MARKET_CONSTRAINTS. No fictitious probabilities, new fallback constants or count-family changes needed.",
+    "permitted_source": "Pinned OpenFootball3 complete seasons commitf27dcbef681db2c3195f9def62316ce497278781 yields existing home1.613158/away1.374561 league means. Historical baseline freshness is exact pinned provenance, not current-team freshness. Team-strength current/shadow policy is not activated.",
+    "pipeline_obstruction": "Current unified-state/PrivateV1ExecutionInput requires Odds input, market identity and root market constraints with exact fixture coverage. Root fixture IDs currently arise through market bridge. Future CURRENT_SCORE_PRIOR_BUNDLE SCORE_PRIOR_ONLY explicitly requires genuine NO_EVENT/H2H_UNAVAILABLE evidence from original Odds response. Never fabricate that evidence or a synthetic Odds envelope.",
+    "candidate_scope": "Separate versioned inactive GOVERNED_PRIOR_ONLY candidate may bind exact official FPL fixture lookup IDs, official teams and current-cutoff Stage7 inputs directly, then reuse Stage8 score prior, Stage9 and accepted optimizer. Need explicit optional-source execution contract/application seam; never weaken legacy validators or silently substitute for MARKET_PRIMARY. Production authorization must reject this mode until its separate policy acceptance and source purpose approvals exist.",
+    "horizons": "Existing Stage8+Stage9 pure services are fixture-local and support exact1/3GW candidate fixture sets. Require assigned scheduled fixtures/deadlines; do not invent future fixtures or assume blank/DGW coverage. Current FPL fixture identity can map without Odds, but new app composition must be separately sealed.",
+    "parity": "Require byte/exact-decimal equality to existing empty-constraint Stage8 and Stage9 outputs for identical owned inputs/seeds. Market-primary decision parity is not expected: removal of market information changes inputs and decisions. Compare/report differences, preserve accepted optimizer/rules numerical kernels.",
+    "limits": "League prior ignores opponents/current strength; old Grade-E player allocation/minutes assumptions persist; no market calibration. Expose mode, confidenceD, stale historical seasons and unavailable markets explicitly. Useful engineering candidate, no verified real predictive quality or permission for live execution."
+  },
+  "acceptance_tests_required": [
+    "Missing/inactive/expired/mismatched account-plan-purpose-route-implementation/review approval denies before worker/factory/credential resolver/transport calls.",
+    "Consumed one-shot or wrong grant/mode/horizon rejects; repeated UI clicks and reload cannot reserve or send twice.",
+    "Known quota<2, stale/missing quota snapshot, exhausted daily/monthly credits, reset-clock regression and concurrent reservation reject before send; aborted/failed/429 send remains counted.",
+    "Exact sport-wide call identity with2-credit reservation;1and3GW each onefetch; no event/markets/sports/history quota-check route; response invalid/partial headers failclosed; requests never exceed grant.",
+    "Auth secrets never occur in worker interface, approval JSON, browser views, repr, exceptions, logs or persistent artifacts; cancellation releases memory and old views.",
+    "Complete root H2H/exact fixture mapping required; missing totals stays typed missing; future NO_EVENT only derived from genuine captured complete response in MARKET_PRIMARY.",
+    "GOVERNED_PRIOR_ONLY remains inactive in production; explicit mode required; reject fake Odds/no-event evidence, mixed source modes or policies; synthetic tests cannot grant live authority.",
+    "Candidate fixture identity sets bijective with official assigned1/3GW fixtures; cutoff/deadline/minutes identities identical; exact empty-constraint Stage8/Stage9 parity and optimizer reuse; confidenceD and mode surfaced."
+  ],
+  "suggested_owned_paths": [
+    "config/rights/candidates/accel003_odds_operator_refresh_v1.json (inactive proposal, not old approved registry)",
+    "src/dmf_pulse/dashboard/authorization.py (or parent-owned unified live authorization module)",
+    "src/dmf_pulse/ingestion/odds/transient.py (narrow injected profile/known-quota/single-attempt seam; preserve default legacy contract)",
+    "src/dmf_pulse/private_v1/prior_only_candidate.py (distinct inactive pure contract/composer)",
+    "tests/unit/dashboard/test_live_authorization.py; tests/security/test_operator_market_budget.py; tests/unit/private_v1/test_prior_only_candidate.py",
+    "tickets/DMF-PULSE-ACCEL-003/MARKET-AUTHORIZATION-CANDIDATE.md and evidence public-doc receipts"
+  ],
+  "protected": "No provider access, real credentials, active rights changes, old one-shot resets, A02/A03/A04/P01 changes, tuning/promotion or source edits performed.",
+  "local_file_evidence": [
+    {
+      "path": "specs/manifests/authority_manifest.json",
+      "sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac"
+    },
+    {
+      "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt",
+      "sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72"
+    },
+    {
+      "path": "specs/approved/DMFP-08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE.txt",
+      "sha256": "7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff"
+    },
+    {
+      "path": "config/rights/odds_profiles.json",
+      "sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc"
+    },
+    {
+      "path": "config/rights/openfootball_profiles.json",
+      "sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545"
+    },
+    {
+      "path": "config/providers/the_odds_api.json",
+      "sha256": "b426fc82fe260621598ee2aa5baaacfb513d138f4f2023b5712b97a2ebea9743"
+    },
+    {
+      "path": "config/providers/openfootball_score_prior.json",
+      "sha256": "35c75720f00f0a069ad28a4165f4eef013a2719d55def5af8362d86a88caf314"
+    },
+    {
+      "path": "config/models/score_baseline.yaml",
+      "sha256": "43172c2639fb07eb5e98537c761373fa318161d31dace804dfe594c3853720ae"
+    },
+    {
+      "path": "config/markets/normalisation_policy.json",
+      "sha256": "201a3450482287b6e9a7929bc25f2c97375d1eccf67b239462644ae983242f18"
+    },
+    {
+      "path": "src/dmf_pulse/ingestion/odds/transient.py",
+      "sha256": "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e"
+    },
+    {
+      "path": "src/dmf_pulse/ingestion/odds/client.py",
+      "sha256": "a9b483aacd5e3c12a5dbdd049ad5c3dd51f0917a5d867ad1d4237b3c031d1c64"
+    },
+    {
+      "path": "src/dmf_pulse/ingestion/rights.py",
+      "sha256": "e76d278d4047ed48251392440cae28c9ed6bb4ab05f34a1977f71e98ff0f02c8"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/team_strength_live_network.py",
+      "sha256": "7676a5c00eef585a8dbf3ffb54906ebd3f74bf95860ef64f8565d2a2ae3659a7"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/team_strength_live_authority.py",
+      "sha256": "11e86817d24a4bf64b528255c43f2e30fa5738b923dbcbf35a840cc281cc7c6a"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/one_command.py",
+      "sha256": "e30716fc2653cd8a1210db7d5486a933b6c1ffeb14db942dc4ca030fdbecc102"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/models.py",
+      "sha256": "ba7c9b940910ecc28bd70a2c79393f5549f5b05de43a35f2e5af852f18fd2465"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/rolling_models.py",
+      "sha256": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc"
+    },
+    {
+      "path": "src/dmf_pulse/football_events/service.py",
+      "sha256": "b48c4a336f13671e93128b260be68e7934a77a9dcbb3d1ebe7fa1f3b4b98be50"
+    },
+    {
+      "path": "src/dmf_pulse/football_events/score_projection.py",
+      "sha256": "4fe24403bcca9ba55d767becb2862bbd3912e4bd72aea6c38bf2ec37076b7857"
+    },
+    {
+      "path": "src/dmf_pulse/football_events/score_distribution.py",
+      "sha256": "41f47c2c1080dacac8b6b37b7d35242cb7e5ed937f784adfb152ecc168d06124"
+    }
+  ]
+}

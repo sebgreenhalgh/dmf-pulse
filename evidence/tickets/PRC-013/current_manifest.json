@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 1582,
+      "bytes": 1629,
       "path": ".gitattributes",
-      "sha256": "66a2a2d6dcb9f6c545f9c96ab4d85718c595314ee6e5f3ca91c08b791e2b07da"
+      "sha256": "9795d3d2f1323d3a64d6bc481826c1116932c65848cfe276614babe79825d217"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 207355,
+      "bytes": 208915,
       "path": "PLANS.md",
-      "sha256": "5b98fc5143c88f9d6779ac64c427111da7b3c9996f349b163dd8ea83d75ad585"
+      "sha256": "0bd57206ce807c390382609b527457be6d043cd069c08b3bd75bd259f30c8c51"
     },
     {
       "bytes": 2761,
@@ -8074,6 +8074,16 @@
       "bytes": 36386,
       "path": "tickets/DMF-PULSE-ACCEL-002/REQUEST.txt",
       "sha256": "98f4b71aa6410e235a5194a41d6128c7bf61d272e5c3cf670fd15cfaf4cec71d"
+    },
+    {
+      "bytes": 5638,
+      "path": "tickets/DMF-PULSE-ACCEL-003/CONTRACT.md",
+      "sha256": "3a43072cf72414e4ff848e31a162f1ad73400e95a938403fa7b75960c5c3bc64"
+    },
+    {
+      "bytes": 30780,
+      "path": "tickets/DMF-PULSE-ACCEL-003/REQUEST.txt",
+      "sha256": "98da8cf3c9b9c38696e4ff8bbf63a9d00faadfa97c2eb2088f819d69af6ddbb2"
     },
     {
       "bytes": 724,

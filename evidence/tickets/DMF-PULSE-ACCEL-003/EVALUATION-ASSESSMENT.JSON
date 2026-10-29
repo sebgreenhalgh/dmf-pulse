@@ -1,0 +1,108 @@
+{
+  "assessed_at": "2026-10-29T18:45:32.685876+00:00",
+  "assessment_path": "review_pack/accel003-evaluation-assessment.md",
+  "assessment_sha256": "faa17366659f73f17a25ae74b201611566deab8aae4ba1797c8ce553ad184395",
+  "candidate": {
+    "authority_kind": "OFFICIAL_PUBLIC_HTML_SEARCH_INDEX",
+    "deadline_at": "2026-10-31T11:00:00Z",
+    "direct_open_status": "ACCESS_ERROR",
+    "freeze_status": "NOT_ATTEMPTED",
+    "gameweek": 9,
+    "published_date": "2026-10-29",
+    "season": "2026/27",
+    "source_url": "https://www.premierleague.com/es/news/4750452/everything-you-need-for-gameweek-9-of-fpl-with-the-latest-tips-and-advice",
+    "status": "FUTURE_CANDIDATE_NOT_AUTHORIZED_OR_FROZEN"
+  },
+  "classification": "READ_ONLY_OFFLINE_DESIGN_AND_PUBLIC_TEXT_RESEARCH",
+  "credentials_accessed": false,
+  "gaps": [
+    "No verified real actuals schema or route entitlement.",
+    "No current full-player cohort registry qualification.",
+    "Every retained forecast dependency requires qualification, not only labels.",
+    "FinalPlayerOutcome v1 discards actual minutes and never had start labels.",
+    "Existing Model Performance endpoint hardwires the fixed synthetic demo.",
+    "B0-B5 ladder unavailable entries must remain explicit and cannot become zero baseline success.",
+    "Real original-custody receipts need server/equivalent trusted freeze timestamps; user-provided hashes are not authority."
+  ],
+  "head": "8b74d5f3dc41eb1246ae82388ec6aab3743241b8",
+  "inspected_file_sha256": {
+    "config/rights/fpl_profiles.json": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+    "config/rights/odds_profiles.json": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+    "config/rights/openfootball_profiles.json": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+    "specs/approved/DMFP-15_BACKTESTING_CALIBRATION_AND_BENCHMARKS.txt": "0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed",
+    "specs/approved/DMFP-16_ORCHESTRATION_APIS_AND_DECISION_PIPELINE.txt": "0bf960b211f7f566ae30eed46f1f6b577606d9a8c9fd7229f122f10c64ad18f9",
+    "specs/approved/DMFP-18_DECISION_UI_REPORTING_AND_EXPLANATIONS.txt": "6b2efa3193e6aa123e63038956f06f72dc597ce2bd169130dcaab0c160a1cd0f",
+    "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/dashboard/app.py": "d49c2a880e41ea0a4017ca55b78547df4c0930845ee8195cdc2d0408929f8bc7",
+    "src/dmf_pulse/dashboard/views.py": "d4e629336acfa082173e9dc76c502b3af1d1f5285670b442fa7eb1fca4f72f95",
+    "src/dmf_pulse/database/migrations/versions/20261029_0007_player_research.py": "69acd454b92acfdde1fe17896f4fb1637d14e3a017799fcfd4236efd30b3b45a",
+    "src/dmf_pulse/evaluation/calibration.py": "72a6313be434de31b30609c0a1cb2ae4304336ad4e2de1430d0a0a5bffb31632",
+    "src/dmf_pulse/evaluation/point_metrics.py": "1d0173f00ff7ec28c7ce5f70b5b212ea1de14294c64abf022dec8fcc4996d4a7",
+    "src/dmf_pulse/evaluation/probability_metrics.py": "6bb8f1850ce75049bccdad2451acb5a699695e4dbd4d43d8e3fe2de7218fa16b",
+    "src/dmf_pulse/player_lab/actuals.py": "7a6eae3fec24c12d3bce02003f05efe88b0a76ba06308d2dc0367b5c6fb74676",
+    "src/dmf_pulse/player_lab/contracts.py": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f",
+    "src/dmf_pulse/player_lab/demo.py": "8c40bbfbc15e36a653ee90fcc2fd1c06bf30a35e5579a23923e85709494e5993",
+    "src/dmf_pulse/player_lab/evaluation.py": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e",
+    "src/dmf_pulse/player_lab/resources/source-registry.json": "de16b3d832c48c2249f8b31f63ea134c77ed2652380dc55919d4437433b65121",
+    "src/dmf_pulse/player_lab/rights.py": "576d8fb97854f0712d5757ec44f0752133918e409b0f220a36d54a13ce422103",
+    "src/dmf_pulse/player_lab/snapshots.py": "de0baeac935a37a0041532609cbf0852cebbe191ad4d020f88544da1627c726f",
+    "src/dmf_pulse/player_lab/store.py": "fde0ef1f84ed07ab2d994e705445dc0fdad2adcb03714f8f85c5eb6f05b24ad4"
+  },
+  "provider_json_requests": 0,
+  "real_cohort_size": 0,
+  "real_cohort_status": "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT",
+  "research_method": "Public official HTML open/search only; no provider API JSON, downloads or live schema observations.",
+  "schema_version": "accel003-cp0-independent-evaluation-assessment-v1",
+  "sources": [
+    {
+      "access": "OFFICIAL_SEARCH_INDEX_TEXT; direct open HTML returned zero lines",
+      "does_not_establish": [
+        "API payload schema",
+        "provider source rights",
+        "permission for new route or retention"
+      ],
+      "identity": "Official Fantasy Premier League 2026/27 Game Updates",
+      "supports": [
+        "09:00 London next day points lock",
+        "real-time provisional bonus",
+        "rare extraordinary corrections",
+        "2026/27 BPS changes"
+      ],
+      "url": "https://fantasy.premierleague.com/help/new"
+    },
+    {
+      "access": "OFFICIAL_SEARCH_INDEX_TEXT",
+      "does_not_establish": [
+        "live JSON explain completeness",
+        "starts label availability",
+        "live schema compatibility"
+      ],
+      "identity": "Official FPL basics explained: Scoring points; published20July2026",
+      "supports": [
+        "13 point component meanings",
+        "exact60minute threshold excluding stoppage time",
+        "official2026/27 position-dependent scoring"
+      ],
+      "url": "https://www.premierleague.com/en/news/2174909/"
+    },
+    {
+      "access": "OFFICIAL_SEARCH_INDEX_TEXT",
+      "identity": "Official defensive contribution explainer; published20July2026",
+      "supports": [
+        "per-fixture defensive contribution threshold and two-point cap"
+      ],
+      "url": "https://www.premierleague.com/en/news/4361991"
+    },
+    {
+      "access": "OFFICIAL_SEARCH_INDEX_TEXT",
+      "identity": "Official FPL FAQ Copilot; older text",
+      "supports": [
+        "minutes exclude stoppage time"
+      ],
+      "url": "https://www.premierleague.com/en/news/4661030",
+      "warning": "Earlier one-hour bonus/finality language is stale relative to official current2026/27 help/new."
+    }
+  ],
+  "tracked_edits": false
+}

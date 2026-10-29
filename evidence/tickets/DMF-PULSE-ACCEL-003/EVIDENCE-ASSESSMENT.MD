@@ -1,0 +1,73 @@
+# ACCEL-003 CP4 independent player-evidence assessment
+
+Reviewed 2026-10-29 UTC against engineering parent `8b74d5f3dc41eb1246ae82388ec6aab3743241b8`. This is a read-only design assessment. No provider JSON, account, credential, historical data, model fit, activation or production service was used. Public primary documentation only was researched. All proposed real-source qualifications remain inactive.
+
+## Authority and current seams
+
+- DMFP-20 ADR-DATA-001/003/004/005/006/007 are ACCEPTED: canonical UUIDs and temporal provider mappings; immutable rights-eligible vintages; `usable_at` rather than event time determines eligibility; immutable cutoff bundles; data modes remain separate; missingness never means zero. Exact source: `specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt` lines 462-655.
+- ADR-MIN-001/002/003 are ACCEPTED. START/BENCH/OUT, their conditional minute PMFs and coherent eleven-player lineups remain authoritative. ADR-MIN-004 competing-risk hazards is PROVISIONAL and should not be introduced here (same source lines 938-1049).
+- `availability/models.py::HistoryRow` already identifies a player/fixture/team/manager regime, role, integer 0..90 minutes, feature cutoff and label usable time. `availability/minutes.py::_eligible_rows` requires matching player/team, earlier sequence, earlier feature cutoff and eligible labels. The accepted model is not a naive expected-minutes regressor.
+- `private_v1/automatic_inputs.py::_current_history` currently reconstructs single-GW rows from retrieved FPL GW aggregates using *current* team association, skips team DGWs, maps positive starts to START, other positive minutes to BENCH and zeros to OUT. It discloses these assumptions. It does not prove historical roster membership or unobserved bench selection; this assessment does not silently fix or promote it.
+- `ingestion/fpl/current_player_history.py` is explicitly `EVIDENCE_ONLY_NOT_MODEL_INPUT`, transient and GW-aggregate only. It is unsuitable for pretending to have fixture-level lineup, substitution or OUT labels.
+- Stage-9 fixture presentation can expose a future qualified evidence identity/coverage alongside existing minutes but must not replace `CurrentModelFixtureMinutesInput`, `Stage7MinutesContext`, model artifacts or accepted numerical output. Current Grade-E allocation and current-GW carry-forward remain disclosed limitations.
+- Existing `fpl_official_private_operator_initiated_read_v1` denies raw/derived storage, cache, backup and model training. `player_lab/rights.py` authenticates exact packaged synthetic source bytes and exact qualified outputs. A new generic caller-supplied `ALLOW` flag would weaken this boundary and is rejected.
+
+## Source shortlist and exact supported conclusions
+
+| Source | Coverage and fields evidenced by primary docs | Rights and decision |
+|---|---|---|
+| Pappalardo/Massucco Wyscout public research release | The authors' paper and collection cover the full 2017/18 English first division alongside four other domestic leagues and two tournaments. Matches documentation includes lineup, bench, substitutions and minute, canonical source player/team/match/season IDs, match status and `hasFormation`. This is historical evidence, with no current-season availability promise. | Figshare Matches item 7770422 and Players item 7765196 explicitly show CC BY 4.0. Attribution, citation, licence link and change notices required; the licence provides no publicity/privacy/trademark warranty. Best candidate for separately qualified historical starts/minutes research. Pin all required item versions and bytes before later acquisition. No acquisition here. |
+| Hudl StatsBomb open data | Official 2023 EPL release states a full 2015/16 season, competition 2 / season 27. Official Invincibles release states 32 of Arsenal's 38 2003/04 matches, not a complete EPL season. Events and lineups are documented; neither is evidence of a current EPL feed. | Repository README requires StatsBomb attribution/logo for published analyses. Official Invincibles article states non-commercial fan/academic licence and separate commercial discussion. The repository LICENSE.pdf could not be parsed through the browser; do not replace the full user agreement with README attribution or infer general CC licensing. Candidate research only pending full agreement review and purpose acceptance. |
+| API-Football | Primary coverage lists EPL; exact seasons/fixtures and fields are explicitly variable. v3.9.3 documentation offers starting XI/bench, events and fixture player statistics; all required field-level historical completeness remains unobserved. | Terms permit applications/fantasy projects but explicitly say the service does not grant publication/competition licences and user must establish third-party permissions. Retention/training/derived artefact entitlement is not established by an API subscription. No active account or plan inspected. Obtain exact scope and written clarification before a candidate rights profile. |
+| Sportmonks | EPL is a paid-plan competition. Docs provide starter/substitute type IDs, lineups, per-player minute statistics and events. Historical squads are advertised from 2005 with explicit coverage gaps. Exact EPL season-by-field coverage is not established by marketing or an all-leagues count. | Terms explicitly permit storage/transfer/distribution of data in a product while prohibiting unapproved resale. Integrity page explicitly disclaims official league rights. Need exact selected league/season/field tier, retained research/training and post-termination terms. Product/FAQ xG inclusion and trial requirements differ; resolve contract/plan instead of choosing favorable copy. No subscription/contact/purchase performed. |
+
+OpenFootball offers team final scores, not player starts/minutes. FPL-history mirrors may mix repository code licences with downstream data; do not qualify them by a code licence alone. No shortlist item supplies official FPL points semantics automatically. Event assists, elapsed minutes, xG definitions and FPL defensive contributions require separate compatibility; no cross-provider equivalence is claimed.
+
+Primary URLs and retrieval metadata are in the adjacent JSON receipt. Metadata/article pages were read; underlying match/player/event JSON files were not requested.
+
+## Smallest substantive vertical slice
+
+Suggested owned paths (isolated from other workstreams):
+
+- `src/dmf_pulse/player_evidence/__init__.py`
+- `src/dmf_pulse/player_evidence/contracts.py`
+- `src/dmf_pulse/player_evidence/qualification.py`
+- `src/dmf_pulse/player_evidence/features.py`
+- `src/dmf_pulse/player_evidence/demo.py`
+- `src/dmf_pulse/player_evidence/resources/__init__.py`
+- `src/dmf_pulse/player_evidence/resources/owned-participation-v1.json`
+- `src/dmf_pulse/player_evidence/resources/owned-source-registry-v1.json`
+- `tests/unit/player_evidence/test_participation_features.py`
+- `tests/integration/player_evidence/test_owned_pipeline.py`
+- `tickets/DMF-PULSE-ACCEL-003/PLAYER-EVIDENCE.md`
+
+No accepted availability/private-v1 kernels, real rights profiles, source registry, database migrations or current Stage-9 contracts need modification for this evidence slice. An optional read-only dashboard evidence summary can be added by the root-owned integration after the contract is reviewed.
+
+Contracts should be frozen, strict, extra-forbid Pydantic models with UTC-aware clocks and semantic hashes. Carry source mode (`SYNTHETIC`, `RECONSTRUCTED`, `LIVE_OBSERVED`), complete provenance and explicit `EVIDENCE_ONLY_NOT_MODEL_INPUT`/`production_activation=False` throughout.
+
+1. **Source binding:** provider and source ID, exact bytes SHA, schema/normalizer version, rights-profile identity, licence/approval identity, observed/processed/mapped/usable times. Qualification should close over exact packaged owned-synthetic bytes initially. Passing a forged source descriptor or matching hash with different body must not admit data. Any real/proposed/revoked/unregistered source is rejected before parsing or persistence. No network, file-writing or database behavior in the pure builder.
+2. **Identity map:** source provider/player/team/fixture/competition/season IDs to canonical UUIDs; effective interval for fixture occurrence, and its own observed/usable clocks. Require one exact applicable mapping. No player-name joins, current-team backfill, overlapping temporal spells or cross-season ID reuse. Transfers retain canonical player ID while fixture team varies. Independent fixture assignment; no assumption that provider matchweek equals FPL GW.
+3. **Participation observation:** one `(provider, season, fixture, player, revision)`; explicit `START`, `BENCH` (selected bench including unused), `OUT` only with roster/eligibility proof, otherwise UNKNOWN. Explicit nullable minutes plus typed reason. Provider elapsed/minute/90-minute/FPL-minute convention is versioned. Do not infer absence, DNP, injury, FPL zero or OUT from missing lineup/event/roster rows. Positive benched minutes are possible; BENCH zero is valid. START zero needs an explicit supported convention and should be rejected in the Stage-7 export candidate because current accepted contract requires >0. More-than-90/extra-time values remain separate unsupported-convention states rather than silent clipping.
+4. **Revision chain:** append-only semantic identity, `supersedes_sha256`, monotone revision and usable time. Latest version *eligible at cutoff* is selected, with identity corrections similarly cut off. Post-cutoff corrections never alter earlier output; forked/conflicting same revision, missing parent or duplicate identities fail closed. No mutable latest alias.
+5. **Feature request:** canonical season/player/fixture-team scope, explicit cutoff, target kickoff and bounded history/window policy. Validate cutoff precedes target and require fixture completion, observation usable time and mapping usable time at/before cutoff. Event time alone is insufficient. Reconstructed timestamps remain RECONSTRUCTED and must not count as historically live observed.
+6. **Output:** ordered selected observation identities; expected/completed/source/mapped/usable/known-minute counts and explicit exclusion/missingness reasons. Compute descriptive sample start/bench/out counts, known-minute sum/mean, conditional START/BENCH empirical distributions, known 60+ count/rate, and age since latest usable observation. Decimal/fraction arithmetic; report numerator/denominator for every statistic. No imputation or new predictive probabilities. Uncertainty is explicit empirical support/counts, range/PMF and a statement that no calibrated predictive uncertainty has been estimated. Missing field-specific denominators remain distinct.
+
+An inactive future Stage-7 export candidate can produce *reviewable* `HistoryRow`-shaped rows only for exact fixture participation with valid role/minute conventions, roster, manager-regime and position mappings, qualified purposes and cutoff. It must reject production use without a separate accepted model/source qualification. Existing `HistoryRow` shape does not confer training rights. Do not fabricate manager regimes, sequence indices or features to satisfy that shape.
+
+## Owned-synthetic acceptance (same complete path)
+
+Build one owned source artifact with two seasons, a transfer, DGW distinct fixtures, explicit unused bench, verified OUT, missing roster/role/minutes, one mapping ambiguity, later correction and a post-cutoff future row. Freeze its registry/body identities. Demonstrate builder output for two cutoffs and exact changes in selected revisions/features; a repeat with identical input is byte/semantic deterministic. This tests engineering, not real forecasting skill.
+
+Required attacks: naive datetime, bool/int substitution, duplicate JSON keys, nonfinite/binary floats, unknown fields, oversize input, bad byte/semantic hash, forged synthetic source, real/revoked source, unauthorized purpose, wrong season, provider ID collision, overlapping mappings, transfer backfill, fixture/GW confusion, incomplete roster interpreted as OUT, unknown minutes as zero, impossible role/minute pair, unsupported >90 convention, incomplete/abandoned fixture, missing revision predecessor/fork/timestamp reversal, post-cutoff source/mapping/correction, future target fixture, zero denominator and partial field coverage. Assert zero transport calls/persistence and unchanged parent model output for the evidence-only operation.
+
+## Chronological holdout comparison plan (future, no fit/activation)
+
+Preregister before labels/model selection: full eligible mapped EPL population, fixture-level targets, stable identity, transfer/missingness rules, three fixed model IDs (current historical Grade-E/accepted Stage-7 baseline; position/role-only fallback; evidence-supported challenger), exact source/cutoff/mapping/model/rules identities, denominator and attrition reporting. Grade-E is an allocation prior; do not pretend it already supplies an alternative trained minutes model.
+
+Use earlier chronological training, later validation and untouched final test blocks by fixture date, not randomized player rows. Keep fixtures and manager/team temporal information coherent. Candidate windows, shrinkage and prior selection use training/validation only; lock before final test. Reconstructed historical data and strict-live observed cohorts receive separate reports. Shared recent players are not an excuse to leak future appearance, roster, current-team or latest-vintage facts.
+
+Predeclare Stage-12 existing-kernel metrics: START/BENCH/OUT multiclass Brier/log loss where admissible; unconditional minute MAE/RMSE/bias and full minute PMF RPS/log loss; 60+ event Brier and calibration; coverage/attrition and per-position/team/new-player/transfer slices. Compare paired exact same targets and report fixture/GW-block uncertainty; sample-size support and effective block count must accompany intervals. Component/points metrics are downstream secondary outcomes and require their own qualified FPL labels. No numeric improvement threshold is invented here; technical acceptance of this slice does not approve model promotion.
+
+## Conclusion
+
+CP4 can complete substantively with strict owned fixture evidence, temporal features, revisions, uncertainty/missingness coverage and an inactive Stage-7 export seam while real acquisition and training remain blocked. Strongest historical open candidate is the explicitly CC BY 4.0 Wyscout research release; current EPL would still require separately qualified current evidence. No improved real model accuracy can be claimed from this implementation.

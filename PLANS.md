@@ -1,5 +1,30 @@
 # DMF Pulse execution plans
 
+## DMF-PULSE-ACCEL-003 — current-mode execution and prospective evidence
+
+Parent: `8b74d5f3dc41eb1246ae82388ec6aab3743241b8`.
+The owner authorizes engineering and checkpoint publication. Live pilots,
+provider rights, retention, training, model promotion and activation are separate.
+
+- [x] CP0 fetch refs; isolate parent; authenticate 359 unchanged source files,
+  four existing exact-parent numerical baselines, eleven protected blobs and
+  P01 pins; preserve original dirty Availability worktree; freeze contract.
+- [ ] CP1 current-mode process worker, pre-transport authorization and full-stack
+  injected one-/three-GW acceptance with coherent same-run views.
+- [ ] CP2 inactive operator market proposal, account/plan/quota/consumption
+  boundaries and explicit prior-only candidate assessment.
+- [ ] CP3 operational full-cohort evaluation runner/CLI, diagnostic sidecars,
+  compatibility proposal, future cohort plan and Model Performance integration.
+- [ ] CP4 typed temporal starts/minutes evidence, identity/revisions/missingness,
+  licensed/open source assessment and chronological holdout plan.
+- [ ] CP5 adversarial independent review, parity, all unchanged release gates,
+  clean installed wheel, capped pack, final pushed SHA and complete 20/20 CI.
+
+No real provider requests or credentials during this programme. The production
+refresh registry remains unapproved; real cohort size stays zero unless all
+separate permissions are granted before collection. P01 remains unscored;
+A02/A03 stay consumed, A04 absent and team strength shadow-only.
+
 ## DMF-PULSE-ACCEL-002 — Seb's Desk
 
 - [x] CP0 isolate immutable ACCEL-001 parent; fetch references; resolve authority,
