@@ -1,0 +1,33 @@
+{
+  "a02_a03": "PERMANENTLY_CONSUMED",
+  "a04_authority_created": false,
+  "all_package_python_working_bytes_equal_checkpoint_blobs": true,
+  "classification": "READ_ONLY_PROTECTED_ARTIFACT_AUDIT",
+  "credentials_inspected": false,
+  "existing_fpl_profiles_semantically_unchanged": true,
+  "forecast_action": "BYTES_AND_STORED_IDENTITY_READ_ONLY_NO_MODEL_VALIDATOR_NO_SCORE",
+  "live_provider_calls": 0,
+  "metadata_candidate": "INACTIVE / PROPOSED_UNAPPROVED",
+  "new_fpl_profile": "OWNED_SYNTHETIC_ONLY",
+  "original_worktree_head": "4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb",
+  "original_worktree_mutations_by_this_programme": 0,
+  "original_worktree_status_sha256": "f4b88b6a4cf32618a9c192b7addace05e2520802b6f696d0cfb94a292bb84abd",
+  "p01_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "p01_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "package_python_files": 359,
+  "production_active": false,
+  "source_checkpoint": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+  "status": "PASS",
+  "team_strength": "SHADOW_ONLY",
+  "unchanged_git_blob_sha256": {
+    "config/evaluation/team_strength_p01_a02_consumption.json": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+    "config/evaluation/team_strength_p01_fallback_a02.json": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+    "config/evaluation/team_strength_p01_fallback_a03.json": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+    "config/rights/odds_profiles.json": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+    "config/rights/openfootball_profiles.json": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/fpl_points/models.py": "25112ee7e5bf69980d292da981336120b120e3fcffea0a6c0e3bf56e068a956c",
+    "src/dmf_pulse/private_v1/models.py": "ba7c9b940910ecc28bd70a2c79393f5549f5b05de43a35f2e5af852f18fd2465",
+    "src/dmf_pulse/private_v1/rolling_models.py": "32750351fe73dbe8e9e3350971ef12b3e5e05ea89dc820ec25cbda2a3f3d7bdc"
+  }
+}

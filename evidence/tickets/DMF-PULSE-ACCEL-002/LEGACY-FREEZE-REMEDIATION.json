@@ -1,0 +1,68 @@
+{
+  "additional_focused_tests": {
+    "command": ".venv/Scripts/python -m pytest tests/unit/ingestion/test_ingestion_branch_oracles.py --basetemp=review_pack/pytest-installed-resource-remediation -o cache_dir=review_pack/cache-installed-resource-remediation -q",
+    "elapsed_seconds": 2.41,
+    "exit_code": 0,
+    "fix": "Installed-resource fallback expects exact fourth owned synthetic profile and validates full semantic identity/capabilities with shared helper",
+    "passed": 12,
+    "skipped": 0
+  },
+  "base_sha": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+  "classification": "TEST_ONLY_NO_PACKAGE_OR_RIGHTS_CHANGE",
+  "diff_check": "PASS",
+  "existing_pins_preserved": {
+    "legacy_fpl_sha1": "cbe6afa0eacc175a6500152460ec04ff4ac990a0",
+    "legacy_fpl_sha256": "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d",
+    "owned_profile_id": "accel002_synthetic_player_lab_v1",
+    "owned_profile_semantic_sha256": "3c3661abeb6f7887f97979368174b609c7931ebe0ba1052aebd6f5eb01a102eb"
+  },
+  "first_attempt": {
+    "failed": 1,
+    "passed": 152,
+    "reason": "Removing added import alias left authorized Ruff import wrapping; exact known import block now restores original two-name single line."
+  },
+  "focused_tests": {
+    "command": ".venv/Scripts/python -m pytest tests/unit/ingestion/test_horizon_rights_approval.py tests/unit/ingestion/test_rights_and_fixtures.py tests/unit/private_v1/test_team_strength_d1_controls.py tests/unit/private_v1/test_team_strength_l2.py --basetemp=review_pack/pytest-legacy-freeze-remediation-2 -o cache_dir=review_pack/cache-legacy-freeze-remediation-2 -q",
+    "elapsed_seconds": 5.95,
+    "exit_code": 0,
+    "new_adversarial_cases": 12,
+    "passed": 153,
+    "skipped": 0
+  },
+  "format": "PASS_SIX_CHANGED_FILES",
+  "lint": "PASS_SIX_CHANGED_FILES",
+  "logs": {
+    "review_pack/installed-resource-remediation-tests.log": {
+      "bytes": 204,
+      "sha256": "64c3366a95e2622ef2401dec067e4a6aca7b55c83245f9e0cf218391e06137d1"
+    },
+    "review_pack/legacy-freeze-remediation-tests-first-import-format-failure.log": {
+      "bytes": 4850,
+      "sha256": "dddf0e4e470963fa206867e20d62adfb1ef54f194f346183887cd251f6b8fdc2"
+    },
+    "review_pack/legacy-freeze-remediation-tests.log": {
+      "bytes": 530,
+      "sha256": "dbe25c2b1372a2f59fa0ae78cfee180d6c214c6423f0179d5f5066f957fc9069"
+    }
+  },
+  "package_or_config_edits": false,
+  "provider_calls": 0,
+  "remaining_profile_set_search": {
+    "other_exact_sets": "Odds/OpenFootball registries and player projection profile counts are unrelated and unchanged",
+    "retained_failure": "review_pack/ci-job-123290218064.log",
+    "scope": "tests/unit and tests/integration",
+    "status": "NO_REMAINING_STALE_FPL_REGISTRY_SET_OR_COUNT_EXPECTATION"
+  },
+  "review_independence": "Author of this test-only remediation; separate fresh review required. Prior production integration review remains valid for unchanged package files.",
+  "schema_version": "accel002-legacy-freeze-test-remediation-v1",
+  "status": "PASS_AWAITING_SEPARATE_INDEPENDENT_REVIEW",
+  "test_files_sha256": {
+    "tests/accel002_legacy_freeze_support.py": "9ef1e664f1dad2891ffebb519a1fb4baed23d56844f69c896f21a54bbe709e03",
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "9f5327de083077de0f5cd59bb76c9f5b2a02040243eb8132640965e6aa83d2fd",
+    "tests/unit/ingestion/test_ingestion_branch_oracles.py": "db2f2af7f27f64daf0171c138031e742e99cb6bc39544e2137f21a63785fc3f1",
+    "tests/unit/ingestion/test_rights_and_fixtures.py": "ed74a70fc17840a606043c7858a253e152e904c01fe1dc2a72fd8cdbf124a511",
+    "tests/unit/private_v1/test_team_strength_d1_controls.py": "84ee8ff262791c15d5298b3ce884a6dda592b39c444495535f2ea77a2a907627",
+    "tests/unit/private_v1/test_team_strength_l2.py": "26344617ab1fc747018c32ce987caaea8a937b13e6af6fec03ef447262337a01"
+  },
+  "total_distinct_changed_file_tests_passed": 165
+}

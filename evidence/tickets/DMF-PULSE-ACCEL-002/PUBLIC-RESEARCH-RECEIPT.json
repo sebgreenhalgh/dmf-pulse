@@ -1,0 +1,33 @@
+{
+  "checked_at": "2026-10-29T05:58:51Z",
+  "kind": "PUBLIC_DOCUMENTATION_ONLY_NO_PROVIDER_JSON",
+  "limitations": "FPL direct HTML extraction returned a JS shell; primary search index returned governing text (crawl two weeks old). Earlier authority/source review remains controlling. No response body, source credential, purchase or subscription retained.",
+  "method": "Web primary-page open plus search-index extraction for JS-shell FPL help pages",
+  "sources": [
+    {
+      "finding": "Automated extraction restriction and underlying Game IP; owner risk acceptance is not source permission",
+      "locator": "2026/27 Terms clauses 27-29 and 28(d)",
+      "url": "https://fantasy.premierleague.com/help/terms"
+    },
+    {
+      "finding": "09:00 UK day after last GW match; extraordinary correction possibility",
+      "locator": "New Gameweek points lock time",
+      "url": "https://fantasy.premierleague.com/help/new"
+    },
+    {
+      "finding": "19 USD per month; 7500 requests per day advertised; access not reuse licence",
+      "locator": "Pro plan",
+      "url": "https://www.api-football.com/pricing"
+    },
+    {
+      "finding": "29 EUR monthly; 5 leagues; 2000 calls per entity per hour; page advertises xG within the feature set",
+      "locator": "Starter pricing and full feature set",
+      "url": "https://www.sportmonks.com/football-api/"
+    },
+    {
+      "finding": "FAQ separately describes an xG add-on; obtain a written package and rights quote",
+      "locator": "Expected Goals add-on answers",
+      "url": "https://www.sportmonks.com/faq/"
+    }
+  ]
+}

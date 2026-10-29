@@ -1,0 +1,20 @@
+{
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "initial_current_source_identity": "dmf-pulse-0.2.0:source-sha256:bd47b7f01bd9fd98961f3cb8f39c4d6d9b6c27ba2b8ac7f3ffaa9dbf91ad5f81",
+  "final_current_source_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+  "author_declared_changes": [
+    "src/dmf_pulse/ingestion/fpl/service.py: TARGET_REVISION 0006 to 0007 to match the new schema head",
+    "src/dmf_pulse/dashboard/synthetic.py: injected fake bearer marker changed to placeholder"
+  ],
+  "independent_source_inventory_confirmed_exactly_these_two_changes": true,
+  "initial_batch_exit_code": 1,
+  "initial_batch_final_error": "AssertionError: implementation changed during parity run",
+  "failure_meaning": "The overall initial batch source snapshot was correctly rejected after the author explicitly amended the frozen package. No numerical mismatch caused this guard rejection.",
+  "remediation": "Retained initial current one-GW and demo artifacts as before-final-freeze; reran both against final bytes; completed all remaining current workers against final bytes; resumed only exact-source-verified worker receipts and compared all full payloads.",
+  "final_resume_command": ".venv/Scripts/python.exe review_pack/accel002_parity.py --parent ../ACCEL-001-PRIVATE --resume",
+  "final_resume_exit_code": 0,
+  "independent_finalizer_command": ".venv/Scripts/python.exe review_pack/accel002_review_finalize.py",
+  "independent_finalizer_exit_code": 0,
+  "setup_issue": "Python-spawned Git initially rejected parent worktree ownership. The ignored harness uses command-local git -c safe.directory=<exact parent path>; no global Git config was mutated.",
+  "production_package_or_authentication_changed_by_reviewer": false
+}

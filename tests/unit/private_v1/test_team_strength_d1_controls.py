@@ -14,6 +14,7 @@ from dmf_pulse.optimisation.multi_gameweek_models import (
 from dmf_pulse.optimisation.multi_gameweek_policy import load_multi_gameweek_search_policy
 from dmf_pulse.private_v1 import team_strength_comparison as comparison
 from dmf_pulse.private_v1.service import _exact_root_action_upper_bound, bounded_horizon_screen
+from tests.accel002_legacy_freeze_support import without_accel002_presentation
 from tests.unit.private_v1.team_strength_d1_parent_support import parent_source
 
 
@@ -89,7 +90,9 @@ def test_real_candidate_screen_can_move_derived_budget_without_hard_control_dive
 def test_ordinary_service_is_parent_ast_except_scoped_diagnostic_notes(repository_root):
     relative = "src/dmf_pulse/private_v1/service.py"
     parent = ast.parse(parent_source(repository_root, relative))
-    current = ast.parse((repository_root / relative).read_text())
+    current = ast.parse(
+        without_accel002_presentation((repository_root / relative).read_text(), relative)
+    )
 
     class RemoveNotes(ast.NodeTransformer):
         def visit_ImportFrom(self, node):

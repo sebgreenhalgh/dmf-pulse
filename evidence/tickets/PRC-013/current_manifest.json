@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 1198,
+      "bytes": 1457,
       "path": ".gitattributes",
-      "sha256": "c39f45187f379517a6f9ba03be8789bbd3d5b81ec252605bb80a269c646f793b"
+      "sha256": "82d44c3d54b75bfb977f8c1de4858f734bb717cace6957ffac2bef1b71ff6133"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 206188,
+      "bytes": 206422,
       "path": "PLANS.md",
-      "sha256": "5da48820abe24f9b4207169fb7fd9ccf1bd730f985b3622e5a6b160858995365"
+      "sha256": "ad07a28773947300323ff2bfe25b46389303d06bcca3daf12f6fd2ad3a59cc04"
     },
     {
       "bytes": 2761,
@@ -5056,6 +5056,11 @@
       "sha256": "0684f0a36af288bcb1a29da35bbca5ee00d64f534a9c14e2b945fdb9d77923b1"
     },
     {
+      "bytes": 8072,
+      "path": "tests/accel002_legacy_freeze_support.py",
+      "sha256": "9ef1e664f1dad2891ffebb519a1fb4baed23d56844f69c896f21a54bbe709e03"
+    },
+    {
       "bytes": 17063,
       "path": "tests/assurance/fpl_points/test_assurance_mutations.py",
       "sha256": "e3f7d92bbd794b8c949d66ccdf214d271490085518b9341755753d24e24c53aa"
@@ -6866,14 +6871,14 @@
       "sha256": "333534df4233f50c990a4db99d0ca2bcdd2f1052ca04de64bdae3c068c96c4ec"
     },
     {
-      "bytes": 8414,
+      "bytes": 8527,
       "path": "tests/unit/ingestion/test_horizon_rights_approval.py",
-      "sha256": "92103b442c9f73abf35edd639e76f879182e7dd620b228db31182c838c51587e"
+      "sha256": "9f5327de083077de0f5cd59bb76c9f5b2a02040243eb8132640965e6aa83d2fd"
     },
     {
-      "bytes": 11253,
+      "bytes": 11477,
       "path": "tests/unit/ingestion/test_ingestion_branch_oracles.py",
-      "sha256": "ced808d5f6deb03ae9343f971b45f12f24a936ebab71b1907d9082f064386666"
+      "sha256": "db2f2af7f27f64daf0171c138031e742e99cb6bc39544e2137f21a63785fc3f1"
     },
     {
       "bytes": 14805,
@@ -6936,9 +6941,9 @@
       "sha256": "da8a795243f4919b74e8941c6c19e3767329c38bac0d2258fa46ef176778e939"
     },
     {
-      "bytes": 15703,
+      "bytes": 16990,
       "path": "tests/unit/ingestion/test_rights_and_fixtures.py",
-      "sha256": "2a6e23dff38f4dec359b450a9a8350be55fb70eb2f71914de75ae6df42e6fa91"
+      "sha256": "ed74a70fc17840a606043c7858a253e152e904c01fe1dc2a72fd8cdbf124a511"
     },
     {
       "bytes": 16031,
@@ -7326,9 +7331,9 @@
       "sha256": "7095ffba78ae7b71681ad2b65f9a58e19beb1c26a4f3b6d8b24ac6ba0acbb8d8"
     },
     {
-      "bytes": 4830,
+      "bytes": 4964,
       "path": "tests/unit/private_v1/test_team_strength_d1_controls.py",
-      "sha256": "3d2ed4edcb66bc4d3c6854b95b33a92f77d59cb871241737ee40e9dc269e365f"
+      "sha256": "84ee8ff262791c15d5298b3ce884a6dda592b39c444495535f2ea77a2a907627"
     },
     {
       "bytes": 21373,
@@ -7381,9 +7386,9 @@
       "sha256": "6fbb008b330b9189a8fc134a98a1ad83768513eec81601a62d551af836602c75"
     },
     {
-      "bytes": 21884,
+      "bytes": 24296,
       "path": "tests/unit/private_v1/test_team_strength_l2.py",
-      "sha256": "c4f9dafa243268939d2ab4785bfa54d12e099a49252f81b18d5037a2180ec733"
+      "sha256": "26344617ab1fc747018c32ce987caaea8a937b13e6af6fec03ef447262337a01"
     },
     {
       "bytes": 5076,
@@ -8051,9 +8056,14 @@
       "sha256": "6e89a56690bbc28db0b96019051e1f0eeac0a8a8b998b4113d7cac7496e94d81"
     },
     {
-      "bytes": 10432,
+      "bytes": 23945,
+      "path": "tickets/DMF-PULSE-ACCEL-002/DATA-INVENTORY.json",
+      "sha256": "3a2dd0dc5224e22aeca6f96a50dfa9e4945c3b2528ed4c1caeba164b43277c68"
+    },
+    {
+      "bytes": 11045,
       "path": "tickets/DMF-PULSE-ACCEL-002/DATA-STRATEGY.md",
-      "sha256": "dc1c0eb7563804320a4982ae2a4db35833fea6ccf14a7d572a73a5c33e118ba8"
+      "sha256": "c0172fd3c9f038676f8a25001b5a6f5ea1d0075db7bf9877c6e71988e2482ac4"
     },
     {
       "bytes": 36386,

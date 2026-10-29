@@ -1,0 +1,510 @@
+{
+  "reviewed_at_utc": "2026-10-29T06:08:15.233266+00:00",
+  "programme": "DMF-PULSE-ACCEL-002",
+  "immutable_parent": "02576a563179e0a8d3311fc5e82c770905975f61",
+  "implementation_source_edits_by_reviewer": false,
+  "binding": "Working-byte SHA-256 and immutable checkpoint Git-blob SHA-256 are both recorded. Git normalizes line endings; uncommitted documentation is explicitly working-only or a later working edit.",
+  "prohibited_actions_performed": [],
+  "live_provider_calls": 0,
+  "credentials_inspected": false,
+  "quality_state": {
+    "unresolved_P0": 0,
+    "unresolved_P1": 0,
+    "unresolved_material_P2": 0
+  },
+  "unit_evidence": {
+    "path": "review_pack/accel002-rights-security-unit-evidence.json",
+    "sha256": "edeac8e8e06811dbcc6fd075d6655df10185a72e9eb2d1fffe0e27c3b8db039a",
+    "command": ".venv/Scripts/python.exe -B -m pytest tests/unit/dashboard/test_dashboard.py tests/unit/player_lab/test_player_lab.py --basetemp review_pack/rights-security-final-tests -p no:cacheprovider -q --tb=short",
+    "exit_code": 0,
+    "passed": 71,
+    "elapsed_seconds": 85.72,
+    "stdout": ".......................................................................  [100%]\n71 passed in 85.72s (0:01:25)",
+    "network_policy": "repository socket/DNS guards intact; provider-shaped sources are injected synthetic only"
+  },
+  "review_type": "SOURCE_RIGHTS_AND_DATA_RETENTION",
+  "verdict": "PASS_FOR_REVIEWED_OFFLINE_SYNTHETIC_SOURCE_RIGHTS_AND_RETENTION_SCOPE",
+  "governing_authority": [
+    {
+      "locator": "AGENTS.md Authority; authority_manifest.json /precedence",
+      "finding": "Provider terms outrank accepted project decisions; tickets cannot confer third-party rights."
+    },
+    {
+      "locator": "DMFP-20 ADR-OPS-006; B6-control-UI manifest scope",
+      "finding": "Accepted shared FastAPI/API/CLI services support narrow private loopback UI; DMFP-16/18 PROPOSED headers are not wholesale approval."
+    },
+    {
+      "locator": "DMFP-20 ADR-ASSUR-006; config/rights/fpl_profiles.json",
+      "finding": "Every capability and purpose stays fail-closed; existing private raw/derived/cache/backup/training/display denials unchanged."
+    }
+  ],
+  "current_public_terms": [
+    {
+      "url": "https://fantasy.premierleague.com/help/terms",
+      "locator": "2026/27 terms clauses 27,28(d),29",
+      "observed_on": "2026-10-29",
+      "access": "search-indexed official content; direct page rendered a JS shell",
+      "finding": "Automated access/extraction remains prohibited; credentials and Game data rights are restricted. Existing owner risk acceptance is neither Premier League permission nor a licence."
+    },
+    {
+      "url": "https://fantasy.premierleague.com/help/new",
+      "locator": "New Gameweek points lock time",
+      "observed_on": "2026-10-29",
+      "finding": "Normal finality is 09:00 Europe/London after the last GW match, with extraordinary corrections possible. Candidate actuals adapter explicitly implements this season-specific policy."
+    },
+    {
+      "url": "https://www.api-football.com/terms",
+      "locator": "Terms of use; third-party intellectual-property rights paragraphs",
+      "observed_on": "2026-10-29",
+      "finding": "Provider access does not itself grant underlying competition/fantasy publication rights; additional rights qualification remains required."
+    },
+    {
+      "url": "https://github.com/openfootball/football.json/blob/master/LICENSE.md",
+      "locator": "CC0 dedication and limitations",
+      "observed_on": "2026-10-29",
+      "finding": "Existing profile remains narrower than source licence: private team-score/prior purpose only, no player/FPL label inference."
+    }
+  ],
+  "retention_controls": [
+    "New accel002_synthetic_player_lab_v1 profile is confined to owner-owned manifest-verified fixtures and explicitly denies automated access, model training, public display and redistribution.",
+    "Closed package registry authenticates exact source ID, payload hash, profile identity and observed/usable timestamps; caller SYNTHETIC flags or borrowed source references do not grant retention rights.",
+    "Qualified forecast semantic allowlist and re-derived exact label identity prevent invented values being saved under an eligible source reference.",
+    "Actuals wrapper verifies exact raw-byte and finality-context hashes before candidate parsing. Pure parser is explicitly not source acquisition or retention permission.",
+    "MemoryLedger and PostgresResearchLedger revalidate immutable contracts and all source dependencies. Persistent Python paths perform qualification/custody checks before invoking connection factory.",
+    "Current actuals transport gate denies the sole eligible synthetic profile before invoking the callback. Existing direct FPL route grammar remains unchanged; event-status/element-summary are not activated.",
+    "PostgreSQL migration freezes source records and exact owned experiment/scorecard/forecast/label qualifications; frozen wrapper shape/timezone and fail-closed null checks are present. Append-only guards and deferred complete-pair checks preserve original label vintages.",
+    "Private real dashboard refresh is explicitly RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED; existing one-shot Odds purpose is not expanded.",
+    "Current registry classifies SYNTHETIC_ONLY_NO_REAL_QUALIFIED_SOURCES. No real prospective cohort, training entitlement, source activation or public display permission is asserted.",
+    "require_sources now hashes each actual backing resource byte sequence against its registered payload SHA before it can support source retention; focused independently rerun tamper regression passes."
+  ],
+  "registry_snapshot": {
+    "classification": "SYNTHETIC_ONLY_NO_REAL_QUALIFIED_SOURCES",
+    "source_ids": [
+      "ACCEL002_OWNED_STAGE9_ACTUALS",
+      "ACCEL002_OWNED_STAGE9_RUN",
+      "ACCEL002_SYNTHETIC_ACTUALS_GW2",
+      "ACCEL002_SYNTHETIC_ACTUALS_GW2_REV1",
+      "ACCEL002_SYNTHETIC_ACTUALS_GW3",
+      "ACCEL002_SYNTHETIC_FORECAST_INPUTS"
+    ],
+    "synthetic_profile": {
+      "account_scope": "ACCEL-002 manifest-verified repository-owned synthetic player-lab assets only",
+      "approved_at": "2026-10-29T00:00:00Z",
+      "approved_by": "Sebastian Greenhalgh programme request",
+      "approved_purpose": "offline synthetic adapter, prospective custody simulation and evaluation acceptance only",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "ALLOW",
+        "cache": "DENY",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "ALLOW",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-10-29T00:00:00Z",
+      "geography_scope": "local deterministic test environment",
+      "human_approval_id": "DMF-PULSE-ACCEL-002#synthetic-acceptance",
+      "notes": "Owner-owned synthetic fixtures only. No real provider data, live transport, training, real cohort, source licence expansion or production activation.",
+      "profile_version": "1.0.0",
+      "provider_key": "synthetic_fpl",
+      "retention_reason": "repository-approved synthetic data has no retention limit",
+      "retention_seconds": null,
+      "rights_profile_id": "accel002_synthetic_player_lab_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false,
+      "terms_source": "tickets/DMF-PULSE-ACCEL-002/REQUEST.txt sections 6, 7.4 and 11",
+      "terms_version": "1.0.0",
+      "unresolved_rights": []
+    }
+  },
+  "findings_closed": [
+    {
+      "id": "RET-SQL-EXTRA-PAYLOAD",
+      "severity": "P2",
+      "status": "REMEDIATED_AND_INDEPENDENT_SQL_RETEST_CONFIRMED",
+      "evidence": "Exact experiment/scorecard allowlists statically verified; separately attributed integration receipt independently rejects all 13 missing/null/naive/extra-field cases, including extra private-shaped marker cases."
+    },
+    {
+      "id": "RET-SOURCE-RESOURCE-BYTES",
+      "severity": "P2",
+      "status": "FIXED_AND_FOCUSED_TAMPER_TEST_PASSES",
+      "evidence": "Actual backing resource hashes are checked; independent focused regression passed 1/1."
+    }
+  ],
+  "limits": [
+    "No real provider access, raw bodies or credentials were inspected; public legal/documentation pages only.",
+    "Source/resource changes after these hashes invalidate the affected binding; full release CI, numerical parity, packaging and acceptance remain separate.",
+    "No present StatsBomb/Wyscout/API-Football/Sportmonks licence or account was qualified or activated by engineering.",
+    "Final exact-SHA release CI and human acceptance remain separate; reviewed checkpoint package bytes are committed, while the new inventory/research receipt and strategy additions are bound to explicitly recorded working bytes."
+  ],
+  "source_sha256": {
+    "AGENTS.md": "c7f804af7c2fd40c507425d663ec9256b41fc9e1b93931d07fa669cc56396305",
+    "CODE_REVIEW.md": "f4d21b3538bb0b27503d02fa2bf08cff7110e2ef95bcd58ab0db9948858aae01",
+    "config/rights/fpl_profiles.json": "3809457f073d06e192be619726c50713c2e777558c0a70573d53ff647534b6e9",
+    "config/rights/odds_profiles.json": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+    "config/rights/openfootball_profiles.json": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+    "docs/operations/private_v1_one_command.md": "65b80bf1cada48f1b8f9edff0c92c07f21ce45f494866df525cb0239a6120a67",
+    "evidence/tickets/DMF-PULSE-ACCEL-002/PUBLIC-RESEARCH-RECEIPT.json": "1f3c05c6944513a924d9c29996fd6a281c7d3b8fd817f28bb8a792191c9a768b",
+    "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/dashboard/resources/demo/manifest.json": "23db8268eccec279bb2ee94dea61361c6eb548a0340fbe67bb94eb01fd871721",
+    "src/dmf_pulse/dashboard/synthetic.py": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73",
+    "src/dmf_pulse/data_model/tables.py": "5adf24cec629e1a232f1578c38bfc90a6d3f385a43a2e4e52d9ccd6b5db3c54b",
+    "src/dmf_pulse/database/migrations/versions/20261029_0007_player_research.py": "69acd454b92acfdde1fe17896f4fb1637d14e3a017799fcfd4236efd30b3b45a",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "1fcf74ac35ccd81a6a6e28138edb86460ccc42596804d04236c14632809810a4",
+    "src/dmf_pulse/ingestion/fpl/service.py": "cb776ca7728ea4d354f3bbda804e411a795ca595180e7d9abe0b8f8e624f128b",
+    "src/dmf_pulse/ingestion/rights.py": "e76d278d4047ed48251392440cae28c9ed6bb4ab05f34a1977f71e98ff0f02c8",
+    "src/dmf_pulse/player_lab/actuals.py": "7a6eae3fec24c12d3bce02003f05efe88b0a76ba06308d2dc0367b5c6fb74676",
+    "src/dmf_pulse/player_lab/contracts.py": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f",
+    "src/dmf_pulse/player_lab/demo.py": "8c40bbfbc15e36a653ee90fcc2fd1c06bf30a35e5579a23923e85709494e5993",
+    "src/dmf_pulse/player_lab/evaluation.py": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e",
+    "src/dmf_pulse/player_lab/resources/actuals-gw2-revision1.json": "6418ace66d97afb9b44ecfd7c5de1f321434afe83fe601b010ad3946c355b6c4",
+    "src/dmf_pulse/player_lab/resources/actuals-gw2.json": "cff309ed67dfaf834cfd7ec0dfd7ec5c8c3b88107806a0d35b55c999f20f5c49",
+    "src/dmf_pulse/player_lab/resources/actuals-gw3.json": "7bf5d26798f663c7ae1e3358b0bb0bbb05f8445a0f545e40c14b54f17e6e3d5f",
+    "src/dmf_pulse/player_lab/resources/context-gw2-revision1.json": "20e60d10dacc9c5b4f3f66450e9eec684012bcfb5ebca98261a96567b139e7fb",
+    "src/dmf_pulse/player_lab/resources/context-gw2.json": "284a0a6622b8c31e4d33d7703e3d4a62bddaa63e7ba3494db7ec50f13cd10445",
+    "src/dmf_pulse/player_lab/resources/context-gw3.json": "fcf8c73e703816c6edf3974b30aa27ec8588d1cd2b51a7f3ba4924c5f01a1e51",
+    "src/dmf_pulse/player_lab/resources/forecast-inputs.json": "7091eba0b5e60aca1f4513c27474009e729bfcaf653245d46222f24a904d64f6",
+    "src/dmf_pulse/player_lab/resources/source-registry.json": "de16b3d832c48c2249f8b31f63ea134c77ed2652380dc55919d4437433b65121",
+    "src/dmf_pulse/player_lab/resources/stage9-actuals.json": "8bb047bf6dfaa39079c7fa911d216dab109e1ddbeba5721a177cd54d25883e65",
+    "src/dmf_pulse/player_lab/resources/stage9-input-evidence.json": "84a653f9022b950e4dafa397325a1887db959dc568cd6fd174a11a14bce260f1",
+    "src/dmf_pulse/player_lab/resources/stage9-outcome-context.json": "373c8debdb9984326c07db72d9c63715ce554b8b45f640ce5bc044514224bdb3",
+    "src/dmf_pulse/player_lab/resources/stage9-snapshot.json": "0e3655314fb67c4ceef1ced4d2d885787cb35e2c3113358666a5d603be44828a",
+    "src/dmf_pulse/player_lab/rights.py": "576d8fb97854f0712d5757ec44f0752133918e409b0f220a36d54a13ce422103",
+    "src/dmf_pulse/player_lab/snapshots.py": "de0baeac935a37a0041532609cbf0852cebbe191ad4d020f88544da1627c726f",
+    "src/dmf_pulse/player_lab/stage9_demo.py": "9c880212c4b2444d7f2387663758a1f8dd6c96c43a2c756640bc6af4a49abd47",
+    "src/dmf_pulse/player_lab/store.py": "fde0ef1f84ed07ab2d994e705445dc0fdad2adcb03714f8f85c5eb6f05b24ad4",
+    "src/dmf_pulse/private_v1/one_command.py": "e30716fc2653cd8a1210db7d5486a933b6c1ffeb14db942dc4ca030fdbecc102",
+    "src/dmf_pulse/private_v1/presentation.py": "79853618a05a028c9c9b54a4a70df60f99ef02df4fb9f988eff0119b0dbb9722",
+    "tests/integration/player_lab/test_research_store.py": "ae1f0f32f064eb88bd4f0d1576be7755d21d912944f9d51a9e600b7258f3f596",
+    "tests/unit/player_lab/test_player_lab.py": "3244f00e402687ef1423b661eb3ca0e55c25e33194fec757b0afc2347cb844d7",
+    "tickets/DMF-PULSE-ACCEL-002/CONTRACT.md": "6e89a56690bbc28db0b96019051e1f0eeac0a8a8b998b4113d7cac7496e94d81",
+    "tickets/DMF-PULSE-ACCEL-002/DATA-INVENTORY.json": "3a2dd0dc5224e22aeca6f96a50dfa9e4945c3b2528ed4c1caeba164b43277c68",
+    "tickets/DMF-PULSE-ACCEL-002/DATA-STRATEGY.md": "c0172fd3c9f038676f8a25001b5a6f5ea1d0075db7bf9877c6e71988e2482ac4"
+  },
+  "reviewed_checkpoint_sha": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+  "source_bindings": {
+    "AGENTS.md": {
+      "working_sha256": "c7f804af7c2fd40c507425d663ec9256b41fc9e1b93931d07fa669cc56396305",
+      "git_blob_sha256": "c7f804af7c2fd40c507425d663ec9256b41fc9e1b93931d07fa669cc56396305",
+      "git_blob_oid": "09b6f2585090bc29427e9de92a6b6f9c5cf706d0",
+      "comparison": "EXACT"
+    },
+    "CODE_REVIEW.md": {
+      "working_sha256": "f4d21b3538bb0b27503d02fa2bf08cff7110e2ef95bcd58ab0db9948858aae01",
+      "git_blob_sha256": "f4d21b3538bb0b27503d02fa2bf08cff7110e2ef95bcd58ab0db9948858aae01",
+      "git_blob_oid": "15eb32f98528dde9f3a21afa442b7fb5957e2b98",
+      "comparison": "EXACT"
+    },
+    "config/rights/fpl_profiles.json": {
+      "working_sha256": "3809457f073d06e192be619726c50713c2e777558c0a70573d53ff647534b6e9",
+      "git_blob_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+      "git_blob_oid": "47a3e2af1015749fd8ff5931c2a4fd16072c7675",
+      "comparison": "CRLF_NORMALIZATION_ONLY"
+    },
+    "config/rights/odds_profiles.json": {
+      "working_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+      "git_blob_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+      "git_blob_oid": "522cd4b92072d5714d4a152275fdcd0c97e1dd88",
+      "comparison": "EXACT"
+    },
+    "config/rights/openfootball_profiles.json": {
+      "working_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+      "git_blob_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+      "git_blob_oid": "c6081f987c1f6be6dc11e77c7d11db4cd77d80ce",
+      "comparison": "EXACT"
+    },
+    "docs/operations/private_v1_one_command.md": {
+      "working_sha256": "65b80bf1cada48f1b8f9edff0c92c07f21ce45f494866df525cb0239a6120a67",
+      "git_blob_sha256": "65b80bf1cada48f1b8f9edff0c92c07f21ce45f494866df525cb0239a6120a67",
+      "git_blob_oid": "9a8b61c8abedbc4af473246086df5f9a74ac0765",
+      "comparison": "EXACT"
+    },
+    "evidence/tickets/DMF-PULSE-ACCEL-002/PUBLIC-RESEARCH-RECEIPT.json": {
+      "working_sha256": "1f3c05c6944513a924d9c29996fd6a281c7d3b8fd817f28bb8a792191c9a768b",
+      "git_blob_sha256": null,
+      "git_blob_oid": null,
+      "comparison": "WORKING_ONLY_NOT_IN_CHECKPOINT"
+    },
+    "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt": {
+      "working_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+      "git_blob_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+      "git_blob_oid": "07f30be13597dfeabf4d808e9fc277e9bfca0384",
+      "comparison": "EXACT"
+    },
+    "specs/manifests/authority_manifest.json": {
+      "working_sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+      "git_blob_sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+      "git_blob_oid": "4331c1a8651b039228b9179560a4d3073a5ed0bd",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/dashboard/resources/demo/manifest.json": {
+      "working_sha256": "23db8268eccec279bb2ee94dea61361c6eb548a0340fbe67bb94eb01fd871721",
+      "git_blob_sha256": "f01c0717d12580bcacbec759f6128f7d3509d6912d0b847774e3288995e1b1ec",
+      "git_blob_oid": "abce596639e7beaab61f3f9402a487cec8f50088",
+      "comparison": "CRLF_NORMALIZATION_ONLY"
+    },
+    "src/dmf_pulse/dashboard/synthetic.py": {
+      "working_sha256": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73",
+      "git_blob_sha256": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73",
+      "git_blob_oid": "fc0fba363efb85fab35b80f56de60e21f4006d38",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/data_model/tables.py": {
+      "working_sha256": "5adf24cec629e1a232f1578c38bfc90a6d3f385a43a2e4e52d9ccd6b5db3c54b",
+      "git_blob_sha256": "5adf24cec629e1a232f1578c38bfc90a6d3f385a43a2e4e52d9ccd6b5db3c54b",
+      "git_blob_oid": "88e0ef7865e1096f9e5bd6e0f55bc01b43102c6a",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/database/migrations/versions/20261029_0007_player_research.py": {
+      "working_sha256": "69acd454b92acfdde1fe17896f4fb1637d14e3a017799fcfd4236efd30b3b45a",
+      "git_blob_sha256": "69acd454b92acfdde1fe17896f4fb1637d14e3a017799fcfd4236efd30b3b45a",
+      "git_blob_oid": "6c7a8eda6a9cc7cbe890c47506c48ced8010281d",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/ingestion/fpl/direct.py": {
+      "working_sha256": "1fcf74ac35ccd81a6a6e28138edb86460ccc42596804d04236c14632809810a4",
+      "git_blob_sha256": "1fcf74ac35ccd81a6a6e28138edb86460ccc42596804d04236c14632809810a4",
+      "git_blob_oid": "40fa59ba162641d90ff65f4448a3d42f0239cc26",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/ingestion/fpl/service.py": {
+      "working_sha256": "cb776ca7728ea4d354f3bbda804e411a795ca595180e7d9abe0b8f8e624f128b",
+      "git_blob_sha256": "cb776ca7728ea4d354f3bbda804e411a795ca595180e7d9abe0b8f8e624f128b",
+      "git_blob_oid": "a69cb19292875ba3559675782cf4d2093433e4ed",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/ingestion/rights.py": {
+      "working_sha256": "e76d278d4047ed48251392440cae28c9ed6bb4ab05f34a1977f71e98ff0f02c8",
+      "git_blob_sha256": "e76d278d4047ed48251392440cae28c9ed6bb4ab05f34a1977f71e98ff0f02c8",
+      "git_blob_oid": "dce9f72cf0464beff397317c2c4d5a6a51be808c",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/actuals.py": {
+      "working_sha256": "7a6eae3fec24c12d3bce02003f05efe88b0a76ba06308d2dc0367b5c6fb74676",
+      "git_blob_sha256": "7a6eae3fec24c12d3bce02003f05efe88b0a76ba06308d2dc0367b5c6fb74676",
+      "git_blob_oid": "9dcd459d10b5f0fa26354c72eace6585cf06551f",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/contracts.py": {
+      "working_sha256": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f",
+      "git_blob_sha256": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f",
+      "git_blob_oid": "882616b878b23a8178aa9c729d0352f8aac21ce3",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/demo.py": {
+      "working_sha256": "8c40bbfbc15e36a653ee90fcc2fd1c06bf30a35e5579a23923e85709494e5993",
+      "git_blob_sha256": "8c40bbfbc15e36a653ee90fcc2fd1c06bf30a35e5579a23923e85709494e5993",
+      "git_blob_oid": "5c06c736cdd0c0399329ce54a49076d88ace224d",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/evaluation.py": {
+      "working_sha256": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e",
+      "git_blob_sha256": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e",
+      "git_blob_oid": "6e431fc40de9329196ab39b3db973b08300ad90e",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/actuals-gw2-revision1.json": {
+      "working_sha256": "6418ace66d97afb9b44ecfd7c5de1f321434afe83fe601b010ad3946c355b6c4",
+      "git_blob_sha256": "6418ace66d97afb9b44ecfd7c5de1f321434afe83fe601b010ad3946c355b6c4",
+      "git_blob_oid": "2eafab5e2b66754839493b211d510aeb2264bd2e",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/actuals-gw2.json": {
+      "working_sha256": "cff309ed67dfaf834cfd7ec0dfd7ec5c8c3b88107806a0d35b55c999f20f5c49",
+      "git_blob_sha256": "cff309ed67dfaf834cfd7ec0dfd7ec5c8c3b88107806a0d35b55c999f20f5c49",
+      "git_blob_oid": "495fef486268dda73252d5eb7aa8e37cc981f595",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/actuals-gw3.json": {
+      "working_sha256": "7bf5d26798f663c7ae1e3358b0bb0bbb05f8445a0f545e40c14b54f17e6e3d5f",
+      "git_blob_sha256": "7bf5d26798f663c7ae1e3358b0bb0bbb05f8445a0f545e40c14b54f17e6e3d5f",
+      "git_blob_oid": "606986b9541895ecc323c5bd39e58a2e5d51fe88",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/context-gw2-revision1.json": {
+      "working_sha256": "20e60d10dacc9c5b4f3f66450e9eec684012bcfb5ebca98261a96567b139e7fb",
+      "git_blob_sha256": "20e60d10dacc9c5b4f3f66450e9eec684012bcfb5ebca98261a96567b139e7fb",
+      "git_blob_oid": "fb95953455e38506ffd92b242578e89a14a7bb00",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/context-gw2.json": {
+      "working_sha256": "284a0a6622b8c31e4d33d7703e3d4a62bddaa63e7ba3494db7ec50f13cd10445",
+      "git_blob_sha256": "284a0a6622b8c31e4d33d7703e3d4a62bddaa63e7ba3494db7ec50f13cd10445",
+      "git_blob_oid": "98f61cc5e28c1a137fdb62a3abf26abec627876a",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/context-gw3.json": {
+      "working_sha256": "fcf8c73e703816c6edf3974b30aa27ec8588d1cd2b51a7f3ba4924c5f01a1e51",
+      "git_blob_sha256": "fcf8c73e703816c6edf3974b30aa27ec8588d1cd2b51a7f3ba4924c5f01a1e51",
+      "git_blob_oid": "4d9e3c6892ba15915945a52d87d7099852fd948d",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/forecast-inputs.json": {
+      "working_sha256": "7091eba0b5e60aca1f4513c27474009e729bfcaf653245d46222f24a904d64f6",
+      "git_blob_sha256": "7091eba0b5e60aca1f4513c27474009e729bfcaf653245d46222f24a904d64f6",
+      "git_blob_oid": "db9f9b152fa871b52baa247ae834a1f8f4e86db3",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/source-registry.json": {
+      "working_sha256": "de16b3d832c48c2249f8b31f63ea134c77ed2652380dc55919d4437433b65121",
+      "git_blob_sha256": "de16b3d832c48c2249f8b31f63ea134c77ed2652380dc55919d4437433b65121",
+      "git_blob_oid": "e29553c8eea7db2df49055a3f68a5d544e78b99e",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/stage9-actuals.json": {
+      "working_sha256": "8bb047bf6dfaa39079c7fa911d216dab109e1ddbeba5721a177cd54d25883e65",
+      "git_blob_sha256": "8bb047bf6dfaa39079c7fa911d216dab109e1ddbeba5721a177cd54d25883e65",
+      "git_blob_oid": "6907b1efdda68561531abb654667d998ff153628",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/stage9-input-evidence.json": {
+      "working_sha256": "84a653f9022b950e4dafa397325a1887db959dc568cd6fd174a11a14bce260f1",
+      "git_blob_sha256": "84a653f9022b950e4dafa397325a1887db959dc568cd6fd174a11a14bce260f1",
+      "git_blob_oid": "215c2e3309c92381d7125a8fd7c07f94a7723a4d",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/stage9-outcome-context.json": {
+      "working_sha256": "373c8debdb9984326c07db72d9c63715ce554b8b45f640ce5bc044514224bdb3",
+      "git_blob_sha256": "373c8debdb9984326c07db72d9c63715ce554b8b45f640ce5bc044514224bdb3",
+      "git_blob_oid": "24103483ac7e577f9ddf6cfbdbd454917c478465",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/resources/stage9-snapshot.json": {
+      "working_sha256": "0e3655314fb67c4ceef1ced4d2d885787cb35e2c3113358666a5d603be44828a",
+      "git_blob_sha256": "0e3655314fb67c4ceef1ced4d2d885787cb35e2c3113358666a5d603be44828a",
+      "git_blob_oid": "afd6e32342beb32bf7755918935e49ef706017e9",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/rights.py": {
+      "working_sha256": "576d8fb97854f0712d5757ec44f0752133918e409b0f220a36d54a13ce422103",
+      "git_blob_sha256": "576d8fb97854f0712d5757ec44f0752133918e409b0f220a36d54a13ce422103",
+      "git_blob_oid": "2c5e628f71a4c7da9ff2c8f791d2e094b848d983",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/snapshots.py": {
+      "working_sha256": "de0baeac935a37a0041532609cbf0852cebbe191ad4d020f88544da1627c726f",
+      "git_blob_sha256": "de0baeac935a37a0041532609cbf0852cebbe191ad4d020f88544da1627c726f",
+      "git_blob_oid": "222e2e7f6e608dfef30907087a0a50e20d383ec9",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/stage9_demo.py": {
+      "working_sha256": "9c880212c4b2444d7f2387663758a1f8dd6c96c43a2c756640bc6af4a49abd47",
+      "git_blob_sha256": "9c880212c4b2444d7f2387663758a1f8dd6c96c43a2c756640bc6af4a49abd47",
+      "git_blob_oid": "4b14e17e3cbaa9f3bf62ef2fe841fb3fac64df22",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/player_lab/store.py": {
+      "working_sha256": "fde0ef1f84ed07ab2d994e705445dc0fdad2adcb03714f8f85c5eb6f05b24ad4",
+      "git_blob_sha256": "fde0ef1f84ed07ab2d994e705445dc0fdad2adcb03714f8f85c5eb6f05b24ad4",
+      "git_blob_oid": "41688a717a707690f235203f2b1328b4b6748cf4",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/private_v1/one_command.py": {
+      "working_sha256": "e30716fc2653cd8a1210db7d5486a933b6c1ffeb14db942dc4ca030fdbecc102",
+      "git_blob_sha256": "e30716fc2653cd8a1210db7d5486a933b6c1ffeb14db942dc4ca030fdbecc102",
+      "git_blob_oid": "08b3214b0039b47329b9ea8bb4545bd09678d06b",
+      "comparison": "EXACT"
+    },
+    "src/dmf_pulse/private_v1/presentation.py": {
+      "working_sha256": "79853618a05a028c9c9b54a4a70df60f99ef02df4fb9f988eff0119b0dbb9722",
+      "git_blob_sha256": "79853618a05a028c9c9b54a4a70df60f99ef02df4fb9f988eff0119b0dbb9722",
+      "git_blob_oid": "529abfbc9ef3a3eaae8e5665d5e48daafbe42914",
+      "comparison": "EXACT"
+    },
+    "tests/integration/player_lab/test_research_store.py": {
+      "working_sha256": "ae1f0f32f064eb88bd4f0d1576be7755d21d912944f9d51a9e600b7258f3f596",
+      "git_blob_sha256": "ae1f0f32f064eb88bd4f0d1576be7755d21d912944f9d51a9e600b7258f3f596",
+      "git_blob_oid": "6fcb7014a00ef7380c30b5f63c0f3a42b63c7dfe",
+      "comparison": "EXACT"
+    },
+    "tests/unit/player_lab/test_player_lab.py": {
+      "working_sha256": "3244f00e402687ef1423b661eb3ca0e55c25e33194fec757b0afc2347cb844d7",
+      "git_blob_sha256": "ec768c76e9a054a6dea033847c929dfda191eeac571f053eff297f1081bc17d0",
+      "git_blob_oid": "6d298c726776f3f84b41f8af77c4e123c4b94118",
+      "comparison": "CRLF_NORMALIZATION_ONLY"
+    },
+    "tickets/DMF-PULSE-ACCEL-002/CONTRACT.md": {
+      "working_sha256": "6e89a56690bbc28db0b96019051e1f0eeac0a8a8b998b4113d7cac7496e94d81",
+      "git_blob_sha256": "6e89a56690bbc28db0b96019051e1f0eeac0a8a8b998b4113d7cac7496e94d81",
+      "git_blob_oid": "b4408165c0030d39223b0633715440d9662c313d",
+      "comparison": "EXACT"
+    },
+    "tickets/DMF-PULSE-ACCEL-002/DATA-INVENTORY.json": {
+      "working_sha256": "3a2dd0dc5224e22aeca6f96a50dfa9e4945c3b2528ed4c1caeba164b43277c68",
+      "git_blob_sha256": null,
+      "git_blob_oid": null,
+      "comparison": "WORKING_ONLY_NOT_IN_CHECKPOINT"
+    },
+    "tickets/DMF-PULSE-ACCEL-002/DATA-STRATEGY.md": {
+      "working_sha256": "c0172fd3c9f038676f8a25001b5a6f5ea1d0075db7bf9877c6e71988e2482ac4",
+      "git_blob_sha256": "dc1c0eb7563804320a4982ae2a4db35833fea6ccf14a7d572a73a5c33e118ba8",
+      "git_blob_oid": "7ce33a339d1a97d08bb4604e29592cbad7a0a0a8",
+      "comparison": "WORKING_EDIT_AFTER_CHECKPOINT"
+    }
+  },
+  "rebind_test_scope": "Static final-delta inspection plus one focused tamper regression. Existing 71-unit result is historical reviewer evidence; current coordinated suites and real-browser results are separately attributed, not falsely reported as rerun by this reviewer.",
+  "focused_rebind_test": {
+    "command": ".venv/Scripts/python.exe -B -m pytest tests/unit/player_lab/test_player_lab.py::test_registered_source_hashes_actual_resource_bytes --basetemp review_pack/rights-rebind-tamper-tests -p no:cacheprovider -q --tb=short",
+    "passed": 1,
+    "elapsed_seconds": 1.02,
+    "exit_code": 0
+  },
+  "external_evidence": [
+    {
+      "path": "review_pack/accel002-integration-review.json",
+      "sha256": "ce30c783f79edaaad287c020b1db9165825aaca2b03fae476d05515f6076a2c4",
+      "attribution": "Separate independent integration reviewer; 59 post-correction unit cases, 13 rejected SQL attacks and positive qualified forecast; no provider calls."
+    },
+    {
+      "path": "review_pack/accel002-sql-null-review.json",
+      "sha256": "defc55bea0bb727ab86537cf7e3ec49bed27448035873b9732d01d2cd2d3c6c9",
+      "attribution": "Separate independent disposable-PG 13-case malformed/extra-payload rejection receipt."
+    },
+    {
+      "path": "review_pack/migrations-integration-final.log",
+      "sha256": "77de47c48c3d63599686702cd99a69506a5f009966f8197761f7db5f481df2ee",
+      "attribution": "Root coordinated PostgreSQL/migration suite receipt: 88 passed."
+    },
+    {
+      "path": "review_pack/dashboard-browser/receipt.json",
+      "sha256": "7e9aea6810ecfa8b569bd32b27f62ebaceddcd50a44eddd23f1bc417f5387012",
+      "attribution": "Separate actual-browser synthetic acceptance: refresh, authenticated reload, mobile, logout; no browser errors/provider calls."
+    }
+  ],
+  "final_delta_inspection": [
+    "Fake injected bearer text changed only to placeholder; dictionary injection still avoids real environment/credentials and no browser leak is introduced.",
+    "FPL service TARGET_REVISION aligns with accepted schema migration 20261029_0007, without changing source capabilities or adding transport routes.",
+    "Fifteen-family inventory records candidate access, unobserved freshness, season/field/cost/stability/usefulness and separate raw/derived/training/display decisions. Only existing scoped OpenFootball rights allow retention/training.",
+    "DATA-STRATEGY explicitly preserves the Sportmonks product-page/FAQ xG entitlement discrepancy and requires written package/rights qualification; it grants neither interpretation permission.",
+    "PUBLIC-RESEARCH-RECEIPT is documentation-only, timestamped 2026-10-29T05:58:51Z, and candidly identifies indexed official FPL content as two-week-old crawl after JS-shell direct extraction. No provider JSON, source approval or credential retention is inferred.",
+    "Owned Stage9 helper authenticates complete snapshot bytes, canonical summary identity and the closed registry, uses production snapshot/custody boundaries, then opens only a later exact owned synthetic label."
+  ],
+  "data_inventory_summary": {
+    "path": "tickets/DMF-PULSE-ACCEL-002/DATA-INVENTORY.json",
+    "families": 15,
+    "provider_data_retrieved": false,
+    "classification": "ENGINEERING_CANDIDATES_NO_NEW_SOURCE_PERMISSION"
+  },
+  "documentation_wording_rebind": {
+    "reviewed_at_utc": "2026-10-29T06:21:44.325713+00:00",
+    "classification": "READABILITY_SPACING_ONLY_NO_FACT_RIGHT_OR_PERMISSION_CHANGE",
+    "inspected": [
+      {
+        "path": "tickets/DMF-PULSE-ACCEL-002/DATA-INVENTORY.json",
+        "working_sha256": "3a2dd0dc5224e22aeca6f96a50dfa9e4945c3b2528ed4c1caeba164b43277c68"
+      },
+      {
+        "path": "evidence/tickets/DMF-PULSE-ACCEL-002/PUBLIC-RESEARCH-RECEIPT.json",
+        "working_sha256": "1f3c05c6944513a924d9c29996fd6a281c7d3b8fd817f28bb8a792191c9a768b"
+      }
+    ],
+    "finding": "Public plan price and quota values are unchanged; inventory still contains 15 engineering-candidate families, no provider retrieval, no new source permission, and explicit qualification decisions. Public research receipt preserves 2026-10-29T05:58:51Z and JS-shell/indexed-content limitations."
+  }
+}

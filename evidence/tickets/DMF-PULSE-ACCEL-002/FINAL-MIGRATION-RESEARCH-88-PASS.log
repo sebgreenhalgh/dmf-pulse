@@ -1,0 +1,14 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0
+cachedir: review_pack\cache-migrations-final
+rootdir: C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hypothesis-6.159.0, cov-7.1.0
+collected 88 items
+
+tests\integration\migrations\test_migrations.py ........................ [ 27%]
+.......................................                                  [ 71%]
+tests\integration\player_lab\test_research_store.py .................... [ 94%]
+.....                                                                    [100%]
+
+======================= 88 passed in 282.47s (0:04:42) ========================

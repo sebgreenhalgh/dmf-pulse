@@ -1,0 +1,13 @@
+uv : Building source distribution...
+At line:2 char:22
++ ... env:UV_OFFLINE='1'; uv build *> review_pack/build-final-2.log; exit $ ...
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Building source distribution...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Building wheel from source distribution...
+Successfully built dist\dmf_pulse-0.2.0.tar.gz
+Successfully built dist\dmf_pulse-0.2.0-py3-none-any.whl

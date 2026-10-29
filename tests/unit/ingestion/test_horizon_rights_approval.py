@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 from dmf_pulse.ingestion.models import CapabilityValue, RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
+from tests.accel002_legacy_freeze_support import original_fpl_registry_bytes
 from tests.unit.ingestion.test_horizon_probe import _script
 
 pytestmark = pytest.mark.unit
@@ -187,7 +188,9 @@ def test_r8b_provider_boundaries_and_a2_unmodified_executables_remain_parent_ide
             == digest
         )
     assert (
-        hashlib.sha1((repository_root / "config/rights/fpl_profiles.json").read_bytes()).hexdigest()
+        hashlib.sha1(
+            original_fpl_registry_bytes(repository_root / "config/rights/fpl_profiles.json")
+        ).hexdigest()
         == "cbe6afa0eacc175a6500152460ec04ff4ac990a0"
     )
 

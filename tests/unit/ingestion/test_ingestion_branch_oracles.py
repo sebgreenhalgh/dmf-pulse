@@ -33,6 +33,10 @@ from dmf_pulse.ingestion.models import (
     SourceBundleSummary,
 )
 from dmf_pulse.ingestion.rights import load_rights_profiles
+from tests.accel002_legacy_freeze_support import (
+    OWNED_PROFILE_ID,
+    assert_owned_synthetic_profile,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -294,11 +298,14 @@ def test_rights_loader_uses_installed_resource_when_repository_config_is_absent(
             return repository_root / "config/rights/fpl_profiles.json"
 
     monkeypatch.setattr(rights_module.resources, "files", lambda _package: ResourceRoot())
-    assert set(load_rights_profiles()) == {
+    profiles = load_rights_profiles()
+    assert set(profiles) == {
         "fpl_official_private_manual_v1",
         "fpl_official_private_operator_initiated_read_v1",
         "synthetic_test_v1",
+        OWNED_PROFILE_ID,
     }
+    assert_owned_synthetic_profile(profiles[OWNED_PROFILE_ID])
 
 
 def test_provider_resource_model_accepts_aware_time_for_control() -> None:

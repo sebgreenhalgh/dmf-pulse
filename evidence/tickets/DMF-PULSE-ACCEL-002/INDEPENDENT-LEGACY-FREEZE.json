@@ -1,0 +1,139 @@
+{
+  "current_reviewed_working_byte_sha256s": {
+    "tests/accel002_legacy_freeze_support.py": "9ef1e664f1dad2891ffebb519a1fb4baed23d56844f69c896f21a54bbe709e03",
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "9f5327de083077de0f5cd59bb76c9f5b2a02040243eb8132640965e6aa83d2fd",
+    "tests/unit/ingestion/test_ingestion_branch_oracles.py": "db2f2af7f27f64daf0171c138031e742e99cb6bc39544e2137f21a63785fc3f1",
+    "tests/unit/ingestion/test_rights_and_fixtures.py": "ed74a70fc17840a606043c7858a253e152e904c01fe1dc2a72fd8cdbf124a511",
+    "tests/unit/private_v1/test_team_strength_d1_controls.py": "84ee8ff262791c15d5298b3ce884a6dda592b39c444495535f2ea77a2a907627",
+    "tests/unit/private_v1/test_team_strength_l2.py": "26344617ab1fc747018c32ce987caaea8a937b13e6af6fec03ef447262337a01"
+  },
+  "external_ci_completion_claimed": false,
+  "findings": [],
+  "finite_profile_exception": {
+    "authentication_before_subtraction": true,
+    "capability_count": 11,
+    "exact_capabilities": {
+      "automated_access": "DENY",
+      "backup": "ALLOW",
+      "cache": "DENY",
+      "derived_storage": "ALLOW",
+      "manual_import": "ALLOW",
+      "model_training": "DENY",
+      "private_internal_use": "ALLOW",
+      "public_display": "DENY",
+      "raw_storage": "ALLOW",
+      "redistribution": "DENY",
+      "transient_processing": "ALLOW"
+    },
+    "existing_private_profile_retention_and_transport_assertions_unchanged": true,
+    "legacy_profile_ids": [
+      "synthetic_test_v1",
+      "fpl_official_private_manual_v1",
+      "fpl_official_private_operator_initiated_read_v1"
+    ],
+    "legacy_reconstruction": "Only the exact authenticated owned fourth profile is removed. All original fields remain for unchanged parent equality, SHA1 and SHA256 assertions after original sorted indent-2 serialization.",
+    "new_provider_permission": false,
+    "owned_profile_id": "accel002_synthetic_player_lab_v1",
+    "owned_profile_semantic_sha256": "3c3661abeb6f7887f97979368174b609c7931ebe0ba1052aebd6f5eb01a102eb",
+    "profile_count": 4,
+    "reconstructed_legacy_sha1": "cbe6afa0eacc175a6500152460ec04ff4ac990a0",
+    "reconstructed_legacy_sha256": "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d"
+  },
+  "finite_source_exception": {
+    "allowed_files": [
+      "src/dmf_pulse/private_v1/service.py",
+      "src/dmf_pulse/private_v1/rolling.py"
+    ],
+    "broad_ast_stripping_added": false,
+    "numerical_or_solver_freeze_weakened": false,
+    "ordinary_service": "Exactly one final fixture_projections dataclass field and one final return keyword, syntax/count checked and removed by single literal text replacement.",
+    "rolling_service": "Same exact field/return allowance plus exact FixtureProjectionResult import and tuple capture over execution.horizon_gameweeks; AST checked adjacent to unchanged report record and cleanup, then literal text replacement only.",
+    "unchanged_rest": "All other source characters remain for unchanged full parent equality. Existing D1 diagnostic-note AST exception is unchanged and applied after finite presentation subtraction."
+  },
+  "four_test_patch_sha256": "aecf618891fa7cca95fbb3d141a44631bda8c9986a49762f9c62fbf481e6b307",
+  "installed_resource_followup": {
+    "all_other_file_text_equal_to_de50_after_reversing_only_exact_additions": true,
+    "command": ".venv/Scripts/python.exe -m pytest tests/unit/ingestion/test_ingestion_branch_oracles.py --basetemp=review_pack/pytest-evaluation-installed-rights-review -o cache_dir=review_pack/cache-evaluation-installed-rights-review -q --tb=short",
+    "elapsed_seconds": 3.04,
+    "exact_change": "Import existing finite owned-profile constants/authenticator; retain the three original expected IDs, add exactly OWNED_PROFILE_ID, and authenticate the loaded owned profile through existing3c366... hash plus exact11 capabilities.",
+    "exit_code": 0,
+    "file": "tests/unit/ingestion/test_ingestion_branch_oracles.py",
+    "installed_resource_fallback_simulation_unchanged": true,
+    "passed": 12,
+    "patch_sha256": "628633f953153e71b3a96b8910a174aeea736167d4c3224a51511c4c359f9a3c",
+    "prior_receipt_sha256": "a39d1e8f8ceeacf4d250331c3724e70056888829af5dbfbc3f2ad79f310b32cd",
+    "runtime_profile_loader_or_provider_gates_changed": false,
+    "scope_confirmation": "Same authorized owned synthetic profile allowance; no additional provider permission, source change, floor/guard weakening, tracked reviewer edits or task overreach.",
+    "skipped": 0,
+    "test": "test_rights_loader_uses_installed_resource_when_repository_config_is_absent"
+  },
+  "old_literal_pin_preservation": {
+    "tests/unit/ingestion/test_horizon_rights_approval.py": {
+      "all_old_literal_digest_pins_retained": true,
+      "old_digest_count": 9
+    },
+    "tests/unit/ingestion/test_ingestion_branch_oracles.py": {
+      "all_old_literal_digest_pins_retained": true,
+      "old_digest_count": 0
+    },
+    "tests/unit/ingestion/test_rights_and_fixtures.py": {
+      "all_old_literal_digest_pins_retained": true,
+      "old_digest_count": 2
+    },
+    "tests/unit/private_v1/test_team_strength_d1_controls.py": {
+      "all_old_literal_digest_pins_retained": true,
+      "old_digest_count": 0
+    },
+    "tests/unit/private_v1/test_team_strength_l2.py": {
+      "all_old_literal_digest_pins_retained": true,
+      "old_digest_count": 9
+    }
+  },
+  "package_config_integrity": {
+    "all_python_working_bytes_equal_checkpoint_git_blobs": true,
+    "fpl_profiles_checkout_difference": "Existing checkout has147 CRLF endings; immutable Git blob uses LF. Original working hash equals previously reviewed hash3809457f...; no configuration content edit.",
+    "fpl_profiles_content_equals_checkpoint_after_only_CRLF_normalization": true,
+    "fpl_profiles_git_blob_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+    "fpl_profiles_working_sha256": "3809457f073d06e192be619726c50713c2e777558c0a70573d53ff647534b6e9",
+    "native_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+    "package_python_files": 359,
+    "package_python_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0"
+  },
+  "prior_test_git_blob_sha256s": {
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "92103b442c9f73abf35edd639e76f879182e7dd620b228db31182c838c51587e",
+    "tests/unit/ingestion/test_ingestion_branch_oracles.py": "ced808d5f6deb03ae9343f971b45f12f24a936ebab71b1907d9082f064386666",
+    "tests/unit/ingestion/test_rights_and_fixtures.py": "2a6e23dff38f4dec359b450a9a8350be55fb70eb2f71914de75ae6df42e6fa91",
+    "tests/unit/private_v1/test_team_strength_d1_controls.py": "3d2ed4edcb66bc4d3c6854b95b33a92f77d59cb871241737ee40e9dc269e365f",
+    "tests/unit/private_v1/test_team_strength_l2.py": "c4f9dafa243268939d2ab4785bfa54d12e099a49252f81b18d5037a2180ec733"
+  },
+  "production_checkpoint_sha": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+  "reviewed_scope": [
+    "tests/accel002_legacy_freeze_support.py",
+    "tests/unit/ingestion/test_horizon_rights_approval.py",
+    "tests/unit/ingestion/test_rights_and_fixtures.py",
+    "tests/unit/private_v1/test_team_strength_d1_controls.py",
+    "tests/unit/private_v1/test_team_strength_l2.py",
+    "tests/unit/ingestion/test_ingestion_branch_oracles.py"
+  ],
+  "reviewer": "Evaluation/leakage reviewer; independent of remediation author",
+  "schema_version": "accel002-independent-test-freeze-review-v1",
+  "scope_confirmation": "Test-only legacy-freeze reconciliation is within explicitly authorized presentation seam and owned synthetic profile. No production Python/config content edit, coverage floor change, runtime guard change, new provider entitlement, activation, P01 scoring or task-scope expansion was introduced by remediation or this review. Reviewer wrote only this ignored JSON receipt.",
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "test_execution_summary": "153 tests across the prior four files plus12 tests in installed-resource branch oracles:165 total independent passes; zero skips. Original12 negative guard mutations remain covered.",
+  "test_result": {
+    "command": ".venv/Scripts/python.exe -m pytest tests/unit/ingestion/test_horizon_rights_approval.py tests/unit/ingestion/test_rights_and_fixtures.py tests/unit/private_v1/test_team_strength_d1_controls.py tests/unit/private_v1/test_team_strength_l2.py --basetemp=review_pack/pytest-evaluation-legacy-review-final -o cache_dir=review_pack/cache-evaluation-legacy-review-final -q --tb=short",
+    "elapsed_seconds": 5.83,
+    "exit_code": 0,
+    "negative_guard_cases": {
+      "exact_presentation_seam": 6,
+      "owned_profile": 4,
+      "total": 12,
+      "unapproved_body_change_preservation": 2
+    },
+    "passed": 153,
+    "provider_network": "Blocked by existing global test fixture; no live provider acquisition.",
+    "skipped": 0
+  },
+  "total_independently_passed_tests": 165,
+  "tracked_edits_by_reviewer": []
+}

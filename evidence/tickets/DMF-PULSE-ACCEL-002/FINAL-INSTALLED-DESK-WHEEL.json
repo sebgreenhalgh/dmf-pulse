@@ -1,0 +1,192 @@
+{
+  "clean_environment_outside_repository": true,
+  "cleaned_up": true,
+  "doctor_nvidia_status": "TIMEOUT",
+  "doctor_status": "HEALTHY",
+  "installed_data_model": {
+    "as_of_assertions": 8,
+    "database_status": "HEALTHY",
+    "demo_assertions": 8,
+    "schema_sha256": "b29b0e3f3f3e2ff99ef62693c5bb9f4e6344805248a7e25807f29f4bcb5d2417"
+  },
+  "installed_module_path": "<temporary-environment>/site-packages/dmf_pulse/__init__.py",
+  "installed_runtime_distributions": [
+    {
+      "name": "alembic",
+      "version": "1.18.5"
+    },
+    {
+      "name": "annotated-doc",
+      "version": "0.0.4"
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.7.0"
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1"
+    },
+    {
+      "name": "click",
+      "version": "8.5.0"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6"
+    },
+    {
+      "name": "dmf-pulse",
+      "version": "0.2.0"
+    },
+    {
+      "name": "fastapi",
+      "version": "0.162.0"
+    },
+    {
+      "name": "greenlet",
+      "version": "3.5.4"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "name": "idna",
+      "version": "3.20"
+    },
+    {
+      "name": "mako",
+      "version": "1.3.12"
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0"
+    },
+    {
+      "name": "markupsafe",
+      "version": "3.0.3"
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2"
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.1"
+    },
+    {
+      "name": "psycopg",
+      "version": "3.3.4"
+    },
+    {
+      "name": "psycopg-binary",
+      "version": "3.3.4"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.4"
+    },
+    {
+      "name": "pydantic-core",
+      "version": "2.46.4"
+    },
+    {
+      "name": "pygments",
+      "version": "2.20.0"
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3"
+    },
+    {
+      "name": "rich",
+      "version": "15.0.0"
+    },
+    {
+      "name": "shellingham",
+      "version": "1.5.4"
+    },
+    {
+      "name": "sqlalchemy",
+      "version": "2.0.51"
+    },
+    {
+      "name": "starlette",
+      "version": "1.10.0"
+    },
+    {
+      "name": "typer",
+      "version": "0.27.0"
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.2"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.3"
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.54.0"
+    }
+  ],
+  "installed_sebs_desk": {
+    "all_stage9_summaries_equal": true,
+    "blocked": 1,
+    "catalogue": 121,
+    "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+    "evaluation_pairs": 8,
+    "live_refresh": "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED",
+    "packaged_assets": [
+      "index.html",
+      "desk.js",
+      "desk.css"
+    ],
+    "projected": 120,
+    "provider_calls": 0,
+    "stage9_snapshot_pairs": 1,
+    "status": "PASS"
+  },
+  "installed_version_output": "dmf 0.2.0",
+  "installed_zoneinfo_fallback": true,
+  "locked_runtime_manifest_sha256": "53450929df2e7e470e618fcb96262688056b06c2dca37fe555e5efa44151a069",
+  "network_fetch_disabled": true,
+  "platform": {
+    "architecture": "AMD64",
+    "operating_system": "Windows",
+    "python": "3.13.9"
+  },
+  "status": "PASS",
+  "toolchain": {
+    "build": "1.5.0",
+    "build_backend": "hatchling",
+    "hatchling": "1.31.0"
+  },
+  "uv_build_distributions": [
+    {
+      "bytes": 1652677,
+      "name": "dmf_pulse-0.2.0-py3-none-any.whl",
+      "sha256": "d1a7c6a7f802db2cd1acf7b72755d78a0c8e7b3b130632530e27e68316094fca"
+    },
+    {
+      "bytes": 13827516,
+      "name": "dmf_pulse-0.2.0.tar.gz",
+      "sha256": "659dc9d4ff77ab4c1b117a078c3b0b36e8190dcee81678b070f32bf16f9389f1"
+    }
+  ],
+  "uv_version": "uv 0.11.26 (396ef7ce4 2026-06-30 x86_64-pc-windows-msvc)",
+  "wheel": {
+    "bytes": 1652677,
+    "contains_py_typed": true,
+    "file_count": 461,
+    "name": "dmf_pulse-0.2.0-py3-none-any.whl",
+    "sha256": "d1a7c6a7f802db2cd1acf7b72755d78a0c8e7b3b130632530e27e68316094fca",
+    "zoneinfo_fallback_sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+  }
+}

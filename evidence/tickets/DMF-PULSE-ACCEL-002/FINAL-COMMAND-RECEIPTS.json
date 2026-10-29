@@ -1,0 +1,71 @@
+{
+  "classification": "OFFLINE_SYNTHETIC_ONLY",
+  "note": "uv run equivalents executed directly with the frozen synchronized .venv where shown in retained logs; shell-native exit codes checked. Full CI is a separate final-SHA gate.",
+  "receipts": [
+    {
+      "command": "uv sync --all-groups --frozen",
+      "exit_code": 0
+    },
+    {
+      "capture": "FINAL-BUILD.log",
+      "command": "uv build",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "formatted_files": 1001
+    },
+    {
+      "command": "uv run ruff check .",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "exit_code": 0,
+      "source_files": 359
+    },
+    {
+      "command": "uv run python scripts/verify_gcs008_wheel.py",
+      "evidence": "Direct tool stdout PASS; unchanged diagnostic wrapper also PASS in FINAL-GCS-WHEEL-PASS.log",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python scripts/verify_team_strength_u_wheel.py",
+      "exit_code": 0,
+      "result": {
+        "frozen_forecast_unchanged": true,
+        "private_storage_denied": true,
+        "provider_calls": 0,
+        "public_freeze_command": true,
+        "public_score_command": true,
+        "status": "PASS"
+      }
+    },
+    {
+      "command": "uv run python scripts/verify_p01_fallback_a02_wheel.py",
+      "exit_code": 0,
+      "result": {
+        "d2_legacy_admission_preserved": true,
+        "fixture_count": 10,
+        "full_metric_report_replay": true,
+        "note": "synthetic replay only, no actual P01 score",
+        "product_count": 3,
+        "provider_calls": 0,
+        "status": "PASS"
+      }
+    },
+    {
+      "command": "uv run python scripts/verify_team_strength_l1_wheel.py",
+      "exit_code": 0,
+      "result": {
+        "l1_through_l8_authorities_consumed": true,
+        "no_current_live_authority": true,
+        "production_activation": false,
+        "provider_calls": 0,
+        "status": "PASS"
+      }
+    }
+  ],
+  "source_checkpoint": "de50b54692f481206ad8f59a1f477089b1fcf01f"
+}

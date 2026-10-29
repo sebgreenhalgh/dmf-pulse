@@ -6,16 +6,20 @@
   rights, transient projection seam and evaluation contracts with read-only audits.
 - [x] CP1 local FastAPI application, authenticated loopback lifecycle, typed views,
   bounded single-flight refresh, progress, expiry and cleanup.
-- [ ] CP2 actual one-command integration, decisions and controlled numerical parity.
+- [x] CP2 actual one-command integration, decisions and controlled numerical parity.
 - [x] CP3 all-player Stage-9 table, fixture minutes, distribution, components,
   same-horizon comparison and explicit catalogue missingness.
 - [x] CP4 immutable prospective player forecasts, finalized labels, Stage-12
   evaluation, rights-gated PostgreSQL ledger and Model Performance view.
 - [x] CP5 strict offline GW-wide actual-points adapter, current source/terms
   research, rights alternatives and data-quality diagnostics.
-- [ ] CP6 real-stack synthetic demonstrations, independent five-scope review,
-  wheel/security/migration/manifests/coverage gates, checkpoint publication and
-  final exact-SHA full CI green. External receipts bind final publication.
+- [x] CP6 real-stack synthetic demonstrations, independent five-scope review,
+  installed-wheel/security/migration/local gates and durable checkpoints.
+
+Final publication acceptance is external to this source snapshot: require the
+final local and remote SHA to agree and that exact SHA's unchanged full workflow
+to pass all twenty jobs, including combined coverage. The publication receipt
+and final handoff record the observed result without a circular commit hash.
 
 No live provider acquisition during implementation/tests; ordinary live Refresh
 fails closed without independently eligible market approval. Preserve all P01,

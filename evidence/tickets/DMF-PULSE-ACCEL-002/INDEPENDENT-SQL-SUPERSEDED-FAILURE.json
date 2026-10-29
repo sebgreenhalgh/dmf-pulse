@@ -1,0 +1,59 @@
+{
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ROLLBACK_ONLY",
+  "checks": [
+    {
+      "kind": "FORECAST",
+      "field": "recorded_at",
+      "mutation": "missing",
+      "accepted": true
+    },
+    {
+      "kind": "FORECAST",
+      "field": "recorded_at",
+      "mutation": "null",
+      "accepted": true
+    },
+    {
+      "kind": "EXPERIMENT",
+      "field": "registered_at",
+      "mutation": "missing",
+      "accepted": true
+    },
+    {
+      "kind": "EXPERIMENT",
+      "field": "registered_at",
+      "mutation": "null",
+      "accepted": true
+    },
+    {
+      "kind": "EXPERIMENT",
+      "field": "promotion",
+      "mutation": "missing",
+      "accepted": true
+    },
+    {
+      "kind": "EXPERIMENT",
+      "field": "promotion",
+      "mutation": "null",
+      "accepted": true
+    },
+    {
+      "kind": "EXPERIMENT",
+      "field": "dataset_mode",
+      "mutation": "missing",
+      "accepted": true
+    },
+    {
+      "kind": "EXPERIMENT",
+      "field": "dataset_mode",
+      "mutation": "null",
+      "accepted": true
+    },
+    {
+      "kind": "SCORECARD",
+      "mutation": "missing count, forecast_hashes, label_hashes, promotion; zero score_pair rows",
+      "accepted": true
+    }
+  ],
+  "nested_forecast_qualified_in_database": true
+}

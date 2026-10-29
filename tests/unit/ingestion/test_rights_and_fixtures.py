@@ -23,6 +23,11 @@ from dmf_pulse.ingestion.rights import (
     require_rights,
     rights_config_sha256,
 )
+from tests.accel002_legacy_freeze_support import (
+    OWNED_PROFILE_ID,
+    assert_owned_synthetic_profile,
+    original_fpl_registry_bytes,
+)
 
 pytestmark = pytest.mark.unit
 
@@ -63,7 +68,10 @@ def test_required_profiles_encode_the_conservative_capability_matrix(repository_
         "synthetic_test_v1",
         "fpl_official_private_manual_v1",
         "fpl_official_private_operator_initiated_read_v1",
+        OWNED_PROFILE_ID,
     }
+    assert_owned_synthetic_profile(profiles[OWNED_PROFILE_ID])
+    original_fpl_registry_bytes(_config(repository_root))
     assert synthetic.status is RightsProfileStatus.HUMAN_APPROVED
     assert synthetic.capabilities[RightsCapability.RAW_STORAGE] is CapabilityValue.ALLOW
     assert synthetic.capabilities[RightsCapability.DERIVED_STORAGE] is CapabilityValue.ALLOW
@@ -79,11 +87,34 @@ def test_required_profiles_encode_the_conservative_capability_matrix(repository_
 
 
 def test_default_profile_loader_resolves_repository_resource() -> None:
-    assert set(load_rights_profiles()) == {
+    profiles = load_rights_profiles()
+    assert set(profiles) == {
         "synthetic_test_v1",
         "fpl_official_private_manual_v1",
         "fpl_official_private_operator_initiated_read_v1",
+        OWNED_PROFILE_ID,
     }
+    assert_owned_synthetic_profile(profiles[OWNED_PROFILE_ID])
+
+
+@pytest.mark.parametrize("mutation", ["transport", "provider", "identity", "extra-profile"])
+def test_owned_profile_freeze_exception_rejects_other_authority(
+    repository_root: Path, tmp_path: Path, mutation: str
+) -> None:
+    value = json.loads(_config(repository_root).read_text(encoding="utf-8"))
+    owned = value["profiles"][-1]
+    if mutation == "transport":
+        owned["capabilities"]["automated_access"] = "ALLOW"
+    elif mutation == "provider":
+        owned["provider_key"] = "official_fpl"
+    elif mutation == "identity":
+        owned["rights_profile_id"] = "unapproved_profile"
+    else:
+        value["profiles"].append({**owned, "rights_profile_id": "unapproved_profile"})
+    path = tmp_path / "changed-profile.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(AssertionError):
+        original_fpl_registry_bytes(path)
 
 
 def test_decisions_are_stable_and_unknown_is_denied(repository_root: Path) -> None:

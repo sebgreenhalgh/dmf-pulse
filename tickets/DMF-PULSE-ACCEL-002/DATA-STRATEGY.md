@@ -21,6 +21,12 @@ finalization/evidence, and requires complete identity/component reconciliation.
 
 ## Prioritized source and route matrix
 
+The [route and data-family inventory](DATA-INVENTORY.json) records all fifteen
+families with explicit field/season/freshness/access/cost/stability/usefulness,
+raw/derived/training/display rights and required decisions. Freshness is
+unobserved wherever no provider acquisition occurred. These are candidate
+contracts and existing scope descriptions, never a new allowlist.
+
 | Priority / source | Evidence value and implemented boundary | Efficient access if separately eligible | Cost position / retention and training |
 | --- | --- | --- | --- |
 | 1. Existing own-team FPL routes | Current authenticated squad, price cohorts, bank/FT, current catalogue and fixture identity; accepted client retained unchanged | One operator run, sequential bulk bootstrap/fixtures plus bounded own entry/history/transfers/picks/my-team and required GW live inputs; existing 24-request cap | No new price/permission inferred. Existing transient private purpose only; raw/derived/cache/backup/training DENY. Live dashboard also needs independently eligible market approval. |
@@ -42,6 +48,9 @@ Provider shortlist, based on public primary pages checked on the date above:
 Prices describe advertised access, not a suitable licensed-data budget or purchase
 recommendation. No supplier was contacted and no account/contract was inspected.
 Community repository code licences do not prove rights over scraped Game data.
+The latest Sportmonks product page advertises xG within its full feature set,
+while its FAQ retains add-on wording. Resolve that inconsistency and the exact
+EPL package in writing; this release grants neither interpretation an entitlement.
 
 ## Product comparison
 

@@ -1,0 +1,30 @@
+{
+  "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "fallback_count": 120,
+  "fixture_and_component_copy_exact": true,
+  "network_blocked": true,
+  "provider_injected_removed_player": {
+    "detail_role": "UNAVAILABLE",
+    "official_id": 99999,
+    "unavailable_reason": "REMOVED_UNMAPPED"
+  },
+  "sealed_decision_sha256": "70bc225287d4c6ef8c7c6931fec3bdad6dc60f426802b9aa585ecc983827ce85",
+  "source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+  "status": "PASS",
+  "view_proof": {
+    "all_13_component_means_reconcile": true,
+    "all_numeric_summaries_equal": true,
+    "all_projected_players_checked": 120,
+    "blocked_count": 1,
+    "catalogue_count": 121,
+    "detail_and_two_player_comparison_equal": true,
+    "fixture_count": 3,
+    "horizon_gameweeks": [
+      2
+    ],
+    "minutes_equal": true,
+    "projected_count": 120,
+    "view_sha256": "59105e907f905ab132076fcc8f2c841d0a1efafe7d9edf96a245e7f788a06e08"
+  }
+}

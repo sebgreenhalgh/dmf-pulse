@@ -16,6 +16,10 @@ from dmf_pulse.ingestion.rights import load_rights_profiles as load_fpl_rights
 from dmf_pulse.optimisation.multi_gameweek_policy import load_multi_gameweek_search_policy
 from dmf_pulse.private_v1 import team_strength_live as live
 from dmf_pulse.private_v1 import team_strength_live_authority as authority
+from tests.accel002_legacy_freeze_support import (
+    original_fpl_registry_bytes,
+    without_accel002_presentation,
+)
 
 pytestmark = pytest.mark.unit
 PARENT = "f4585eee4a3ea492b6a535f33fa13183734ab2ac"
@@ -284,7 +288,12 @@ def test_profile_hash_change_cannot_reactivate_consumed_l7(monkeypatch):
     ],
 )
 def test_unchanged_provider_rights_are_byte_identical_to_d7_parent(path):
-    assert Path(path).read_text(encoding="utf-8") == parent_text(path)
+    current = (
+        original_fpl_registry_bytes(Path(path)).decode("utf-8")
+        if path == "config/rights/fpl_profiles.json"
+        else Path(path).read_text(encoding="utf-8")
+    )
+    assert current == parent_text(path)
 
 
 def test_d1_through_d7_live_control_flow_changes_only_l8_metadata():
@@ -328,13 +337,68 @@ def test_d1_through_d7_live_control_flow_changes_only_l8_metadata():
     ],
 )
 def test_model_decision_and_provider_boundaries_are_parent_identical(path):
-    assert Path(path).read_text(encoding="utf-8") == parent_text(path)
+    current = Path(path).read_text(encoding="utf-8")
+    if path in {"src/dmf_pulse/private_v1/service.py", "src/dmf_pulse/private_v1/rolling.py"}:
+        current = without_accel002_presentation(current, path)
+    assert current == parent_text(path)
+
+
+@pytest.mark.parametrize(
+    "relative,before,after",
+    [
+        (
+            "service.py",
+            "fixture_projections: tuple[FixtureProjectionResult, ...] = ()",
+            "fixture_projections: tuple[FixtureProjectionResult, ...] = None",
+        ),
+        (
+            "rolling.py",
+            "fixture_projections: tuple[FixtureProjectionResult, ...] = ()",
+            "fixture_projections: tuple[FixtureProjectionResult, ...] = None",
+        ),
+        (
+            "service.py",
+            "fixture_projections=fixture_results,",
+            "fixture_projections=tuple(fixture_results),",
+        ),
+        (
+            "rolling.py",
+            "fixture_projections=presentation_fixtures,",
+            "fixture_projections=tuple(presentation_fixtures),",
+        ),
+        (
+            "rolling.py",
+            "for gameweek in execution.horizon_gameweeks\n",
+            "for gameweek in reversed(execution.horizon_gameweeks)\n",
+        ),
+        (
+            "rolling.py",
+            "    FixtureProjectionResult,\n",
+            "    FixtureProjectionResult as OtherProjection,\n",
+        ),
+    ],
+)
+def test_presentation_freeze_exception_rejects_changed_seam(relative, before, after):
+    path = f"src/dmf_pulse/private_v1/{relative}"
+    source = Path(path).read_text(encoding="utf-8")
+    assert before in source
+    with pytest.raises(AssertionError):
+        without_accel002_presentation(source.replace(before, after), path)
+
+
+@pytest.mark.parametrize("relative", ["service.py", "rolling.py"])
+def test_presentation_freeze_exception_preserves_unapproved_body_changes(relative):
+    path = f"src/dmf_pulse/private_v1/{relative}"
+    source = Path(path).read_text(encoding="utf-8") + "\nUNAPPROVED_MODEL_CONTROL = True\n"
+    stripped = without_accel002_presentation(source, path)
+    assert stripped.endswith("UNAPPROVED_MODEL_CONTROL = True\n")
+    assert stripped != parent_text(path)
 
 
 def test_standing_fpl_file_exact_identity():
-    assert hashlib.sha256(Path("config/rights/fpl_profiles.json").read_bytes()).hexdigest() == (
-        "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d"
-    )
+    assert hashlib.sha256(
+        original_fpl_registry_bytes(Path("config/rights/fpl_profiles.json"))
+    ).hexdigest() == ("1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d")
 
 
 def test_standing_fpl_purpose_remains_adequate_without_expansion():

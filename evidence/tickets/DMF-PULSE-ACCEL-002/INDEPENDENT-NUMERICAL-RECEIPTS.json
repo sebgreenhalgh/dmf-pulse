@@ -1,0 +1,315 @@
+{
+  "accepted_parent": "02576a563179e0a8d3311fc5e82c770905975f61",
+  "browser_asset_bindings": {
+    "src/dmf_pulse/dashboard/resources/demo/manifest.json": "23db8268eccec279bb2ee94dea61361c6eb548a0340fbe67bb94eb01fd871721",
+    "src/dmf_pulse/dashboard/resources/desk.css": "36ecd7e7df58dcf92351e61014df3a30360685dd8d5eeed225be47eb32669328",
+    "src/dmf_pulse/dashboard/resources/desk.js": "07f5a251f6793f041067706b0137586f2407c1d1c52d14b750ed56d59cc49b0b",
+    "src/dmf_pulse/dashboard/resources/index.html": "b42d86a640fa96b8187816cc321ba329b3537137101bc2fc2b3fefbace2a19b6"
+  },
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "comparisons": [
+    {
+      "all_decision_content_excluding_declared_provenance_exact": true,
+      "all_projection_numerical_content_exact": true,
+      "classification": "native",
+      "full_json_equal": {
+        "decision": false,
+        "optimiser_result": false,
+        "projections": false
+      },
+      "horizon_gameweeks": 1
+    },
+    {
+      "all_decision_content_excluding_declared_provenance_exact": true,
+      "all_projection_numerical_content_exact": true,
+      "classification": "native",
+      "full_json_equal": {
+        "decision": false,
+        "optimiser_result": false,
+        "projections": false
+      },
+      "horizon_gameweeks": 3
+    },
+    {
+      "all_decision_content_excluding_declared_provenance_exact": true,
+      "all_projection_numerical_content_exact": true,
+      "classification": "controlled",
+      "full_json_equal": {
+        "decision": true,
+        "optimiser_result": true,
+        "projections": true
+      },
+      "horizon_gameweeks": 1
+    },
+    {
+      "all_decision_content_excluding_declared_provenance_exact": true,
+      "all_projection_numerical_content_exact": true,
+      "classification": "controlled",
+      "full_json_equal": {
+        "decision": true,
+        "optimiser_result": true,
+        "projections": true
+      },
+      "horizon_gameweeks": 3
+    }
+  ],
+  "current_python_file_count": 359,
+  "current_source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+  "demo_121_receipt": {
+    "byte_sha256": "937f21340f062a7e29c6fb93ae066443bcb4e9a47a7782c1177de56c3417d168",
+    "proof": {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+      "fallback_count": 120,
+      "fixture_and_component_copy_exact": true,
+      "network_blocked": true,
+      "provider_injected_removed_player": {
+        "detail_role": "UNAVAILABLE",
+        "official_id": 99999,
+        "unavailable_reason": "REMOVED_UNMAPPED"
+      },
+      "sealed_decision_sha256": "70bc225287d4c6ef8c7c6931fec3bdad6dc60f426802b9aa585ecc983827ce85",
+      "source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+      "status": "PASS",
+      "view_proof": {
+        "all_13_component_means_reconcile": true,
+        "all_numeric_summaries_equal": true,
+        "all_projected_players_checked": 120,
+        "blocked_count": 1,
+        "catalogue_count": 121,
+        "detail_and_two_player_comparison_equal": true,
+        "fixture_count": 3,
+        "horizon_gameweeks": [
+          2
+        ],
+        "minutes_equal": true,
+        "projected_count": 120,
+        "view_sha256": "59105e907f905ab132076fcc8f2c841d0a1efafe7d9edf96a245e7f788a06e08"
+      }
+    }
+  },
+  "existing_real_rights_profiles_unchanged": true,
+  "limitations": [
+    "Synthetic engineering parity only; no real football predictive accuracy claim.",
+    "Controlled provenance exists only inside isolated socket-blocked review workers.",
+    "Native complete hashes correctly differ due to package and appended synthetic-registry provenance.",
+    "This review does not replace source-rights, web security, evaluation leakage, installed-wheel, full gates or human acceptance."
+  ],
+  "live_provider_traffic": false,
+  "package_source_stable_for_every_final_worker": true,
+  "production_authentication_modified": false,
+  "receipts": [
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+      "actual_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "byte_sha256": "aa86aeb193003221e5846f811e62e1e02b151466bc61b5137a2a928fc28a1d1e",
+      "bytes": 5040405,
+      "classification": "SYNTHETIC_NATIVE_AUTHENTICATED_PROVENANCE",
+      "decision_semantic_sha256": "41d93fa02a7092eb035299e53a46ec0ed962f16275db66213a6bba01325c1190",
+      "effective_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+      "name": "native-1gw-parent.json",
+      "projection_result_sha256s": [
+        "f7e8fb6de36acac197ad5d6bc30981c367abf83413a3cd3cec6b4f69fc13b235"
+      ],
+      "source_manifest_sha256": "8ff622d4f5ceb2d2e05211aaea53ae3d82cfc784caaf1a8acd67e2ca74ccde7f",
+      "view_proof": null,
+      "wall_seconds": 76.45030030002818
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "actual_fpl_rights_config_identity": "d83db19dfb7ea4f4cd36f20a35d3ced902b97b39d510a7ce0c58af9e374829e9",
+      "byte_sha256": "13efdc97f7da2d5524d5eecb6739111d50366a25ecfe3daaa3c305e5502d1807",
+      "bytes": 5043068,
+      "classification": "SYNTHETIC_NATIVE_AUTHENTICATED_PROVENANCE",
+      "decision_semantic_sha256": "a3f3e6f7d8e346527f04aa6d1f1cd1ecbcdfa8817f5b164637a12eaf2d147340",
+      "effective_fpl_rights_config_identity": "d83db19dfb7ea4f4cd36f20a35d3ced902b97b39d510a7ce0c58af9e374829e9",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "name": "native-1gw-current.json",
+      "projection_result_sha256s": [
+        "d51c8b8d2f8b09361dd9d0a36000e75fa258e8ec1d82805a91389ebf3a6dd7d8"
+      ],
+      "source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+      "view_proof": {
+        "all_13_component_means_reconcile": true,
+        "all_numeric_summaries_equal": true,
+        "all_projected_players_checked": 120,
+        "blocked_count": 0,
+        "catalogue_count": 120,
+        "detail_and_two_player_comparison_equal": true,
+        "fixture_count": 3,
+        "horizon_gameweeks": [
+          2
+        ],
+        "minutes_equal": true,
+        "projected_count": 120,
+        "view_sha256": "152ba0af6d7cd47f57da74182e5609f22fe20bf58a0c7e4613c4bd428d47affe"
+      },
+      "wall_seconds": 88.89195039996412
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+      "actual_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "byte_sha256": "b1e7c5797a90ce77cebd89f5f0838aff588828a5e90ce87d98f61063ce532503",
+      "bytes": 10271201,
+      "classification": "SYNTHETIC_NATIVE_AUTHENTICATED_PROVENANCE",
+      "decision_semantic_sha256": "3a437dd650032385ec8d50045150968ae387bc2acfa2b5257e013856e8811282",
+      "effective_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+      "name": "native-3gw-parent.json",
+      "projection_result_sha256s": [
+        "2926a8e2b4cd95d5996072cc6f13c3bca9e95ed6ba465faa2d01fac465b4d48b",
+        "c7ac6e898a389aa6f80e8a75398e288262c59b611c0b9dd9150ab86a47e08d40",
+        "e88ca59134284999f82bde3b49a3e87df03e3afacd11a7452c0f1e856607fe6c"
+      ],
+      "source_manifest_sha256": "8ff622d4f5ceb2d2e05211aaea53ae3d82cfc784caaf1a8acd67e2ca74ccde7f",
+      "view_proof": null,
+      "wall_seconds": 222.17197479994502
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "actual_fpl_rights_config_identity": "d83db19dfb7ea4f4cd36f20a35d3ced902b97b39d510a7ce0c58af9e374829e9",
+      "byte_sha256": "9a9581414a7e86fd841be4a6e8d3a20ecb4fcff07732a0bfb2762040133cac7c",
+      "bytes": 10273610,
+      "classification": "SYNTHETIC_NATIVE_AUTHENTICATED_PROVENANCE",
+      "decision_semantic_sha256": "d46b2d68ca74e02e0b5e1a3ec0245c7ca3846690abb60ec94f65b6ab9148f2fe",
+      "effective_fpl_rights_config_identity": "d83db19dfb7ea4f4cd36f20a35d3ced902b97b39d510a7ce0c58af9e374829e9",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "name": "native-3gw-current.json",
+      "projection_result_sha256s": [
+        "ad69b0b531b3ab7049fd4b8aa631b100bc4f8b26585c7ca7082eb1161fcd675c",
+        "6e44343ee4084f674f92ec9bd44e9af42acd1fcc744cac5eb46352d13eb5be44",
+        "32742d8bf95263be29904979a6f495a190b0f737e793937038677140f3f42a04"
+      ],
+      "source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+      "view_proof": {
+        "all_13_component_means_reconcile": true,
+        "all_numeric_summaries_equal": true,
+        "all_projected_players_checked": 120,
+        "blocked_count": 0,
+        "catalogue_count": 120,
+        "detail_and_two_player_comparison_equal": true,
+        "fixture_count": 9,
+        "horizon_gameweeks": [
+          2,
+          3,
+          4
+        ],
+        "minutes_equal": true,
+        "projected_count": 120,
+        "view_sha256": "5a2d8cde9cc72d422c88a1516a026381e2c7e9e244a6a022551cbc05bf1af44b"
+      },
+      "wall_seconds": 240.9977245000191
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+      "actual_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "byte_sha256": "59060998a7b7a12d8a1100a4a2026051983ec067c6fc19f0715199d2d2014184",
+      "bytes": 5040661,
+      "classification": "SYNTHETIC_TEST_ONLY_CONTROLLED_PROVENANCE",
+      "decision_semantic_sha256": "9382ebc13c9aafdc32972f0223d921404783e2aeb49963d03bc82812885a0d4e",
+      "effective_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "controlled-1gw-parent.json",
+      "projection_result_sha256s": [
+        "c06f4aa7015359bc69e809cb781c721c9bce3cdf2db5dd4e88643ddfc23ce309"
+      ],
+      "source_manifest_sha256": "8ff622d4f5ceb2d2e05211aaea53ae3d82cfc784caaf1a8acd67e2ca74ccde7f",
+      "view_proof": null,
+      "wall_seconds": 95.13047949993052
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "actual_fpl_rights_config_identity": "d83db19dfb7ea4f4cd36f20a35d3ced902b97b39d510a7ce0c58af9e374829e9",
+      "byte_sha256": "495fcca6d0b3a8302e60aadaf85ff0bd1bd35ac325def5374810493f9fcf7c18",
+      "bytes": 5043067,
+      "classification": "SYNTHETIC_TEST_ONLY_CONTROLLED_PROVENANCE",
+      "decision_semantic_sha256": "9382ebc13c9aafdc32972f0223d921404783e2aeb49963d03bc82812885a0d4e",
+      "effective_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "controlled-1gw-current.json",
+      "projection_result_sha256s": [
+        "c06f4aa7015359bc69e809cb781c721c9bce3cdf2db5dd4e88643ddfc23ce309"
+      ],
+      "source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+      "view_proof": {
+        "all_13_component_means_reconcile": true,
+        "all_numeric_summaries_equal": true,
+        "all_projected_players_checked": 120,
+        "blocked_count": 0,
+        "catalogue_count": 120,
+        "detail_and_two_player_comparison_equal": true,
+        "fixture_count": 3,
+        "horizon_gameweeks": [
+          2
+        ],
+        "minutes_equal": true,
+        "projected_count": 120,
+        "view_sha256": "eb6ca85d6171e6b8f57ae345e008f8e084c522eb24f401f03cc2e5f8a5099eae"
+      },
+      "wall_seconds": 89.93739359988831
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:8362f9403249f123a7a42f657891ce0b9c34084083c247966057cf86626f8b50",
+      "actual_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "byte_sha256": "d80a38adeb1a974eea7c21eb520e7caf50c77ae108abcc7a1536826f8a0322e5",
+      "bytes": 10271457,
+      "classification": "SYNTHETIC_TEST_ONLY_CONTROLLED_PROVENANCE",
+      "decision_semantic_sha256": "4685c43ec4b19d301a14046c33c2691a1aa3a4c765dc77177282fc36198c31ed",
+      "effective_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "controlled-3gw-parent.json",
+      "projection_result_sha256s": [
+        "da3dba3344c25a0465623985550d18a00bfbde6b0ba1535e8652ef8ba654a7ad",
+        "5fd2e22052bd1ee4815c04230afcaac592ee64373034d47036656ef14ded20f4",
+        "e88ca59134284999f82bde3b49a3e87df03e3afacd11a7452c0f1e856607fe6c"
+      ],
+      "source_manifest_sha256": "8ff622d4f5ceb2d2e05211aaea53ae3d82cfc784caaf1a8acd67e2ca74ccde7f",
+      "view_proof": null,
+      "wall_seconds": 251.80534029996488
+    },
+    {
+      "actual_build_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+      "actual_fpl_rights_config_identity": "d83db19dfb7ea4f4cd36f20a35d3ced902b97b39d510a7ce0c58af9e374829e9",
+      "byte_sha256": "1fed32d21a42e6919c3abab4f745f27a6c46063e02e7b956b36b531efeacbb84",
+      "bytes": 10273867,
+      "classification": "SYNTHETIC_TEST_ONLY_CONTROLLED_PROVENANCE",
+      "decision_semantic_sha256": "4685c43ec4b19d301a14046c33c2691a1aa3a4c765dc77177282fc36198c31ed",
+      "effective_fpl_rights_config_identity": "130f93313f7f8cde432d23774687b23c1586cd9d36f11bfc2c7898bece316087",
+      "effective_market_identity": "dmf-pulse-0.2.0:source-sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "controlled-3gw-current.json",
+      "projection_result_sha256s": [
+        "da3dba3344c25a0465623985550d18a00bfbde6b0ba1535e8652ef8ba654a7ad",
+        "5fd2e22052bd1ee4815c04230afcaac592ee64373034d47036656ef14ded20f4",
+        "e88ca59134284999f82bde3b49a3e87df03e3afacd11a7452c0f1e856607fe6c"
+      ],
+      "source_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+      "view_proof": {
+        "all_13_component_means_reconcile": true,
+        "all_numeric_summaries_equal": true,
+        "all_projected_players_checked": 120,
+        "blocked_count": 0,
+        "catalogue_count": 120,
+        "detail_and_two_player_comparison_equal": true,
+        "fixture_count": 9,
+        "horizon_gameweeks": [
+          2,
+          3,
+          4
+        ],
+        "minutes_equal": true,
+        "projected_count": 120,
+        "view_sha256": "20b989fe4c260253da4090bcdc4d926b18d3a6afb11ff8b83d70ab5eeeb6e44f"
+      },
+      "wall_seconds": 240.02868819993455
+    }
+  ],
+  "scope": "INDEPENDENT_NUMERICAL_AND_VIEW_INTEGRATION_REVIEW",
+  "sealed_schemas_unchanged": [
+    "src/dmf_pulse/private_v1/models.py",
+    "src/dmf_pulse/private_v1/rolling_models.py",
+    "src/dmf_pulse/fpl_points/models.py"
+  ],
+  "status": "PASS",
+  "unresolved_P0_P1_or_material_P2": []
+}

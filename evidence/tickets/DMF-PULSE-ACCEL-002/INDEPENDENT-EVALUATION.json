@@ -1,0 +1,220 @@
+{
+  "actual_stage9_acceptance": {
+    "canonical_player_id": "76b2dd1f-745f-593c-bf63-e835f348578d",
+    "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+    "component_count": 13,
+    "fixture_ids": [
+      "7886b8a0-b2ab-520e-8980-6f393692b205"
+    ],
+    "forecast_sha256": "c928ab4a87cdc342bc3932588916054b20deb1879c3bcbcf8446fb663cf10332",
+    "gameweek": 2,
+    "label_sha256": "9381657d9e7b79c69f664c6e137331bbe4a6dcf0b391650661cc294d94dcf824",
+    "official_player_id": 188,
+    "scorecard_sha256": "8546fe06967d69f4d1daf7f6b55b9c881f6d61c84c104c7f2b20c8a64de237ed",
+    "summary_sha256": "0135e90d04c52578da313d597c4ee883d6f98c8dfd5ef11ab20dd58d5116197d",
+    "unchanged_mean": "1.96875"
+  },
+  "bound_file_sha256s": {
+    "src/dmf_pulse/dashboard/synthetic.py": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73",
+    "src/dmf_pulse/data_model/tables.py": "5adf24cec629e1a232f1578c38bfc90a6d3f385a43a2e4e52d9ccd6b5db3c54b",
+    "src/dmf_pulse/database/doctor.py": "c1795b0848ffc1703ec6b402af5614577c2a623ccd7cff5593a52742a1299a27",
+    "src/dmf_pulse/database/migrations/versions/20261029_0007_player_research.py": "69acd454b92acfdde1fe17896f4fb1637d14e3a017799fcfd4236efd30b3b45a",
+    "src/dmf_pulse/database/schema.py": "74e59833b3c4825d9cb5931f0ccfc2de294a427654f0f5dbb8998e42a143bf32",
+    "src/dmf_pulse/ingestion/fpl/service.py": "cb776ca7728ea4d354f3bbda804e411a795ca595180e7d9abe0b8f8e624f128b",
+    "src/dmf_pulse/player_lab/__init__.py": "616b5fedc2062a2b7c19fb905db86281ef2fe89868c1b45786667d880b2c5ce0",
+    "src/dmf_pulse/player_lab/actuals.py": "7a6eae3fec24c12d3bce02003f05efe88b0a76ba06308d2dc0367b5c6fb74676",
+    "src/dmf_pulse/player_lab/contracts.py": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f",
+    "src/dmf_pulse/player_lab/demo.py": "8c40bbfbc15e36a653ee90fcc2fd1c06bf30a35e5579a23923e85709494e5993",
+    "src/dmf_pulse/player_lab/evaluation.py": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e",
+    "src/dmf_pulse/player_lab/resources/actuals-gw2-revision1.json": "6418ace66d97afb9b44ecfd7c5de1f321434afe83fe601b010ad3946c355b6c4",
+    "src/dmf_pulse/player_lab/resources/actuals-gw2.json": "cff309ed67dfaf834cfd7ec0dfd7ec5c8c3b88107806a0d35b55c999f20f5c49",
+    "src/dmf_pulse/player_lab/resources/actuals-gw3.json": "7bf5d26798f663c7ae1e3358b0bb0bbb05f8445a0f545e40c14b54f17e6e3d5f",
+    "src/dmf_pulse/player_lab/resources/context-gw2-revision1.json": "20e60d10dacc9c5b4f3f66450e9eec684012bcfb5ebca98261a96567b139e7fb",
+    "src/dmf_pulse/player_lab/resources/context-gw2.json": "284a0a6622b8c31e4d33d7703e3d4a62bddaa63e7ba3494db7ec50f13cd10445",
+    "src/dmf_pulse/player_lab/resources/context-gw3.json": "fcf8c73e703816c6edf3974b30aa27ec8588d1cd2b51a7f3ba4924c5f01a1e51",
+    "src/dmf_pulse/player_lab/resources/forecast-inputs.json": "7091eba0b5e60aca1f4513c27474009e729bfcaf653245d46222f24a904d64f6",
+    "src/dmf_pulse/player_lab/resources/source-registry.json": "de16b3d832c48c2249f8b31f63ea134c77ed2652380dc55919d4437433b65121",
+    "src/dmf_pulse/player_lab/resources/stage9-actuals.json": "8bb047bf6dfaa39079c7fa911d216dab109e1ddbeba5721a177cd54d25883e65",
+    "src/dmf_pulse/player_lab/resources/stage9-input-evidence.json": "84a653f9022b950e4dafa397325a1887db959dc568cd6fd174a11a14bce260f1",
+    "src/dmf_pulse/player_lab/resources/stage9-outcome-context.json": "373c8debdb9984326c07db72d9c63715ce554b8b45f640ce5bc044514224bdb3",
+    "src/dmf_pulse/player_lab/resources/stage9-snapshot.json": "0e3655314fb67c4ceef1ced4d2d885787cb35e2c3113358666a5d603be44828a",
+    "src/dmf_pulse/player_lab/rights.py": "576d8fb97854f0712d5757ec44f0752133918e409b0f220a36d54a13ce422103",
+    "src/dmf_pulse/player_lab/snapshots.py": "de0baeac935a37a0041532609cbf0852cebbe191ad4d020f88544da1627c726f",
+    "src/dmf_pulse/player_lab/stage9_demo.py": "9c880212c4b2444d7f2387663758a1f8dd6c96c43a2c756640bc6af4a49abd47",
+    "src/dmf_pulse/player_lab/store.py": "fde0ef1f84ed07ab2d994e705445dc0fdad2adcb03714f8f85c5eb6f05b24ad4",
+    "tests/integration/player_lab/test_research_store.py": "ae1f0f32f064eb88bd4f0d1576be7755d21d912944f9d51a9e600b7258f3f596",
+    "tests/unit/player_lab/test_player_lab.py": "3244f00e402687ef1423b661eb3ca0e55c25e33194fec757b0afc2347cb844d7",
+    "tests/unit/player_lab/test_stage9_snapshot.py": "9a8b6c8372414c604b731ec9808848e9990b836965bcf04371b99f282f28af25"
+  },
+  "bound_git_blob_sha256s": {
+    "src/dmf_pulse/dashboard/synthetic.py": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73",
+    "src/dmf_pulse/data_model/tables.py": "5adf24cec629e1a232f1578c38bfc90a6d3f385a43a2e4e52d9ccd6b5db3c54b",
+    "src/dmf_pulse/database/doctor.py": "c1795b0848ffc1703ec6b402af5614577c2a623ccd7cff5593a52742a1299a27",
+    "src/dmf_pulse/database/migrations/versions/20261029_0007_player_research.py": "69acd454b92acfdde1fe17896f4fb1637d14e3a017799fcfd4236efd30b3b45a",
+    "src/dmf_pulse/database/schema.py": "74e59833b3c4825d9cb5931f0ccfc2de294a427654f0f5dbb8998e42a143bf32",
+    "src/dmf_pulse/ingestion/fpl/service.py": "cb776ca7728ea4d354f3bbda804e411a795ca595180e7d9abe0b8f8e624f128b",
+    "src/dmf_pulse/player_lab/__init__.py": "616b5fedc2062a2b7c19fb905db86281ef2fe89868c1b45786667d880b2c5ce0",
+    "src/dmf_pulse/player_lab/actuals.py": "7a6eae3fec24c12d3bce02003f05efe88b0a76ba06308d2dc0367b5c6fb74676",
+    "src/dmf_pulse/player_lab/contracts.py": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f",
+    "src/dmf_pulse/player_lab/demo.py": "8c40bbfbc15e36a653ee90fcc2fd1c06bf30a35e5579a23923e85709494e5993",
+    "src/dmf_pulse/player_lab/evaluation.py": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e",
+    "src/dmf_pulse/player_lab/resources/actuals-gw2-revision1.json": "6418ace66d97afb9b44ecfd7c5de1f321434afe83fe601b010ad3946c355b6c4",
+    "src/dmf_pulse/player_lab/resources/actuals-gw2.json": "cff309ed67dfaf834cfd7ec0dfd7ec5c8c3b88107806a0d35b55c999f20f5c49",
+    "src/dmf_pulse/player_lab/resources/actuals-gw3.json": "7bf5d26798f663c7ae1e3358b0bb0bbb05f8445a0f545e40c14b54f17e6e3d5f",
+    "src/dmf_pulse/player_lab/resources/context-gw2-revision1.json": "20e60d10dacc9c5b4f3f66450e9eec684012bcfb5ebca98261a96567b139e7fb",
+    "src/dmf_pulse/player_lab/resources/context-gw2.json": "284a0a6622b8c31e4d33d7703e3d4a62bddaa63e7ba3494db7ec50f13cd10445",
+    "src/dmf_pulse/player_lab/resources/context-gw3.json": "fcf8c73e703816c6edf3974b30aa27ec8588d1cd2b51a7f3ba4924c5f01a1e51",
+    "src/dmf_pulse/player_lab/resources/forecast-inputs.json": "7091eba0b5e60aca1f4513c27474009e729bfcaf653245d46222f24a904d64f6",
+    "src/dmf_pulse/player_lab/resources/source-registry.json": "de16b3d832c48c2249f8b31f63ea134c77ed2652380dc55919d4437433b65121",
+    "src/dmf_pulse/player_lab/resources/stage9-actuals.json": "8bb047bf6dfaa39079c7fa911d216dab109e1ddbeba5721a177cd54d25883e65",
+    "src/dmf_pulse/player_lab/resources/stage9-input-evidence.json": "84a653f9022b950e4dafa397325a1887db959dc568cd6fd174a11a14bce260f1",
+    "src/dmf_pulse/player_lab/resources/stage9-outcome-context.json": "373c8debdb9984326c07db72d9c63715ce554b8b45f640ce5bc044514224bdb3",
+    "src/dmf_pulse/player_lab/resources/stage9-snapshot.json": "0e3655314fb67c4ceef1ced4d2d885787cb35e2c3113358666a5d603be44828a",
+    "src/dmf_pulse/player_lab/rights.py": "576d8fb97854f0712d5757ec44f0752133918e409b0f220a36d54a13ce422103",
+    "src/dmf_pulse/player_lab/snapshots.py": "de0baeac935a37a0041532609cbf0852cebbe191ad4d020f88544da1627c726f",
+    "src/dmf_pulse/player_lab/stage9_demo.py": "9c880212c4b2444d7f2387663758a1f8dd6c96c43a2c756640bc6af4a49abd47",
+    "src/dmf_pulse/player_lab/store.py": "fde0ef1f84ed07ab2d994e705445dc0fdad2adcb03714f8f85c5eb6f05b24ad4",
+    "tests/integration/player_lab/test_research_store.py": "ae1f0f32f064eb88bd4f0d1576be7755d21d912944f9d51a9e600b7258f3f596",
+    "tests/unit/player_lab/test_player_lab.py": "ec768c76e9a054a6dea033847c929dfda191eeac571f053eff297f1081bc17d0",
+    "tests/unit/player_lab/test_stage9_snapshot.py": "9a8b6c8372414c604b731ec9808848e9990b836965bcf04371b99f282f28af25"
+  },
+  "closed_findings": [
+    {
+      "id": "EVAL-P1-001",
+      "issue": "Publicly resealed post-outcome forecast accepted without original custody.",
+      "resolution": "Scoring requires original custody verification and exact qualified full forecast hash. Coherent mean/PMF/component replacement rejected by executed tests."
+    },
+    {
+      "id": "EVAL-P1-002",
+      "issue": "Known synthetic source metadata could qualify arbitrary Stage9/forecast values.",
+      "resolution": "Snapshot requires exact summary/input/key registration; freeze and scoring require complete forecast semantic whitelist. Real Stage9 owned service output successfully qualified; altered source summary/input/forecast metadata and values rejected."
+    },
+    {
+      "id": "EVAL-P2-003",
+      "issue": "Numeric one accepted by Literal True finality flags.",
+      "resolution": "Identity-strict true field validator added; current targeted player-lab tests pass."
+    },
+    {
+      "id": "EVAL-P2-004",
+      "issue": "Correction evidence and chronology omitted.",
+      "resolution": "Label now carries ordinary points lock, season-specific policy, finality evidence hash and correction finalization instant; revision lineage and source qualification enforced. Registered revision1 fixture and correction tests exist."
+    },
+    {
+      "id": "EVAL-P2-005",
+      "issue": "Incorrect RPS test oracle and unbounded pytest parameter IDs.",
+      "resolution": "Expected ordered-support RPS corrected to .25; bounded parameter IDs supplied. Entire targeted player-lab suite passes."
+    }
+  ],
+  "final_focused_rebind": {
+    "additional_heavy_tests_run": false,
+    "all_package_python_git_working_bytes_equal": true,
+    "checkpoint_sha": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+    "external_ci_completion_claimed": false,
+    "line_ending_only_bound_file_differences": [
+      {
+        "git_crlf_count": 0,
+        "path": "tests/unit/player_lab/test_player_lab.py",
+        "reason": "Working checkout CRLF; immutable Git blob LF; byte differences limited to CRLF normalization.",
+        "working_crlf_count": 489
+      }
+    ],
+    "package_python_count": 359,
+    "package_python_git_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+    "package_python_working_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+    "previous_package_manifest_sha256": "3b4a1b643440d60dbf01d009956e99c8bf148ac2faed18bf3bf996a2b0b1c636",
+    "previous_report_sha256": "a31ae205c2ed6bedfab054a47833add512d493cffce7c81e0ee75492a2844d7c",
+    "previous_review_checkpoint_sha": "81022eade2f6bcbb893222d7ceaee35e1de8b517",
+    "prior_evaluation_scope_working_bytes_unchanged": true,
+    "release_clearance": "Exact pushed-SHA CI and remaining release gates remain separate; no human acceptance, production activation or real cohort claim.",
+    "reviewed_production_deltas": [
+      {
+        "assessment": "Matches the newly accepted current migration head. Mismatch denial, rights and transport gates unchanged.",
+        "change": "TARGET_REVISION 20260807_0006 -> 20261029_0007",
+        "path": "src/dmf_pulse/ingestion/fpl/service.py"
+      },
+      {
+        "assessment": "Synthetic transport credential marker only. Model inputs, evaluation contracts, resources and numerical kernels unchanged.",
+        "change": "Injected owned fake bearer literal -> scanner-recognized placeholder",
+        "path": "src/dmf_pulse/dashboard/synthetic.py"
+      }
+    ],
+    "verification": "Read every immutable Git blob for all359 package Python files and all bound evaluation/schema/resources/tests; compared with working bytes. All359 Python blobs exactly match. All28 prior scoped working byte hashes unchanged. One scoped test differs only in checkout line endings; both hashes retained."
+  },
+  "implementation_limits": [
+    "Synthetic-only qualified cohort; real forecasts/labels/storage remain blocked.",
+    "Zero-points baseline is explicitly labelled; no assertion of B0 recent-points superiority or real historical success.",
+    "No fit, model promotion, source-rights expansion, provider JSON call, real credential read, P01 score, A04, metadata activation or production action.",
+    "No confidence interval/significance claim from correlated player rows or the small synthetic holdout.",
+    "This reviewer inspected PostgreSQL guards and tests without independently running PostgreSQL. Root retained84-test PostgreSQL/player-lab pass evidence; peer integration review independently rejected13 SQL attacks and admitted a valid qualified forecast. Root reports88 migration/research tests passed. Exact pushed-SHA CI remains outside this focused rebind."
+  ],
+  "independence": "Reviewer did not author root production contracts/rights/evaluation/store/SQL. Reviewer separately authored stage9_demo.py and test_stage9_snapshot.py under explicit delegation; those files have executed acceptance evidence and remain subject to root/integration review.",
+  "native_package_identity": "dmf-pulse-0.2.0:source-sha256:ba24b0b4f93af33668575a9fbbd25602661353651c938901aabfc3bb8708759c",
+  "package_python_file_count": 359,
+  "package_python_manifest_hash_algorithm": "SHA256 of UTF8 compact sorted-key JSON mapping of repository-relative src/dmf_pulse/**/*.py paths to byte SHA256, without trailing newline.",
+  "package_python_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+  "review_date": "2026-10-29",
+  "reviewed_checkpoint_sha": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+  "schema_version": "accel002-evaluation-independent-review-v1",
+  "scope": "Root-authored player forecast contracts, rights/retention, finality/corrections, custody, Stage12 metric composition, paired chronological holdout, PostgreSQL research schema and direct-SQL guards.",
+  "status": "NO_UNRESOLVED_P0_P1_IN_REVIEWED_SYNTHETIC_SCOPE",
+  "supplemental_execution_receipts": {
+    "independent_integration_review": {
+      "byte_sha256": "ce30c783f79edaaad287c020b1db9165825aaca2b03fae476d05515f6076a2c4",
+      "packaging_remediation_tests": {
+        "elapsed_seconds": 3.46,
+        "passed": 66,
+        "scope": [
+          "FPL service boundaries",
+          "database contracts"
+        ],
+        "skipped": 0
+      },
+      "path": "review_pack/accel002-integration-review.json",
+      "post_correction_tests": {
+        "command": ".venv/Scripts/python -m pytest tests/unit/player_lab --basetemp=review_pack/pytest-integration-review-final -o cache_dir=review_pack/cache-integration-review-final -q",
+        "database_mutations_rolled_back": true,
+        "elapsed_seconds": 3.08,
+        "passed": 59,
+        "positive_qualified_forecast_admitted": true,
+        "skipped": 0,
+        "sql_attack_cases_rejected": 13
+      },
+      "reviewed_checkpoint_sha": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+      "status": "CLEAR_SOURCE_INTEGRATION"
+    },
+    "independent_sql_attacks": {
+      "byte_sha256": "defc55bea0bb727ab86537cf7e3ec49bed27448035873b9732d01d2cd2d3c6c9",
+      "classification": "REPOSITORY_OWNED_SYNTHETIC_ROLLBACK_ONLY",
+      "path": "review_pack/accel002-sql-null-review.json",
+      "positive_qualified_forecast_admitted": true,
+      "rejected_cases": 13
+    },
+    "root_postgres_player_pass": {
+      "byte_sha256": "db2bb69e8a76eead8c9b4e22d7b0e6c368c1f7cb6ede845539c3cda3f1852cad",
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/POSTGRES-PLAYER-84-PASS.log",
+      "result": "84 passed in66.65s; retained root-run output inspected, not independently reexecuted here."
+    },
+    "root_reported_full_migration_research": {
+      "result": "88 tests passed",
+      "verification": "Parent completion report; not independently reexecuted in this focused rebind."
+    }
+  },
+  "verification": [
+    {
+      "command": ".venv/Scripts/python.exe -m pytest tests/unit/player_lab/test_stage9_snapshot.py tests/unit/player_lab/test_player_lab.py -q --tb=short --basetemp review_pack/stage9-acceptance-pytest",
+      "result": "58 passed in 2.65s; global test fixture rejects provider network."
+    },
+    {
+      "command": "ruff check and ruff format --check src/dmf_pulse/player_lab/stage9_demo.py tests/unit/player_lab/test_stage9_snapshot.py",
+      "result": "Pass; both files formatted."
+    },
+    {
+      "command": "mypy src/dmf_pulse/player_lab/stage9_demo.py",
+      "result": "Success: no issues found in 1 source file."
+    },
+    {
+      "command": "review_pack/generate_stage9_evaluation.py under rejecting socket connect/connect_ex/sendto and DNS guards",
+      "result": "Exit0; actual run_synthetic_recommendation(1, NullProgress()) succeeded; appended two source records and preserved all four existing analytic records."
+    }
+  ]
+}

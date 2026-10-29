@@ -1,0 +1,159 @@
+{
+  "source": "src/dmf_pulse/dashboard/resources/desk.js",
+  "source_sha256": "07f5a251f6793f041067706b0137586f2407c1d1c52d14b750ed56d59cc49b0b",
+  "total": 20,
+  "passed": 20,
+  "failed": 0,
+  "results": [
+    {
+      "name": "delayed_player_after_hidden",
+      "passed": true,
+      "detail": {
+        "content_children": 0,
+        "aborted": true
+      }
+    },
+    {
+      "name": "delayed_player_after_pagehide",
+      "passed": true,
+      "detail": {
+        "content_children": 0,
+        "aborted": true
+      }
+    },
+    {
+      "name": "delayed_player_after_cancel",
+      "passed": true,
+      "detail": {
+        "content_children": 0,
+        "aborted": true
+      }
+    },
+    {
+      "name": "delayed_player_after_logout",
+      "passed": true,
+      "detail": {
+        "content_children": 0,
+        "aborted": true
+      }
+    },
+    {
+      "name": "delayed_player_after_superseded",
+      "passed": true,
+      "detail": {
+        "content_children": 1,
+        "aborted": true
+      }
+    },
+    {
+      "name": "delayed_compare_after_hidden",
+      "passed": true,
+      "detail": {
+        "content_children": 0
+      }
+    },
+    {
+      "name": "delayed_desk_after_hidden",
+      "passed": true,
+      "detail": {
+        "active_job": null
+      }
+    },
+    {
+      "name": "delayed_desk_after_cancel",
+      "passed": true,
+      "detail": {
+        "active_job": null
+      }
+    },
+    {
+      "name": "delayed_desk_after_logout",
+      "passed": true,
+      "detail": {
+        "active_job": null
+      }
+    },
+    {
+      "name": "delayed_desk_after_superseded",
+      "passed": true,
+      "detail": {
+        "active_job": "job-B"
+      }
+    },
+    {
+      "name": "desk_wrong_job_rejected",
+      "passed": true,
+      "detail": {
+        "active_job": null
+      }
+    },
+    {
+      "name": "remaining_ttl_subtracts_full_round_trip",
+      "passed": true,
+      "detail": {
+        "server_remaining_ms": 1000,
+        "round_trip_ms": 400,
+        "client_lifetime_ms": 600
+      }
+    },
+    {
+      "name": "expired_in_transit_response_rejected",
+      "passed": true,
+      "detail": {
+        "active_job": null
+      }
+    },
+    {
+      "name": "detail_rejected_after_monotonic_expiry",
+      "passed": true,
+      "detail": {
+        "expired_detail_added": false
+      }
+    },
+    {
+      "name": "stale_transport_failure_preserves_newer_view",
+      "passed": true,
+      "detail": {
+        "active_job": "job-B"
+      }
+    },
+    {
+      "name": "request_timeout_is_15_seconds",
+      "passed": true,
+      "detail": {
+        "abort_after_ms": 15000
+      }
+    },
+    {
+      "name": "context_resume_does_not_restore_local_private_data",
+      "passed": true,
+      "detail": {
+        "paired": true,
+        "local_private_view": false
+      }
+    },
+    {
+      "name": "stale_context_after_hidden_does_not_repair_session",
+      "passed": true,
+      "detail": {
+        "paired": false,
+        "local_private_view": false
+      }
+    },
+    {
+      "name": "stale_context_after_logout_does_not_repair_session",
+      "passed": true,
+      "detail": {
+        "paired": false,
+        "local_private_view": false
+      }
+    },
+    {
+      "name": "unauthorized_context_keeps_pairing_screen",
+      "passed": true,
+      "detail": {
+        "paired": false
+      }
+    }
+  ]
+}

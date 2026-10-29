@@ -1,0 +1,72 @@
+{
+  "baseline_revision": "20260803_0005",
+  "baseline_state": {
+    "availability_table_count": 12,
+    "revision": "20260803_0005"
+  },
+  "data_preservation": {
+    "baseline_seed": {},
+    "downgraded_seed": {},
+    "final_seed": {},
+    "head_seed": {},
+    "status": "PASS"
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "name": "dmf_pulse_test",
+    "port": 55432,
+    "postgres_version": "18.4"
+  },
+  "matrix": [
+    {
+      "from": "base",
+      "status": "PASS",
+      "to": "20261029_0007"
+    },
+    {
+      "from": "20261029_0007",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20261029_0007"
+    },
+    {
+      "from": "20261029_0007",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20261029_0007"
+    }
+  ],
+  "metadata_drift_check": "PASS",
+  "offline_sql": {
+    "bytes": 271512,
+    "path": "artifacts/accel002/offline_upgrade_0005.sql",
+    "secret_free": true,
+    "sha256": "edf975e37f3b7dbd2eea4d02a63d282754fbc5b25783a23988a9badc95b2c6e1"
+  },
+  "revision_count": 2,
+  "revisions": [
+    "20260807_0006",
+    "20261029_0007"
+  ],
+  "schema": {
+    "alembic_revision": "20261029_0007",
+    "schema_sha256": "b29b0e3f3f3e2ff99ef62693c5bb9f4e6344805248a7e25807f29f4bcb5d2417",
+    "table_count": 74,
+    "view_count": 12
+  },
+  "schema_manifest": {
+    "path": "evidence/tickets/DMF-PULSE-ACCEL-002/schema_manifest_0005.json",
+    "sha256": "25401dba53e39693af2658db5e9e863c818530279425535d60fcbb52710b7369"
+  },
+  "status": "PASS",
+  "target_revision": "20261029_0007",
+  "ticket_id": "DMF-PULSE-ACCEL-002"
+}

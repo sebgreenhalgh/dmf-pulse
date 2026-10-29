@@ -1,0 +1,51 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0
+cachedir: review_pack\cache-performance-final
+rootdir: C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, hypothesis-6.159.0, cov-7.1.0
+collected 6119 items / 6115 deselected / 4 selected
+
+tests\performance\chips\test_stage14_service_performance.py .            [ 25%]
+tests\performance\fpl_points\test_smoke_budget.py .                      [ 50%]
+tests\performance\prices\test_price_path_performance.py .                [ 75%]
+tests\unit\football_events\test_team_strength_adapter.py F               [100%]
+
+================================== FAILURES ===================================
+_________________ test_thirty_fixture_inferences_under_100ms __________________
+
+    @pytest.mark.performance
+    def test_thirty_fixture_inferences_under_100ms() -> None:
+        artifact = synthetic_artifact()
+        matches = tuple(
+            row for row in synthetic_dataset().fixture_registry.fixtures if row.season == "2025/26"
+        )[:30]
+        adapter._validated_artifact_json.cache_clear()
+        start = perf_counter()
+        results = [
+            fixture_prior_bundle(
+                artifact=artifact,
+                fixture=match,
+                as_of=STAMP + timedelta(seconds=2),
+                expected_artifact_sha256=artifact.semantic_sha256,
+            )
+            for match in matches
+        ]
+        elapsed = perf_counter() - start
+        assert len({row.semantic_sha256 for row in results}) == 30
+>       assert elapsed < 0.1, f"30 cold-cache adapter calls took {elapsed:.6f}s"
+E       AssertionError: 30 cold-cache adapter calls took 0.108845s
+E       assert 0.10884490003809333 < 0.1
+
+tests\unit\football_events\test_team_strength_adapter.py:284: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\pydantic\main.py:475
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='confidence', input_value='A', input_type=str])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms
+========== 1 failed, 3 passed, 6115 deselected, 1 warning in 52.20s ===========

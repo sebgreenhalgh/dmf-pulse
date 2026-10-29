@@ -1,0 +1,236 @@
+{
+  "acceptance_failure_remains_open": true,
+  "accepted_parent": "02576a563179e0a8d3311fc5e82c770905975f61",
+  "authentication_weakened": false,
+  "benchmark_retry_until_pass": false,
+  "cache_warmed_before_timer": false,
+  "cells": [
+    {
+      "artifact": "performance-parent-raw.json",
+      "byte_sha256": "5c4ea2f4c7307141be7f95bd936cb7dd8895793fbf667bf751d7405bc10b457d",
+      "bytes": 6752,
+      "cache_info": {
+        "currsize": 1,
+        "hits": 29,
+        "maxsize": 8,
+        "misses": 1
+      },
+      "diagnostic_elapsed_excluding_observed_gc": 0.1377714000409469,
+      "elapsed_seconds": 0.14033140009269118,
+      "mode": "raw",
+      "pytest_exit_code": 1,
+      "selected_count": 4,
+      "selection": "full",
+      "timed_gc_events": [
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0015660000499337912,
+          "timed_overlap_seconds": 0.0015660000499337912,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0002397999633103609,
+          "timed_overlap_seconds": 0.0002397999633103609,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 2.9199989512562752e-05,
+          "timed_overlap_seconds": 2.9199989512562752e-05,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0007250000489875674,
+          "timed_overlap_seconds": 0.0007250000489875674,
+          "uncollectable": 0
+        }
+      ],
+      "timed_gc_seconds": 0.0025600000517442822
+    },
+    {
+      "artifact": "performance-current-raw.json",
+      "byte_sha256": "6e6863d001a376fb5ca35ab4361aaffca2ad76544873258a8751747f9eb5dec1",
+      "bytes": 6742,
+      "cache_info": {
+        "currsize": 1,
+        "hits": 29,
+        "maxsize": 8,
+        "misses": 1
+      },
+      "diagnostic_elapsed_excluding_observed_gc": 0.1318452999694273,
+      "elapsed_seconds": 0.13355989998672158,
+      "mode": "raw",
+      "pytest_exit_code": 1,
+      "selected_count": 4,
+      "selection": "full",
+      "timed_gc_events": [
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0010628000600263476,
+          "timed_overlap_seconds": 0.0010628000600263476,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.00015380000695586205,
+          "timed_overlap_seconds": 0.00015380000695586205,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 3.370002377778292e-05,
+          "timed_overlap_seconds": 3.370002377778292e-05,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0004642999265342951,
+          "timed_overlap_seconds": 0.0004642999265342951,
+          "uncollectable": 0
+        }
+      ],
+      "timed_gc_seconds": 0.0017146000172942877
+    },
+    {
+      "artifact": "performance-parent-profile.json",
+      "byte_sha256": "0f9c44df75324e725cb12062d3ec1bcf7e49cd22079378f980c6e5010ef1e38c",
+      "bytes": 10525,
+      "cache_info": {
+        "currsize": 1,
+        "hits": 29,
+        "maxsize": 8,
+        "misses": 1
+      },
+      "diagnostic_elapsed_excluding_observed_gc": 0.13116510002873838,
+      "elapsed_seconds": 0.31253970006946474,
+      "mode": "profile",
+      "pytest_exit_code": 1,
+      "selected_count": 1,
+      "selection": "isolated",
+      "timed_gc_events": [
+        {
+          "collected": 0,
+          "generation": 2,
+          "seconds": 0.18090729997493327,
+          "timed_overlap_seconds": 0.18090729997493327,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 9.709992446005344e-05,
+          "timed_overlap_seconds": 9.709992446005344e-05,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 3.730005118995905e-05,
+          "timed_overlap_seconds": 3.730005118995905e-05,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0003329000901430845,
+          "timed_overlap_seconds": 0.0003329000901430845,
+          "uncollectable": 0
+        }
+      ],
+      "timed_gc_seconds": 0.18137460004072636
+    },
+    {
+      "artifact": "performance-current-profile.json",
+      "byte_sha256": "b1b30b065ddc181070308e2c817a20d1ce7948227b58cf5bf40441ba10ecd26c",
+      "bytes": 10319,
+      "cache_info": {
+        "currsize": 1,
+        "hits": 29,
+        "maxsize": 8,
+        "misses": 1
+      },
+      "diagnostic_elapsed_excluding_observed_gc": 0.13666529988404363,
+      "elapsed_seconds": 0.13831990002654493,
+      "mode": "profile",
+      "pytest_exit_code": 1,
+      "selected_count": 1,
+      "selection": "isolated",
+      "timed_gc_events": [
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.0011650000233203173,
+          "timed_overlap_seconds": 0.0011650000233203173,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.00012310000602155924,
+          "timed_overlap_seconds": 0.00012310000602155924,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 4.0500075556337833e-05,
+          "timed_overlap_seconds": 4.0500075556337833e-05,
+          "uncollectable": 0
+        },
+        {
+          "collected": 0,
+          "generation": 0,
+          "seconds": 0.00032600003760308027,
+          "timed_overlap_seconds": 0.00032600003760308027,
+          "uncollectable": 0
+        }
+      ],
+      "timed_gc_seconds": 0.0016546001425012946
+    }
+  ],
+  "classification": "INHERITED_LOCAL_100MS_BUDGET_FAILURE_REPRODUCED_ON_ACCEPTED_PARENT",
+  "controlled_pre_timer_gc_collect_run": false,
+  "dependency_versions_parent_and_current": {
+    "pydantic": "2.13.4",
+    "pydantic_core": "2.46.4",
+    "pytest": "9.1.1"
+  },
+  "executed_matrix": "One raw full selection per source; one isolated attribution profile per source; then stopped.",
+  "gc_disabled": false,
+  "limitations": "Small fixed diagnostic sample on this Windows host; no claim of speedup, broad statistical equivalence, or CI performance result.",
+  "live_provider_traffic": false,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "profile_attribution": {
+    "current_authenticated_path_30_seconds_approx": 0.102,
+    "current_full_artifact_serializations_30_seconds_approx": 0.059,
+    "current_one_cold_authenticated_parse_seconds_approx": 0.041,
+    "other_costs": "context, fixture/registry validation, canonical sealing and rate construction",
+    "parent_profile_gen2_seconds": 0.18137460004072636,
+    "warning": "Profile timings include instrumentation. Parent profile Gen2 collection did not occur in either unprofiled failure and is not causal evidence for a gc.collect fix."
+  },
+  "python": "3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]",
+  "raw_gc_hypothesis": "NOT_SUPPORTED: only generation0, zero collected objects, less than3ms in either raw timing window",
+  "reason_precollect_not_run": "Predeclared condition was not met: observed raw GC cannot account for either threshold failure.",
+  "recommendation": "Do not apply gc.collect or weaken timing/cache/authentication to manufacture green. Preserve the local failure. Any real performance remediation requires a separate measured change retaining exact validation/tamper protection; this attribution does not waive the100ms acceptance gate.",
+  "scope": "INDEPENDENT_READ_ONLY_PERFORMANCE_ATTRIBUTION",
+  "setup_failure_retained": "performance-parent-collection-importmode-error.json: harness initially overrode required pytest import mode; collection aborted before benchmark, corrected by retaining repository addopts.",
+  "source_bindings_identical": {
+    "src/dmf_pulse/football_events/team_strength_adapter.py": "0833d4d21ebdd1b16b506ae614253d0671f8b95fced43769e6cfcf7d1ba6bc06",
+    "src/dmf_pulse/football_events/team_strength_model.py": "406339d0519eeaffee0fb305c52f2732c356f079d0e1af8f7ef5f8355623f164",
+    "src/dmf_pulse/football_events/team_strength_numerics.py": "cc82edc6c501802207edcf4545a14b704bc54848edf400b67523be0997ad7d36",
+    "tests/unit/football_events/test_team_strength_adapter.py": "eeff4547585328857ee5d9fe442a8459de97f0f5cd50ae1ad47559a470dc0bab"
+  },
+  "status": "LOCAL_PERFORMANCE_GATE_FAILED_INHERITED",
+  "threshold_seconds_unchanged": 0.1,
+  "tracked_source_or_test_changes": false
+}
