@@ -80,6 +80,24 @@ def _capabilities(manifest: SchemaManifest, *, uuidv7: bool) -> dict[str, bool]:
                 for constraint in table["constraints"]
             )
     return {
+        "canonical_refresh_control": (
+            {"core.guard_refresh_control", "core.reject_refresh_control_change"} <= function_names
+            and expected_triggers(
+                {
+                    f"trg_refresh_control_{name}_insert": ("core", f"refresh_control_{name}")
+                    for name in ("ledger", "event")
+                },
+                "guard_refresh_control",
+            )
+            and expected_triggers(
+                {
+                    f"trg_refresh_control_{name}_{operation}": ("core", f"refresh_control_{name}")
+                    for name in ("ledger", "event")
+                    for operation in ("immutable", "truncate")
+                },
+                "reject_refresh_control_change",
+            )
+        ),
         "player_research_custody": (
             {
                 "evaluation.guard_source",

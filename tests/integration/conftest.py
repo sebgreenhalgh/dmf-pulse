@@ -41,11 +41,17 @@ def postgres_session_factory(postgres_engine: Engine) -> sessionmaker[Session]:
 
 
 def _truncate(engine: Engine) -> None:
-    # Accepted immutable qualification rows are configuration, seeded by migration.
+    # Qualification is seeded configuration. Control history is append-only even
+    # under TRUNCATE; control tests use unique owned account IDs instead of resets.
     tables = ", ".join(
         table.fullname
         for table in metadata.sorted_tables
-        if table.fullname != "evaluation.qualified_source"
+        if table.fullname
+        not in {
+            "evaluation.qualified_source",
+            "core.refresh_control_ledger",
+            "core.refresh_control_event",
+        }
     )
     with engine.begin() as connection:
         connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))

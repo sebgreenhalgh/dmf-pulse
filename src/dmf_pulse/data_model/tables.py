@@ -4069,3 +4069,50 @@ player_research_pair = Table(
     ),
     schema="evaluation",
 )
+
+# ACCEL-003: control metadata only; no provider payload or manager facts.
+refresh_control_ledger = Table(
+    "refresh_control_ledger",
+    metadata,
+    Column("ledger_id", CHAR(64), primary_key=True),
+    Column("account_sha256", CHAR(64), nullable=False, unique=True),
+    Column("binding_sha256", CHAR(64), nullable=False),
+    Column("schema_version", Text, nullable=False),
+    CheckConstraint("ledger_id ~ '^[0-9a-f]{64}$'", name="ck_refresh_ledger_identity"),
+    CheckConstraint("account_sha256 ~ '^[0-9a-f]{64}$'", name="ck_refresh_ledger_account"),
+    CheckConstraint("binding_sha256 ~ '^[0-9a-f]{64}$'", name="ck_refresh_ledger_binding"),
+    CheckConstraint(
+        "schema_version = 'postgres-refresh-control-v1'", name="ck_refresh_ledger_version"
+    ),
+    schema="core",
+)
+
+refresh_control_event = Table(
+    "refresh_control_event",
+    metadata,
+    Column(
+        "ledger_id",
+        CHAR(64),
+        ForeignKey("core.refresh_control_ledger.ledger_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("sequence", Integer, primary_key=True),
+    Column("sha256", CHAR(64), nullable=False, unique=True),
+    Column("previous_sha256", CHAR(64), nullable=False),
+    Column("kind", Text, nullable=False),
+    Column("at", DateTime(timezone=True), nullable=False),
+    Column("payload", JSONB, nullable=False),
+    CheckConstraint("sequence >= 0 AND sequence < 100000", name="ck_refresh_event_sequence"),
+    CheckConstraint(
+        "sha256 ~ '^[0-9a-f]{64}$' AND previous_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_refresh_event_hashes",
+    ),
+    CheckConstraint(
+        "kind IN ('RESERVATION','CLAIM','CHECK','ATTEMPT')", name="ck_refresh_event_kind"
+    ),
+    CheckConstraint(
+        "jsonb_typeof(payload) = 'object' AND octet_length(payload::text) <= 4096",
+        name="ck_refresh_event_payload_bound",
+    ),
+    schema="core",
+)

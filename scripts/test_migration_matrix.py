@@ -779,7 +779,7 @@ def run_matrix(
             "CREATE TABLE football.team_season",
             "CREATE TABLE fpl.player_season",
         ]
-        if plan.target == "20261029_0007":
+        if plan.target in {"20261029_0007", "20261029_0008"}:
             required_sql.extend(
                 (
                     "CREATE TABLE evaluation.qualified_source",
@@ -946,7 +946,9 @@ def run_matrix(
         "status": "PASS",
         "target_revision": plan.target,
         "ticket_id": (
-            "DMF-PULSE-ACCEL-002"
+            "DMF-PULSE-ACCEL-003"
+            if plan.target == "20261029_0008"
+            else "DMF-PULSE-ACCEL-002"
             if plan.target == "20261029_0007"
             else "MIN-007F"
             if min007f

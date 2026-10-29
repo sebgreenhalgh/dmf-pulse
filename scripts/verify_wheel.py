@@ -473,7 +473,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         capabilities = database_doctor.get("capabilities")
         if not isinstance(capabilities, dict) or set(capabilities) != set(
             expected_schema["required_capabilities"]
-        ) | {"player_research_custody"}:
+        ) | {"player_research_custody", "canonical_refresh_control"}:
             raise VerificationError("installed database capabilities differ from contract")
         if not all(value is True for value in capabilities.values()):
             raise VerificationError("installed database capability probe failed")
