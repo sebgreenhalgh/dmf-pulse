@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0
+cachedir: review_pack\cache-final-pg-2
+rootdir: C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hypothesis-6.159.0, cov-7.1.0
+collected 84 items
+
+tests\integration\player_lab\test_research_store.py .................... [ 23%]
+.....                                                                    [ 29%]
+tests\unit\player_lab\test_player_lab.py ............................... [ 66%]
+.....................                                                    [ 91%]
+tests\unit\player_lab\test_stage9_snapshot.py .......                    [100%]
+
+======================== 84 passed in 66.65s (0:01:06) ========================

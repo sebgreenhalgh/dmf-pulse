@@ -21,6 +21,14 @@ No live provider acquisition during implementation/tests; ordinary live Refresh
 fails closed without independently eligible market approval. Preserve all P01,
 A02/A03, inactive metadata and shadow-only restrictions and dirty original tree.
 
+Release hardening retained independent SQL NULL/extra-field bypass and resource
+authentication findings, fixed them and passed 84 PostgreSQL/player-lab tests.
+Browser refresh/reload/mobile/logout passes. The first installed-wheel check
+found the inherited FPL required-head constant still at 0006; updating it to the
+new 0007 head preserves fail-closed schema enforcement. Synthetic dummy markers
+and test call syntax were corrected to satisfy the unchanged secret scanner.
+Fresh wheel/matrix, numerical parity and exact-SHA CI remain release gates.
+
 ## CURRENT-TEAM-STRENGTH-001P-L8 Phase A
 
 - [x] Verify exact D7 parent and isolate a clean L8 worktree.

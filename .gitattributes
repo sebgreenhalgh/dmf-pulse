@@ -19,6 +19,7 @@ src/dmf_pulse/_data/zoneinfo/Europe/London binary
 tests/fixtures/evaluation/a03_stopped_metadata_gate.json binary
 evidence/tickets/DMF-PULSE-ACCEL-001/REQUEST.txt binary
 tickets/DMF-PULSE-ACCEL-002/REQUEST.txt binary
+evidence/tickets/DMF-PULSE-ACCEL-002/*.log binary
 evidence/tickets/DMF-PULSE-ACCEL-001/*.log binary
 # Byte-authenticated review captures may have native CRLF; retain whitespace checks.
 evidence/tickets/DMF-PULSE-ACCEL-001/PRIVATE-*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

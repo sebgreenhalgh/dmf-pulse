@@ -509,6 +509,14 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         # Copy the acceptance driver outside the checkout and import only from
         # the clean wheel environment. No tests or editable source are available.
         desk_probe = temporary_path / "accel002_wheel_probe.py"
+        desk_help = _run(
+            [*environment_dmf, "dashboard", "--help"],
+            cwd=temporary_path,
+            step="installed dashboard public command",
+            environment=clean_environment,
+        )
+        if "--demo" not in desk_help.stdout:
+            raise VerificationError("installed dashboard command is missing its demo option")
         shutil.copyfile(REPOSITORY_ROOT / "scripts/accel002_wheel_probe.py", desk_probe)
         desk_result = _run(
             [str(environment_python), "-I", str(desk_probe)],

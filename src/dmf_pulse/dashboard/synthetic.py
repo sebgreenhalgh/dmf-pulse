@@ -111,7 +111,7 @@ def run_synthetic_recommendation(
             attestation,
             transport=direct,
             credential_provider=DirectFplCredentialProvider(
-                {"DMF_FPL_BEARER_TOKEN": "repository-owned-synthetic-only"}
+                {"DMF_FPL_BEARER_TOKEN": "placeholder"}
             ),
             sleeper=lambda _: None,
             pace_seconds=0,

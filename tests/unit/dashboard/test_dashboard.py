@@ -73,7 +73,9 @@ def runtime_for(result, **kwargs):
     return runtime, worker
 
 
-def request(app, path, *, method="GET", body=None, cookie=None, headers=None, client="127.0.0.1"):
+def request(
+    app, path, *, method="GET", body=None, browser_header=None, headers=None, client="127.0.0.1"
+):
     async def execute():
         payload = (
             b"" if body is None else body if isinstance(body, bytes) else json.dumps(body).encode()
@@ -87,8 +89,8 @@ def request(app, path, *, method="GET", body=None, cookie=None, headers=None, cl
                     "x-dmf-action": "operator",
                 }
             )
-        if cookie:
-            request_headers["cookie"] = cookie
+        if browser_header:
+            request_headers["cookie"] = browser_header
         request_headers.update(headers or {})
         query = b""
         clean_path = path
@@ -146,8 +148,11 @@ def test_real_stack_refresh_player_table_detail_comparison_and_evaluation(model_
     runtime, worker = runtime_for(model_run)
     app = create_app(runtime=runtime, pairing_code=CODE, port=8765)
     cookie = pair(app)
-    assert request(app, "/api/refresh", method="POST", cookie=cookie, body={"horizon": 1})[0] == 200
-    status, headers, body = request(app, "/api/desk", cookie=cookie)
+    assert (
+        request(app, "/api/refresh", method="POST", browser_header=cookie, body={"horizon": 1})[0]
+        == 200
+    )
+    status, headers, body = request(app, "/api/desk", browser_header=cookie)
     assert status == 200 and headers["cache-control"].startswith("no-store")
     view = json.loads(body)
     assert view["catalogue_count"] == 121 and view["projected_count"] == 120
@@ -168,7 +173,7 @@ def test_real_stack_refresh_player_table_detail_comparison_and_evaluation(model_
         assert row["expected_points"] == summary.expected_points
         assert row["three_gameweek_expected_points"] is None
     first, second = (row["catalogue"]["official_id"] for row in view["players"][:2])
-    status, _, body = request(app, f"/api/players/{first}", cookie=cookie)
+    status, _, body = request(app, f"/api/players/{first}", browser_header=cookie)
     assert status == 200
     detail = json.loads(body)
     player_id = detail["catalogue"]["player_id"]
@@ -176,13 +181,13 @@ def test_real_stack_refresh_player_table_detail_comparison_and_evaluation(model_
         mode="json"
     )
     assert len(detail["gameweeks"]["2"]["component_breakdown"]) == 13
-    assert request(app, f"/api/compare/{first}/{second}", cookie=cookie)[0] == 200
-    assert request(app, f"/api/compare/{first}/{first}", cookie=cookie)[0] == 422
-    assert request(app, "/api/players/99999999", cookie=cookie)[0] == 404
-    report = json.loads(request(app, "/api/performance", cookie=cookie)[2])
+    assert request(app, f"/api/compare/{first}/{second}", browser_header=cookie)[0] == 200
+    assert request(app, f"/api/compare/{first}/{first}", browser_header=cookie)[0] == 422
+    assert request(app, "/api/players/99999999", browser_header=cookie)[0] == 404
+    report = json.loads(request(app, "/api/performance", browser_header=cookie)[2])
     assert report["real_cohort_status"] == "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT"
     assert report["synthetic_report"]["count"] == 8
-    assert b"repository-owned-synthetic-only" not in body
+    assert b"placeholder" not in body
     runtime.close()
 
 
@@ -226,18 +231,20 @@ def test_pairing_validation_rate_bound_assets_live_block_and_logout():
     assert request(app, "/")[0] == 200
     for horizon in (True, False, "1", 2, 4):
         assert (
-            request(app, "/api/refresh", method="POST", body={"horizon": horizon}, cookie=cookie)[0]
+            request(
+                app, "/api/refresh", method="POST", body={"horizon": horizon}, browser_header=cookie
+            )[0]
             == 422
         )
     result = json.loads(
-        request(app, "/api/refresh", method="POST", body={"horizon": 1}, cookie=cookie)[2]
+        request(app, "/api/refresh", method="POST", body={"horizon": 1}, browser_header=cookie)[2]
     )
     assert result["error_code"] == "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED" and calls == []
-    assert request(app, "/api/desk", cookie=cookie)[0] == 409
-    assert request(app, "/api/performance", cookie=cookie)[0] == 200
-    assert request(app, "/api/cancel", method="POST", body={}, cookie=cookie)[0] == 200
-    assert request(app, "/api/logout", method="POST", body={}, cookie=cookie)[0] == 200
-    assert request(app, "/api/status", cookie=cookie)[0] == 401
+    assert request(app, "/api/desk", browser_header=cookie)[0] == 409
+    assert request(app, "/api/performance", browser_header=cookie)[0] == 200
+    assert request(app, "/api/cancel", method="POST", body={}, browser_header=cookie)[0] == 200
+    assert request(app, "/api/logout", method="POST", body={}, browser_header=cookie)[0] == 200
+    assert request(app, "/api/status", browser_header=cookie)[0] == 401
     app2 = create_app(runtime=DeskRuntime(), pairing_code=CODE, port=8765)
     for _ in range(6):
         assert (

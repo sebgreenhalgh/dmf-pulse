@@ -1,0 +1,63 @@
+{
+  "checkpoint": "IMPLEMENTATION_AND_FIRST_HARDENING",
+  "classification": "OFFLINE_SYNTHETIC_ONLY",
+  "note": "First failures preserved; later final receipts supersede them. No live provider traffic.",
+  "receipts": [
+    {
+      "original_bytes": 5726,
+      "original_path": "review_pack/desk-lab-final-1.log",
+      "original_sha256": "b2f053f4c0b7e418a7b6d7303c62a942348b66f3991825792d0b57910eb7e969",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/DASHBOARD-PLAYER-71-PASS.log"
+    },
+    {
+      "original_bytes": 1684,
+      "original_path": "review_pack/pg-lab-final-2.log",
+      "original_sha256": "43e91029163ea58afe5ecdad0f90423449a874750aa6bfb1e503d769c631280b",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/POSTGRES-PLAYER-84-PASS.log"
+    },
+    {
+      "original_bytes": 1364,
+      "original_path": "review_pack/fpl-head-fix-tests.log",
+      "original_sha256": "69117aa84a15a161052b8a2fc5ca65945b7c762fd0169b3007e6c16a91dfa93b",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/FPL-HEAD-REGRESSION-PASS.log"
+    },
+    {
+      "original_bytes": 6910,
+      "original_path": "review_pack/secret-scan-81022ea.log",
+      "original_sha256": "c9c5908896270615a40b516a17eef50b5d245b2c6847b906e0ab28094a1f051e",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-SECRET-SCAN.log"
+    },
+    {
+      "original_bytes": 138,
+      "original_path": "review_pack/secret-scan-final-2.log",
+      "original_sha256": "2f724e9ecda9d0fbe4aba3bb50f21e0e82cae304a3e95c93b06106055fc0ce81",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/SECRET-SCAN-PASS.log"
+    },
+    {
+      "original_bytes": 200,
+      "original_path": "review_pack/matrix-0006-81022ea.log",
+      "original_sha256": "310a8ac2da1a1abab9385c2ced828166c0f47c35a4c47648d8cf787fe77dd303",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-MIGRATION-HEAD-FAILURE.log"
+    },
+    {
+      "original_bytes": 224,
+      "original_path": "review_pack/wheel-81022ea.log",
+      "original_sha256": "1c87501a8e3a364b40006c2e07ce4fee439b70e5de6ce27843b2aadb9b7cc9de",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-WHEEL-HEAD-FAILURE.log"
+    },
+    {
+      "original_bytes": 64,
+      "original_path": "review_pack/repository-validation-81022ea.log",
+      "original_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+      "representation": "UTF8_NORMALIZED_COPY_ORIGINAL_HASH_RETAINED",
+      "retained_path": "evidence/tickets/DMF-PULSE-ACCEL-002/REPOSITORY-81022ea-PASS.log"
+    }
+  ]
+}

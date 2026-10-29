@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0
+cachedir: review_pack\cache-fpl-head-fix
+rootdir: C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hypothesis-6.159.0, cov-7.1.0
+collected 66 items
+
+tests\unit\ingestion\test_fpl_service_boundaries.py .................... [ 30%]
+................................                                         [ 78%]
+tests\unit\database\test_dat003_branch_contracts.py ..............       [100%]
+
+============================= 66 passed in 4.47s ==============================

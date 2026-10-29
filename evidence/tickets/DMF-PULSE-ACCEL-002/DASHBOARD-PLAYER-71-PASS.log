@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0
+cachedir: review_pack\cache-final-desk-1
+rootdir: C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hypothesis-6.159.0, cov-7.1.0
+collected 71 items
+
+tests\unit\dashboard\test_dashboard.py ....................              [ 28%]
+tests\unit\player_lab\test_player_lab.py ............................... [ 71%]
+....................                                                     [100%]
+
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                             Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------------------
+src\dmf_pulse\dashboard\__init__.py                  0      0      0      0   100%
+src\dmf_pulse\dashboard\app.py                     179     26     38      2    86%   83-99, 110-112, 153-154, 173-174, 220, 232, 237, 263-264
+src\dmf_pulse\dashboard\resources\__init__.py        0      0      0      0   100%
+src\dmf_pulse\dashboard\runtime.py                 220     42     62     11    78%   59->61, 62->exit, 74-83, 88-94, 97-102, 105, 108-118, 156, 192, 200-201, 210, 219, 224->243, 249-250, 253, 260, 295
+src\dmf_pulse\dashboard\synthetic.py                67      4     10      4    90%   43, 46, 58, 76
+src\dmf_pulse\dashboard\views.py                    83      1      6      1    98%   181
+src\dmf_pulse\player_lab\__init__.py                 0      0      0      0   100%
+src\dmf_pulse\player_lab\actuals.py                156      6     50      6    94%   137, 147, 152, 154, 157, 160
+src\dmf_pulse\player_lab\contracts.py              160     13     46     13    87%   52, 86, 130, 132, 136, 140, 144, 154, 159, 199, 206, 208, 214
+src\dmf_pulse\player_lab\demo.py                    61      0     10      0   100%
+src\dmf_pulse\player_lab\evaluation.py             191     15     62     15    88%   64, 71, 73, 90, 95, 127, 241, 245, 268, 366, 369, 375, 390, 403, 406
+src\dmf_pulse\player_lab\resources\__init__.py       0      0      0      0   100%
+src\dmf_pulse\player_lab\rights.py                  54      2     16      1    96%   73, 83
+src\dmf_pulse\player_lab\snapshots.py               33      9      8      0    68%   60-81
+src\dmf_pulse\player_lab\store.py                   97     97     24      0     0%   3-245
+--------------------------------------------------------------------------------------------
+TOTAL                                             1301    215    332     53    81%
+======================= 71 passed in 129.89s (0:02:09) ========================

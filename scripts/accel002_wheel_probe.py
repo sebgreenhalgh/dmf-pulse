@@ -6,6 +6,7 @@ import json
 import socket
 from datetime import timedelta
 from decimal import Decimal
+from importlib.resources import files
 
 
 def main() -> None:
@@ -14,6 +15,7 @@ def main() -> None:
     from dmf_pulse.dashboard.synthetic import DEMO_TIME, run_synthetic_recommendation
     from dmf_pulse.dashboard.views import desk_view, player_detail
     from dmf_pulse.player_lab.demo import synthetic_evaluation
+    from dmf_pulse.player_lab.stage9_demo import stage9_synthetic_evaluation
     from dmf_pulse.private_v1.progress import NullProgress
 
     def forbidden(*args: object, **kwargs: object) -> None:
@@ -54,6 +56,11 @@ def main() -> None:
         )
     lab = synthetic_evaluation()
     assert lab.scorecard.point_metrics.mae == Decimal(2)
+    retained = stage9_synthetic_evaluation()
+    assert retained.scorecard.count == 1
+    assets = files("dmf_pulse.dashboard.resources")
+    for name in ("index.html", "desk.js", "desk.css"):
+        assert len(assets.joinpath(name).read_bytes()) > 100
     runtime = DeskRuntime()
     app = create_app(runtime=runtime, pairing_code="synthetic-wheel-only", port=8765)
     assert app.docs_url is None and app.openapi_url is None
@@ -70,6 +77,8 @@ def main() -> None:
                 "blocked": view.blocked_count,
                 "all_stage9_summaries_equal": True,
                 "evaluation_pairs": len(lab.labels),
+                "stage9_snapshot_pairs": retained.scorecard.count,
+                "packaged_assets": ["index.html", "desk.js", "desk.css"],
                 "live_refresh": "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED",
             },
             sort_keys=True,
