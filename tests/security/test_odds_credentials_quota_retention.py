@@ -59,7 +59,18 @@ def postgres_session_factory() -> Iterator[sessionmaker[Session]]:
             application_name="dmf-pulse-odd005-security-tests",
         ),
     )
-    tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+    # Keep seeded qualification and append-only control custody across tests;
+    # every ordinary ingestion/evidence table still resets before and after.
+    tables = ", ".join(
+        table.fullname
+        for table in metadata.sorted_tables
+        if table.fullname
+        not in {
+            "evaluation.qualified_source",
+            "core.refresh_control_ledger",
+            "core.refresh_control_event",
+        }
+    )
     with engine.begin() as connection:
         connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
     factory = session_factory(engine)
