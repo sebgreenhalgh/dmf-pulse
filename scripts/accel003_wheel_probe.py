@@ -306,7 +306,7 @@ def _case(horizon: int, root: Path) -> dict[str, Any]:
             context["execution_mode"] == "PRIVATE_CURRENT" and context["synthetic_sources"] is True
         )
         assert context["demo"] is False
-        cookie = headers["set-cookie"].split(";", 1)[0]
+        cookie = headers.get("set-cookie", "").split(";", 1)[0]
         status, _, body = request(
             app, "/api/refresh", method="POST", body={"horizon": horizon}, cookie=cookie
         )
@@ -405,8 +405,10 @@ def _case(horizon: int, root: Path) -> dict[str, Any]:
         assert sum(row["kind"] == "RESERVATION" for row in records) == 1
         assert sum(row["kind"] == "CLAIM" for row in records) == 1
         assert sum(row["kind"] == "ATTEMPT" for row in records) == 13
-        assert request(app, "/api/logout", method="POST", body={}, cookie=cookie)[0] == 200
-        assert request(app, "/api/desk", cookie=cookie)[0] == 401
+        logout_status, _, _ = request(app, "/api/logout", method="POST", body={}, cookie=cookie)
+        assert logout_status == 200
+        unauthenticated_status, _, _ = request(app, "/api/desk", cookie=cookie)
+        assert unauthenticated_status == 401
         assert runtime._result is None and runtime._worker is None
         assert all(child.pid != child_pid for child in multiprocessing.active_children())
         return {
@@ -541,7 +543,7 @@ def _cancellation(phase: str, root: Path) -> dict[str, Any]:
             body={"pairing_code": "owned-cancel-wheel-pairing-only"},
         )
         assert code == 200
-        cookie = headers["set-cookie"].split(";", 1)[0]
+        cookie = headers.get("set-cookie", "").split(";", 1)[0]
         code, _, _ = request(app, "/api/refresh", method="POST", body={"horizon": 1}, cookie=cookie)
         assert code == 200
         worker = runtime._worker
@@ -549,7 +551,8 @@ def _cancellation(phase: str, root: Path) -> dict[str, Any]:
         child_pid = worker._process.pid
         marker = f"OWNED_TEST_{phase.upper()}_PAUSED"
         while monotonic() - started < 90:
-            state = json.loads(request(app, "/api/status", cookie=cookie)[2])
+            _, _, body = request(app, "/api/status", cookie=cookie)
+            state = json.loads(body)
             if marker in state["stages"] or state["status"] != "RUNNING":
                 break
             sleep(0.05)
@@ -559,7 +562,8 @@ def _cancellation(phase: str, root: Path) -> dict[str, Any]:
         assert runtime._worker is None and runtime._result is None and runtime.view() is None
         assert worker._process._closed is True
         assert all(child.pid != child_pid for child in multiprocessing.active_children())
-        assert request(app, "/api/desk", cookie=cookie)[0] == 409
+        withheld_status, _, _ = request(app, "/api/desk", cookie=cookie)
+        assert withheld_status == 409
         records = [
             json.loads(path.read_bytes()) for path in (root / f"cancel-{phase}").glob("[0-9]*.json")
         ]
