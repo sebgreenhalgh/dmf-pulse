@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "mypy",
+    "src/dmf_pulse"
+  ],
+  "started_at": "2026-10-29T00:29:57.458813+00:00",
+  "elapsed_seconds": 2.5382561999140307,
+  "exit_code": 0,
+  "output_file": "CI-REMEDIATION-MYPY-01.log",
+  "output_byte_sha256": "d70fa934f5a524b1c973feae4086f9aadbb518fff6536027b7180683854eefd3"
+}

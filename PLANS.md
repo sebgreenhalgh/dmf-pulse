@@ -2823,3 +2823,10 @@ A02/A03 remain consumed; the A03 metadata gate says nothing about final-result a
 - [ ] Release full unchanged gates, protected evidence audit, exact-SHA CI, publication and capped handoff.
 
 No provider access, actual P01 score, A04 authority, promotion or activation. New worktrees preserve dirty Availability work.
+
+Release CI 40791018259 exposed an inherited score-prior prefetch regression test
+that expected the old synthetic report without the new official-deadline notice.
+The follow-up retains every acquisition-order, cutoff and numerical-equivalence
+assertion and checks the exact deadline notice and receipt bindings. Production
+bytes and all CI gates remain unchanged; the failure and targeted remediation are
+retained, and the follow-up commit requires fresh full exact-SHA CI.

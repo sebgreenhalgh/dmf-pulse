@@ -1,0 +1,11 @@
+{
+  "implementation_sha": "0ffec422ea4d48d1069a934dc1dfb686bf3e321b",
+  "ci_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40791018259",
+  "job_id": 123176965574,
+  "test_passed": 633,
+  "test_failed": 1,
+  "cause": "Inherited exact-report assertion omitted the newly required official-deadline notice. Production behavior is correct; no infrastructure retry or gate change.",
+  "log": "CI-RELEASE-01-SHARD14.log",
+  "log_sha256": "a1b14d073cbd4babc5df576faa65bcb7bcaba070ff6119bfe2fa3a6dbb703005",
+  "production_code_changed_by_remediation": false
+}

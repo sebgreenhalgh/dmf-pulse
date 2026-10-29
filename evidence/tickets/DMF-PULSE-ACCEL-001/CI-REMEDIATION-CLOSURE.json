@@ -1,0 +1,13 @@
+{
+  "parent_sha": "0ffec422ea4d48d1069a934dc1dfb686bf3e321b",
+  "status": "TARGETED_REMEDIATION_PASSED_FRESH_CI_REQUIRED",
+  "production_workflow_dependency_bytes_unchanged": true,
+  "tests_passed": 5,
+  "test_receipt_byte_sha256": "a0dbb1d7b1acda2fd78394c1077e0227fc0ec0a7c51186bc383f97a2ac311ea0",
+  "review_byte_sha256": "e2b03b76dc9855fbdabab64512154d39c0678d7586519eb38b55a20ec51a4a73",
+  "review_semantic_sha256": "790ced32361dda58dfcea51eac6bd6b5b564277ebb13667308796b59420405d7",
+  "prior_wheel_and_functional_review_source_bindings_still_valid": true,
+  "provider_requests": 0,
+  "actual_p01_scored": false,
+  "fresh_exact_sha_ci_required": true
+}

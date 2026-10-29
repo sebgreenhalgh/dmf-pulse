@@ -1,0 +1,67 @@
+{
+  "authenticated_failure_summary": "The shard reported 633 passed and one failed test. Exact old report equality rejected the appended ACTION DEADLINE notice and official fixture deadline.",
+  "binding": {
+    "expected_lf_git_byte_sha256": "acf9eac44b5227588a664d75bf2700f460e30ff124340c33cdfd8479fa61bf43",
+    "failed_ci_log_byte_sha256": "a1b14d073cbd4babc5df576faa65bcb7bcaba070ff6119bfe2fa3a6dbb703005",
+    "failed_ci_log_bytes": 116478,
+    "old_git_byte_sha256": "e161d58ff3153e810bd031cb533cb1a7ce6632955fc026be1066d60ddc7c28a7",
+    "reviewed_working_byte_sha256": "acf9eac44b5227588a664d75bf2700f460e30ff124340c33cdfd8479fa61bf43",
+    "test_line_endings": "LF",
+    "test_path": "tests/unit/private_v1/test_score_prior_prefetch.py",
+    "unchanged_bindings": {
+      ".github/workflows/ci.yml": {
+        "git_byte_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+        "working_byte_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392"
+      },
+      "src/dmf_pulse/private_v1/actionability.py": {
+        "git_byte_sha256": "c8d9213136067b7849202fb4eef5b86835d22d12693b7e1c9e301312571da8ca",
+        "working_byte_sha256": "c8d9213136067b7849202fb4eef5b86835d22d12693b7e1c9e301312571da8ca"
+      },
+      "src/dmf_pulse/private_v1/one_command.py": {
+        "git_byte_sha256": "7fad44ff46fd25e5d83930f18734d95e7b8d73d585559dd6fe35ea49ea0028ed",
+        "working_byte_sha256": "7fad44ff46fd25e5d83930f18734d95e7b8d73d585559dd6fe35ea49ea0028ed"
+      },
+      "tests/unit/private_v1/test_one_command.py": {
+        "git_byte_sha256": "f017b07d55838469d6a9029cc87282601261f2d1f154eaeb6df93d6de8f6f026",
+        "working_byte_sha256": "f017b07d55838469d6a9029cc87282601261f2d1f154eaeb6df93d6de8f6f026"
+      }
+    }
+  },
+  "failed_ci_job": 123176965574,
+  "failed_ci_run": 40791018259,
+  "failed_implementation_sha": "0ffec422ea4d48d1069a934dc1dfb686bf3e321b",
+  "failure_classification": "Real inherited test-contract mismatch after the intended deadline-notice addition; not an infrastructure failure.",
+  "historical_prepack_audit_disposition": "Preserved as historical evidence for 0ffec; it is not final publication clearance for the remedied commit.",
+  "release_clearance": false,
+  "required_followup": [
+    "Targeted whole-file test command must succeed against the reviewed test bytes.",
+    "Publish an ordinary follow-up commit; preserve the failed CI log and all earlier evidence.",
+    "Run the complete unchanged CI workflow on the new exact commit. No prior pending or failed CI run establishes release success.",
+    "Refresh exact-SHA publication, review-pack and final audit bindings for the new commit."
+  ],
+  "review_findings": [
+    "The fixture helper explicitly supplies target Gameweek deadline 2026-09-04T17:30:00Z; the corrected expected UTC time is source-backed synthetic fixture data.",
+    "The unchanged service appends deadline_notice after rendering and binds the report and decision to an ActionabilityReceipt after computation.",
+    "The replacement assertion remains exact whole-report equality. It does not use a substring, suppress the notice, or discard output differences.",
+    "New assertions verify the exact fixture deadline, checked_at and final publication clock, decision hash, and SHA256 of the returned report.",
+    "All inherited prefetch count/order, acquisition-before-cutoff, provenance, source reuse, nine-fixture-prior, and seven-versus-nine-minute numerical-equivalence assertions remain.",
+    "No production source, workflow, dependency, test exclusion, coverage threshold or timeout change is present.",
+    "Only hashlib and UTC imports plus the report/receipt assertion block changed in the test; test case count is unchanged."
+  ],
+  "reviewed_at": "2026-10-29T00:31:22.364353+00:00",
+  "reviewer": "/root/accel_p01_audit",
+  "reviewer_football_provider_requests": 0,
+  "reviewer_tests_run": 0,
+  "reviewer_tracked_files_changed": 0,
+  "schema_version": "accel001-ci-remediation-independent-review-v1",
+  "semantic_sha256": "790ced32361dda58dfcea51eac6bd6b5b564277ebb13667308796b59420405d7",
+  "source_inspected": [
+    "tests/unit/private_v1/test_score_prior_prefetch.py:195",
+    "tests/unit/private_v1/test_one_command.py:173",
+    "src/dmf_pulse/private_v1/one_command.py:891",
+    "src/dmf_pulse/private_v1/actionability.py:97"
+  ],
+  "targeted_tests_status_at_review": "Root whole-file offline command running; receipt not yet sealed. Reviewer did not rerun tests.",
+  "unresolved_material_findings": [],
+  "verdict": "CLEAR_NARROW_TEST_CONTRACT_REMEDIATION"
+}

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import NoReturn
@@ -194,7 +195,19 @@ def test_three_gameweek_prefetch_survives_compute_beyond_five_minute_cutoff(
         )
 
         assert result.status == "REAL_PRIVATE_TRANSIENT_RECOMMENDATION"
-        assert result.report == "R1 SYNTHETIC REPORT"
+        assert result.report == (
+            "R1 SYNTHETIC REPORT\n"
+            "ACTION DEADLINE\n"
+            "Official Gameweek deadline: 2026-09-04T17:30:00+00:00.\n"
+            "This recommendation expires at that deadline; no execution buffer is assumed.\n"
+        )
+        assert result.actionability.deadline_at == datetime(2026, 9, 4, 17, 30, tzinfo=UTC)
+        assert result.actionability.checked_at == clock()
+        assert result.publication_not_before == clock()
+        assert result.actionability.decision_sha256 == result.decision.semantic_sha256
+        assert (
+            result.actionability.report_sha256 == hashlib.sha256(result.report.encode()).hexdigest()
+        )
         assert len(score_factory_calls) == 1
         assert len(score_transport.requests) == 4
         assert len(source_results) == 1
