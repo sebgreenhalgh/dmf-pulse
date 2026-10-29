@@ -558,3 +558,11 @@ def test_incomplete_or_unsafe_approval_contract_rejects(tmp_path, update):
     _, approval, _, _ = setup(tmp_path)
     with pytest.raises(ValueError):
         approval.model_copy(update=update)
+
+
+def test_json_horizon_boolean_cannot_be_normalized_into_approval(tmp_path):
+    _, approval, _, _ = setup(tmp_path)
+    body = approval.model_dump(mode="json")
+    body["horizons"] = [True]
+    with pytest.raises(ValueError, match="exact integers"):
+        OperatorRefreshApproval.model_validate_json(json.dumps(body))

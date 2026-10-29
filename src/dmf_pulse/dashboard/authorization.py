@@ -161,7 +161,7 @@ class OperatorRefreshApproval(_Contract):
     @field_validator("horizons", mode="before")
     @classmethod
     def integer_horizons(cls, value: object) -> object:
-        if isinstance(value, tuple) and any(type(item) is not int for item in value):
+        if isinstance(value, (tuple, list)) and any(type(item) is not int for item in value):
             raise ValueError("horizons require exact integers")
         return value
 
