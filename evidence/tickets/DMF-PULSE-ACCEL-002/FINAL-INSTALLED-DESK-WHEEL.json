@@ -1,8 +1,13 @@
 {
   "clean_environment_outside_repository": true,
   "cleaned_up": true,
-  "doctor_nvidia_status": "TIMEOUT",
+  "doctor_nvidia_status": "AVAILABLE",
   "doctor_status": "HEALTHY",
+  "installed_dashboard_option_parser": {
+    "demo": true,
+    "no_demo": false,
+    "unknown_option_rejected": true
+  },
   "installed_data_model": {
     "as_of_assertions": 8,
     "database_status": "HEALTHY",
@@ -175,9 +180,9 @@
       "sha256": "d1a7c6a7f802db2cd1acf7b72755d78a0c8e7b3b130632530e27e68316094fca"
     },
     {
-      "bytes": 13827516,
+      "bytes": 14006494,
       "name": "dmf_pulse-0.2.0.tar.gz",
-      "sha256": "659dc9d4ff77ab4c1b117a078c3b0b36e8190dcee81678b070f32bf16f9389f1"
+      "sha256": "cb585110f3652efde1046cbf0f65361198fd742b7c2f954ac64752052efa54b5"
     }
   ],
   "uv_version": "uv 0.11.26 (396ef7ce4 2026-06-30 x86_64-pc-windows-msvc)",

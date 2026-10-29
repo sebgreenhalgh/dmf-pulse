@@ -16,6 +16,11 @@
       "sha256": "d94f7bf241505b4c5d644b4a5ac128572f01b03b9b2f0123dc421ce960860921"
     },
     {
+      "bytes": 204,
+      "path": "review_pack/CI-D4-SHARD-FOCUSED-original-utf16.log",
+      "sha256": "ef4c822c03f48bcc9455b7fed62e77ce8d908540f264ebb6d9765eb1a282da00"
+    },
+    {
       "bytes": 140248,
       "path": "review_pack/ci-job-123290218025.log",
       "sha256": "fc64b3038c9c5209c6aaa7707893d08f2953e373b86da1c7b9360db6930c69ec"
@@ -39,6 +44,11 @@
       "bytes": 160530,
       "path": "review_pack/ci-job-123290218172.log",
       "sha256": "e22313e9bdd71ed68d7af64431ef7aa5bc8c967fc3b66c43cfe33f535a1e557f"
+    },
+    {
+      "bytes": 185708,
+      "path": "review_pack/ci-job-123307905913.log",
+      "sha256": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b"
     },
     {
       "bytes": 206,
@@ -221,13 +231,23 @@
       "sha256": "6adf618a421af20e74c1d106d31e0aa7242bc054239572480cef67c82c83de9b"
     },
     {
-      "bytes": 65997,
+      "bytes": 2455,
+      "path": "review_pack/postgres-verifier-remediation.log",
+      "sha256": "e9b30d09fdcf353141dcfc7ea6551fddf7804ba6f17ae340d3e38e058baba990"
+    },
+    {
+      "bytes": 66805,
       "path": "review_pack/postgres.log",
-      "sha256": "2ce74a2829b08b7ad52c4a8f23738008aa7ddda4cb17a192a8696823b33267da"
+      "sha256": "74a21b3194ce1efc88599a3327e0013d363d1696fab4f775ca1c7560ea94fde6"
     },
     {
       "bytes": 64,
       "path": "review_pack/repository-validation-81022ea.log",
+      "sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
+    },
+    {
+      "bytes": 64,
+      "path": "review_pack/repository-validation-fb68d6d6466b.log",
       "sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
     },
     {
@@ -249,6 +269,16 @@
       "bytes": 138,
       "path": "review_pack/secret-scan-final-2.log",
       "sha256": "2f724e9ecda9d0fbe4aba3bb50f21e0e82cae304a3e95c93b06106055fc0ce81"
+    },
+    {
+      "bytes": 138,
+      "path": "review_pack/secret-scan-final-checkpoint.log",
+      "sha256": "2f724e9ecda9d0fbe4aba3bb50f21e0e82cae304a3e95c93b06106055fc0ce81"
+    },
+    {
+      "bytes": 738,
+      "path": "review_pack/secret-scan-rebalance-final.log",
+      "sha256": "8b1587aabae87693951de1192885e048e7e8c4d88e429b8ce2d6f29717c6517c"
     },
     {
       "bytes": 138,
@@ -299,6 +329,21 @@
       "bytes": 398,
       "path": "review_pack/wheel-gcs008-final.log",
       "sha256": "f6268171da38534a91bbab58979d936b5d766f4dcc97b1207b78d5c617e0c167"
+    },
+    {
+      "bytes": 508,
+      "path": "review_pack/wheel-help-full-regression.log",
+      "sha256": "76cf9353b79aa0849a9d1edbcd363933cd8f53a0ae9c678eda736afdcd08a54c"
+    },
+    {
+      "bytes": 204,
+      "path": "review_pack/wheel-help-remediation-tests.log",
+      "sha256": "c779a492c7500b5170ba0b3be8906d03e79263af665e639f1121debd11f8d8b3"
+    },
+    {
+      "bytes": 2142,
+      "path": "review_pack/wheel-help-superseded-db-port-failure.log",
+      "sha256": "ca38d9651323eb2fd2c4ced309f9f99b97827d225137671f66f43e898c566a12"
     }
   ],
   "note": "Original ignored diagnostics remain local; bounded selected copies retained. No provider body is included."

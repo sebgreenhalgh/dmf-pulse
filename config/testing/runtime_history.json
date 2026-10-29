@@ -10,154 +10,266 @@
     "tests/assurance/optimisation/test_r2c_artifact_validation.py": {
       "estimated_seconds": 977.0,
       "observations": [
-        {"seconds": 864.4, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 977.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 668.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 864.4,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 977.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 668.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
     },
     "tests/assurance/optimisation/test_surface.py": {
       "estimated_seconds": 217.18,
       "observations": [
-        {"seconds": 217.18, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 217.18,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/contract/optimisation/test_r2a_contract_gates.py": {
       "estimated_seconds": 214.55,
       "observations": [
-        {"seconds": 214.55, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 214.55,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/golden/optimisation/test_golden.py": {
       "estimated_seconds": 214.13,
       "observations": [
-        {"seconds": 214.13, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 214.13,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/integration/optimisation/test_integration.py": {
       "estimated_seconds": 215.36,
       "observations": [
-        {"seconds": 215.36, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 215.36,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/markets/test_repository_persistence_boundaries.py": {
       "estimated_seconds": 2.77,
       "observations": [
-        {"seconds": 2.77, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 2.77,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/optimisation/test_service.py": {
       "estimated_seconds": 513.0,
       "observations": [
-        {"seconds": 429.03, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 439.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 513.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 429.03,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 439.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 513.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
     },
     "tests/unit/optimisation/test_terminal_r7_equivalence.py": {
       "estimated_seconds": 341.36,
       "observations": [
-        {"seconds": 341.36, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 341.36,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/prices/test_configuration_contracts.py": {
       "estimated_seconds": 2.0,
       "observations": [
-        {"seconds": 2.0, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 2.0,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_a1_03_shadow_comparison.py": {
       "estimated_seconds": 392.21,
       "observations": [
-        {"seconds": 392.21, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 392.21,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_a2_preparation.py": {
       "estimated_seconds": 794.0,
       "observations": [
-        {"seconds": 800.77, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 794.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 462.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 800.77,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 794.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 462.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
     },
     "tests/unit/private_v1/test_bounded_horizon_oracle.py": {
       "estimated_seconds": 254.31,
       "observations": [
-        {"seconds": 254.31, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 254.31,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_horizon_candidate_oracle.py": {
       "estimated_seconds": 259.18,
       "observations": [
-        {"seconds": 259.18, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 259.18,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_one_command.py": {
       "estimated_seconds": 583.24,
       "observations": [
-        {"seconds": 583.24, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 583.24,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_score_prior_prefetch.py": {
       "estimated_seconds": 316.72,
       "observations": [
-        {"seconds": 316.72, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 316.72,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_team_strength_d1_diagnostics.py": {
       "estimated_seconds": 446.29,
       "observations": [
-        {"seconds": 446.29, "source_id": "phase2-local-profile-ci-calibrated"}
+        {
+          "seconds": 446.29,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_team_strength_d3_seam.py": {
       "estimated_seconds": 1504.0,
       "observations": [
-        {"seconds": 1444.66, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 1504.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 1491.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 1444.66,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 1504.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 1491.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
+    },
+    "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py": {
+      "estimated_seconds": 2551.107,
+      "observations": [
+        {
+          "seconds": 2551.107,
+          "source_id": "accel002-ci-40831728997"
+        }
+      ],
+      "sample_count": 1
     },
     "tests/unit/private_v1/test_team_strength_l1_e2e.py": {
       "estimated_seconds": 672.0,
       "observations": [
-        {"seconds": 704.9, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 662.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 672.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 704.9,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 662.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 672.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
     },
     "tests/unit/private_v1/test_team_strength_shadow_cases.py": {
       "estimated_seconds": 1604.0,
       "observations": [
-        {"seconds": 1851.36, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 1588.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 1604.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 1851.36,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 1588.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 1604.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
     },
     "tests/unit/private_v1/test_team_strength_shadow_comparison.py": {
       "estimated_seconds": 662.0,
       "observations": [
-        {"seconds": 675.96, "source_id": "phase2-local-profile-ci-calibrated"},
-        {"seconds": 646.0, "source_id": "phase2-run-35950179886"},
-        {"seconds": 662.0, "source_id": "phase2-run-35952828470"}
+        {
+          "seconds": 675.96,
+          "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 646.0,
+          "source_id": "phase2-run-35950179886"
+        },
+        {
+          "seconds": 662.0,
+          "source_id": "phase2-run-35952828470"
+        }
       ],
       "sample_count": 3
     }
@@ -196,6 +308,13 @@
       "kind": "measured",
       "observed_at_utc": "2026-09-24T03:46:12Z",
       "reference": "github-actions:35952828470"
+    },
+    {
+      "description": "CI40831728997 job123307905913 progress-log elapsed bound for112-node D4 module: preceding module completion06:58:59.7541595Z through final D4 continuation07:41:30.8611561Z. Includes transition/teardown and log timestamp effects; estimated, not pytest per-module/per-node measurement. Observation time is actual last raw-log finish.",
+      "id": "accel002-ci-40831728997",
+      "kind": "estimated",
+      "observed_at_utc": "2026-10-29T07:53:49Z",
+      "reference": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE.json#ci-progress-log-bound"
     }
   ]
 }

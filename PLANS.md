@@ -33,6 +33,20 @@ new 0007 head preserves fail-closed schema enforcement. Synthetic dummy markers
 and test call syntax were corrected to satisfy the unchanged secret scanner.
 Fresh wheel/matrix, numerical parity and exact-SHA CI remain release gates.
 
+Final checkpoint fb68d6d CI 40831728997 passed fifteen coverage shards; the last
+passed 683 tests and failed the installed-wheel dashboard help assertion. Preserve
+the failure, fix only verifier handling of public CLI help, and independently
+check the actual installed demo option and real-stack wheel probe. Package bytes
+remain frozen at de50b54692f481206ad8f59a1f477089b1fcf01f.
+
+The owner's subsequent request authorizes investigating shard rebalancing. CI
+progress logs identify the 112-test D4 rolling diagnostics module as roughly
+2551 seconds, versus its 40.32-second fallback estimate. Add a clearly labelled
+estimated timing source to the existing runtime history so LPT isolates that
+whole module and preserves shared setup. Keep all test identities, assertions,
+sixteen shards, twenty workflow jobs, coverage floors and timeouts unchanged.
+Require independent review, exact staged manifests and fresh full exact-SHA CI.
+
 ## CURRENT-TEAM-STRENGTH-001P-L8 Phase A
 
 - [x] Verify exact D7 parent and isolate a clean L8 worktree.

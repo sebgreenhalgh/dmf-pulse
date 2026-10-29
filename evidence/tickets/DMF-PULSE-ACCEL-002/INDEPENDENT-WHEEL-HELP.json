@@ -1,0 +1,81 @@
+{
+  "baseline_git_sha": "fb68d6d6466be4c8132880dc591651b72edb18b6",
+  "baseline_verifier_git_blob_sha256": "5295b5746a4c4cd3c2661e0c775f8650c9ded45781dd6c417a74c77394f435b4",
+  "bound_working_byte_sha256s": {
+    ".github/workflows/ci.yml": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+    "config/testing/runtime_history.json": "b6742304136a59b4caa48a6ff07294d2f331804808d474cfe1a9aeb627287df5",
+    "pyproject.toml": "8226a15907aca7107774bf9ffdc386196f2bac627135f34f593eb480ac5cbe88",
+    "scripts/accel002_wheel_probe.py": "00be151414342e6a74f74ee76f14fec9f084493d447d6d98e6df8ccac4cf86b9",
+    "scripts/ci_coverage_shards.py": "35d6376527fd31b33f5b58386c85b4b8c6e7db92459339bcacbb1f3057ca6d44",
+    "scripts/verify_wheel.py": "c7c501dfb30a2b5746284c620117d8e15bfc0c3f267c8b108ada841715556ca7",
+    "src/dmf_pulse/cli/dashboard.py": "37464188a5fef040f60764a898702c04b55aff87bda3deb99a99abc3a2ab84b0",
+    "tests/unit/scripts/test_dashboard_wheel_cli.py": "4badb828730476373010b64b7445161522eeaac58aa22f5fa3de04a628d3cb7d"
+  },
+  "change_assessment": {
+    "fail_closed_help": "Missing --demo, --demonstration, --demo-extra and --no-demo-only help are rejected. No prefix match or skip added.",
+    "help_normalization": "Removes CSI ANSI terminal controls before matching exact --demo token with word/hyphen boundaries. Genuine Rich separately styled hyphens reproduce the old substring failure.",
+    "not_a_source_or_math_change": true,
+    "not_a_test_gate_weakening": true,
+    "real_installed_command": "Adds installed dashboard --demo --help outside source tree in clean wheel environment. Existing installed dashboard help and real-stack synthetic wheel probe remain required.",
+    "real_installed_parser": "Isolated installed Python imports actual Typer application and creates command contexts for --demo=True and --no-demo=False. Unknown option must raise NoSuchOption. Does not invoke server callbacks.",
+    "strict_result": "Parser must emit exact expected JSON; existing _run nonzero-exit/timeout checks remain."
+  },
+  "complete_current_collection": {
+    "current_digest": "d903382f71c0605c144fba2558e94281f24877bad9e7029c923104b394d75e18",
+    "current_simulated_plan_sha256": "b01a3d22c0449acd4d47289cb2d9a9ea37e3f1fa9b1f97aaaf35b17f08a6811f",
+    "current_total": 6138,
+    "d4_still_intact_alone_nodes": 112,
+    "new_nodes": 11,
+    "new_nodes_only_from": "tests/unit/scripts/test_dashboard_wheel_cli.py",
+    "old_nodes_preserved": 6127,
+    "omitted_old_nodes": 0,
+    "partition": {
+      "complete": true,
+      "duplicate_nodeid_count": 0,
+      "omitted_nodeid_count": 0,
+      "unexpected_nodeid_count": 0
+    },
+    "shards": 16
+  },
+  "findings": [],
+  "independent_execution": {
+    "actual_local_application_parser_probe": {
+      "demo": true,
+      "no_demo": false,
+      "unknown_option_rejected": true
+    },
+    "actual_local_probe_environment": "Worktree venv Python under rejecting socket/DNS guards. This supplements, but does not claim independent clean-wheel full verification.",
+    "elapsed_seconds": 2.03,
+    "focused_cases": [
+      "Genuine Rich SGR split reproduces missing raw substring",
+      "Plain exact option accepted",
+      "Four missing/prefix/no-demo-only help failures",
+      "Valid bool contexts produce safe JSON without callback",
+      "Four malformed/missing/unknown-accepting parser failures without callback"
+    ],
+    "focused_command": ".venv/Scripts/python.exe -B -m pytest tests/unit/scripts/test_dashboard_wheel_cli.py --basetemp=review_pack/pytest-evaluation-wheel-help-review -o cache_dir=review_pack/cache-evaluation-wheel-help-review -q --tb=short",
+    "focused_tests_passed": 11,
+    "ruff_command": "ruff check scripts/verify_wheel.py tests/unit/scripts/test_dashboard_wheel_cli.py",
+    "ruff_result": "All checks passed",
+    "skipped": 0
+  },
+  "release_limits": "Root is executing full clean wheel with GITHUB_ACTIONS=true and owned synthetic PostgreSQL. No independent full-wheel completion, real provider validation or final external-CI success is claimed here.",
+  "reviewed_scope": [
+    "scripts/verify_wheel.py",
+    "tests/unit/scripts/test_dashboard_wheel_cli.py"
+  ],
+  "reviewer": "Independent evaluation reviewer; did not author verifier change",
+  "schema_version": "accel002-independent-wheel-help-review-v1",
+  "scope_confirmation": "Narrow verifier portability correction plus additional negative tests. No source/model change, permission expansion, callback execution, gate relaxation, activation or task-scope overreach.",
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "unchanged_boundaries": {
+    "application_source_math_models_rules_rights_unchanged": true,
+    "installed_real_stack_probe_unchanged": true,
+    "production_package_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+    "production_package_python_files": 359,
+    "provider_calls": 0,
+    "tracked_edits_by_reviewer": [],
+    "workflow_coverage_performance_database_gates_unchanged": true
+  },
+  "verifier_patch_sha256": "b1fb5a1c9e3813b1ca40ffe9be7f34ec2937cd67444748f2915f3ab829d7d1bc"
+}

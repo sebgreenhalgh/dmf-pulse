@@ -1,0 +1,57 @@
+{
+  "actual_provider_calls": 0,
+  "base_commit": "fb68d6d6466be4c8132880dc591651b72edb18b6",
+  "bindings": {
+    "review_pack/wheel-help-full-regression.json": {
+      "bytes": 4297,
+      "sha256": "cd201aa4361d8fa055828994be55d21c3503502c00bf4e87b74bdc1260370025"
+    },
+    "review_pack/wheel-help-full-regression.log": {
+      "bytes": 508,
+      "sha256": "76cf9353b79aa0849a9d1edbcd363933cd8f53a0ae9c678eda736afdcd08a54c"
+    },
+    "review_pack/wheel-help-superseded-db-port-failure.log": {
+      "bytes": 2142,
+      "sha256": "ca38d9651323eb2fd2c4ced309f9f99b97827d225137671f66f43e898c566a12"
+    },
+    "scripts/verify_wheel.py": {
+      "bytes": 29260,
+      "sha256": "c7c501dfb30a2b5746284c620117d8e15bfc0c3f267c8b108ada841715556ca7"
+    },
+    "tests/unit/scripts/test_dashboard_wheel_cli.py": {
+      "bytes": 4441,
+      "sha256": "4badb828730476373010b64b7445161522eeaac58aa22f5fa3de04a628d3cb7d"
+    }
+  },
+  "ci_style_environment": {
+    "GITHUB_ACTIONS": "true",
+    "TERM": "xterm-256color",
+    "UV_OFFLINE": "1"
+  },
+  "classification": "OWNED_SYNTHETIC_CLEAN_INSTALLED_WHEEL_ACCEPTANCE",
+  "clean_environment_outside_repository": true,
+  "cleaned_up": true,
+  "first_local_attempt": {
+    "cause": "Owned PostgreSQL start omitted original -h127.0.0.1 -p55432 options and listened on5432; corrected owned startup restores original loopback55432, schema healthy. No source fix was needed.",
+    "native_exit": 50,
+    "status": "FAILED_PREREQUISITE",
+    "step": "installed database doctor"
+  },
+  "installed_dashboard_option_parser": {
+    "demo": true,
+    "no_demo": false,
+    "unknown_option_rejected": true
+  },
+  "installed_real_stack_probe": "PASS",
+  "platform": {
+    "architecture": "AMD64",
+    "operating_system": "Windows",
+    "python": "3.13.9"
+  },
+  "platform_limit": "Full wheel executed on Windows; genuine Rich POSIX-style rendering separately reproduced in regression tests. Fresh mandatory Linux CI still required.",
+  "production_activation": false,
+  "source_package_checkpoint": "de50b54692f481206ad8f59a1f477089b1fcf01f",
+  "status": "PASS",
+  "wheel_bytes_unchanged_from_prior_verified_package": true,
+  "wheel_sha256": "d1a7c6a7f802db2cd1acf7b72755d78a0c8e7b3b130632530e27e68316094fca"
+}

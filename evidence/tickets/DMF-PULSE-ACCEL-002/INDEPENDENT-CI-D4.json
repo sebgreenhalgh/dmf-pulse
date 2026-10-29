@@ -1,0 +1,161 @@
+{
+  "bound_byte_sha256s": {
+    ".github/workflows/ci.yml": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+    "config/testing/runtime_history.json": "b6742304136a59b4caa48a6ff07294d2f331804808d474cfe1a9aeb627287df5",
+    "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE-CHECKS.json": "e23d639942ed2382288f1fb03f9edb42ed7fb02021f41afc6d83d3297cd98c1e",
+    "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE.json": "07419ed787f113826dd0abe09f488e877b9d8692fb3127bf4cf114b54bfb8bda",
+    "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-RUNTIME-OBSERVATIONS.json": "bd39f0a69f2671e0488f0508fbc3d7072d4c82a54e106207fdb82972f00d4c24",
+    "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-SHARD-FOCUSED.log": "7f4f1de39e6dcd2c90bbf16f0b9b42dfee1e2a28bda031fb16510416b52f7435",
+    "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-SHARD-PARTITION.json": "037d1755d1079e144acd77c33d82ade3304779cb4e827620ab0553d8ddd0f52d",
+    "pyproject.toml": "8226a15907aca7107774bf9ffdc386196f2bac627135f34f593eb480ac5cbe88",
+    "review_pack/CI-D4-SHARD-FOCUSED-original-utf16.log": "ef4c822c03f48bcc9455b7fed62e77ce8d908540f264ebb6d9765eb1a282da00",
+    "review_pack/accel002-ci-rebalance/after-plan.json": "1486cbd554b2307fa674f760a1a0999d1c2724b7d34e7aede18c98e5c518b8d0",
+    "review_pack/accel002-ci-rebalance/before-plan.json": "9f06b84d0289f4080411ac0e2a0e9ed932d7a876dcc791e584ac34d9d5e3cfe6",
+    "review_pack/accel002-ci-rebalance/before-runtime-history.json": "ebd67c216319b104c5785b0e1a2494bb737495fb973d03eb72394f159d4ae763",
+    "review_pack/ci-job-123307905913.log": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b",
+    "scripts/ci_coverage_shards.py": "35d6376527fd31b33f5b58386c85b4b8c6e7db92459339bcacbb1f3057ca6d44",
+    "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py": "05c7c1e26eff5fd2cfc87915d31ac774b238eb290ae455c91a1676e1cb311fbb",
+    "tests/unit/scripts/test_ci_coverage_shards.py": "c420d903c4396e8841bfc0dfd24e726211e7903d539345fd4d2cab0b069179aa",
+    "tests/unit/scripts/test_ci_workflow_contract.py": "c8e94ac5fce9524f30fccaf8d12bfb285f317d9dbccc8231d22e3ef61937f609"
+  },
+  "documentary_normalization_refresh": {
+    "all_other_previous_bound_bytes_unchanged": true,
+    "classification": "DOCUMENTARY_BYTE_BINDINGS_ONLY_NO_CODE_CONFIG_TEST_OR_COLLECTION_CHANGE",
+    "collection_rerun": false,
+    "decoded_line_equality_independently_verified": true,
+    "external_ci_completion_claimed": false,
+    "independent_test_result_unchanged": "61 passed in1.67s from original independent execution. Author focused receipt still61 passed in1.76s; no new execution claim.",
+    "normalization_recomputed_exactly": true,
+    "normalized_focused_log": {
+      "byte_sha256": "7f4f1de39e6dcd2c90bbf16f0b9b42dfee1e2a28bda031fb16510416b52f7435",
+      "bytes": 99,
+      "encoding": "UTF-8 without BOM",
+      "newlines": "LF",
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-SHARD-FOCUSED.log"
+    },
+    "original_crlf_count": 2,
+    "original_focused_log": {
+      "byte_sha256": "ef4c822c03f48bcc9455b7fed62e77ce8d908540f264ebb6d9765eb1a282da00",
+      "bytes": 204,
+      "encoding": "UTF-16LE with BOM",
+      "path": "review_pack/CI-D4-SHARD-FOCUSED-original-utf16.log"
+    },
+    "other_unchanged_binding_count": 14,
+    "previous_documentary_bindings": {
+      "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE-CHECKS.json": "fbe54395057baf7ff4079a8365e58b92354aecf40e2be16892685c1412534198",
+      "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-SHARD-FOCUSED.log": "ef4c822c03f48bcc9455b7fed62e77ce8d908540f264ebb6d9765eb1a282da00"
+    },
+    "reason": "Final scanner could not cover UTF-16 evidence encoding; normalized readable evidence preserves all decoded content. No secret finding inferred.",
+    "scope_confirmation": "Only this ignored review and its verbatim superseded archive were written. No tracked edit, source/math/gate change, provider call, activation or task-scope expansion.",
+    "superseded_review": {
+      "bytes": 6054,
+      "exact_byte_sha256": "68c7e37e6eed3869790b592b32a9fdc656ff51c771581faeba0d4c4bd9e836de",
+      "preserved_verbatim": true,
+      "retained_ignored_path": "review_pack/accel002-ci-d4-independent-review-before-utf8-normalization.json"
+    },
+    "tests_rerun": false,
+    "updated_checks_byte_sha256": "e23d639942ed2382288f1fb03f9edb42ed7fb02021f41afc6d83d3297cd98c1e",
+    "updated_provenance_independently_matches_both_logs": true,
+    "verifier_review_preserved": {
+      "byte_sha256": "53813af2290d51ca56b932400ddc13b93646c51e35fa916eca796018fc0d3104",
+      "bytes": 5219,
+      "path": "review_pack/accel002-wheel-help-independent-review.json",
+      "unchanged": true
+    }
+  },
+  "findings": [],
+  "independent_tests": {
+    "command": ".venv/Scripts/python.exe -B -m pytest tests/unit/scripts/test_ci_coverage_shards.py tests/unit/scripts/test_ci_workflow_contract.py --basetemp=review_pack/pytest-evaluation-ci-d4-review -o cache_dir=review_pack/cache-evaluation-ci-d4-review -q --tb=short",
+    "elapsed_seconds": 1.67,
+    "passed": 61,
+    "skipped": 0
+  },
+  "limitations": [
+    "Honest estimated placement guidance, not a measured speedup. Intact D4 retains approximately42.5min bottleneck on the observed runner.",
+    "No final exact-SHA green CI claim. Installed-wheel verifier failure is a separate focused review when its fix lands."
+  ],
+  "partition_rebuilt_from_fresh_collection": {
+    "after_plan_sha256": "2bd56cf0552c33522cfe3a6b0a671695f2cb7679fe181ae630ad6575ca2fe752",
+    "before_and_after_plans_exactly_reproduced": true,
+    "complete_disjoint_exactly_once": true,
+    "d4_whole_module_alone": true,
+    "duplicates": 0,
+    "mandatory_jobs": 20,
+    "new_d4_nodes": 112,
+    "new_d4_shard": 0,
+    "node_count": 6127,
+    "nodeid_sha256": "e35986f1ca2fe3b3776e8c8401787b6f8b3bc40c7b5ab71a1af6ac1977397850",
+    "old_d4_shard": 7,
+    "old_shard_nodes": 684,
+    "omitted": 0,
+    "shards": 16,
+    "unexpected": 0
+  },
+  "preserved_gates": {
+    "all_test_content": true,
+    "math_models_rights_and_provider_boundaries": true,
+    "old_history_modules_sources_fallback_node_exceptions": true,
+    "package_python_files": 359,
+    "package_python_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+    "planner_workflow_performance_coverage_database_gates": true
+  },
+  "raw_log_review": {
+    "bytes": 185708,
+    "ci_job_id": 123307905913,
+    "ci_run_id": 40831728997,
+    "d4_progress_interval_estimate_seconds": 2551.107,
+    "following_canonical_interval_seconds": 594.069,
+    "locators_verified": {
+      "canonical_case_completion": {
+        "line": 584,
+        "timestamp": "2026-10-29T07:51:24.9300434Z"
+      },
+      "d4_first_progress": {
+        "line": 581,
+        "timestamp": "2026-10-29T06:58:59.7734328Z"
+      },
+      "d4_last_progress": {
+        "line": 583,
+        "timestamp": "2026-10-29T07:41:30.8611561Z"
+      },
+      "preceding_module_completion": {
+        "line": 580,
+        "timestamp": "2026-10-29T06:58:59.7541595Z"
+      },
+      "test_session_end": {
+        "line": 590,
+        "timestamp": "2026-10-29T07:53:44.8950301Z"
+      },
+      "test_session_start": {
+        "line": 530,
+        "timestamp": "2026-10-29T06:53:56.9999762Z"
+      }
+    },
+    "not_measured_pytest_module_or_node_duration": true,
+    "raw_log_sha256": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b",
+    "run_result": "683 passed,1 installed-wheel help assertion failed; not a green CI claim"
+  },
+  "reviewer": "Independent evaluation/leakage reviewer; not runtime-history author",
+  "reviewer_actions": {
+    "fresh_collection_only_no_model_benchmark": true,
+    "provider_calls": 0,
+    "tracked_edits": [],
+    "wrote_only_ignored_review_receipt": true
+  },
+  "schema_version": "accel002-independent-ci-d4-rebalance-review-v1",
+  "scope_confirmation": "Authorized config-only placement update; no omitted tests, gate relaxation, numerical/source change, rights expansion, activation or task-scope overreach.",
+  "semantic_history_delta": {
+    "added_module": "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py",
+    "all_other_top_level_values_unchanged": true,
+    "before_bytes_equal_git_blob": true,
+    "estimated_seconds": 2551.107,
+    "formatting_only_other_changes": true,
+    "node_partition_exceptions_preserved": 2,
+    "old_modules_preserved": 20,
+    "old_sources_preserved": 3,
+    "sample_count": 1,
+    "source_kind": "estimated"
+  },
+  "simulation_git_sha": "fb68d6d6466be4c8132880dc591651b72edb18b6",
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+}

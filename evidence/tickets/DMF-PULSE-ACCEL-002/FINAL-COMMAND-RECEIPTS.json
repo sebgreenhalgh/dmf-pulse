@@ -14,7 +14,7 @@
     {
       "command": "uv run ruff format --check .",
       "exit_code": 0,
-      "formatted_files": 1001
+      "formatted_files": 1002
     },
     {
       "command": "uv run ruff check .",

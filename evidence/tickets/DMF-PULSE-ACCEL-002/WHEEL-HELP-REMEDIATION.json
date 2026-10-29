@@ -1,0 +1,94 @@
+{
+  "author": "accel002_integration_review",
+  "base_sha": "fb68d6d6466be4c8132880dc591651b72edb18b6",
+  "classification": "VERIFIER_AND_TEST_ONLY",
+  "diff_check": "PASS",
+  "failed_ci_job": 123307905913,
+  "failed_ci_run": 40831728997,
+  "failure": "Raw literal --demo help assertion, despite successful command exit; CI did not retain raw help stdout",
+  "file_bindings": {
+    "scripts/verify_wheel.py": {
+      "bytes": 29260,
+      "sha256": "c7c501dfb30a2b5746284c620117d8e15bfc0c3f267c8b108ada841715556ca7"
+    },
+    "tests/unit/scripts/test_dashboard_wheel_cli.py": {
+      "bytes": 4441,
+      "sha256": "4badb828730476373010b64b7445161522eeaac58aa22f5fa3de04a628d3cb7d"
+    }
+  },
+  "focused_tests": {
+    "callback_invocations": 0,
+    "command": ".venv/Scripts/python -m pytest tests/unit/scripts/test_dashboard_wheel_cli.py tests/unit/assurance/test_wheel_entrypoint.py --basetemp=review_pack/pytest-wheel-help-remediation-2 -o cache_dir=review_pack/cache-wheel-help-remediation-2 -q",
+    "elapsed_seconds": 2.07,
+    "exit_code": 0,
+    "new_regression_cases": 11,
+    "passed": 14,
+    "skipped": 0
+  },
+  "football_provider_calls": 0,
+  "format": "PASS",
+  "full_installed_wheel_regression": "ROOT_RUN_PENDING",
+  "implemented_checks": [
+    "ANSI-normalized exact option token; similarly prefixed options denied",
+    "Actual installed dashboard --demo --help public command",
+    "Real installed Typer parser --demo=True and --no-demo=False without invoking callback",
+    "Unknown option must raise NoSuchOption",
+    "Existing genuine installed real-stack model probe unchanged"
+  ],
+  "lint": "PASS",
+  "mechanism": "Typer forces Rich terminal rendering under GITHUB_ACTIONS. POSIX-style Rich emits separate SGR spans around the two hyphens, so the raw --demo substring is absent. Windows legacy rendering consumes those styles.",
+  "package_python_files_unchanged_from_de50": 359,
+  "provider_and_rights_config_unchanged": true,
+  "real_credentials_inspected": false,
+  "reproduction": [
+    {
+      "ansi_escape_present": false,
+      "bounded_demo_line_repr": "'| --demo      --no-demo                                  Run actual models with packaged          |'",
+      "exit_code": 0,
+      "mode": "plain",
+      "normalized_has_literal_demo": true,
+      "raw_has_literal_demo": true,
+      "raw_stdout_bytes": 1214,
+      "raw_stdout_sha256": "1f7647c008abfa3e52aacf79d05febcef5f1b5c24c9e1b94cf019ba1c03a3ca0"
+    },
+    {
+      "ansi_escape_present": false,
+      "bounded_demo_line_repr": "'| --demo      --no-demo                                  Run actual models with packaged          |'",
+      "exit_code": 0,
+      "mode": "github_actions_windows",
+      "normalized_has_literal_demo": true,
+      "raw_has_literal_demo": true,
+      "raw_stdout_bytes": 1214,
+      "raw_stdout_sha256": "1f7647c008abfa3e52aacf79d05febcef5f1b5c24c9e1b94cf019ba1c03a3ca0"
+    },
+    {
+      "ansi_escape_present": true,
+      "bounded_demo_line_repr": "'\\x1b[2m|\\x1b[0m \\x1b[1;36m-\\x1b[0m\\x1b[1;36m-demo\\x1b[0m      \\x1b[1;35m-\\x1b[0m\\x1b[1;35m-no\\x1b[0m\\x1b[1;35m-demo\\x1b[0m    \\x1b[1;33m                            \\x1b[0m  Run actual models with packaged synthetic \\x1b[2m|\\x1b[0m'",
+      "exit_code": 0,
+      "mode": "github_actions_linux_console",
+      "normalized_has_literal_demo": true,
+      "raw_has_literal_demo": false,
+      "raw_stdout_bytes": 1590,
+      "raw_stdout_sha256": "5fd2347a0af2ec3f94fac50a6caa10adaf25a91fd729d312dbfc800aa8e6c7da"
+    }
+  ],
+  "reproduction_boundary": "Actual local entrypoint/help with same locked framework; POSIX Rich rendering emulated by changing only the child console WINDOWS flag. No Linux CI help bytes are claimed captured.",
+  "retained_logs": {
+    "review_pack/ci-job-123307905913.log": {
+      "bytes": 185708,
+      "sha256": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b"
+    },
+    "review_pack/wheel-help-remediation-tests.log": {
+      "bytes": 204,
+      "sha256": "c779a492c7500b5170ba0b3be8906d03e79263af665e639f1121debd11f8d8b3"
+    }
+  },
+  "review_independence": "Authored verifier remediation; separate peer review and fresh full exact-SHA CI remain required.",
+  "schema_version": "accel002-wheel-help-remediation-v1",
+  "status": "FOCUSED_PASS_AWAITING_FULL_WHEEL_AND_SEPARATE_PEER_REVIEW",
+  "versions": {
+    "click": "8.5.0",
+    "rich": "15.0.0",
+    "typer": "0.27.0"
+  }
+}

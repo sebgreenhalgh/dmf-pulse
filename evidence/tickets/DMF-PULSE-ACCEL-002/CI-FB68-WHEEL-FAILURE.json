@@ -1,0 +1,145 @@
+{
+  "classification": "RETAINED_FAILED_EXACT_SHA_CI_NOT_ACCEPTANCE",
+  "conclusion": "failure",
+  "failed_test": "tests/integration/package/test_installed_wheel.py::test_wheel_installs_and_runs_outside_source_tree",
+  "job_id": 123307905913,
+  "jobs": [
+    {
+      "conclusion": "success",
+      "id": 123307466221,
+      "name": "Pre-flight",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905775,
+      "name": "Coverage shard 5 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905784,
+      "name": "Coverage shard 13 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905808,
+      "name": "Coverage shard 0 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905832,
+      "name": "Coverage shard 15 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905835,
+      "name": "Coverage shard 2 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905843,
+      "name": "Coverage shard 4 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905869,
+      "name": "Coverage shard 9 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905873,
+      "name": "Coverage shard 11 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905884,
+      "name": "Coverage shard 10 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905905,
+      "name": "Coverage shard 14 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905906,
+      "name": "Coverage shard 8 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123307905913,
+      "name": "Coverage shard 7 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905943,
+      "name": "Coverage shard 12 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905983,
+      "name": "Coverage shard 6 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307905984,
+      "name": "Coverage shard 1 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123307906023,
+      "name": "Coverage shard 3 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123328483589,
+      "name": "Python 3.13 / Ubuntu",
+      "status": "completed"
+    },
+    {
+      "conclusion": "skipped",
+      "id": 123328484946,
+      "name": "Combined coverage gate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "skipped",
+      "id": 123328484957,
+      "name": "Post-coverage acceptance",
+      "status": "completed"
+    }
+  ],
+  "last_shard_results": {
+    "failed": 1,
+    "passed": 683,
+    "pytest_seconds": 3596.71
+  },
+  "message": "installed dashboard command is missing its demo option",
+  "original_log": {
+    "bytes": 185708,
+    "path": "review_pack/ci-job-123307905913.log",
+    "sha256": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b"
+  },
+  "remediation_scope": "CLI verifier formatting/capability check only; separate owner-authorized D4 whole-module scheduling estimate; package bytes, numerical decisions, test identities,16shards20jobs and gates remain protected.",
+  "run_id": 40831728997,
+  "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40831728997",
+  "source_checkpoint": "fb68d6d6466be4c8132880dc591651b72edb18b6",
+  "successful_coverage_shards": 15,
+  "timed_out": false
+}

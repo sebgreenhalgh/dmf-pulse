@@ -1,0 +1,19 @@
+.venv/Scripts/python : Traceback (most recent call last):
+At line:8 char:283
++ ... -256color'; .venv/Scripts/python review_pack/run_wheel_help_regressio ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-002\review_pack\run_wheel_help_regression.py", line 4, in 
+<module>
+    report=ns['verify_wheel'](report_path=Path('review_pack/wheel-help-full-regression.json'))
+  File "scripts/verify_wheel.py", line 425, in verify_wheel
+    database_doctor_result = _run(
+        [*environment_dmf, "data-model", "doctor", "--json"],
+    ...<2 lines>...
+        environment=clean_environment,
+    )
+  File "scripts/verify_wheel.py", line 97, in _run
+    raise VerificationError(f"{step} failed with exit code {result.returncode}")
+<run_path>.VerificationError: installed database doctor failed with exit code 50

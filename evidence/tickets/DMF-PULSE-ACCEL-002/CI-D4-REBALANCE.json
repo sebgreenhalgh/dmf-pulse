@@ -1,0 +1,130 @@
+{
+  "ci_job_id": 123307905913,
+  "ci_progress_log_bound": {
+    "canonical_case_following_module_elapsed_bound_seconds": 594.069,
+    "d4_module_elapsed_bound_seconds": 2551.107,
+    "interpretation": "D4 continuation lines consume most elapsed time.3145s combined interval is not one canonical case. Canonical case remains approximately594s, consistent with existing598.143s node estimate.",
+    "last_log_timestamp": "2026-10-29T07:53:49.2577600Z",
+    "log_locators": {
+      "canonical_case_completion": {
+        "line": 584,
+        "timestamp": "2026-10-29T07:51:24.9300434Z"
+      },
+      "d4_first_progress": {
+        "line": 581,
+        "timestamp": "2026-10-29T06:58:59.7734328Z"
+      },
+      "d4_last_progress": {
+        "line": 583,
+        "timestamp": "2026-10-29T07:41:30.8611561Z"
+      },
+      "preceding_module_completion": {
+        "line": 580,
+        "timestamp": "2026-10-29T06:58:59.7541595Z"
+      },
+      "test_session_end": {
+        "line": 590,
+        "timestamp": "2026-10-29T07:53:44.8950301Z"
+      },
+      "test_session_start": {
+        "line": 530,
+        "timestamp": "2026-10-29T06:53:56.9999762Z"
+      }
+    },
+    "not_a_measured_module_or_node_duration": true,
+    "raw_log_bytes": 185708,
+    "raw_log_sha256": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b",
+    "shard_test_session_elapsed_bound_seconds": 3587.895
+  },
+  "ci_run_id": 40831728997,
+  "classification": "CONFIG_ONLY_CI_PLACEMENT_CHANGE_ESTIMATED_LOG_BOUND",
+  "expected_benefit_not_guaranteed": "Separates the observed~594s canonical-case buddy and other shard work from D4. Roughly10min of observed co-packing is removed; D4 retains an approximately42.5min whole-module floor on this runner. Actual next CI time depends on setup, contention and other underestimated modules. No speedup is claimed as measured.",
+  "history_after_byte_sha256": "b6742304136a59b4caa48a6ff07294d2f331804808d474cfe1a9aeb627287df5",
+  "history_before_byte_sha256": "ebd67c216319b104c5785b0e1a2494bb737495fb973d03eb72394f159d4ae763",
+  "history_update_receipt": {
+    "added_module_count": 1,
+    "changed_module_count": 0,
+    "removed_observation_count": 0,
+    "runtime_history_sha256": "b6742304136a59b4caa48a6ff07294d2f331804808d474cfe1a9aeb627287df5",
+    "schema_version": "ci-runtime-history-v1",
+    "source_added": true,
+    "status": "PASS",
+    "unchanged_module_count": 0
+  },
+  "observation_sha256": "bd39f0a69f2671e0488f0508fbc3d7072d4c82a54e106207fdb82972f00d4c24",
+  "package_manifest_sha256": "a0b10c25ed36b21bb6bdf2eccd088289f80d811d0d9f2f081e0af7030bc563e0",
+  "package_python_file_count": 359,
+  "partition": {
+    "complete": true,
+    "duplicate_nodeid_count": 0,
+    "eligible_nodeid_count": 6127,
+    "eligible_nodeid_sha256": "e35986f1ca2fe3b3776e8c8401787b6f8b3bc40c7b5ab71a1af6ac1977397850",
+    "mandatory_workflow_job_count": 20,
+    "omitted_nodeid_count": 0,
+    "shard_count": 16,
+    "unexpected_nodeid_count": 0
+  },
+  "placement": {
+    "after_plan_sha256": "2bd56cf0552c33522cfe3a6b0a671695f2cb7679fe181ae630ad6575ca2fe752",
+    "after_runtime_summary": {
+      "estimated_module_count": 14,
+      "estimated_spread_seconds": 1636.187,
+      "fallback_module_count": 428,
+      "imbalance_ratio": 2.788339,
+      "manifest_module_count": 21,
+      "max_estimated_shard_seconds": 2551.107,
+      "measured_module_count": 7,
+      "median_estimated_shard_seconds": 916.785,
+      "min_estimated_shard_seconds": 914.92,
+      "quality": {
+        "dominant_module_explains_outlier": true,
+        "dominant_module_path": "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py",
+        "outlier_threshold_seconds": 1833.57,
+        "status": "PASS"
+      }
+    },
+    "before_plan_sha256": "e0683631d42af115dfb58cb879c91597e6fdbc2e3f6aabcc9d3f11e38c43086f",
+    "before_runtime_summary": {
+      "estimated_module_count": 13,
+      "estimated_spread_seconds": 119.6,
+      "fallback_module_count": 429,
+      "imbalance_ratio": 1.139491,
+      "manifest_module_count": 20,
+      "max_estimated_shard_seconds": 977.0,
+      "measured_module_count": 7,
+      "median_estimated_shard_seconds": 857.677,
+      "min_estimated_shard_seconds": 857.4,
+      "quality": {
+        "dominant_module_explains_outlier": true,
+        "dominant_module_path": "tests/assurance/optimisation/test_r2c_artifact_validation.py",
+        "outlier_threshold_seconds": 1715.353,
+        "status": "PASS"
+      }
+    },
+    "d4_alone": true,
+    "d4_new_estimated_seconds": 2551.107,
+    "d4_old_fallback_seconds": 40.32,
+    "d4_whole_module": true,
+    "new_shard_index": 0,
+    "new_shard_node_count": 112,
+    "old_shard_index": 7,
+    "old_shard_node_count": 684
+  },
+  "preserved": {
+    "all_existing_modules": true,
+    "all_existing_sources": true,
+    "coverage_and_database_gates": true,
+    "fallback": true,
+    "model_package_python": true,
+    "node_partition_exceptions": true,
+    "performance_gate": true,
+    "test_content": true,
+    "workflow_bytes": true
+  },
+  "schema_version": "accel002-ci-d4-rebalance-evidence-v1",
+  "simulation_git_sha": "fb68d6d6466be4c8132880dc591651b72edb18b6",
+  "status": "PASS",
+  "why_no_extra_shards": "More shards do not divide an intact module;16 shards and all20 mandatory jobs remain unchanged.",
+  "why_no_node_split": "D4 has shared module-scoped captured real rolling/full-seam pipelines. Splitting112 nodes without per-node/setup data risks repeated expensive captures; no such experiment or test change is authorized here.",
+  "workflow_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392"
+}

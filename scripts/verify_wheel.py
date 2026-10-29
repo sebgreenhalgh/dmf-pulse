@@ -24,10 +24,40 @@ DEFAULT_REPORT = REPOSITORY_ROOT / "evidence" / "tickets" / "DAT-003" / "package
 RUNTIME_MANIFEST = REPOSITORY_ROOT / "specs" / "manifests" / "runtime_lock_manifest.json"
 BUNDLED_ZONEINFO = "dmf_pulse/_data/zoneinfo/Europe/London"
 BUNDLED_ZONEINFO_SHA256 = "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+_ANSI_CONTROL = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+_DASHBOARD_PARSER_PROBE = """
+import json
+from dmf_pulse.cli.app import app
+from typer.main import get_command
+
+dashboard = get_command(app).commands.get('dashboard')
+if dashboard is None:
+    raise RuntimeError('dashboard command missing')
+for option, expected in (('--demo', True), ('--no-demo', False)):
+    with dashboard.make_context('dashboard', [option]) as context:
+        if context.params.get('demo') is not expected:
+            raise RuntimeError('dashboard demo option does not parse as a boolean')
+try:
+    dashboard.make_context('dashboard', ['--dmf-invalid-wheel-probe-option'])
+except Exception as error:
+    if type(error).__name__ != 'NoSuchOption':
+        raise
+else:
+    raise RuntimeError('dashboard parser accepted an unknown option')
+print(json.dumps({'demo': True, 'no_demo': False, 'unknown_option_rejected': True}))
+"""
 
 
 class VerificationError(Exception):
     """A safe package verification failure."""
+
+
+def _require_dashboard_demo_help(output: str) -> None:
+    # Rich can style the first hyphen separately under GitHub Actions. Match
+    # the complete option after removing terminal controls, never a prefix.
+    plain = _ANSI_CONTROL.sub("", output)
+    if re.search(r"(?<![\w-])--demo(?![\w-])", plain) is None:
+        raise VerificationError("installed dashboard command is missing its demo option")
 
 
 def _sha256(path: Path) -> str:
@@ -515,8 +545,28 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             step="installed dashboard public command",
             environment=clean_environment,
         )
-        if "--demo" not in desk_help.stdout:
-            raise VerificationError("installed dashboard command is missing its demo option")
+        _require_dashboard_demo_help(desk_help.stdout)
+        _run(
+            [*environment_dmf, "dashboard", "--demo", "--help"],
+            cwd=temporary_path,
+            step="installed dashboard demo public command",
+            environment=clean_environment,
+        )
+        # make_context parses the real installed command without invoking its
+        # server callback. Help is eager, so independently check boolean values
+        # and unknown-option rejection rather than inferring them from help.
+        desk_parser_result = _run(
+            [str(environment_python), "-I", "-c", _DASHBOARD_PARSER_PROBE],
+            cwd=temporary_path,
+            step="installed dashboard option parser",
+            environment=clean_environment,
+        )
+        try:
+            desk_parser = json.loads(desk_parser_result.stdout)
+        except json.JSONDecodeError as exc:
+            raise VerificationError("installed dashboard parser did not emit safe JSON") from exc
+        if desk_parser != {"demo": True, "no_demo": False, "unknown_option_rejected": True}:
+            raise VerificationError("installed dashboard option parser failed")
         shutil.copyfile(REPOSITORY_ROOT / "scripts/accel002_wheel_probe.py", desk_probe)
         desk_result = _run(
             [str(environment_python), "-I", str(desk_probe)],
@@ -579,6 +629,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             "locked_runtime_manifest_sha256": _sha256(RUNTIME_MANIFEST),
             "installed_zoneinfo_fallback": True,
             "installed_sebs_desk": desk_acceptance,
+            "installed_dashboard_option_parser": desk_parser,
             "platform": {
                 "architecture": platform.machine(),
                 "operating_system": platform.system(),

@@ -105,6 +105,20 @@ Stage-8 launcher attempts failed generically before an unchanged direct retry
 passed; the precise transient OS cause was not established. Initial wheel checks
 without a completed build and the parity freeze-transition guard are disclosed.
 
+Checkpoint fb68d6d's full CI passed fifteen coverage shards and 683 tests in the
+last shard, then failed a raw help-text search for `--demo`. GitHub Actions forces
+Rich terminal styling, which splits the two hyphens with ANSI sequences. The
+verifier normalizes presentation and checks the installed option parser; the
+real-stack installed-wheel probe remains required. The failed run is retained.
+
+Following the owner's rebalancing request, one honest log-derived runtime
+estimate isolates the complete 112-test D4 diagnostics module on its own shard.
+All 6,127 original eligible test identities, sixteen shards and twenty workflow
+jobs remain. Existing timing records, test content, floors, timeouts and workflow
+bytes are preserved. This removes roughly ten minutes of observed co-packing;
+the module's roughly 42.5-minute runtime remains a floor on that runner. Actual
+speedup and final pass counts come from the new exact-SHA CI receipt.
+
 P01 byte/semantic pins remain unchanged. A02/A03 remain consumed; metadata policy
 is inactive/proposed; no A04, actual P01 scoring, team-strength activation, model
 promotion, PR, merge, tag, history rewrite or human acceptance occurred. The

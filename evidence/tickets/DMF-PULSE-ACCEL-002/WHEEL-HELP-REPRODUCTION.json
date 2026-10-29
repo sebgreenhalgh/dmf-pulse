@@ -1,0 +1,32 @@
+[
+  {
+    "mode": "plain",
+    "exit_code": 0,
+    "raw_stdout_bytes": 1214,
+    "raw_stdout_sha256": "1f7647c008abfa3e52aacf79d05febcef5f1b5c24c9e1b94cf019ba1c03a3ca0",
+    "raw_has_literal_demo": true,
+    "normalized_has_literal_demo": true,
+    "ansi_escape_present": false,
+    "bounded_demo_line_repr": "'| --demo      --no-demo                                  Run actual models with packaged          |'"
+  },
+  {
+    "mode": "github_actions_windows",
+    "exit_code": 0,
+    "raw_stdout_bytes": 1214,
+    "raw_stdout_sha256": "1f7647c008abfa3e52aacf79d05febcef5f1b5c24c9e1b94cf019ba1c03a3ca0",
+    "raw_has_literal_demo": true,
+    "normalized_has_literal_demo": true,
+    "ansi_escape_present": false,
+    "bounded_demo_line_repr": "'| --demo      --no-demo                                  Run actual models with packaged          |'"
+  },
+  {
+    "mode": "github_actions_linux_console",
+    "exit_code": 0,
+    "raw_stdout_bytes": 1590,
+    "raw_stdout_sha256": "5fd2347a0af2ec3f94fac50a6caa10adaf25a91fd729d312dbfc800aa8e6c7da",
+    "raw_has_literal_demo": false,
+    "normalized_has_literal_demo": true,
+    "ansi_escape_present": true,
+    "bounded_demo_line_repr": "'\\x1b[2m|\\x1b[0m \\x1b[1;36m-\\x1b[0m\\x1b[1;36m-demo\\x1b[0m      \\x1b[1;35m-\\x1b[0m\\x1b[1;35m-no\\x1b[0m\\x1b[1;35m-demo\\x1b[0m    \\x1b[1;33m                            \\x1b[0m  Run actual models with packaged synthetic \\x1b[2m|\\x1b[0m'"
+  }
+]

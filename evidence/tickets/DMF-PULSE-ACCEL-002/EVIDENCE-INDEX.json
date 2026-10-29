@@ -11,6 +11,36 @@
       "sha256": "b893647bddb3bba31f187ee4213a2e20c95d7ab721d1e3dd90b4c44549fa9784"
     },
     {
+      "bytes": 3146,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE-CHECKS.json",
+      "sha256": "e23d639942ed2382288f1fb03f9edb42ed7fb02021f41afc6d83d3297cd98c1e"
+    },
+    {
+      "bytes": 5618,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE.json",
+      "sha256": "00523685ff0fa2d866d02ff1cf27d2e08c7d391f850477971e16f5d5de88f9ed"
+    },
+    {
+      "bytes": 737,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-RUNTIME-OBSERVATIONS.json",
+      "sha256": "db1cd79f1bf67812ec0323e007fa17db42f835438328b6b06babcd83de6488d9"
+    },
+    {
+      "bytes": 99,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-SHARD-FOCUSED.log",
+      "sha256": "7f4f1de39e6dcd2c90bbf16f0b9b42dfee1e2a28bda031fb16510416b52f7435"
+    },
+    {
+      "bytes": 4076,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-SHARD-PARTITION.json",
+      "sha256": "3994d632c3aa3d390e2905b3cb6052693fe5f2c3e16ce927c31dea3e0d9514b3"
+    },
+    {
+      "bytes": 3824,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-FB68-WHEEL-FAILURE.json",
+      "sha256": "e23284c79ac6c92a31314617d408d30ad6bb338850e61bb088c6af9c37eeb902"
+    },
+    {
       "bytes": 2187,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/CP0-BASELINE.json",
       "sha256": "52adfadff7c31ae1b2fe3437acc7f668d04724ddcf24f0c9acbc43680601f028"
@@ -28,7 +58,7 @@
     {
       "bytes": 2085,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/FINAL-COMMAND-RECEIPTS.json",
-      "sha256": "aabdfe4b09d6854d0911176d41343b9c8f29d49365bb98d92d6187bb1fd8a911"
+      "sha256": "b7e7f96cd7d42c92f82c4fdc6c6197d2e21ceaf2a0cfa55877d22dc6d5c6e26b"
     },
     {
       "bytes": 762,
@@ -41,9 +71,9 @@
       "sha256": "798bb05ed2061f45fdd29762a92c5b3dd1436e812f9f9ff50115447b18ca1dd0"
     },
     {
-      "bytes": 4173,
+      "bytes": 4297,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/FINAL-INSTALLED-DESK-WHEEL.json",
-      "sha256": "95f458eafcaedba8a5981fc037b9177442bc6f5108757646d173b181659c16bf"
+      "sha256": "cd201aa4361d8fa055828994be55d21c3503502c00bf4e87b74bdc1260370025"
     },
     {
       "bytes": 5666,
@@ -81,6 +111,11 @@
       "sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25"
     },
     {
+      "bytes": 253,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/FINAL-WHEEL-HELP-REGRESSION-PASS.log",
+      "sha256": "8b33b58e0877f956a04049d6674f093f7ae16837f3c2114ab9e9d41a22764465"
+    },
+    {
       "bytes": 681,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/FPL-HEAD-REGRESSION-PASS.log",
       "sha256": "b3ffcf04548e14aaaade9db841898dc11400c286e86589c60f7f7ac8c97d8a5d"
@@ -94,6 +129,11 @@
       "bytes": 1134,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/INDEPENDENT-CATALOGUE-ACCEPTANCE.json",
       "sha256": "937f21340f062a7e29c6fb93ae066443bcb4e9a47a7782c1177de56c3417d168"
+    },
+    {
+      "bytes": 8800,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/INDEPENDENT-CI-D4.json",
+      "sha256": "02a2bfb1f6f23541ff49c5597df7488027ba2e6b487dedf9ef17e528d3b4f784"
     },
     {
       "bytes": 17538,
@@ -161,14 +201,19 @@
       "sha256": "636528e374afb7043ad4782f74706ef542fd40de0dc6dbddaf49499569e018f9"
     },
     {
+      "bytes": 5219,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/INDEPENDENT-WHEEL-HELP.json",
+      "sha256": "53813af2290d51ca56b932400ddc13b93646c51e35fa916eca796018fc0d3104"
+    },
+    {
       "bytes": 3971,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/LEGACY-FREEZE-REMEDIATION.json",
       "sha256": "f0909ab2faacb6b8d91bf4657b3261e2615d216afe7c17a23ec25868a2b67026"
     },
     {
-      "bytes": 10332,
+      "bytes": 11948,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/LOCAL-DIAGNOSTIC-INVENTORY.json",
-      "sha256": "192aae7fa5f75890602793cb6232717f14a8babe05a60f46623ead31ec1ada74"
+      "sha256": "fc5690cd946bc310f43c413c61612d701f1d2dbe27b042356bc211d56acbd6cc"
     },
     {
       "bytes": 2787,
@@ -191,9 +236,9 @@
       "sha256": "1f3c05c6944513a924d9c29996fd6a281c7d3b8fd817f28bb8a792191c9a768b"
     },
     {
-      "bytes": 7321,
+      "bytes": 8264,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/RELEASE-HANDOFF.md",
-      "sha256": "3fea214781baf9dbc84a5039279fca874574b69bfc15fe96256b43b94013e5b6"
+      "sha256": "db6a09fe7f08a5cf1be296586ee32eed409fdf4dc95d30d02df61feb188ea77e"
     },
     {
       "bytes": 64,
@@ -226,14 +271,39 @@
       "sha256": "ce9c1e3f4882a38b2d2f8e9adc6868cbe5f60b305bf99658138f660a20866be2"
     },
     {
+      "bytes": 368,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-SECRET-SCAN-UTF16.log",
+      "sha256": "ecc48b5e9fcde87dbfabfe09ecf4b42ab1d629f11ddbdeec4c14f97aeca2b58f"
+    },
+    {
       "bytes": 3454,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-SECRET-SCAN.log",
       "sha256": "343c4cd73dbfd0976833a640cc113ec87403836ff39f205b7e8e31c1d35884e1"
     },
     {
+      "bytes": 1070,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-WHEEL-DB-PORT-FAILURE.log",
+      "sha256": "06f0728301d21eec64feeeb2264cadd1af5fe4a0ecd2602df7063687c5adec34"
+    },
+    {
       "bytes": 111,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-002/SUPERSEDED-WHEEL-HEAD-FAILURE.log",
       "sha256": "7452e3b665bea485881f2bcb134e1c3b034607e186bf6a291104cd1a7cf7b11b"
+    },
+    {
+      "bytes": 2239,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/WHEEL-HELP-FULL-ACCEPTANCE.json",
+      "sha256": "8b5f15538559b15078c6ea78bd49242f291bb501f11872916338424b0321d5fd"
+    },
+    {
+      "bytes": 4508,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/WHEEL-HELP-REMEDIATION.json",
+      "sha256": "0cfe3aec46b3c725481287048bb6d2e0fa4bed558678a1bf6fe2495732afbff2"
+    },
+    {
+      "bytes": 1470,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-002/WHEEL-HELP-REPRODUCTION.json",
+      "sha256": "409b1c8efe1327d88edba1ff294c7bc06c3cff12c418df8e4b5cbbb78da8d84b"
     },
     {
       "bytes": 1705,

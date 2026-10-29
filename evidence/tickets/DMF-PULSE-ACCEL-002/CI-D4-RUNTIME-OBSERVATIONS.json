@@ -1,0 +1,13 @@
+{
+  "modules": {
+    "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py": 2551.107
+  },
+  "schema_version": "ci-runtime-observations-v1",
+  "source": {
+    "description": "CI40831728997 job123307905913 progress-log elapsed bound for112-node D4 module: preceding module completion06:58:59.7541595Z through final D4 continuation07:41:30.8611561Z. Includes transition/teardown and log timestamp effects; estimated, not pytest per-module/per-node measurement. Observation time is actual last raw-log finish.",
+    "id": "accel002-ci-40831728997",
+    "kind": "estimated",
+    "observed_at_utc": "2026-10-29T07:53:49Z",
+    "reference": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE.json#ci-progress-log-bound"
+  }
+}
