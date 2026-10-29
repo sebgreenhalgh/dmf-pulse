@@ -8,11 +8,14 @@ from typing import Literal, cast
 from uuid import NAMESPACE_URL, uuid5
 
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.ingestion.models import RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.client import OddsClient
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from dmf_pulse.ingestion.odds.credentials import EnvironmentOddsCredentialProvider
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
+from dmf_pulse.ingestion.odds.models import QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
+from dmf_pulse.ingestion.rights import require_rights
 
 ODDS_PRIVATE_PROFILE_ID = "the_odds_api_private_analytics_v1"
 
@@ -26,10 +29,22 @@ class CurrentOddsTransientService:
         credential_provider: EnvironmentOddsCredentialProvider | None = None,
         client_factory: Callable[..., OddsClient] = OddsClient,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        rights_profile: RightsProfile | None = None,
+        quota: QuotaState | None = None,
+        maximum_attempts: Literal[1] | None = None,
+        require_known_quota: bool = False,
     ) -> None:
+        if maximum_attempts is not None and (
+            type(maximum_attempts) is not int or maximum_attempts != 1
+        ):
+            raise ValueError("only a single-attempt narrowing is supported")
         self._credential_provider = credential_provider or EnvironmentOddsCredentialProvider()
         self._client_factory = client_factory
         self._clock = clock
+        self._profile = rights_profile
+        self._quota = quota
+        self._maximum_attempts = maximum_attempts
+        self._require_known_quota = require_known_quota
 
     def acquire(
         self,
@@ -46,15 +61,33 @@ class CurrentOddsTransientService:
         range_end = commence_to.astimezone(UTC)
         if range_end <= cutoff:
             raise IngestionError("VALIDATION_FAILED", "Odds fixture range is empty")
+        if self._require_known_quota and self._quota is None:
+            raise IngestionError("QUOTA_EVIDENCE_REQUIRED", "qualified Odds quota is required")
+        if self._quota is not None and self._quota.remaining < 2:
+            raise IngestionError("QUOTA_EXHAUSTED", "Odds quota is insufficient")
+        if self._profile is not None:
+            require_rights(
+                self._profile, RightsCapability.AUTOMATED_ACCESS, checked_at=self._clock()
+            )
+            require_rights(
+                self._profile, RightsCapability.TRANSIENT_PROCESSING, checked_at=self._clock()
+            )
         if not self._credential_provider._configured():
             raise IngestionError("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
-        profile = load_rights_profiles()[ODDS_PRIVATE_PROFILE_ID]
+        profile = self._profile or load_rights_profiles()[ODDS_PRIVATE_PROFILE_ID]
+        client_options: dict[str, object] = {}
+        if self._maximum_attempts is not None:
+            client_options["maximum_attempts"] = self._maximum_attempts
         client = self._client_factory(
             profile,
             credential_provider=self._credential_provider,
             clock=self._clock,
+            **client_options,
         )
-        fetched = client.fetch(commence_from=cutoff, commence_to=range_end)
+        if self._quota is None:
+            fetched = client.fetch(commence_from=cutoff, commence_to=range_end)
+        else:
+            fetched = client.fetch(commence_from=cutoff, commence_to=range_end, quota=self._quota)
         parsed = parse_odds_payload(fetched.body)
         if not fetched.attempts:
             raise IngestionError("INTERNAL_INVARIANT", "Odds retrieval evidence is absent")

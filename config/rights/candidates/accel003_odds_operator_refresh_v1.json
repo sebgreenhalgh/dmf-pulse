@@ -1,0 +1,72 @@
+{
+  "schema_version": "operator-refresh-proposal-v1",
+  "authorization_id": "the_odds_api_operator_refresh_transient_candidate_v1",
+  "status": "PROPOSED_INACTIVE",
+  "provider": "The Odds API Pty Ltd",
+  "terms_url": "https://the-odds-api.com/terms-and-conditions.html",
+  "terms_displayed_updated": "2026-08-31",
+  "public_document_retrieval_utc": "2026-10-29T18:44:56Z",
+  "purpose": "Sebastian's private manually triggered current-season EPL FPL recommendations",
+  "mode": "MARKET_PRIMARY",
+  "season_code": "2026/27",
+  "horizons": [1, 3],
+  "route": {
+    "method": "GET",
+    "scheme": "https",
+    "host": "api.the-odds-api.com",
+    "path": "/v4/sports/soccer_epl/odds",
+    "parameters": {
+      "regions": "uk",
+      "markets": "h2h,totals",
+      "oddsFormat": "decimal",
+      "dateFormat": "iso",
+      "commenceTimeFrom": "one coherent UTC information cutoff",
+      "commenceTimeTo": "latest exact officially assigned horizon kickoff plus one second"
+    }
+  },
+  "per_refresh": {
+    "maximum_odds_transport_attempts": 1,
+    "reserved_odds_credits": 2,
+    "cost_basis": "GET odds: two requested markets times one region, independent of fixture count and one-/three-GW horizon",
+    "automatic_retries": 0,
+    "retry_policy": "A failed send or HTTP 429 remains spent; a subsequent operator trigger needs a new eligible reservation and approved cooldown",
+    "provider_total_timeout_seconds": 30
+  },
+  "account_ref": null,
+  "operator_ref": null,
+  "account_plan_evidence": null,
+  "qualified_quota_evidence": null,
+  "daily_request_limit": null,
+  "daily_credit_limit": null,
+  "monthly_request_limit": null,
+  "monthly_credit_limit": null,
+  "safety_reserve_credits": null,
+  "quota_max_age_seconds": null,
+  "approved_at": null,
+  "expires_at": null,
+  "implementation_git_sha": null,
+  "wheel_or_package_content_identity": null,
+  "independent_review_receipt_sha256": null,
+  "human_approval_evidence_sha256": null,
+  "source_profile_bindings": null,
+  "durable_control_ledger_identity": null,
+  "control_metadata_retention_approval": null,
+  "capabilities": {
+    "user_initiated_transient_private_recommendation": "PROPOSED_ONLY",
+    "scheduled_polling": "DENY",
+    "raw_storage": "DENY",
+    "derived_storage": "DENY",
+    "backup": "DENY",
+    "training": "DENY",
+    "redistribution": "DENY",
+    "fpl_account_write": "DENY"
+  },
+  "unresolved": [
+    "Verify account and plan eligibility without inspecting credentials",
+    "Owner must approve exact source routes, account, purpose, budgets, implementation and expiry separately",
+    "Daily/monthly limits require actual account allocation, other-usage allowance and owner choice; no numbers inferred from public pricing",
+    "Durable secret-free control metadata needs separate explicit permission; no raw/private observations or credentials may be written",
+    "FPL source execution and all retained evaluation dependencies qualify separately",
+    "Retained market research/training is a distinct inactive purpose proposal, never implied by this transient candidate"
+  ]
+}
