@@ -1,0 +1,11 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "scripts/validate_repository.py"
+  ],
+  "started_at": "2026-10-29T00:38:21.729459+00:00",
+  "elapsed_seconds": 9.14840499998536,
+  "exit_code": 0,
+  "output_file": "CI-PORTABILITY-REPOSITORY-01.log",
+  "output_byte_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
+}

@@ -765,8 +765,13 @@ def test_resolved_and_hard_link_aliases_are_rejected_by_opened_identity(
     repository_root: Path,
     tmp_path: Path,
 ) -> None:
-    bootstrap = repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json"
-    resolved_alias = bootstrap.parent / ".." / "happy_path" / "bootstrap.json"
+    source_directory = tmp_path / "same-filesystem"
+    source_directory.mkdir()
+    bootstrap = source_directory / "bootstrap.json"
+    bootstrap.write_bytes(
+        (repository_root / "fixtures/fpl/FPL-004/happy_path/bootstrap.json").read_bytes()
+    )
+    resolved_alias = source_directory / ".." / "same-filesystem" / "bootstrap.json"
     _assert_error(_request(bootstrap, resolved_alias), "USAGE_INVALID")
 
     hard_link = tmp_path / "bootstrap-hard-link.json"
@@ -774,6 +779,8 @@ def test_resolved_and_hard_link_aliases_are_rejected_by_opened_identity(
         os.link(bootstrap, hard_link)
     except OSError as exc:
         pytest.skip(f"hard links are unavailable on this test host: {exc}")
+    assert bootstrap != hard_link
+    assert os.path.samefile(bootstrap, hard_link)
     _assert_error(_request(bootstrap, hard_link), "USAGE_INVALID")
 
 

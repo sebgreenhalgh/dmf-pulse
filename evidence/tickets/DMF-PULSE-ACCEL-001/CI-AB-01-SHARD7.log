@@ -1,0 +1,695 @@
+﻿2026-10-28T23:39:27.5150052Z Current runner version: '2.338.0'
+2026-10-28T23:39:27.5180202Z ##[group]Runner Image Provisioner
+2026-10-28T23:39:27.5181178Z Hosted Compute Agent
+2026-10-28T23:39:27.5182005Z Version: 20261021.618
+2026-10-28T23:39:27.5182790Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-28T23:39:27.5183752Z Build Date: 2026-10-21T00:45:21Z
+2026-10-28T23:39:27.5184687Z Worker ID: {72b43cee-6fbf-48a6-8d66-8ad80c856eb4}
+2026-10-28T23:39:27.5185641Z Region: eastus
+2026-10-28T23:39:27.5186357Z Cloud: Azure
+2026-10-28T23:39:27.5187024Z ##[endgroup]
+2026-10-28T23:39:27.5188895Z ##[group]Operating System
+2026-10-28T23:39:27.5189717Z Ubuntu
+2026-10-28T23:39:27.5190333Z 26.04.1
+2026-10-28T23:39:27.5190946Z LTS
+2026-10-28T23:39:27.5191567Z ##[endgroup]
+2026-10-28T23:39:27.5192225Z ##[group]Runner Image
+2026-10-28T23:39:27.5193041Z Image: ubuntu-26.04
+2026-10-28T23:39:27.5193759Z Version: 20261012.163.1
+2026-10-28T23:39:27.5195386Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261012.163/images/ubuntu/Ubuntu2604-Readme.md
+2026-10-28T23:39:27.5197422Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261012.163
+2026-10-28T23:39:27.5199113Z ##[endgroup]
+2026-10-28T23:39:27.5200380Z ##[group]GITHUB_TOKEN Permissions
+2026-10-28T23:39:27.5202699Z Contents: read
+2026-10-28T23:39:27.5203371Z Metadata: read
+2026-10-28T23:39:27.5204065Z ##[endgroup]
+2026-10-28T23:39:27.5206380Z Secret source: Actions
+2026-10-28T23:39:27.5207772Z Cache mode: write
+2026-10-28T23:39:27.5208644Z Prepare workflow directory
+2026-10-28T23:39:27.5888604Z Prepare all required actions
+2026-10-28T23:39:27.5931277Z Getting action download info
+2026-10-28T23:39:27.7600905Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-28T23:39:27.8605789Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-28T23:39:27.9425308Z Download action repository 'actions/download-artifact@v8' (SHA:9000827ccba6bdab643e8b6fd33ac0654aef8333)
+2026-10-28T23:39:28.0833343Z Download action repository 'actions/upload-artifact@v7' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-10-28T23:39:28.3199250Z Complete job name: Coverage shard 7 of 16
+2026-10-28T23:39:28.3596573Z ##[group]Checking docker version
+2026-10-28T23:39:28.3607437Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2026-10-28T23:39:28.4568785Z '1.54'
+2026-10-28T23:39:28.4580629Z Docker daemon API version: '1.54'
+2026-10-28T23:39:28.4581245Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2026-10-28T23:39:28.4953718Z '1.54'
+2026-10-28T23:39:28.4969910Z Docker client API version: '1.54'
+2026-10-28T23:39:28.4974940Z ##[endgroup]
+2026-10-28T23:39:28.4976900Z ##[group]Clean up resources from previous jobs
+2026-10-28T23:39:28.4981650Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=e9f373"
+2026-10-28T23:39:28.5146634Z ##[command]/usr/bin/docker network prune --force --filter "label=e9f373"
+2026-10-28T23:39:28.5311152Z ##[endgroup]
+2026-10-28T23:39:28.5311584Z ##[group]Create local container network
+2026-10-28T23:39:28.5320230Z ##[command]/usr/bin/docker network create --label e9f373 github_network_5e43cea74b1047e289d1ae8812d06210
+2026-10-28T23:39:28.5786972Z c6e005dcad64331a93fb5d550e6d1b3b8ed5436258e9c552a0409acd28a5b866
+2026-10-28T23:39:28.5811072Z ##[endgroup]
+2026-10-28T23:39:28.5833224Z ##[group]Starting postgres service container
+2026-10-28T23:39:28.5850908Z ##[command]/usr/bin/docker pull postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+2026-10-28T23:39:28.8280659Z docker.io/library/postgres@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296: Pulling from library/postgres
+2026-10-28T23:39:28.9216077Z fdf918c668f0: Pulling fs layer
+2026-10-28T23:39:28.9217810Z c0c1de4afa7c: Pulling fs layer
+2026-10-28T23:39:28.9219012Z ff6b10e6e3c1: Pulling fs layer
+2026-10-28T23:39:28.9219858Z 921d3e41f019: Pulling fs layer
+2026-10-28T23:39:28.9221258Z 05627e956ac8: Pulling fs layer
+2026-10-28T23:39:28.9222095Z 6a4a261838bd: Pulling fs layer
+2026-10-28T23:39:28.9222586Z e66f3d31f0a4: Pulling fs layer
+2026-10-28T23:39:28.9223217Z f6b6c0088116: Pulling fs layer
+2026-10-28T23:39:28.9223776Z 1aa105197c98: Pulling fs layer
+2026-10-28T23:39:28.9224281Z b7f390175be1: Pulling fs layer
+2026-10-28T23:39:28.9224839Z ca237f633f74: Pulling fs layer
+2026-10-28T23:39:28.9225440Z 597c6c618d36: Pulling fs layer
+2026-10-28T23:39:28.9225905Z a4be007191d3: Pulling fs layer
+2026-10-28T23:39:29.0057719Z fdf918c668f0: Download complete
+2026-10-28T23:39:29.0059687Z 921d3e41f019: Download complete
+2026-10-28T23:39:29.0068632Z e66f3d31f0a4: Download complete
+2026-10-28T23:39:29.0077067Z 1aa105197c98: Download complete
+2026-10-28T23:39:29.0088618Z b7f390175be1: Download complete
+2026-10-28T23:39:29.0099488Z a4be007191d3: Download complete
+2026-10-28T23:39:29.0108717Z f6b6c0088116: Download complete
+2026-10-28T23:39:29.0119674Z c0c1de4afa7c: Download complete
+2026-10-28T23:39:29.0145928Z 05627e956ac8: Download complete
+2026-10-28T23:39:29.1032697Z 6a4a261838bd: Download complete
+2026-10-28T23:39:29.1034736Z 26a20c3e45a6: Download complete
+2026-10-28T23:39:29.1036175Z ff6b10e6e3c1: Download complete
+2026-10-28T23:39:29.3023096Z 597c6c618d36: Download complete
+2026-10-28T23:39:29.3025697Z d26d0e32541b: Download complete
+2026-10-28T23:39:29.9120108Z 597c6c618d36: Pull complete
+2026-10-28T23:39:30.0026438Z ca237f633f74: Download complete
+2026-10-28T23:39:30.0035222Z fdf918c668f0: Pull complete
+2026-10-28T23:39:30.0127867Z 6a4a261838bd: Pull complete
+2026-10-28T23:39:30.1079462Z f6b6c0088116: Pull complete
+2026-10-28T23:39:30.2027195Z e66f3d31f0a4: Pull complete
+2026-10-28T23:39:30.2050718Z 1aa105197c98: Pull complete
+2026-10-28T23:39:30.2068123Z b7f390175be1: Pull complete
+2026-10-28T23:39:30.2104992Z ff6b10e6e3c1: Pull complete
+2026-10-28T23:39:31.6659265Z 921d3e41f019: Pull complete
+2026-10-28T23:39:31.6674764Z a4be007191d3: Pull complete
+2026-10-28T23:39:31.6688656Z c0c1de4afa7c: Pull complete
+2026-10-28T23:39:31.6694086Z 05627e956ac8: Pull complete
+2026-10-28T23:39:31.6704498Z ca237f633f74: Pull complete
+2026-10-28T23:39:31.6705767Z Digest: sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+2026-10-28T23:39:31.6707169Z Status: Downloaded newer image for postgres@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+2026-10-28T23:39:31.6714885Z docker.io/library/postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+2026-10-28T23:39:31.6792624Z ##[command]/usr/bin/docker create --name 190acc2cd138458d8a3599e5b46322fb_postgres184bookwormsha2561961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296_38892b --label e9f373 --network github_network_5e43cea74b1047e289d1ae8812d06210 --network-alias postgres -p 5432:5432 --health-cmd "pg_isready -U dmf_test -d dmf_pulse_test" --health-interval 2s --health-timeout 3s --health-retries 30 -e "POSTGRES_DB=dmf_pulse_test" -e "POSTGRES_USER=dmf_test" -e "POSTGRES_PASSWORD=changeme" -e GITHUB_ACTIONS=true -e CI=true postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+2026-10-28T23:39:34.2218346Z 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-28T23:39:34.2242624Z ##[command]/usr/bin/docker start 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-28T23:39:34.4178182Z 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-28T23:39:34.4201546Z ##[command]/usr/bin/docker ps --all --filter id=3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2026-10-28T23:39:34.4471410Z 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12 Up Less than a second (health: starting)
+2026-10-28T23:39:34.4504025Z ##[command]/usr/bin/docker port 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-28T23:39:34.4638052Z 5432/tcp -> 0.0.0.0:5432
+2026-10-28T23:39:34.4638441Z 5432/tcp -> [::]:5432
+2026-10-28T23:39:34.4685958Z ##[endgroup]
+2026-10-28T23:39:34.4693168Z ##[group]Waiting for all services to be ready
+2026-10-28T23:39:34.4704414Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-28T23:39:34.4843092Z starting
+2026-10-28T23:39:34.4865543Z postgres service is starting, waiting 2 seconds before checking again.
+2026-10-28T23:39:36.4859801Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-28T23:39:36.4999846Z healthy
+2026-10-28T23:39:36.5018466Z postgres service is healthy.
+2026-10-28T23:39:36.5018844Z ##[endgroup]
+2026-10-28T23:39:36.5247273Z ##[group]Run actions/checkout@v4
+2026-10-28T23:39:36.5247990Z with:
+2026-10-28T23:39:36.5248178Z   fetch-depth: 0
+2026-10-28T23:39:36.5248385Z   persist-credentials: false
+2026-10-28T23:39:36.5248640Z   repository: sebgreenhalgh/dmf-pulse
+2026-10-28T23:39:36.5250868Z   token: ***
+2026-10-28T23:39:36.5251056Z   ssh-strict: true
+2026-10-28T23:39:36.5251242Z   ssh-user: git
+2026-10-28T23:39:36.5251404Z   clean: true
+2026-10-28T23:39:36.5251591Z   sparse-checkout-cone-mode: true
+2026-10-28T23:39:36.5251810Z   fetch-tags: false
+2026-10-28T23:39:36.5251984Z   show-progress: true
+2026-10-28T23:39:36.5252155Z   lfs: false
+2026-10-28T23:39:36.5252310Z   submodules: false
+2026-10-28T23:39:36.5252485Z   set-safe-directory: true
+2026-10-28T23:39:36.5252687Z   allow-unsafe-pr-checkout: false
+2026-10-28T23:39:36.5253035Z env:
+2026-10-28T23:39:36.5253197Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:36.5253510Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:36.5253913Z   PGPASSWORD: changeme
+2026-10-28T23:39:36.5254091Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:36.5254321Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:36.5254614Z ##[endgroup]
+2026-10-28T23:39:36.7785609Z Syncing repository: sebgreenhalgh/dmf-pulse
+2026-10-28T23:39:36.7787008Z ##[group]Getting Git version info
+2026-10-28T23:39:36.7787348Z Working directory is '/home/runner/work/dmf-pulse/dmf-pulse'
+2026-10-28T23:39:36.7788020Z [command]/usr/bin/git version
+2026-10-28T23:39:36.7806913Z git version 2.55.0
+2026-10-28T23:39:36.7825136Z ##[endgroup]
+2026-10-28T23:39:36.7838875Z Temporarily overriding HOME='/home/runner/work/_temp/b405e60c-4974-4d90-97af-42032cc152d0' before making global git config changes
+2026-10-28T23:39:36.7839985Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T23:39:36.7843294Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/dmf-pulse/dmf-pulse
+2026-10-28T23:39:36.7910472Z Deleting the contents of '/home/runner/work/dmf-pulse/dmf-pulse'
+2026-10-28T23:39:36.7914157Z ##[group]Initializing the repository
+2026-10-28T23:39:36.7917881Z [command]/usr/bin/git init /home/runner/work/dmf-pulse/dmf-pulse
+2026-10-28T23:39:36.8033726Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-28T23:39:36.8034727Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-28T23:39:36.8035632Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-28T23:39:36.8036127Z hint: call:
+2026-10-28T23:39:36.8036456Z hint:
+2026-10-28T23:39:36.8036965Z hint: 	git config --global init.defaultBranch <name>
+2026-10-28T23:39:36.8037481Z hint:
+2026-10-28T23:39:36.8038214Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-28T23:39:36.8039037Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-28T23:39:36.8039730Z hint:
+2026-10-28T23:39:36.8040214Z hint: 	git branch -m <name>
+2026-10-28T23:39:36.8040706Z hint:
+2026-10-28T23:39:36.8041254Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-28T23:39:36.8042250Z Initialized empty Git repository in /home/runner/work/dmf-pulse/dmf-pulse/.git/
+2026-10-28T23:39:36.8049131Z [command]/usr/bin/git remote add origin https://github.com/sebgreenhalgh/dmf-pulse
+2026-10-28T23:39:36.8101148Z ##[endgroup]
+2026-10-28T23:39:36.8101661Z ##[group]Disabling automatic garbage collection
+2026-10-28T23:39:36.8105918Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-28T23:39:36.8141827Z ##[endgroup]
+2026-10-28T23:39:36.8142301Z ##[group]Setting up auth
+2026-10-28T23:39:36.8149250Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T23:39:36.8193230Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T23:39:36.8637145Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T23:39:36.8666413Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T23:39:36.8915280Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T23:39:36.8947083Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T23:39:36.9195150Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-28T23:39:36.9236703Z ##[endgroup]
+2026-10-28T23:39:36.9237103Z ##[group]Fetching the repository
+2026-10-28T23:39:36.9246577Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-28T23:39:38.1308948Z From https://github.com/sebgreenhalgh/dmf-pulse
+2026-10-28T23:39:38.1310087Z  * [new branch]      backup-stage13-recovery-pre-repair-20260818 -> origin/backup-stage13-recovery-pre-repair-20260818
+2026-10-28T23:39:38.1311070Z  * [new branch]      diagnostic/CI-DIAG-02-ubuntu-evaluation-cli -> origin/diagnostic/CI-DIAG-02-ubuntu-evaluation-cli
+2026-10-28T23:39:38.1311975Z  * [new branch]      evidence/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-consumed -> origin/evidence/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-consumed
+2026-10-28T23:39:38.1313065Z  * [new branch]      governance/CI-GOV-001-ci-runtime-budget -> origin/governance/CI-GOV-001-ci-runtime-budget
+2026-10-28T23:39:38.1314140Z  * [new branch]      infra/ci-runtime-overhaul-2026-09-24 -> origin/infra/ci-runtime-overhaul-2026-09-24
+2026-10-28T23:39:38.1315314Z  * [new branch]      infra/runtime-informed-ci-scheduling-2026-09-24 -> origin/infra/runtime-informed-ci-scheduling-2026-09-24
+2026-10-28T23:39:38.1316542Z  * [new branch]      infra/test-suite-rationalisation-2026-09-24 -> origin/infra/test-suite-rationalisation-2026-09-24
+2026-10-28T23:39:38.1318124Z  * [new branch]      integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient -> origin/integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient
+2026-10-28T23:39:38.1319840Z  * [new branch]      integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity -> origin/integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity
+2026-10-28T23:39:38.1321652Z  * [new branch]      integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state -> origin/integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state
+2026-10-28T23:39:38.1323494Z  * [new branch]      integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state -> origin/integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state
+2026-10-28T23:39:38.1325399Z  * [new branch]      integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints -> origin/integration/current-markets/CURRENT-MARKETS-001A-transient-market-constraints
+2026-10-28T23:39:38.1327761Z  * [new branch]      integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior -> origin/integration/current-score-prior/CURRENT-SCORE-PRIOR-001A-openfootball-score-prior
+2026-10-28T23:39:38.1330339Z  * [new branch]      integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-P0-authority-identity-policy -> origin/integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-P0-authority-identity-policy
+2026-10-28T23:39:38.1332345Z  * [new branch]      integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-independent-poisson -> origin/integration/current-team-strength/CURRENT-TEAM-STRENGTH-001A-independent-poisson
+2026-10-28T23:39:38.1333898Z  * [new branch]      integration/post-ci/LIVE-ODDS-001-on-repaired-main -> origin/integration/post-ci/LIVE-ODDS-001-on-repaired-main
+2026-10-28T23:39:38.1335436Z  * [new branch]      integration/post-gw1/LIVE-ODDS-001-production-live-odds -> origin/integration/post-gw1/LIVE-ODDS-001-production-live-odds
+2026-10-28T23:39:38.1336652Z  * [new branch]      main                     -> origin/main
+2026-10-28T23:39:38.1338096Z  * [new branch]      readiness/CURRENT-AVAILABILITY-001B-private-manual-transient-minutes-override -> origin/readiness/CURRENT-AVAILABILITY-001B-private-manual-transient-minutes-override
+2026-10-28T23:39:38.1339238Z  * [new branch]      readiness/CURRENT-PLAYER-ALLOCATION-PORT-001A -> origin/readiness/CURRENT-PLAYER-ALLOCATION-PORT-001A
+2026-10-28T23:39:38.1340263Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L1-D1-safe-comparison-failure-diagnostics -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L1-D1-safe-comparison-failure-diagnostics
+2026-10-28T23:39:38.1341404Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L1-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L1-one-shot-live-observation
+2026-10-28T23:39:38.1342476Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L2-D2-wrapper-failure-localisation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L2-D2-wrapper-failure-localisation
+2026-10-28T23:39:38.1344095Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L2-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L2-one-shot-live-observation
+2026-10-28T23:39:38.1345721Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L3-D3-prepared-runner-diagnostic-propagation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L3-D3-prepared-runner-diagnostic-propagation
+2026-10-28T23:39:38.1346920Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L3-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L3-one-shot-live-observation
+2026-10-28T23:39:38.1348680Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L4-D4-baseline-rolling-failure-localisation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L4-D4-baseline-rolling-failure-localisation
+2026-10-28T23:39:38.1350169Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L4-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L4-one-shot-live-observation
+2026-10-28T23:39:38.1352159Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L5-D5-stage11-resource-limit-remediation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L5-D5-stage11-resource-limit-remediation
+2026-10-28T23:39:38.1353564Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L5-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L5-one-shot-live-observation
+2026-10-28T23:39:38.1355162Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L6-D6-cumulative-legal-action-scalability -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L6-D6-cumulative-legal-action-scalability
+2026-10-28T23:39:38.1356600Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L6-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L6-one-shot-live-observation
+2026-10-28T23:39:38.1358202Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L7-D7-policy-generation-scalability -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L7-D7-policy-generation-scalability
+2026-10-28T23:39:38.1359717Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L7-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L7-one-shot-live-observation
+2026-10-28T23:39:38.1361317Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-L8-one-shot-live-observation -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-L8-one-shot-live-observation
+2026-10-28T23:39:38.1362857Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001P-private-three-gw-shadow -> origin/readiness/CURRENT-TEAM-STRENGTH-001P-private-three-gw-shadow
+2026-10-28T23:39:38.1364506Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001U-parameter-uncertainty-prospective-evaluation -> origin/readiness/CURRENT-TEAM-STRENGTH-001U-parameter-uncertainty-prospective-evaluation
+2026-10-28T23:39:38.1366235Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1-failure-localisation -> origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-D1-failure-localisation
+2026-10-28T23:39:38.1367834Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-openligadb-only -> origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A02-openligadb-only
+2026-10-28T23:39:38.1369411Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2-schema-compatibility -> origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2-schema-compatibility
+2026-10-28T23:39:38.1371020Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-one-shot-reauthorization -> origin/readiness/CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-one-shot-reauthorization
+2026-10-28T23:39:38.1372747Z  * [new branch]      readiness/CURRENT-TEAM-STRENGTH-001V-prospective-protocol -> origin/readiness/CURRENT-TEAM-STRENGTH-001V-prospective-protocol
+2026-10-28T23:39:38.1374195Z  * [new branch]      readiness/DMF-PULSE-ACCEL-001-integrated-readiness -> origin/readiness/DMF-PULSE-ACCEL-001-integrated-readiness
+2026-10-28T23:39:38.1375546Z  * [new branch]      readiness/DMF-PULSE-ACCEL-001-p01-offline -> origin/readiness/DMF-PULSE-ACCEL-001-p01-offline
+2026-10-28T23:39:38.1376700Z  * [new branch]      readiness/GW1-2026-27-live-input-initial-squad -> origin/readiness/GW1-2026-27-live-input-initial-squad
+2026-10-28T23:39:38.1378126Z  * [new branch]      readiness/GW1-2026-27-market-primary-remediation -> origin/readiness/GW1-2026-27-market-primary-remediation
+2026-10-28T23:39:38.1379431Z  * [new branch]      readiness/GW1-2026-27-player-evidence-candidate -> origin/readiness/GW1-2026-27-player-evidence-candidate
+2026-10-28T23:39:38.1380860Z  * [new branch]      readiness/GW1-2026-27-player-role-prior-candidate -> origin/readiness/GW1-2026-27-player-role-prior-candidate
+2026-10-28T23:39:38.1381960Z  * [new branch]      readiness/GW1-2026-27-support-prior-candidate -> origin/readiness/GW1-2026-27-support-prior-candidate
+2026-10-28T23:39:38.1383055Z  * [new branch]      readiness/PRIVATE-V1-E2E-001A -> origin/readiness/PRIVATE-V1-E2E-001A
+2026-10-28T23:39:38.1384107Z  * [new branch]      readiness/PRIVATE-V1-LIVE-TRANSIENT-001A -> origin/readiness/PRIVATE-V1-LIVE-TRANSIENT-001A
+2026-10-28T23:39:38.1385225Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001A -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001A
+2026-10-28T23:39:38.1385791Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001B -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001B
+2026-10-28T23:39:38.1386378Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001C -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001C
+2026-10-28T23:39:38.1386890Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001D -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001D
+2026-10-28T23:39:38.1387410Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001E -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001E
+2026-10-28T23:39:38.1388167Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001F -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001F
+2026-10-28T23:39:38.1388688Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001G -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001G
+2026-10-28T23:39:38.1389190Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001H -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001H
+2026-10-28T23:39:38.1389905Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001I -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001I
+2026-10-28T23:39:38.1390408Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001J -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001J
+2026-10-28T23:39:38.1390941Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001K -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001K
+2026-10-28T23:39:38.1391883Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001L -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001L
+2026-10-28T23:39:38.1392751Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001M -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001M
+2026-10-28T23:39:38.1393834Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N
+2026-10-28T23:39:38.1395023Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R1-score-prior-prefetch -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R1-score-prior-prefetch
+2026-10-28T23:39:38.1396559Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R2-stage11-exact-acceleration -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R2-stage11-exact-acceleration
+2026-10-28T23:39:38.1398383Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R3-fpl-entry-reconciliation -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R3-fpl-entry-reconciliation
+2026-10-28T23:39:38.1400042Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R3A-manifest-reconciliation -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R3A-manifest-reconciliation
+2026-10-28T23:39:38.1401530Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R4-ft-scope-and-comparator -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R4-ft-scope-and-comparator
+2026-10-28T23:39:38.1403086Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R5-horizon-candidate-scope -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R5-horizon-candidate-scope
+2026-10-28T23:39:38.1404772Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R6-bounded-horizon-candidate-search -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R6-bounded-horizon-candidate-search
+2026-10-28T23:39:38.1406551Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R7-live-scale-exact-acceleration -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R7-live-scale-exact-acceleration
+2026-10-28T23:39:38.1408664Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1-rights-approval-reconciliation -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-R1-rights-approval-reconciliation
+2026-10-28T23:39:38.1410529Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-horizon-market-coverage-probe -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8A-horizon-market-coverage-probe
+2026-10-28T23:39:38.1412209Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1-live-rights-approval -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-R1-live-rights-approval
+2026-10-28T23:39:38.1413866Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-horizon-market-integration -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R8B-horizon-market-integration
+2026-10-28T23:39:38.1415755Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R9A-current-player-history-evidence -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9A-current-player-history-evidence
+2026-10-28T23:39:38.1417905Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R9B-current-player-eb-shadow -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9B-current-player-eb-shadow
+2026-10-28T23:39:38.1419744Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1-three-gw-shadow-decision-adapter -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A1-three-gw-shadow-decision-adapter
+2026-10-28T23:39:38.1421939Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2-live-three-gw-shadow-observation -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-A2-live-three-gw-shadow-observation
+2026-10-28T23:39:38.1424131Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-D1-safe-shadow-failure-diagnostics -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-D1-safe-shadow-failure-diagnostics
+2026-10-28T23:39:38.1425903Z  * [new branch]      readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-D2-safe-acquisition-trace -> origin/readiness/PRIVATE-V1-ONE-COMMAND-001N-R9C-D2-safe-acquisition-trace
+2026-10-28T23:39:38.1427279Z  * [new branch]      readiness/RUL-2026-27-full-season-activation -> origin/readiness/RUL-2026-27-full-season-activation
+2026-10-28T23:39:38.1428466Z  * [new branch]      rebuild/post-A-FPL-001-correctness-stack -> origin/rebuild/post-A-FPL-001-correctness-stack
+2026-10-28T23:39:38.1429770Z  * [new branch]      recovery/GW1-checkpoint-1-2-final-head-verification -> origin/recovery/GW1-checkpoint-1-2-final-head-verification
+2026-10-28T23:39:38.1430607Z  * [new branch]      recovery/GW1-checkpoint-1-2-publication-reconciliation -> origin/recovery/GW1-checkpoint-1-2-publication-reconciliation
+2026-10-28T23:39:38.1431645Z  * [new branch]      recovery/GW1-checkpoint-1-2-publish -> origin/recovery/GW1-checkpoint-1-2-publish
+2026-10-28T23:39:38.1432457Z  * [new branch]      remediation/CI-COVERAGE-SHARD-001-sharded-coverage -> origin/remediation/CI-COVERAGE-SHARD-001-sharded-coverage
+2026-10-28T23:39:38.1433212Z  * [new branch]      remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time -> origin/remediation/CI-FPL-REPLAY-001-deterministic-synthetic-time
+2026-10-28T23:39:38.1433981Z  * [new branch]      remediation/CI-TEST-001-cross-platform-canonical-fixture -> origin/remediation/CI-TEST-001-cross-platform-canonical-fixture
+2026-10-28T23:39:38.1434713Z  * [new branch]      remediation/CI-TEST-002-evaluation-cli-ansi-contract -> origin/remediation/CI-TEST-002-evaluation-cli-ansi-contract
+2026-10-28T23:39:38.1435274Z  * [new branch]      stage/A1/FND-001-foundation -> origin/stage/A1/FND-001-foundation
+2026-10-28T23:39:38.1435756Z  * [new branch]      stage/A10/OPT-010-one-gameweek-optimiser -> origin/stage/A10/OPT-010-one-gameweek-optimiser
+2026-10-28T23:39:38.1436373Z  * [new branch]      stage/A11/OPT-011-multi-gameweek-transfer-optimiser -> origin/stage/A11/OPT-011-multi-gameweek-transfer-optimiser
+2026-10-28T23:39:38.1436993Z  * [new branch]      stage/A12/EVAL-012-backtesting-framework -> origin/stage/A12/EVAL-012-backtesting-framework
+2026-10-28T23:39:38.1437510Z  * [new branch]      stage/A13/PRC-013-price-prediction -> origin/stage/A13/PRC-013-price-prediction
+2026-10-28T23:39:38.1438400Z  * [new branch]      stage/A14/CHIP-014-chip-optimisation -> origin/stage/A14/CHIP-014-chip-optimisation
+2026-10-28T23:39:38.1438966Z  * [new branch]      stage/A15/RANK-015-rank-aware-strategy -> origin/stage/A15/RANK-015-rank-aware-strategy
+2026-10-28T23:39:38.1439460Z  * [new branch]      stage/A2/RUL-002-rules-foundation -> origin/stage/A2/RUL-002-rules-foundation
+2026-10-28T23:39:38.1439962Z  * [new branch]      stage/A3/DAT-003-canonical-foundation -> origin/stage/A3/DAT-003-canonical-foundation
+2026-10-28T23:39:38.1440473Z  * [new branch]      stage/A4/FPL-004-official-ingestion -> origin/stage/A4/FPL-004-official-ingestion
+2026-10-28T23:39:38.1441003Z  * [new branch]      stage/A5/ODD-005-odds-provider-foundation -> origin/stage/A5/ODD-005-odds-provider-foundation
+2026-10-28T23:39:38.1441537Z  * [new branch]      stage/A6/NRM-006-odds-normalisation -> origin/stage/A6/NRM-006-odds-normalisation
+2026-10-28T23:39:38.1441998Z  * [new branch]      stage/A7/MIN-007-final-recovery -> origin/stage/A7/MIN-007-final-recovery
+2026-10-28T23:39:38.1442529Z  * [new branch]      stage/A8/GCS-008-goal-clean-sheet-distributions -> origin/stage/A8/GCS-008-goal-clean-sheet-distributions
+2026-10-28T23:39:38.1443135Z  * [new branch]      stage/A9/PTS-009-fpl-points-simulation -> origin/stage/A9/PTS-009-fpl-points-simulation
+2026-10-28T23:39:38.1443662Z  * [new branch]      stage/A9/PTS-009-red-card-dismissal-r3 -> origin/stage/A9/PTS-009-red-card-dismissal-r3
+2026-10-28T23:39:38.1444173Z  * [new branch]      stage/A9/PTS-009-static-acceptance-r2 -> origin/stage/A9/PTS-009-static-acceptance-r2
+2026-10-28T23:39:38.1444785Z  * [new branch]      stage/R2/FPL-2026-27-rules -> origin/stage/R2/FPL-2026-27-rules
+2026-10-28T23:39:38.1445218Z  * [new branch]      tmp/gw1-1-3b-remediation-20260819 -> origin/tmp/gw1-1-3b-remediation-20260819
+2026-10-28T23:39:38.1445690Z  * [new branch]      tmp/gw1-1-3b-remediation2-20260819 -> origin/tmp/gw1-1-3b-remediation2-20260819
+2026-10-28T23:39:38.1446133Z  * [new branch]      tmp/gw1-session1-head-probe -> origin/tmp/gw1-session1-head-probe
+2026-10-28T23:39:38.1446776Z  * [new branch]      tmp/gw1-session1-head-probe-2 -> origin/tmp/gw1-session1-head-probe-2
+2026-10-28T23:39:38.1447667Z  * [new branch]      tmp/gw1-session1-head-probe-3 -> origin/tmp/gw1-session1-head-probe-3
+2026-10-28T23:39:38.1448339Z  * [new branch]      tmp/gw1-session1-head-probe-4 -> origin/tmp/gw1-session1-head-probe-4
+2026-10-28T23:39:38.1448868Z  * [new branch]      tmp/gw1-session1-head-probe-5 -> origin/tmp/gw1-session1-head-probe-5
+2026-10-28T23:39:38.1449301Z  * [new branch]      tmp/gw1-session1-head-probe-6 -> origin/tmp/gw1-session1-head-probe-6
+2026-10-28T23:39:38.1449686Z  * [new tag]         stage14-workspace-export -> stage14-workspace-export
+2026-10-28T23:39:38.1450864Z [command]/usr/bin/git branch --list --remote origin/readiness/DMF-PULSE-ACCEL-001-p01-offline
+2026-10-28T23:39:38.1451255Z   origin/readiness/DMF-PULSE-ACCEL-001-p01-offline
+2026-10-28T23:39:38.1451856Z [command]/usr/bin/git rev-parse refs/remotes/origin/readiness/DMF-PULSE-ACCEL-001-p01-offline
+2026-10-28T23:39:38.1452280Z ea3f12bb7ca435331cd3be5b68986e777f68bd54
+2026-10-28T23:39:38.1452852Z ##[endgroup]
+2026-10-28T23:39:38.1453141Z ##[group]Determining the checkout info
+2026-10-28T23:39:38.1453454Z ##[endgroup]
+2026-10-28T23:39:38.1453647Z [command]/usr/bin/git sparse-checkout disable
+2026-10-28T23:39:38.1483520Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-28T23:39:38.1515473Z ##[group]Checking out the ref
+2026-10-28T23:39:38.1516348Z [command]/usr/bin/git checkout --progress --force -B readiness/DMF-PULSE-ACCEL-001-p01-offline refs/remotes/origin/readiness/DMF-PULSE-ACCEL-001-p01-offline
+2026-10-28T23:39:38.4164091Z Switched to a new branch 'readiness/DMF-PULSE-ACCEL-001-p01-offline'
+2026-10-28T23:39:38.4165106Z branch 'readiness/DMF-PULSE-ACCEL-001-p01-offline' set up to track 'origin/readiness/DMF-PULSE-ACCEL-001-p01-offline'.
+2026-10-28T23:39:38.4212006Z ##[endgroup]
+2026-10-28T23:39:38.4259881Z [command]/usr/bin/git log -1 --format=%H
+2026-10-28T23:39:38.4284766Z ea3f12bb7ca435331cd3be5b68986e777f68bd54
+2026-10-28T23:39:38.4293171Z ##[group]Removing auth
+2026-10-28T23:39:38.4296302Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T23:39:38.4323867Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T23:39:38.4571717Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T23:39:38.4594587Z http.https://github.com/.extraheader
+2026-10-28T23:39:38.4601290Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-28T23:39:38.4632485Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T23:39:38.4899542Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T23:39:38.4936568Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T23:39:38.5188202Z ##[endgroup]
+2026-10-28T23:39:38.5464656Z ##[group]Run actions/setup-python@v5
+2026-10-28T23:39:38.5464889Z with:
+2026-10-28T23:39:38.5465053Z   python-version: 3.13
+2026-10-28T23:39:38.5465388Z   check-latest: false
+2026-10-28T23:39:38.5467379Z   token: ***
+2026-10-28T23:39:38.5467763Z   update-environment: true
+2026-10-28T23:39:38.5467969Z   allow-prereleases: false
+2026-10-28T23:39:38.5468162Z   freethreaded: false
+2026-10-28T23:39:38.5468333Z env:
+2026-10-28T23:39:38.5468491Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:38.5468796Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:38.5469126Z   PGPASSWORD: changeme
+2026-10-28T23:39:38.5469300Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:38.5469533Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:38.5469802Z ##[endgroup]
+2026-10-28T23:39:38.6627843Z ##[group]Installed versions
+2026-10-28T23:39:38.6713082Z (node:2762) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T23:39:38.6714002Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T23:39:38.6714509Z Successfully set up CPython (3.13.16)
+2026-10-28T23:39:38.6715109Z ##[endgroup]
+2026-10-28T23:39:38.6859598Z ##[group]Run python -m pip install --disable-pip-version-check uv==0.11.26
+2026-10-28T23:39:38.6860098Z [36;1mpython -m pip install --disable-pip-version-check uv==0.11.26[0m
+2026-10-28T23:39:38.7038240Z shell: /usr/bin/bash -e {0}
+2026-10-28T23:39:38.7038507Z env:
+2026-10-28T23:39:38.7038693Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:38.7039042Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:38.7039392Z   PGPASSWORD: changeme
+2026-10-28T23:39:38.7039582Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:38.7039827Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:38.7040182Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:38.7040529Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib/pkgconfig
+2026-10-28T23:39:38.7040869Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:38.7041522Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:38.7041824Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:38.7042122Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib
+2026-10-28T23:39:38.7042376Z ##[endgroup]
+2026-10-28T23:39:41.6519240Z Collecting uv==0.11.26
+2026-10-28T23:39:41.7171889Z   Downloading uv-0.11.26-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+2026-10-28T23:39:41.7418128Z Downloading uv-0.11.26-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (26.3 MB)
+2026-10-28T23:39:42.1589870Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 26.3/26.3 MB 68.6 MB/s  0:00:00
+2026-10-28T23:39:42.2927484Z Installing collected packages: uv
+2026-10-28T23:39:42.5240279Z Successfully installed uv-0.11.26
+2026-10-28T23:39:42.5947957Z ##[group]Run uv sync --all-groups --frozen
+2026-10-28T23:39:42.5948280Z [36;1muv sync --all-groups --frozen[0m
+2026-10-28T23:39:42.6010914Z shell: /usr/bin/bash -e {0}
+2026-10-28T23:39:42.6011272Z env:
+2026-10-28T23:39:42.6011510Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:42.6012035Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:42.6012393Z   PGPASSWORD: changeme
+2026-10-28T23:39:42.6012634Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:42.6012924Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:42.6013257Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:42.6013670Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib/pkgconfig
+2026-10-28T23:39:42.6014005Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:42.6014395Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:42.6014755Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:42.6015138Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib
+2026-10-28T23:39:42.6015404Z ##[endgroup]
+2026-10-28T23:39:42.6713988Z Using CPython 3.13.16 interpreter at: /opt/hostedtoolcache/Python/3.13.16/x64/bin/python3.13
+2026-10-28T23:39:42.6714861Z Creating virtual environment at: .venv
+2026-10-28T23:39:42.6804486Z    Building dmf-pulse @ file:///home/runner/work/dmf-pulse/dmf-pulse
+2026-10-28T23:39:42.7241860Z Downloading psycopg-binary (4.9MiB)
+2026-10-28T23:39:42.7438340Z Downloading pydantic-core (2.0MiB)
+2026-10-28T23:39:42.7442305Z Downloading pygments (1.2MiB)
+2026-10-28T23:39:42.7442786Z Downloading sqlalchemy (3.1MiB)
+2026-10-28T23:39:42.7444971Z Downloading hypothesis (1.1MiB)
+2026-10-28T23:39:42.7447440Z Downloading ruff (10.9MiB)
+2026-10-28T23:39:42.7448587Z Downloading mypy (14.0MiB)
+2026-10-28T23:39:42.9511059Z  Downloaded pydantic-core
+2026-10-28T23:39:43.1027298Z  Downloaded psycopg-binary
+2026-10-28T23:39:43.1123426Z  Downloaded ruff
+2026-10-28T23:39:43.1432066Z  Downloaded hypothesis
+2026-10-28T23:39:43.1853884Z  Downloaded sqlalchemy
+2026-10-28T23:39:43.1971748Z  Downloaded pygments
+2026-10-28T23:39:43.3300380Z  Downloaded mypy
+2026-10-28T23:39:43.5288542Z       Built dmf-pulse @ file:///home/runner/work/dmf-pulse/dmf-pulse
+2026-10-28T23:39:43.5312473Z Prepared 38 packages in 856ms
+2026-10-28T23:39:43.5712720Z Installed 38 packages in 39ms
+2026-10-28T23:39:43.5713152Z  + alembic==1.18.5
+2026-10-28T23:39:43.5713577Z  + annotated-doc==0.0.4
+2026-10-28T23:39:43.5713881Z  + annotated-types==0.7.0
+2026-10-28T23:39:43.5714168Z  + build==1.5.0
+2026-10-28T23:39:43.5714412Z  + coverage==7.15.2
+2026-10-28T23:39:43.5714803Z  + dmf-pulse==0.2.0 (from file:///home/runner/work/dmf-pulse/dmf-pulse)
+2026-10-28T23:39:43.5715366Z  + greenlet==3.5.4
+2026-10-28T23:39:43.5715641Z  + hatchling==1.31.0
+2026-10-28T23:39:43.5715900Z  + hypothesis==6.159.0
+2026-10-28T23:39:43.5716211Z  + iniconfig==2.3.0
+2026-10-28T23:39:43.5716466Z  + librt==0.13.0
+2026-10-28T23:39:43.5716730Z  + mako==1.3.12
+2026-10-28T23:39:43.5717029Z  + markdown-it-py==4.2.0
+2026-10-28T23:39:43.5717310Z  + markupsafe==3.0.3
+2026-10-28T23:39:43.5717690Z  + mdurl==0.1.2
+2026-10-28T23:39:43.5717950Z  + mypy==1.20.2
+2026-10-28T23:39:43.5718199Z  + mypy-extensions==1.1.0
+2026-10-28T23:39:43.5718474Z  + packaging==26.2
+2026-10-28T23:39:43.5718727Z  + pathspec==1.1.1
+2026-10-28T23:39:43.5718966Z  + pluggy==1.6.0
+2026-10-28T23:39:43.5719204Z  + psycopg==3.3.4
+2026-10-28T23:39:43.5719453Z  + psycopg-binary==3.3.4
+2026-10-28T23:39:43.5719716Z  + pydantic==2.13.4
+2026-10-28T23:39:43.5719969Z  + pydantic-core==2.46.4
+2026-10-28T23:39:43.5720234Z  + pygments==2.20.0
+2026-10-28T23:39:43.5720544Z  + pyproject-hooks==1.2.0
+2026-10-28T23:39:43.5720816Z  + pytest==9.1.1
+2026-10-28T23:39:43.5721059Z  + pytest-cov==7.1.0
+2026-10-28T23:39:43.5721301Z  + pyyaml==6.0.3
+2026-10-28T23:39:43.5721534Z  + rich==15.0.0
+2026-10-28T23:39:43.5721758Z  + ruff==0.15.22
+2026-10-28T23:39:43.5721998Z  + shellingham==1.5.4
+2026-10-28T23:39:43.5722579Z  + sortedcontainers==2.4.0
+2026-10-28T23:39:43.5722862Z  + sqlalchemy==2.0.51
+2026-10-28T23:39:43.5723144Z  + trove-classifiers==2026.6.1.19
+2026-10-28T23:39:43.5723420Z  + typer==0.27.0
+2026-10-28T23:39:43.5723667Z  + typing-extensions==4.16.0
+2026-10-28T23:39:43.5723951Z  + typing-inspection==0.4.2
+2026-10-28T23:39:43.5877793Z ##[group]Run actions/download-artifact@v8
+2026-10-28T23:39:43.5878054Z with:
+2026-10-28T23:39:43.5878300Z   name: coverage-plan-ea3f12bb7ca435331cd3be5b68986e777f68bd54
+2026-10-28T23:39:43.5878607Z   path: /home/runner/work/_temp/coverage-plan
+2026-10-28T23:39:43.5878854Z   digest-mismatch: error
+2026-10-28T23:39:43.5879057Z   merge-multiple: false
+2026-10-28T23:39:43.5879260Z   repository: sebgreenhalgh/dmf-pulse
+2026-10-28T23:39:43.5879475Z   run-id: 40788607213
+2026-10-28T23:39:43.5879650Z   skip-decompress: false
+2026-10-28T23:39:43.5879825Z env:
+2026-10-28T23:39:43.5879977Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:43.5880285Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:43.5880623Z   PGPASSWORD: changeme
+2026-10-28T23:39:43.5880796Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:43.5881030Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:43.5881610Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:43.5881953Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib/pkgconfig
+2026-10-28T23:39:43.5882278Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:43.5882573Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:43.5882866Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:43.5883160Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib
+2026-10-28T23:39:43.5883416Z ##[endgroup]
+2026-10-28T23:39:43.7081356Z Downloading single artifact
+2026-10-28T23:39:43.8101947Z Preparing to download the following artifacts:
+2026-10-28T23:39:43.8103245Z - coverage-plan-ea3f12bb7ca435331cd3be5b68986e777f68bd54 (ID: 12859809236, Size: 238898, Expected Digest: sha256:2150f897ad0a335d8b1e44f65e7ec561c20d2911aa58b623d31a1ae524c3ca79)
+2026-10-28T23:39:43.9646160Z Redirecting to blob download url: https://productionresultssa31.blob.core.windows.net/actions-results/1f03a97f-7bd3-8144-982f-ad913206e760/workflow-job-run-7e31ecfe-a784-5fe2-b1cd-433ce01df981/artifacts/792beadeb5adf540f0eda2a8633be05339b70a6f62cc87d468a93ea2ee10622d.zip
+2026-10-28T23:39:43.9648214Z Starting download of artifact to: /home/runner/work/_temp/coverage-plan
+2026-10-28T23:39:44.0068955Z (node:2885) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-28T23:39:44.0070209Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T23:39:44.0387180Z SHA256 digest of downloaded artifact is 2150f897ad0a335d8b1e44f65e7ec561c20d2911aa58b623d31a1ae524c3ca79
+2026-10-28T23:39:44.0388039Z Artifact download completed successfully.
+2026-10-28T23:39:44.0388448Z Total of 1 artifact(s) downloaded
+2026-10-28T23:39:44.0391185Z Download artifact has finished successfully
+2026-10-28T23:39:44.0502576Z ##[group]Run uv run alembic upgrade head
+2026-10-28T23:39:44.0502877Z [36;1muv run alembic upgrade head[0m
+2026-10-28T23:39:44.0558468Z shell: /usr/bin/bash -e {0}
+2026-10-28T23:39:44.0558707Z env:
+2026-10-28T23:39:44.0558879Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:44.0559215Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:44.0559572Z   PGPASSWORD: changeme
+2026-10-28T23:39:44.0559760Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:44.0560005Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:44.0560341Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:44.0560684Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib/pkgconfig
+2026-10-28T23:39:44.0561044Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:44.0561354Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:44.0561708Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:44.0562028Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib
+2026-10-28T23:39:44.0562291Z ##[endgroup]
+2026-10-28T23:39:46.2767959Z INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+2026-10-28T23:39:46.2768608Z INFO  [alembic.runtime.migration] Will assume transactional DDL.
+2026-10-28T23:39:46.2901153Z INFO  [alembic.runtime.migration] Running upgrade  -> 20260723_0001, Create the DAT-003 canonical temporal PostgreSQL foundation.
+2026-10-28T23:39:46.3768739Z INFO  [alembic.runtime.migration] Running upgrade 20260723_0001 -> 20260724_0002, Remediate DAT-003 and add the FPL-004 ingestion foundation.
+2026-10-28T23:39:46.4697824Z INFO  [alembic.runtime.migration] Running upgrade 20260724_0002 -> 20260725_0003, Bind FPL bundles to authoritative rights and persisted quality.
+2026-10-28T23:39:46.4929465Z INFO  [alembic.runtime.migration] Running upgrade 20260725_0003 -> 20260725_0004, Add canonical operators, markets, exact odds, and quota evidence.
+2026-10-28T23:39:46.5281162Z INFO  [alembic.runtime.migration] Running upgrade 20260725_0004 -> 20260803_0005, NRM-006 post-commit odds publication and normalisation persistence.
+2026-10-28T23:39:46.5774559Z INFO  [alembic.runtime.migration] Running upgrade 20260803_0005 -> 20260807_0006, MIN-007F immutable availability registry and prediction persistence.
+2026-10-28T23:39:47.0988003Z ##[group]Run printf -v shard_label '%02d' "7"
+2026-10-28T23:39:47.0988343Z [36;1mprintf -v shard_label '%02d' "7"[0m
+2026-10-28T23:39:47.0988611Z [36;1mmkdir -p "${RUNNER_TEMP}/coverage-raw"[0m
+2026-10-28T23:39:47.0989304Z [36;1mCOVERAGE_FILE="${RUNNER_TEMP}/coverage-raw/.coverage" uv run pytest "@${RUNNER_TEMP}/coverage-plan/shard-${shard_label}.args" --cov=dmf_pulse --cov-branch --cov-report= --cov-fail-under=0 -m "not performance"[0m
+2026-10-28T23:39:47.1048192Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-28T23:39:47.1048483Z env:
+2026-10-28T23:39:47.1048659Z   DMF_ENVIRONMENT: TEST
+2026-10-28T23:39:47.1048998Z   DMF_TEST_DATABASE_URL: postgresql+psycopg://dmf_test@127.0.0.1:5432/dmf_pulse_test
+2026-10-28T23:39:47.1049352Z   PGPASSWORD: changeme
+2026-10-28T23:39:47.1049549Z   UV_NO_PROGRESS: 1
+2026-10-28T23:39:47.1049795Z   UV_CACHE_DIR: /home/runner/work/dmf-pulse/dmf-pulse/../.uv-cache
+2026-10-28T23:39:47.1050170Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:47.1050512Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib/pkgconfig
+2026-10-28T23:39:47.1050841Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:47.1051147Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:47.1051446Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.16/x64
+2026-10-28T23:39:47.1051747Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.16/x64/lib
+2026-10-28T23:39:47.1052008Z ##[endgroup]
+2026-10-28T23:39:58.1072093Z ============================= test session starts ==============================
+2026-10-28T23:39:58.1072751Z platform linux -- Python 3.13.16, pytest-9.1.1, pluggy-1.6.0
+2026-10-28T23:39:58.1073234Z rootdir: /home/runner/work/dmf-pulse/dmf-pulse
+2026-10-28T23:39:58.1073635Z configfile: pyproject.toml
+2026-10-28T23:39:58.1073959Z plugins: cov-7.1.0, hypothesis-6.159.0
+2026-10-28T23:39:58.1074291Z collected 687 items
+2026-10-28T23:39:58.1074459Z 
+2026-10-28T23:40:21.3202368Z tests/assurance/fpl_points/test_assurance_mutations.py ...............   [  2%]
+2026-10-28T23:40:21.3960563Z tests/assurance/optimisation/test_r2f_coverage_regressions.py ........   [  3%]
+2026-10-28T23:40:21.4108396Z tests/contract/evaluation/test_public_contracts.py ....                  [  3%]
+2026-10-28T23:40:21.4221428Z tests/golden/evaluation/test_golden_scorecards.py ..                     [  4%]
+2026-10-28T23:40:22.2256120Z tests/golden/optimisation/test_multi_gameweek_oracle.py ..........       [  5%]
+2026-10-28T23:40:23.1611406Z tests/integration/availability/test_audit0073_registry_atomicity.py .... [  6%]
+2026-10-28T23:40:23.5532160Z ..                                                                       [  6%]
+2026-10-28T23:40:24.2331923Z tests/integration/availability/test_audit0073c_final_output_truthfulness.py . [  6%]
+2026-10-28T23:40:24.3023839Z                                                                          [  6%]
+2026-10-28T23:40:24.3534554Z tests/integration/evaluation/test_service_vertical_slice.py ..           [  6%]
+2026-10-28T23:40:24.4039117Z tests/integration/rank_strategy/test_synthetic_overall_field.py ....     [  7%]
+2026-10-28T23:40:25.5451388Z tests/property/football_events/test_score_distribution_properties.py ... [  8%]
+2026-10-28T23:40:27.6490004Z ..                                                                       [  8%]
+2026-10-28T23:40:34.6736450Z tests/property/optimisation/test_multi_gameweek_properties.py .......... [  9%]
+2026-10-28T23:40:52.1959553Z ...........................                                              [ 13%]
+2026-10-28T23:40:52.2149898Z tests/unit/assurance/test_coverage_gate.py .....                         [ 14%]
+2026-10-28T23:40:53.6426165Z tests/unit/assurance/test_min007h_fail_closed.py ..............          [ 16%]
+2026-10-28T23:40:54.2087366Z tests/unit/assurance/test_nrm006_acceptance_verifier.py ........         [ 17%]
+2026-10-28T23:40:54.5142580Z tests/unit/assurance/test_review_pack.py .................               [ 20%]
+2026-10-28T23:40:54.5228060Z tests/unit/availability/test_projection.py ..                            [ 20%]
+2026-10-28T23:41:14.5984335Z tests/unit/evaluation/test_p01_fallback_a03.py ......................... [ 24%]
+2026-10-28T23:41:25.3005880Z .................................................                        [ 31%]
+2026-10-28T23:41:27.3860265Z tests/unit/football_events/test_public_model_boundaries.py ............. [ 33%]
+2026-10-28T23:41:31.6208158Z .............................                                            [ 37%]
+2026-10-28T23:41:56.6191041Z tests/unit/football_events/test_team_strength_mixture.py ..........      [ 38%]
+2026-10-28T23:41:58.9329676Z tests/unit/fpl_points/test_allocation.py ...........................     [ 42%]
+2026-10-28T23:42:14.6305490Z tests/unit/fpl_points/test_current_player_shadow_stage9.py ....          [ 43%]
+2026-10-28T23:42:14.7715127Z tests/unit/ingestion/test_fpl_current_input.py .......................s. [ 46%]
+2026-10-28T23:42:15.1012332Z .........................................                                [ 52%]
+2026-10-28T23:42:15.1551065Z tests/unit/ingestion/test_fpl_direct.py ...................              [ 55%]
+2026-10-28T23:42:15.5532545Z tests/unit/ingestion/test_fpl_odds_team_identity.py .................... [ 58%]
+2026-10-28T23:42:15.7540440Z .............                                                            [ 60%]
+2026-10-28T23:42:16.0498083Z tests/unit/ingestion/test_fpl_parser.py ................................ [ 65%]
+2026-10-28T23:42:16.1139458Z .............                                                            [ 66%]
+2026-10-28T23:42:16.1296635Z tests/unit/ingestion/test_fpl_provider_config.py ......                  [ 67%]
+2026-10-28T23:42:50.6957097Z tests/unit/optimisation/test_stage10_r7_factoring.py ...                 [ 68%]
+2026-10-28T23:42:55.1352594Z tests/unit/optimisation/test_transfer_count_frontier.py ............     [ 70%]
+2026-10-28T23:45:58.6199452Z tests/unit/private_v1/test_a1_allocation_injection.py ........           [ 71%]
+2026-10-28T23:45:59.0289410Z tests/unit/private_v1/test_bounded_horizon_candidates.py .............   [ 73%]
+2026-10-28T23:46:21.5918457Z tests/unit/private_v1/test_rolling_contract_hardening.py ............... [ 75%]
+2026-10-28T23:46:21.7535453Z ........                                                                 [ 76%]
+2026-10-28T23:46:21.7662651Z tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py ..... [ 77%]
+2026-10-29T00:12:48.0387683Z ........................................................................ [ 87%]
+2026-10-29T00:21:30.8771247Z ...................................                                      [ 92%]
+2026-10-29T00:21:30.8890502Z tests/unit/private_v1/test_team_strength_l1_cli.py ...                   [ 93%]
+2026-10-29T00:29:34.0053152Z tests/unit/private_v1/test_team_strength_shadow_cases.py .               [ 93%]
+2026-10-29T00:29:34.1376470Z tests/unit/rank_strategy/test_rank_utility_gates.py .................... [ 96%]
+2026-10-29T00:29:34.1455717Z .                                                                        [ 96%]
+2026-10-29T00:29:34.8381688Z tests/unit/scripts/test_ci_workflow_contract.py ........................ [ 99%]
+2026-10-29T00:29:36.7310005Z .                                                                        [100%]
+2026-10-29T00:29:36.7310279Z 
+2026-10-29T00:29:36.7310416Z =============================== warnings summary ===============================
+2026-10-29T00:29:36.7310786Z tests/unit/rank_strategy/test_rank_utility_gates.py: 19 warnings
+2026-10-29T00:29:36.7311375Z   /home/runner/work/dmf-pulse/dmf-pulse/.venv/lib/python3.13/site-packages/pydantic/main.py:475: UserWarning: Pydantic serializer warnings:
+2026-10-29T00:29:36.7312683Z     PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='confidence', input_value='A', input_type=str])
+2026-10-29T00:29:36.7313265Z     return self.__pydantic_serializer__.to_python(
+2026-10-29T00:29:36.7313438Z 
+2026-10-29T00:29:36.7313970Z tests/unit/rank_strategy/test_rank_utility_gates.py::test_candidate_level_rank_confidence_cannot_be_hidden_by_context
+2026-10-29T00:29:36.7314626Z tests/unit/rank_strategy/test_rank_utility_gates.py::test_human_review_availability_does_not_bypass_low_confidence_fail_closed_gate
+2026-10-29T00:29:36.7315307Z tests/unit/rank_strategy/test_rank_utility_gates.py::test_low_confidence_explicit_target_is_evaluated_but_cannot_override_points
+2026-10-29T00:29:36.7316005Z   /home/runner/work/dmf-pulse/dmf-pulse/.venv/lib/python3.13/site-packages/pydantic/main.py:475: UserWarning: Pydantic serializer warnings:
+2026-10-29T00:29:36.7316780Z     PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='confidence', input_value='D', input_type=str])
+2026-10-29T00:29:36.7317356Z     return self.__pydantic_serializer__.to_python(
+2026-10-29T00:29:36.7317526Z 
+2026-10-29T00:29:36.7317973Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2026-10-29T00:29:36.7318338Z =========================== short test summary info ============================
+2026-10-29T00:29:36.7319345Z SKIPPED [1] tests/unit/ingestion/test_fpl_current_input.py:776: hard links are unavailable on this test host: [Errno 18] Invalid cross-device link: '/home/runner/work/dmf-pulse/dmf-pulse/fixtures/fpl/FPL-004/happy_path/bootstrap.json' -> '/tmp/pytest-of-runner/pytest-0/test_resolved_and_hard_link_al0/bootstrap-hard-link.json'
+2026-10-29T00:29:36.7320959Z =========== 686 passed, 1 skipped, 22 warnings in 2985.40s (0:49:45) ===========
+2026-10-29T00:29:39.7770580Z ##[error]Process completed with exit code 1.
+2026-10-29T00:29:39.7873362Z Post job cleanup.
+2026-10-29T00:29:39.8598492Z [command]/usr/bin/git version
+2026-10-29T00:29:39.8640450Z git version 2.55.0
+2026-10-29T00:29:39.8671832Z Temporarily overriding HOME='/home/runner/work/_temp/45d49a40-366d-43c3-9b26-48a4cf147b96' before making global git config changes
+2026-10-29T00:29:39.8672915Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-29T00:29:39.8674506Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/dmf-pulse/dmf-pulse
+2026-10-29T00:29:39.8711162Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-29T00:29:39.8742073Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-29T00:29:39.9010211Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-29T00:29:39.9043363Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-29T00:29:39.9335175Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-29T00:29:39.9372396Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-29T00:29:39.9760230Z Print service container logs: 190acc2cd138458d8a3599e5b46322fb_postgres184bookwormsha2561961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296_38892b
+2026-10-29T00:29:39.9764680Z ##[command]/usr/bin/docker logs --details 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-29T00:29:39.9914979Z  The files belonging to this database system will be owned by user "postgres".
+2026-10-29T00:29:39.9917874Z  initdb: warning: enabling "trust" authentication for local connections
+2026-10-29T00:29:39.9919260Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+2026-10-29T00:29:39.9920532Z  2026-10-28 23:39:35.634 UTC [1] LOG:  starting PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-29T00:29:39.9921491Z  2026-10-28 23:39:35.635 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-10-29T00:29:39.9922171Z  2026-10-28 23:39:35.635 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-10-29T00:29:39.9922840Z  2026-10-28 23:39:35.636 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-29T00:29:39.9923584Z  2026-10-28 23:39:35.640 UTC [75] LOG:  database system was shut down at 2026-10-28 23:39:35 UTC
+2026-10-29T00:29:39.9924258Z  2026-10-28 23:39:35.643 UTC [1] LOG:  database system is ready to accept connections
+2026-10-29T00:29:39.9925154Z  2026-10-28 23:40:23.309 UTC [267] ERROR:  new row for relation "prediction_run" violates check constraint "ck_prediction_publication_counts"
+2026-10-29T00:29:39.9929084Z  2026-10-28 23:40:23.309 UTC [267] DETAIL:  Failing row contains (01a184e2-df8d-7b23-80a9-a07ddf02fe16, f7f06644a7d8084fc38bd85c6748afc0b79710721b34364c84be004c5808c46d, a81008f394f377126f57aae8ea353c77d82ec7e55c1fab63921f506a99747313, null, 943094f5-1d10-5d96-b88b-d271464f3e48, cc1083fa-0c4a-59ab-b6c5-60c04f760782, 2026-08-14 17:30:00+00, null, 329d6a6390ec909e44220ef695e1631b0089504a64ac851d7a0c06f0575f0b7a, fd1b8298d82330f547884aec877c3d14367467297556fae4c800b0dce7d7366a, d54afbb27f4ea2512801e1e8588c8c6c4454388c824dacd00f18fecdb35c6994, integration, {"manager_regime_id": "integration"}, integration, 1, 1, 0, 0, 0, 0, DRAFT, NONE, 0, null, null, 9, 1, MIN-007F-INTEGRATION, 2026-10-28 23:40:23.299095+00).
+2026-10-29T00:29:39.9936221Z  2026-10-28 23:40:23.309 UTC [267] STATEMENT:  INSERT INTO football.prediction_run (prediction_input_signature_sha256, output_semantic_sha256, fixture_id, team_id, as_of, feature_cutoff, model_version_sha256, dataset_version_sha256, policy_sha256, manager_regime_id, manager_context, seed, sample_count, dependency_count, hard_eligibility_count, role_marginal_count, minute_pmf_count, scenario_count, core_state, final_output_state, final_output_count, bench_size, bench_goalkeeper_slots, code_identity) VALUES ($1::VARCHAR, $2::VARCHAR, $3::UUID, $4::UUID, $5::TIMESTAMP WITH TIME ZONE, $6::TIMESTAMP WITH TIME ZONE, $7::VARCHAR, $8::VARCHAR, $9::VARCHAR, $10::VARCHAR, $11::JSONB, $12::VARCHAR, $13::INTEGER, $14::INTEGER, $15::INTEGER, $16::INTEGER, $17::INTEGER, $18::INTEGER, $19::VARCHAR, $20::VARCHAR, $21::INTEGER, $22::SMALLINT, $23::SMALLINT, $24::VARCHAR) ON CONFLICT (prediction_input_signature_sha256) DO NOTHING RETURNING football.prediction_run.prediction_run_id
+2026-10-29T00:29:39.9958709Z  2026-10-28 23:40:23.337 UTC [267] ERROR:  new row for relation "prediction_run" violates check constraint "ck_prediction_publication_counts"
+2026-10-29T00:29:39.9962867Z  2026-10-28 23:40:23.337 UTC [267] DETAIL:  Failing row contains (01a184e2-dfa9-76db-80a3-ec1199b569fe, b51507eda50da41f924d7fc6bef7bb9ad6489752c78c21e973238c19347184f7, 59dad8d1c656442604ab91f92046bd6fe1e249a69a66a8c6395830174c85bc8a, null, 943094f5-1d10-5d96-b88b-d271464f3e48, cc1083fa-0c4a-59ab-b6c5-60c04f760782, 2026-08-14 17:30:00+00, null, 329d6a6390ec909e44220ef695e1631b0089504a64ac851d7a0c06f0575f0b7a, fd1b8298d82330f547884aec877c3d14367467297556fae4c800b0dce7d7366a, d54afbb27f4ea2512801e1e8588c8c6c4454388c824dacd00f18fecdb35c6994, integration, {"manager_regime_id": "integration"}, integration, 2, 1, 0, 20, 40, 1, DRAFT, NONE, 0, null, null, 9, 1, MIN-007F-INTEGRATION, 2026-10-28 23:40:23.299095+00).
+2026-10-29T00:29:39.9970230Z  2026-10-28 23:40:23.337 UTC [267] STATEMENT:  INSERT INTO football.prediction_run (prediction_input_signature_sha256, output_semantic_sha256, fixture_id, team_id, as_of, feature_cutoff, model_version_sha256, dataset_version_sha256, policy_sha256, manager_regime_id, manager_context, seed, sample_count, dependency_count, hard_eligibility_count, role_marginal_count, minute_pmf_count, scenario_count, core_state, final_output_state, final_output_count, bench_size, bench_goalkeeper_slots, code_identity) VALUES ($1::VARCHAR, $2::VARCHAR, $3::UUID, $4::UUID, $5::TIMESTAMP WITH TIME ZONE, $6::TIMESTAMP WITH TIME ZONE, $7::VARCHAR, $8::VARCHAR, $9::VARCHAR, $10::VARCHAR, $11::JSONB, $12::VARCHAR, $13::INTEGER, $14::INTEGER, $15::INTEGER, $16::INTEGER, $17::INTEGER, $18::INTEGER, $19::VARCHAR, $20::VARCHAR, $21::INTEGER, $22::SMALLINT, $23::SMALLINT, $24::VARCHAR) ON CONFLICT (prediction_input_signature_sha256) DO NOTHING RETURNING football.prediction_run.prediction_run_id
+2026-10-29T00:29:39.9974630Z  2026-10-28 23:40:24.016 UTC [267] ERROR:  FINAL_OUTPUT_ROW_MISMATCH
+2026-10-29T00:29:39.9975385Z  2026-10-28 23:40:24.016 UTC [267] CONTEXT:  PL/pgSQL function football.validate_final_output_complete() line 55 at RAISE
+2026-10-29T00:29:39.9976154Z  2026-10-28 23:40:24.016 UTC [267] STATEMENT:  SET CONSTRAINTS ALL IMMEDIATE
+2026-10-29T00:29:39.9976757Z  2026-10-28 23:40:24.057 UTC [267] ERROR:  FINAL_OUTPUT_PLAYER_PAYLOAD_MISMATCH
+2026-10-29T00:29:39.9977695Z  2026-10-28 23:40:24.057 UTC [267] CONTEXT:  PL/pgSQL function football.validate_final_output_complete() line 160 at RAISE
+2026-10-29T00:29:39.9978456Z  2026-10-28 23:40:24.057 UTC [267] STATEMENT:  SET CONSTRAINTS ALL IMMEDIATE
+2026-10-29T00:29:39.9979041Z  2026-10-28 23:40:24.096 UTC [267] ERROR:  FINAL_OUTPUT_PLAYER_PAYLOAD_MISMATCH
+2026-10-29T00:29:39.9979801Z  2026-10-28 23:40:24.096 UTC [267] CONTEXT:  PL/pgSQL function football.validate_final_output_complete() line 160 at RAISE
+2026-10-29T00:29:39.9980593Z  2026-10-28 23:40:24.096 UTC [267] STATEMENT:  SET CONSTRAINTS ALL IMMEDIATE
+2026-10-29T00:29:39.9981160Z  2026-10-28 23:40:24.135 UTC [267] ERROR:  FINAL_OUTPUT_RESULT_HASH_MISMATCH
+2026-10-29T00:29:39.9981903Z  2026-10-28 23:40:24.135 UTC [267] CONTEXT:  PL/pgSQL function football.validate_final_output_complete() line 178 at RAISE
+2026-10-29T00:29:39.9982667Z  2026-10-28 23:40:24.135 UTC [267] STATEMENT:  SET CONSTRAINTS ALL IMMEDIATE
+2026-10-29T00:29:39.9983217Z  2026-10-28 23:40:24.162 UTC [267] ERROR:  FINAL_OUTPUT_OUTPUT_HASH_MISMATCH
+2026-10-29T00:29:39.9983937Z  2026-10-28 23:40:24.162 UTC [267] CONTEXT:  PL/pgSQL function football.validate_final_output_complete() line 201 at RAISE
+2026-10-29T00:29:39.9984673Z  2026-10-28 23:40:24.162 UTC [267] STATEMENT:  SET CONSTRAINTS ALL IMMEDIATE
+2026-10-29T00:29:39.9985202Z  2026-10-28 23:44:35.376 UTC [73] LOG:  checkpoint starting: time
+2026-10-29T00:29:39.9986666Z  2026-10-28 23:45:47.865 UTC [73] LOG:  checkpoint complete: wrote 723 buffers (4.4%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=72.393 s, sync=0.036 s, total=72.490 s; sync files=6108, longest=0.001 s, average=0.001 s; distance=10738 kB, estimate=10738 kB; lsn=0/260F9A0, redo lsn=0/260F910
+2026-10-29T00:29:39.9988302Z  This user must also own the server process.
+2026-10-29T00:29:39.9988696Z  
+2026-10-29T00:29:39.9989060Z  The database cluster will be initialized with locale "en_US.utf8".
+2026-10-29T00:29:39.9989623Z  The default database encoding has accordingly been set to "UTF8".
+2026-10-29T00:29:39.9990190Z  The default text search configuration will be set to "english".
+2026-10-29T00:29:39.9990622Z  
+2026-10-29T00:29:39.9990860Z  Data page checksums are enabled.
+2026-10-29T00:29:39.9991182Z  
+2026-10-29T00:29:39.9991787Z  fixing permissions on existing directory /var/lib/postgresql/18/docker ... ok
+2026-10-29T00:29:39.9992321Z  creating subdirectories ... ok
+2026-10-29T00:29:40.0005658Z  selecting dynamic shared memory implementation ... posix
+2026-10-29T00:29:40.0006145Z  selecting default "max_connections" ... 100
+2026-10-29T00:29:40.0006563Z  selecting default "shared_buffers" ... 128MB
+2026-10-29T00:29:40.0006959Z  selecting default time zone ... Etc/UTC
+2026-10-29T00:29:40.0007314Z  creating configuration files ... ok
+2026-10-29T00:29:40.0007873Z  running bootstrap script ... ok
+2026-10-29T00:29:40.0008578Z  performing post-bootstrap initialization ... ok
+2026-10-29T00:29:40.0008977Z  syncing data to disk ... ok
+2026-10-29T00:29:40.0009254Z  
+2026-10-29T00:29:40.0009484Z  
+2026-10-29T00:29:40.0009771Z  Success. You can now start the database server using:
+2026-10-29T00:29:40.0010162Z  
+2026-10-29T00:29:40.0010481Z      pg_ctl -D /var/lib/postgresql/18/docker -l logfile start
+2026-10-29T00:29:40.0010889Z  
+2026-10-29T00:29:40.0011732Z  waiting for server to start....2026-10-28 23:39:35.327 UTC [53] LOG:  starting PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-29T00:29:40.0012898Z  2026-10-28 23:39:35.327 UTC [53] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-29T00:29:40.0013621Z  2026-10-28 23:39:35.331 UTC [59] LOG:  database system was shut down at 2026-10-28 23:39:34 UTC
+2026-10-29T00:29:40.0014271Z  2026-10-28 23:39:35.334 UTC [53] LOG:  database system is ready to accept connections
+2026-10-29T00:29:40.0014763Z   done
+2026-10-29T00:29:40.0015002Z  server started
+2026-10-29T00:29:40.0015248Z  CREATE DATABASE
+2026-10-29T00:29:40.0015495Z  
+2026-10-29T00:29:40.0015720Z  
+2026-10-29T00:29:40.0016117Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+2026-10-29T00:29:40.0016614Z  
+2026-10-29T00:29:40.0017072Z  waiting for server to shut down...2026-10-28 23:39:35.511 UTC [53] LOG:  received fast shutdown request
+2026-10-29T00:29:40.0017929Z  .2026-10-28 23:39:35.511 UTC [53] LOG:  aborting any active transactions
+2026-10-29T00:29:40.0018662Z  2026-10-28 23:39:35.513 UTC [53] LOG:  background worker "logical replication launcher" (PID 62) exited with exit code 1
+2026-10-29T00:29:40.0019358Z  2026-10-28 23:39:35.514 UTC [57] LOG:  shutting down
+2026-10-29T00:29:40.0019857Z  2026-10-28 23:39:35.515 UTC [57] LOG:  checkpoint starting: shutdown immediate
+2026-10-29T00:29:40.0021299Z  2026-10-28 23:39:35.600 UTC [57] LOG:  checkpoint complete: wrote 941 buffers (5.7%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.083 s, sync=0.002 s, total=0.086 s; sync files=303, longest=0.001 s, average=0.001 s; distance=4334 kB, estimate=4334 kB; lsn=0/1B92F38, redo lsn=0/1B92F38
+2026-10-29T00:29:40.0022756Z  2026-10-28 23:39:35.610 UTC [53] LOG:  database system is shut down
+2026-10-29T00:29:40.0023164Z   done
+2026-10-29T00:29:40.0023397Z  server stopped
+2026-10-29T00:29:40.0023662Z  
+2026-10-29T00:29:40.0023975Z  PostgreSQL init process complete; ready for start up.
+2026-10-29T00:29:40.0024350Z  
+2026-10-29T00:29:40.0033573Z Stop and remove container: 190acc2cd138458d8a3599e5b46322fb_postgres184bookwormsha2561961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296_38892b
+2026-10-29T00:29:40.0040606Z ##[command]/usr/bin/docker rm --force 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-29T00:29:40.1958781Z 3694bbc32e8358196877d30108ce1e90ff3c978ee4b7e804b839b9c8b3629b12
+2026-10-29T00:29:40.1981731Z Remove container network: github_network_5e43cea74b1047e289d1ae8812d06210
+2026-10-29T00:29:40.1985119Z ##[command]/usr/bin/docker network rm github_network_5e43cea74b1047e289d1ae8812d06210
+2026-10-29T00:29:40.3017073Z github_network_5e43cea74b1047e289d1ae8812d06210
+2026-10-29T00:29:40.3090889Z Cleaning up orphan processes
+2026-10-29T00:29:40.3410731Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

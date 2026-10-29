@@ -1,0 +1,103 @@
+{
+  "assessment": [
+    "Both worktrees contain identical LF test bytes.",
+    "The source copy uses exact repository-owned synthetic bootstrap bytes and is created in a child of tmp_path; the real hard link is created in tmp_path on that same filesystem.",
+    "The resolved alias still contains a literal parent-directory component, preserving the path-normalization identity case.",
+    "The test performs real os.link, asserts distinct path spellings and os.path.samefile, then retains the original opened-identity USAGE_INVALID rejection assertion.",
+    "Both original _assert_error gates remain; no assertion was removed or relaxed.",
+    "The pre-existing OSError-to-skip branch remains, and the unchanged conftest hook still converts any skipped test into a failed gate.",
+    "Contract addenda have identical text; only their placement and terminal paragraph newline differ.",
+    "No production source, workflow, dependency or skip-policy difference from the respective failed checkpoint exists.",
+    "Root whole-file offline acceptance succeeded independently in both worktrees: 66 passed, zero skips and zero network attempts."
+  ],
+  "binding": {
+    "failed_log_byte_sha256": "f50a0a71877284598f71c0aa8ad5d3360bba77ca0973251ff908bc640608b4f3",
+    "failed_log_bytes": 73458,
+    "identical_contract_addendum_text_ignoring_terminal_paragraph_newline": "Release portability addendum: inherited current-input hard-link identity testing\nmust create the source copy and its real hard link within the same temporary\nfilesystem. Hosted CI can mount the checkout and temporary directory on separate\ndevices. This permits a focused fixture correction in\ntests/unit/ingestion/test_fpl_current_input.py, preserving real inode alias checks,\nall source-admission assertions and the unchanged zero-skips CI gate. No runtime\nFPL ingestion, rights, provider or acquisition behavior may change.",
+    "identical_test_bytes_both_worktrees": true,
+    "worktrees": {
+      "ACCEL-001-P01": {
+        "comparison_base": "ea3f12bb7ca435331cd3be5b68986e777f68bd54",
+        "contract_byte_sha256": "a4ac861489214bd384792f32c264d4dffa5e7d521b8efc707e174a034d5b30a3",
+        "head": "ea3f12bb7ca435331cd3be5b68986e777f68bd54",
+        "runtime_workflow_dependencies_skip_policy_unchanged": true,
+        "targeted_command": {
+          "command": [
+            ".venv/Scripts/python.exe",
+            "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+            "tests/unit/ingestion/test_fpl_current_input.py",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp",
+            "review_pack/ci-portability-input-01"
+          ],
+          "elapsed_seconds": 4.978369200020097,
+          "exit_code": 0,
+          "output_byte_sha256": "9fa4d9bf44dc8e98c2377878c8d6f6599dffd81e068a2ff6776980fbaba54b7c",
+          "output_file": "CI-PORTABILITY-CURRENT-INPUT-01.log",
+          "started_at": "2026-10-29T00:36:57.917317+00:00"
+        },
+        "targeted_log_tail": [
+          "66 passed in 3.15s",
+          "{\"denied_network_attempts\": 0, \"pytest_exit_code\": 0}"
+        ],
+        "targeted_receipt_byte_sha256": "1e5bb05035332a75c97013b29a0aa4d1985ed4c65fb6ae461460f4e0ed481dd1",
+        "test_lf_byte_sha256": "4a88c483e895841269694a1e2ca1832abf21b8d6a74ac8a3c016e3a8cc171759",
+        "test_working_byte_sha256": "4a88c483e895841269694a1e2ca1832abf21b8d6a74ac8a3c016e3a8cc171759",
+        "zero_skip_policy_byte_sha256": "5be6b83908f93a6096a78c7abcb5cecef79ffd3a29d166398628cdb48eaf3864"
+      },
+      "ACCEL-001-PRIVATE": {
+        "comparison_base": "0ffec422ea4d48d1069a934dc1dfb686bf3e321b",
+        "contract_byte_sha256": "dfc2c2ef55d37219ffeb5c42ea45dc61e8f4ce0be5d9b72b13080c9d1904ffef",
+        "head": "6b91552258f32fae8023f8614ec0aa7d5039fd3e",
+        "runtime_workflow_dependencies_skip_policy_unchanged": true,
+        "targeted_command": {
+          "command": [
+            ".venv/Scripts/python.exe",
+            "evidence/tickets/DMF-PULSE-ACCEL-001/offline_pytest.py",
+            "tests/unit/ingestion/test_fpl_current_input.py",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp",
+            "review_pack/ci-portability-input-01"
+          ],
+          "elapsed_seconds": 5.269793300074525,
+          "exit_code": 0,
+          "output_byte_sha256": "cc30cebdda8a20a20fddf96f2a10102f6da7023b496b4e89351e3178115dbe5d",
+          "output_file": "CI-PORTABILITY-CURRENT-INPUT-01.log",
+          "started_at": "2026-10-29T00:36:29.121213+00:00"
+        },
+        "targeted_log_tail": [
+          "66 passed in 3.01s",
+          "{\"denied_network_attempts\": 0, \"pytest_exit_code\": 0}"
+        ],
+        "targeted_receipt_byte_sha256": "d787b56f740b8dfa12e8492976db8f608cad2a17c00321740d7013ee548063b1",
+        "test_lf_byte_sha256": "4a88c483e895841269694a1e2ca1832abf21b8d6a74ac8a3c016e3a8cc171759",
+        "test_working_byte_sha256": "4a88c483e895841269694a1e2ca1832abf21b8d6a74ac8a3c016e3a8cc171759",
+        "zero_skip_policy_byte_sha256": "5be6b83908f93a6096a78c7abcb5cecef79ffd3a29d166398628cdb48eaf3864"
+      }
+    }
+  },
+  "failed_ci_job": 123168765845,
+  "failed_ci_run": 40788607213,
+  "failure_classification": "Hosted-runner filesystem boundary exposed an inherited test-fixture portability defect. The unchanged zero-skips gate correctly failed the shard.",
+  "failure_summary": "Authenticated log reports Errno 18 Invalid cross-device link from checkout fixture to /tmp, then 686 passed, 1 skipped, and process exit 1.",
+  "release_clearance": false,
+  "required_followup": [
+    "Ordinary follow-up commits on both affected branches; retain earlier failed-run evidence and historical reviews.",
+    "Fresh complete unchanged CI workflows on both exact new SHAs.",
+    "Refresh final publication and capped-pack evidence to the new final commit after all required jobs pass."
+  ],
+  "review_execution_note": "The first paragraph-comparison helper rejected a terminal newline difference because one addendum is at end-of-file. A corrected comparison strips only surrounding paragraph whitespace; exact test bytes were identical throughout. This was a review-helper normalization issue, not a product or contract-content defect.",
+  "reviewed_at": "2026-10-29T00:39:11.152431+00:00",
+  "reviewer": "/root/accel_p01_audit",
+  "reviewer_football_provider_requests": 0,
+  "reviewer_tests_run": 0,
+  "reviewer_tracked_files_changed": 0,
+  "schema_version": "accel001-ci-portability-independent-review-v1",
+  "semantic_sha256": "7b4787cf647694466ac98523e54758d63db422e79caa52b9b40adaa3ca539202",
+  "unresolved_material_findings": [],
+  "verdict": "CLEAR_SAME_FILESYSTEM_HARD_LINK_TEST_REMEDIATION"
+}

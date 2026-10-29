@@ -56,3 +56,11 @@ private counterpart of the AB installed-wheel verifier. It exercises only the
 installed public command's publication boundary with synthetic in-memory service
 output; actual one-/three-GW computation is covered separately by offline stack
 and numerical-oracle runs. No new provider or operational command is introduced.
+
+Release portability addendum: inherited current-input hard-link identity testing
+must create the source copy and its real hard link within the same temporary
+filesystem. Hosted CI can mount the checkout and temporary directory on separate
+devices. This permits a focused fixture correction in
+tests/unit/ingestion/test_fpl_current_input.py, preserving real inode alias checks,
+all source-admission assertions and the unchanged zero-skips CI gate. No runtime
+FPL ingestion, rights, provider or acquisition behavior may change.

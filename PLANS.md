@@ -2830,3 +2830,10 @@ The follow-up retains every acquisition-order, cutoff and numerical-equivalence
 assertion and checks the exact deadline notice and receipt bindings. Production
 bytes and all CI gates remain unchanged; the failure and targeted remediation are
 retained, and the follow-up commit requires fresh full exact-SHA CI.
+
+Standalone AB CI 40788607213 passed all 686 tests in its final shard but its
+hard-link fixture skipped on a cross-device checkout/tmp layout. The required
+zero-skips gate rejected it. Both isolated branches now create the source copy
+and real hard link on one temporary filesystem, preserving inode identity and
+every admission assertion. Each branch passes all 66 current-input tests with
+zero network attempts; independent portability review and fresh full CI follow.
