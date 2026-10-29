@@ -443,7 +443,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         capabilities = database_doctor.get("capabilities")
         if not isinstance(capabilities, dict) or set(capabilities) != set(
             expected_schema["required_capabilities"]
-        ):
+        ) | {"player_research_custody"}:
             raise VerificationError("installed database capabilities differ from contract")
         if not all(value is True for value in capabilities.values()):
             raise VerificationError("installed database capability probe failed")
@@ -506,6 +506,24 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
         else:
             raise VerificationError("dmf_pulse was imported from the repository source tree")
 
+        # Copy the acceptance driver outside the checkout and import only from
+        # the clean wheel environment. No tests or editable source are available.
+        desk_probe = temporary_path / "accel002_wheel_probe.py"
+        shutil.copyfile(REPOSITORY_ROOT / "scripts/accel002_wheel_probe.py", desk_probe)
+        desk_result = _run(
+            [str(environment_python), "-I", str(desk_probe)],
+            cwd=temporary_path,
+            step="installed Seb's Desk real-stack synthetic acceptance",
+            timeout_seconds=900,
+            environment=clean_environment,
+        )
+        try:
+            desk_acceptance = json.loads(desk_result.stdout)
+        except json.JSONDecodeError as exc:
+            raise VerificationError("installed Seb's Desk did not emit safe JSON") from exc
+        if desk_acceptance.get("status") != "PASS":
+            raise VerificationError("installed Seb's Desk acceptance failed")
+
         distributions_result = _run(
             [
                 str(environment_python),
@@ -552,6 +570,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             },
             "locked_runtime_manifest_sha256": _sha256(RUNTIME_MANIFEST),
             "installed_zoneinfo_fallback": True,
+            "installed_sebs_desk": desk_acceptance,
             "platform": {
                 "architecture": platform.machine(),
                 "operating_system": platform.system(),

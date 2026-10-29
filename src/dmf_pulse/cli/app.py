@@ -12,6 +12,7 @@ from dmf_pulse import __version__
 from dmf_pulse.cli.availability_cmd import availability_app
 from dmf_pulse.cli.chips import chips_app
 from dmf_pulse.cli.config_cmd import config_app
+from dmf_pulse.cli.dashboard import dashboard_command
 from dmf_pulse.cli.data_model_cmd import data_model_app
 from dmf_pulse.cli.doctor import build_doctor_report
 from dmf_pulse.cli.evaluate import evaluate_app
@@ -55,6 +56,7 @@ app.add_typer(private_v1_app, name="private-v1")
 app.add_typer(rank_app, name="rank")
 app.add_typer(specs_app, name="specs")
 app.command("pulse")(pulse_command)
+app.command("dashboard")(dashboard_command)
 
 DOCTOR_BLOCKING_EXIT = 40
 

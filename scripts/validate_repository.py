@@ -681,7 +681,16 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
         if isinstance(dependencies, list)
         else set()
     )
-    expected_runtime = {"alembic", "psycopg", "pydantic", "pyyaml", "sqlalchemy", "typer"}
+    expected_runtime = {
+        "alembic",
+        "psycopg",
+        "pydantic",
+        "pyyaml",
+        "sqlalchemy",
+        "typer",
+        "fastapi",
+        "uvicorn",
+    }
     if runtime_names != expected_runtime:
         errors.append(f"pyproject.toml: unexpected runtime dependencies: {sorted(runtime_names)}")
     if isinstance(dependencies, list):
@@ -689,6 +698,8 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
             "SQLAlchemy==2.0.51",
             "alembic==1.18.5",
             "psycopg[binary]==3.3.4",
+            "fastapi==0.162.0",
+            "uvicorn==0.54.0",
         }
         if not required_exact.issubset(set(dependencies)):
             errors.append(
@@ -744,7 +755,6 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
         else set()
     )
     forbidden = {
-        "fastapi",
         "highspy",
         "jax",
         "numpy",

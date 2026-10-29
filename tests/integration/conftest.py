@@ -41,7 +41,12 @@ def postgres_session_factory(postgres_engine: Engine) -> sessionmaker[Session]:
 
 
 def _truncate(engine: Engine) -> None:
-    tables = ", ".join(table.fullname for table in metadata.sorted_tables)
+    # Accepted immutable qualification rows are configuration, seeded by migration.
+    tables = ", ".join(
+        table.fullname
+        for table in metadata.sorted_tables
+        if table.fullname != "evaluation.qualified_source"
+    )
     with engine.begin() as connection:
         connection.execute(text(f"TRUNCATE TABLE {tables} RESTART IDENTITY CASCADE"))
 

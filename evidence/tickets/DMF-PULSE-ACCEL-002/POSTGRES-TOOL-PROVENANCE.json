@@ -1,0 +1,9 @@
+{
+  "bytes": 337444127,
+  "delivery": "official vendor HTTPS; published sidecar returned403, no independent checksum claim",
+  "download_sha256": "7effe34c0bf89027b3f171447d351cbc460f4566c8d0f643daec67f140787858",
+  "extracted_files": 1583,
+  "retrieved_at": "2026-10-29T04:45:06.898700+00:00",
+  "scope": "ignored isolated test runtime only; no system install/service",
+  "source_url": "https://get.enterprisedb.com/postgresql/postgresql-18.4-1-windows-x64-binaries.zip"
+}

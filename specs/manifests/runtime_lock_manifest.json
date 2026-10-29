@@ -1,5 +1,5 @@
 {
-  "lock_sha256": "af7d4de655438868c42d2f7c1d9b7d7a2c096fb72e671365e4a2dd0ffe9f41b9",
+  "lock_sha256": "532cd3017a97762c6c8531a33c35e8f283b0b0c931b6b0a5511965c4c2c47e3d",
   "manifest_version": "1.1",
   "packages": [
     {
@@ -35,15 +35,79 @@
     },
     {
       "activated_extras": [],
+      "dependencies": [
+        {
+          "marker": null,
+          "name": "idna"
+        },
+        {
+          "marker": null,
+          "name": "typing-extensions"
+        }
+      ],
+      "name": "anyio",
+      "version": "4.15.1"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [],
+      "name": "click",
+      "version": "8.5.0"
+    },
+    {
+      "activated_extras": [],
       "dependencies": [],
       "name": "colorama",
       "version": "0.4.6"
     },
     {
       "activated_extras": [],
+      "dependencies": [
+        {
+          "marker": null,
+          "name": "annotated-doc"
+        },
+        {
+          "marker": null,
+          "name": "opentelemetry-api"
+        },
+        {
+          "marker": null,
+          "name": "pydantic"
+        },
+        {
+          "marker": null,
+          "name": "starlette"
+        },
+        {
+          "marker": null,
+          "name": "typing-extensions"
+        },
+        {
+          "marker": null,
+          "name": "typing-inspection"
+        }
+      ],
+      "name": "fastapi",
+      "version": "0.162.0"
+    },
+    {
+      "activated_extras": [],
       "dependencies": [],
       "name": "greenlet",
       "version": "3.5.4"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [],
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [],
+      "name": "idna",
+      "version": "3.20"
     },
     {
       "activated_extras": [],
@@ -78,6 +142,17 @@
       "dependencies": [],
       "name": "mdurl",
       "version": "0.1.2"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [
+        {
+          "marker": null,
+          "name": "typing-extensions"
+        }
+      ],
+      "name": "opentelemetry-api",
+      "version": "1.45.1"
     },
     {
       "activated_extras": [
@@ -189,6 +264,17 @@
       "dependencies": [
         {
           "marker": null,
+          "name": "anyio"
+        }
+      ],
+      "name": "starlette",
+      "version": "1.10.0"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [
+        {
+          "marker": null,
           "name": "annotated-doc"
         },
         {
@@ -229,15 +315,32 @@
       "dependencies": [],
       "name": "tzdata",
       "version": "2026.3"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [
+        {
+          "marker": null,
+          "name": "click"
+        },
+        {
+          "marker": null,
+          "name": "h11"
+        }
+      ],
+      "name": "uvicorn",
+      "version": "0.54.0"
     }
   ],
   "project": "dmf-pulse",
   "roots": [
     "alembic",
+    "fastapi",
     "psycopg",
     "pydantic",
     "pyyaml",
     "sqlalchemy",
-    "typer"
+    "typer",
+    "uvicorn"
   ]
 }

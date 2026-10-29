@@ -26,6 +26,8 @@ dependencies = [
   "PyYAML>=6,<7",
   "SQLAlchemy==2.0.51",
   "typer>=0.12,<1",
+  "fastapi==0.162.0",
+  "uvicorn==0.54.0",
 ]
 
 [project.scripts]

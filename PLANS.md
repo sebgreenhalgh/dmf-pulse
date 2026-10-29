@@ -4,14 +4,14 @@
 
 - [x] CP0 isolate immutable ACCEL-001 parent; fetch references; resolve authority,
   rights, transient projection seam and evaluation contracts with read-only audits.
-- [ ] CP1 local FastAPI application, authenticated loopback lifecycle, typed views,
+- [x] CP1 local FastAPI application, authenticated loopback lifecycle, typed views,
   bounded single-flight refresh, progress, expiry and cleanup.
 - [ ] CP2 actual one-command integration, decisions and controlled numerical parity.
-- [ ] CP3 all-player Stage-9 table, fixture minutes, distribution, components,
+- [x] CP3 all-player Stage-9 table, fixture minutes, distribution, components,
   same-horizon comparison and explicit catalogue missingness.
-- [ ] CP4 immutable prospective player forecasts, finalized labels, Stage-12
+- [x] CP4 immutable prospective player forecasts, finalized labels, Stage-12
   evaluation, rights-gated PostgreSQL ledger and Model Performance view.
-- [ ] CP5 strict offline GW-wide actual-points adapter, current source/terms
+- [x] CP5 strict offline GW-wide actual-points adapter, current source/terms
   research, rights alternatives and data-quality diagnostics.
 - [ ] CP6 real-stack synthetic demonstrations, independent five-scope review,
   wheel/security/migration/manifests/coverage gates, checkpoint publication and

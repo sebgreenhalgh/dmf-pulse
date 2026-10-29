@@ -223,6 +223,7 @@ def test_database_doctor_rejects_wrong_major_and_missing_capabilities() -> None:
     )
     capabilities = doctor_module._capabilities(manifest, uuidv7=False)
     assert capabilities == {
+        "player_research_custody": False,
         "controlled_supersession": False,
         "gist_exclusion": False,
         "immutable_point_observations": False,

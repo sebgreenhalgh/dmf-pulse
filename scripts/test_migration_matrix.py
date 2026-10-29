@@ -561,6 +561,13 @@ def _assert_at_baseline(database_url: str, expected_revision: str) -> dict[str, 
             if revision != expected_revision:
                 raise MatrixError("downgrade did not reach the requested baseline")
             inspector = inspect(connection)
+            if expected_revision == "20260807_0006":
+                if "evaluation" in inspector.get_schema_names():
+                    raise MatrixError("ACCEL-002 research schema remains at parent baseline")
+                tables = set(inspector.get_table_names(schema="football"))
+                if not {"prediction_run", "player_minutes_projection"} <= tables:
+                    raise MatrixError("accepted availability tables lost at parent baseline")
+                return {"revision": revision, "player_research_tables": 0}
             if expected_revision == "20260725_0004":
                 betting_tables = set(inspector.get_table_names(schema="betting"))
                 required_inherited = {
@@ -718,6 +725,12 @@ def run_matrix(
     odd005 = baseline_revision == "20260724_0002"
     nrm006 = baseline_revision == "20260725_0004"
     min007f = baseline_revision == "20260803_0005"
+    accel002 = baseline_revision == "20260807_0006"
+    if accel002:
+        destination = REPOSITORY_ROOT / "evidence/tickets/DMF-PULSE-ACCEL-002"
+        report_path = report_path or destination / "migration_report.json"
+        offline_sql_path = offline_sql_path or destination / "offline_upgrade.sql"
+        schema_manifest_path = schema_manifest_path or destination / "schema_manifest.json"
     report_path = report_path or (
         MIN007F_REPORT
         if min007f
@@ -766,6 +779,16 @@ def run_matrix(
             "CREATE TABLE football.team_season",
             "CREATE TABLE fpl.player_season",
         ]
+        if plan.target == "20261029_0007":
+            required_sql.extend(
+                (
+                    "CREATE TABLE evaluation.qualified_source",
+                    "CREATE TABLE evaluation.research_artifact",
+                    "CREATE TABLE evaluation.score_pair",
+                    "PLAYER_FORECAST_NOT_QUALIFIED",
+                    "PLAYER_SOURCE_RIGHTS_BLOCKED",
+                )
+            )
         if odd005:
             required_sql.extend(
                 (
@@ -815,7 +838,7 @@ def run_matrix(
             head_seed = _fpl004_seed_state(database_url)
             if head_seed != initial_head_seed:
                 raise MatrixError("accepted FPL-004 data changed during ODD-005 upgrade")
-        elif nrm006:
+        elif nrm006 or accel002:
             stage = "accepted FPL-004 data seed at NRM-006 head"
             initial_head_seed = _seed_fpl004_data(database_url)
             stage = "NRM-006 head to ODD-005 baseline downgrade"
@@ -855,14 +878,14 @@ def run_matrix(
         stage = "populated ingestion-head downgrade"
         _alembic("downgrade", database_url, plan.baseline)
         baseline_state = _assert_at_baseline(database_url, plan.baseline)
-        downgraded_seed = _fpl004_seed_state(database_url) if odd005 or nrm006 else {}
-        if (odd005 or nrm006 or min007f) and downgraded_seed != baseline_seed:
+        downgraded_seed = _fpl004_seed_state(database_url) if odd005 or nrm006 or accel002 else {}
+        if (odd005 or nrm006 or min007f or accel002) and downgraded_seed != baseline_seed:
             raise MatrixError("accepted FPL-004 data changed on populated downgrade")
 
         stage = "populated ingestion-head final re-upgrade"
         _alembic("upgrade", database_url, plan.target)
-        final_seed = _fpl004_seed_state(database_url) if odd005 or nrm006 else {}
-        if (odd005 or nrm006 or min007f) and final_seed != head_seed:
+        final_seed = _fpl004_seed_state(database_url) if odd005 or nrm006 or accel002 else {}
+        if (odd005 or nrm006 or min007f or accel002) and final_seed != head_seed:
             raise MatrixError("accepted FPL-004 data changed on final re-upgrade")
         final_manifest = _catalog_state(database_url)
         if first_manifest != final_manifest:
@@ -923,7 +946,15 @@ def run_matrix(
         "status": "PASS",
         "target_revision": plan.target,
         "ticket_id": (
-            "MIN-007F" if min007f else "NRM-006" if nrm006 else "ODD-005" if odd005 else "FPL-004"
+            "DMF-PULSE-ACCEL-002"
+            if plan.target == "20261029_0007"
+            else "MIN-007F"
+            if min007f
+            else "NRM-006"
+            if nrm006
+            else "ODD-005"
+            if odd005
+            else "FPL-004"
         ),
         "baseline_state": baseline_state,
     }

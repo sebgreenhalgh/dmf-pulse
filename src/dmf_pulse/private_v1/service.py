@@ -608,6 +608,7 @@ class PrivateV1RunResult:
     report: str
     gameweek_projection: GameweekProjectionResult
     optimiser_result: MultiGameweekOptimisationResult
+    fixture_projections: tuple[FixtureProjectionResult, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -2585,6 +2586,7 @@ class PrivateV1RecommendationService:
             report=_report(execution, decision),
             gameweek_projection=gameweek,
             optimiser_result=optimiser,
+            fixture_projections=fixture_results,
         )
 
     def replay(self, directory: Path) -> PrivateV1ReplayResult:

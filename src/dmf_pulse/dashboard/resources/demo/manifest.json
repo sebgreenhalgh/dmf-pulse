@@ -1,0 +1,36 @@
+{
+  "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+  "files": {
+    "fpl-0.json": "1c74f6e536cbd609485523354219824e9e15c676efc8e91e0f6a20250337d1e4",
+    "fpl-1.json": "26e437ff6390505e858efc4e46416a880fa134ec1181b829fa9f7823df9c6f72",
+    "fpl-2.json": "32a2c55154eb418e431da161cc1b07b2c6174375f593cc30760243e42e96f8f3",
+    "fpl-3.json": "65a9f39ed6b276058337b674cfb6a31a8a351fa3c00063a2ff942791ad8c1eef",
+    "fpl-4.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "fpl-5.json": "45675d0e631878844673e741e9191b939bfe74b87d1c8ba81027484a407e3505",
+    "fpl-6.json": "67e33c4767ab42afdcbc8ff0b5d6869c303ee1731dbce2e3ed05111fa3567dbf",
+    "fpl-7.json": "801cc2b13bc2588b35477c0ce364000e4bd13ecfa713f20e94862279103fe7a5",
+    "odds.json": "4034b732b6ef5da54f87da882ccda31a641c5915d71a9f2c591f99708b3a5c3a",
+    "score-0.json": "1ca55f831269f18740af1348fba24b7d66f77c88fb54da845779daa1188f3879",
+    "score-1.json": "a00ae89628122efa7b6b6520a459b46026be9df6e7654514dd9075db0ca57046",
+    "score-2.json": "dde7f79f11810fa0a61eed3fc0de5f36e6ac31de1ea87025748595c856661eaf",
+    "score-3.json": "9f05efae187fc15d50b5fa7f372c4babcc0b20699da426e032e358b4f3b83bfd",
+    "score-config.json": "989263a2b05731675f07f470483301e2483741bfb20fc8f715ed2283a4093c22"
+  },
+  "fpl": [
+    "fpl-0.json",
+    "fpl-1.json",
+    "fpl-2.json",
+    "fpl-3.json",
+    "fpl-4.json",
+    "fpl-5.json",
+    "fpl-6.json",
+    "fpl-7.json"
+  ],
+  "origin": "tests/unit/private_v1/test_one_command.py:_provider_sources/_odds_input and tests/unit/ingestion/openfootball/conftest.py:synthetic_snapshot",
+  "score_paths": {
+    "2023-24/en.1.json": "score-0.json",
+    "2024-25/en.1.json": "score-1.json",
+    "2025-26/en.1.json": "score-2.json",
+    "LICENSE.md": "score-3.json"
+  }
+}

@@ -1,5 +1,11 @@
 # DMF Pulse
 
+Seb's Desk is available locally with `dmf dashboard --demo`. It runs the existing
+recommendation engine on repository-owned synthetic inputs and exposes My Team,
+Players, Decisions, Model Performance and Data Health. See the
+[operator instructions](docs/operations/sebs_desk.md) for pairing, refresh,
+privacy, installed-wheel use and the current live-source approval boundary.
+
 DMF Pulse is a private FPL decision-engine project. FPL-004 builds on the governed PostgreSQL 18.4 temporal foundation with rights-gated ingestion of official-FPL-shaped bootstrap and fixture data. The accepted full pipeline uses synthetic fixtures to create immutable retrieval envelopes, append-only lifecycle history, season-scoped canonical mappings, typed observations, quality reports, and cutoff-safe source bundles.
 
 The default official FPL profile permits bounded transient manual validation only and blocks live snapshot transport as well as persistent raw/derived storage. No live provider request, real provider payload, authenticated manager access, recurring polling, SQLite substitute, odds/market ingestion, model, optimiser, scheduler, server/API, UI, or autonomous FPL action belongs in this milestone. Pure rules scoring and payload validation remain database-free; explicit persistence commands and PostgreSQL-marked tests use only the disposable TEST database.

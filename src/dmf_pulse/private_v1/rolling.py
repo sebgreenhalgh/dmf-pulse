@@ -15,7 +15,11 @@ from dmf_pulse.fpl_points.artifacts import semantic_sha256
 from dmf_pulse.fpl_points.errors import FplPointsError
 from dmf_pulse.fpl_points.gameweek import assemble_gameweek
 from dmf_pulse.fpl_points.gameweek_summaries import build_gameweek_projection
-from dmf_pulse.fpl_points.models import GameweekProjectionResult, GameweekScenarioSet
+from dmf_pulse.fpl_points.models import (
+    FixtureProjectionResult,
+    GameweekProjectionResult,
+    GameweekScenarioSet,
+)
 from dmf_pulse.fpl_points.player_prior import load_packaged_player_prior
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.optimisation.models import CandidatePlayer
@@ -117,6 +121,7 @@ class PrivateV1RollingRunResult:
     one_gameweek_optimiser_result: MultiGameweekOptimisationResult
     stage11_work: PrivateRollingStage11Work
     stage_timings: tuple[PrivateRollingStageTiming, ...]
+    fixture_projections: tuple[FixtureProjectionResult, ...] = ()
 
 
 def _coverage(
@@ -1180,6 +1185,11 @@ class PrivateV1RollingRecommendationService:
         with rolling_boundary(RollingPhase.BUILD_ROLLING_REPORT):
             report = render_rolling_report(sealed)
         record("report_and_comparator", started)
+        presentation_fixtures = tuple(
+            fixture
+            for gameweek in execution.horizon_gameweeks
+            for fixture in fixture_results_by_gameweek[gameweek]
+        )
         del (
             fixture_results_by_gameweek,
             stage7_contexts_by_gameweek,
@@ -1237,6 +1247,7 @@ class PrivateV1RollingRecommendationService:
                 one_gameweek_optimiser_result=one_gameweek,
                 stage11_work=stage11_work,
                 stage_timings=tuple(timings),
+                fixture_projections=presentation_fixtures,
             )
 
 

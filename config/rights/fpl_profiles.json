@@ -106,6 +106,41 @@
       "terms_source": "Premier League Terms and Conditions and current FPL application transport observed 2026-09-01",
       "terms_version": "checked-2026-09-01",
       "unresolved_rights": []
+    },
+    {
+      "account_scope": "ACCEL-002 manifest-verified repository-owned synthetic player-lab assets only",
+      "approved_at": "2026-10-29T00:00:00Z",
+      "approved_by": "Sebastian Greenhalgh programme request",
+      "approved_purpose": "offline synthetic adapter, prospective custody simulation and evaluation acceptance only",
+      "attribution_required": false,
+      "attribution_text": null,
+      "capabilities": {
+        "automated_access": "DENY",
+        "backup": "ALLOW",
+        "cache": "DENY",
+        "derived_storage": "ALLOW",
+        "manual_import": "ALLOW",
+        "model_training": "DENY",
+        "private_internal_use": "ALLOW",
+        "public_display": "DENY",
+        "raw_storage": "ALLOW",
+        "redistribution": "DENY",
+        "transient_processing": "ALLOW"
+      },
+      "checked_at": "2026-10-29T00:00:00Z",
+      "geography_scope": "local deterministic test environment",
+      "human_approval_id": "DMF-PULSE-ACCEL-002#synthetic-acceptance",
+      "notes": "Owner-owned synthetic fixtures only. No real provider data, live transport, training, real cohort, source licence expansion or production activation.",
+      "profile_version": "1.0.0",
+      "provider_key": "synthetic_fpl",
+      "retention_reason": "repository-approved synthetic data has no retention limit",
+      "retention_seconds": null,
+      "rights_profile_id": "accel002_synthetic_player_lab_v1",
+      "status": "HUMAN_APPROVED",
+      "termination_deletion_required": false,
+      "terms_source": "tickets/DMF-PULSE-ACCEL-002/REQUEST.txt sections 6, 7.4 and 11",
+      "terms_version": "1.0.0",
+      "unresolved_rights": []
     }
   ],
   "schema_version": "1.0.0"

@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "7466ab96b6ffa19236cfa197e480c7bef86d57c4bb8f486d55fcfdec39bf57cc"
+EXPECTED_SCHEMA_SHA256 = "b29b0e3f3f3e2ff99ef62693c5bb9f4e6344805248a7e25807f29f4bcb5d2417"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",
@@ -110,7 +110,7 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
     assert set(first.extensions) == set(expected["extensions"])
     assert first.schema_sha256 == second.schema_sha256
     assert first.schema_sha256 == EXPECTED_SCHEMA_SHA256
-    assert first.alembic_revision == head_revision() == "20260807_0006"
+    assert first.alembic_revision == head_revision() == "20261029_0007"
 
     function_names = {
         f"{schema}.{function['name']}"
@@ -118,6 +118,10 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         for function in value["functions"]
     }
     assert function_names == {
+        "evaluation.guard_source",
+        "evaluation.guard_artifact",
+        "evaluation.guard_score_complete",
+        "evaluation.reject_change",
         "betting.guard_book_completeness",
         "betting.guard_consensus_vector",
         "betting.guard_normalisation_book_source_fixture",
@@ -172,6 +176,13 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
         trigger["name"] for value in first.schemas.values() for trigger in value["triggers"]
     }
     assert trigger_names == {
+        "trg_research_immutable_qualified_source",
+        "trg_research_immutable_research_artifact",
+        "trg_research_immutable_score_pair",
+        "trg_research_source",
+        "trg_research_artifact",
+        "trg_research_complete_artifact",
+        "trg_research_complete_pair",
         "trg_betting_operator_immutable",
         "trg_canonical_entity_successor",
         "trg_data_quality_bundle_lock",
@@ -341,13 +352,16 @@ def test_catalog_matches_expected_schema_and_is_deterministic(
     doctor = build_database_doctor(postgres_engine, postgres_url)
     assert doctor.status == "HEALTHY"
     assert doctor.postgres.major == 18
-    assert set(doctor.capabilities) == set(expected["required_capabilities"])
+    assert set(doctor.capabilities) == set(expected["required_capabilities"]) | {
+        "player_research_custody"
+    }
     assert all(doctor.capabilities.values())
 
 
 def test_single_linear_revision_and_secret_free_offline_sql(postgres_url: str) -> None:
     revisions = list(ScriptDirectory.from_config(alembic_config()).walk_revisions())
     assert [(revision.revision, revision.down_revision) for revision in revisions] == [
+        ("20261029_0007", "20260807_0006"),
         ("20260807_0006", "20260803_0005"),
         ("20260803_0005", "20260725_0004"),
         ("20260725_0004", "20260725_0003"),
@@ -2144,7 +2158,7 @@ def test_nrm_downgrade_fails_closed_for_unattested_publication(
         with pytest.raises(DBAPIError, match="NRM006_DOWNGRADE_UNATTESTED_PUBLICATION"):
             command.downgrade(alembic_config(postgres_url), "20260725_0004")
         with postgres_engine.connect() as connection:
-            assert inspect_schema(connection).alembic_revision == "20260807_0006"
+            assert inspect_schema(connection).alembic_revision == "20261029_0007"
             assert (
                 connection.scalar(
                     select(func.count())
@@ -2333,4 +2347,4 @@ def test_clean_downgrade_and_reupgrade(postgres_engine: Engine, postgres_url: st
     upgrade_database(postgres_url)
     with postgres_engine.connect() as connection:
         assert connection.execute(text("SELECT uuidv7() IS NOT NULL")).scalar_one() is True
-        assert inspect_schema(connection).alembic_revision == "20260807_0006"
+        assert inspect_schema(connection).alembic_revision == "20261029_0007"

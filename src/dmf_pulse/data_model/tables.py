@@ -3973,3 +3973,99 @@ Index("ix_minute_pmf_run", conditional_minute_pmf.c.prediction_run_id)
 Index("ix_lineup_scenario_run", lineup_scenario.c.prediction_run_id)
 Index("ix_lineup_member_scenario", lineup_scenario_member.c.lineup_scenario_id)
 Index("ix_player_minutes_projection_run", player_minutes_projection.c.prediction_run_id)
+
+# ACCEL-002: closed, append-only player research ledger, separate from private state.
+player_research_source = Table(
+    "qualified_source",
+    metadata,
+    Column("source_id", Text, primary_key=True),
+    Column("source_ref", JSONB, nullable=False),
+    Column("qualification", JSONB, nullable=False),
+    Column("dataset_mode", Text, nullable=False),
+    CheckConstraint(
+        "dataset_mode IN ('SYNTHETIC','INDEPENDENTLY_QUALIFIED_REAL')",
+        name="ck_research_source_mode",
+    ),
+    schema="evaluation",
+)
+
+player_research_artifact = Table(
+    "research_artifact",
+    metadata,
+    Column("artifact_sha256", CHAR(64), primary_key=True),
+    Column("kind", Text, nullable=False),
+    Column("dataset_mode", Text, nullable=False),
+    Column("target_id", CHAR(64)),
+    Column("model_id", Text),
+    Column("revision", Integer, nullable=False, server_default="0"),
+    Column(
+        "experiment_sha256",
+        CHAR(64),
+        ForeignKey("evaluation.research_artifact.artifact_sha256", ondelete="RESTRICT"),
+    ),
+    Column(
+        "supersedes_sha256",
+        CHAR(64),
+        ForeignKey("evaluation.research_artifact.artifact_sha256", ondelete="RESTRICT"),
+    ),
+    Column("source_refs", JSONB, nullable=False),
+    Column("payload", JSONB, nullable=False),
+    Column(
+        "stored_at",
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("clock_timestamp()"),
+    ),
+    CheckConstraint(
+        "kind IN ('EXPERIMENT','FORECAST','LABEL','SCORECARD')", name="ck_research_artifact_kind"
+    ),
+    CheckConstraint(
+        "dataset_mode IN ('SYNTHETIC','PROSPECTIVE_REAL')", name="ck_research_artifact_mode"
+    ),
+    CheckConstraint("artifact_sha256 ~ '^[0-9a-f]{64}$'", name="ck_research_artifact_hash"),
+    CheckConstraint("revision >= 0", name="ck_research_artifact_revision"),
+    CheckConstraint(
+        "(kind = 'EXPERIMENT' AND target_id IS NULL AND model_id IS NULL AND experiment_sha256 IS NULL AND supersedes_sha256 IS NULL AND revision=0) OR (kind = 'FORECAST' AND target_id IS NOT NULL AND model_id IS NOT NULL AND experiment_sha256 IS NOT NULL AND supersedes_sha256 IS NULL AND revision=0) OR (kind = 'LABEL' AND target_id IS NOT NULL AND model_id IS NULL AND experiment_sha256 IS NULL) OR (kind = 'SCORECARD' AND target_id IS NULL AND model_id IS NOT NULL AND experiment_sha256 IS NOT NULL AND supersedes_sha256 IS NULL AND revision=0)",
+        name="ck_research_artifact_shape",
+    ),
+    schema="evaluation",
+)
+Index(
+    "uq_research_forecast_target_model",
+    player_research_artifact.c.target_id,
+    player_research_artifact.c.model_id,
+    unique=True,
+    postgresql_where=text("kind = 'FORECAST'"),
+)
+Index(
+    "uq_research_label_target_revision",
+    player_research_artifact.c.target_id,
+    player_research_artifact.c.revision,
+    unique=True,
+    postgresql_where=text("kind = 'LABEL'"),
+)
+
+player_research_pair = Table(
+    "score_pair",
+    metadata,
+    Column(
+        "score_sha256",
+        CHAR(64),
+        ForeignKey("evaluation.research_artifact.artifact_sha256", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("target_id", CHAR(64), primary_key=True),
+    Column(
+        "forecast_sha256",
+        CHAR(64),
+        ForeignKey("evaluation.research_artifact.artifact_sha256", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    Column(
+        "label_sha256",
+        CHAR(64),
+        ForeignKey("evaluation.research_artifact.artifact_sha256", ondelete="RESTRICT"),
+        nullable=False,
+    ),
+    schema="evaluation",
+)

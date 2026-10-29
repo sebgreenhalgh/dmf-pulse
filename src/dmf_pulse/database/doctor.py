@@ -80,6 +80,35 @@ def _capabilities(manifest: SchemaManifest, *, uuidv7: bool) -> dict[str, bool]:
                 for constraint in table["constraints"]
             )
     return {
+        "player_research_custody": (
+            {
+                "evaluation.guard_source",
+                "evaluation.guard_artifact",
+                "evaluation.guard_score_complete",
+                "evaluation.reject_change",
+            }
+            <= function_names
+            and expected_triggers(
+                {
+                    f"trg_research_immutable_{name}": ("evaluation", name)
+                    for name in ("qualified_source", "research_artifact", "score_pair")
+                },
+                "reject_change",
+            )
+            and expected_triggers(
+                {"trg_research_source": ("evaluation", "qualified_source")}, "guard_source"
+            )
+            and expected_triggers(
+                {"trg_research_artifact": ("evaluation", "research_artifact")}, "guard_artifact"
+            )
+            and expected_triggers(
+                {
+                    "trg_research_complete_artifact": ("evaluation", "research_artifact"),
+                    "trg_research_complete_pair": ("evaluation", "score_pair"),
+                },
+                "guard_score_complete",
+            )
+        ),
         "controlled_supersession": (
             "core.guard_temporal_version" in function_names
             and expected_triggers(TEMPORAL_TRIGGERS, "guard_temporal_version")

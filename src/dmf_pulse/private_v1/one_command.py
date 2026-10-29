@@ -70,6 +70,7 @@ from dmf_pulse.private_v1.models import (
     seal_fixture_score_prior,
 )
 from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
+from dmf_pulse.private_v1.presentation import PrivatePresentation, SourceVintage, build_presentation
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.reporting import render_transfer_frontier
 from dmf_pulse.private_v1.rolling import (
@@ -126,6 +127,7 @@ class OneCommandResult:
     stage_timings: tuple[PrivateRollingStageTiming, ...] = ()
     authenticated_current_state_used: Literal[True] = True
     persistence_performed: Literal[False] = False
+    presentation: PrivatePresentation | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -496,6 +498,7 @@ class PrivateV1OneCommandService:
         _prepared_rolling_runner: _PreparedRollingRunner | None = None,
         _provider_request_guard: Callable[[], None] | None = None,
         progress: ProgressSink | None = None,
+        collect_presentation: bool = False,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._direct_client_factory = direct_client_factory or (
@@ -515,6 +518,7 @@ class PrivateV1OneCommandService:
         self._provider_request_guard = _provider_request_guard
         self._progress = progress or NullProgress()
         self._clock = clock
+        self._collect_presentation = collect_presentation
 
     def run(self, request: OneCommandRequest) -> OneCommandResult:
         self._progress.message("DMF Pulse starting")
@@ -888,6 +892,84 @@ class PrivateV1OneCommandService:
                 decision = one_gameweek_run.decision
                 report = _display_report(decision, snapshot, player_map)
                 stage_timings = ()
+            presentation = None
+            if self._collect_presentation:
+                presentation = build_presentation(
+                    snapshot=snapshot,
+                    identities=player_map,
+                    current_squad=tuple(
+                        sorted(
+                            str(item.canonical_player_id)
+                            for item in player_map.players
+                            if item.official_fpl_element_id
+                            in {member.official_fpl_element_id for member in ownership.members}
+                        )
+                    ),
+                    projections=(
+                        dict(
+                            zip(
+                                rolling_execution.horizon_gameweeks,
+                                rolling_run.gameweek_projections,
+                                strict=True,
+                            )
+                        )
+                        if request.horizon_gameweeks == 3
+                        else {snapshot.target_gameweek: one_gameweek_run.gameweek_projection}
+                    ),
+                    fixtures=(
+                        rolling_run.fixture_projections
+                        if request.horizon_gameweeks == 3
+                        else one_gameweek_run.fixture_projections
+                    ),
+                    minutes=(
+                        rolling_minutes
+                        if request.horizon_gameweeks == 3 and rolling_minutes is not None
+                        else {snapshot.target_gameweek: model_minutes}
+                    ),
+                    fixture_mapping={
+                        **{
+                            str(item.canonical_fixture_id): item.official_fpl_fixture_id
+                            for item in market_view.fixtures
+                        },
+                        **(
+                            {
+                                str(item.canonical_fixture_id): item.official_fpl_fixture_id
+                                for gameweek in rolling_execution.future_gameweeks
+                                for item in gameweek.fixtures
+                            }
+                            if request.horizon_gameweeks == 3
+                            else {}
+                        ),
+                    },
+                    source_vintages=(
+                        SourceVintage(
+                            source="FPL",
+                            identity_sha256=snapshot.fpl_input.semantic_sha256,
+                            received_at=snapshot.fpl_input.provenance.received_at,
+                            usable_at=snapshot.fpl_input.provenance.usable_at,
+                            source_mode="CURRENT_TRANSIENT",
+                            requests=snapshot.request_count,
+                        ),
+                        SourceVintage(
+                            source="MARKETS",
+                            identity_sha256=odds.market_semantic_sha256,
+                            received_at=odds.temporal.received_at,
+                            usable_at=odds.temporal.usable_at,
+                            source_mode="CURRENT_TRANSIENT",
+                            requests=odds.provenance.transport_call_count,
+                        ),
+                        SourceVintage(
+                            source="TEAM_SCORE_PRIOR",
+                            identity_sha256=source_prior.semantic_sha256,
+                            received_at=source_prior.provenance.validation_completed_at,
+                            usable_at=source_prior.provenance.usable_at,
+                            source_mode="HISTORICAL_RECONSTRUCTED",
+                            source_commit_at=source_prior.provenance.source_commit_timestamp,
+                            requests=source_prior.provenance.transport_call_count,
+                        ),
+                    ),
+                    market_quota_remaining=odds.quota.remaining,
+                )
             report += deadline_notice(snapshot.fpl_input.target_event.deadline_at)
             actionability = deadline_guard.bind(
                 deadline_at=snapshot.fpl_input.target_event.deadline_at,
@@ -903,6 +985,7 @@ class PrivateV1OneCommandService:
                 fpl_request_count=snapshot.request_count,
                 fpl_endpoint_classes=snapshot.endpoint_classes,
                 stage_timings=stage_timings,
+                presentation=presentation,
             )
             self._progress.message("Recommendation ready")
             self._progress.finish()
