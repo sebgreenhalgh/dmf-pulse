@@ -333,6 +333,17 @@ class DurableUsageLedger:
             raise AuthorizationError("AUTHORIZATION_CLOCK_REGRESSED")
 
     def reserve(self, approval: OperatorRefreshApproval, grant: RefreshGrant) -> None:
+        if (
+            grant.approval_sha256 != canonical_sha256(approval.model_dump(mode="json"))
+            or grant.classification != approval.classification
+            or grant.ledger_id != approval.ledger_id
+            or grant.ledger_id != self.ledger_id
+            or grant.request.source_scopes != approval.source_scopes
+            or grant.expires_at > approval.expires_at
+        ):
+            raise AuthorizationError("REFRESH_GRANT_INVALID")
+        if approval.classification == "PRIVATE_CURRENT" and approval not in PRODUCTION_APPROVALS:
+            raise AuthorizationError("PRODUCTION_APPROVAL_NOT_ENROLLED", "RIGHTS_APPROVAL_REQUIRED")
         with self._transaction() as records:
             self._clock(records, grant.issued_at)
             reservations = [row for row in records if row.get("kind") == "RESERVATION"]
@@ -487,6 +498,35 @@ class DurableUsageLedger:
             or any(ch not in "0123456789abcdef" for ch in worker_id)
         ):
             raise AuthorizationError("REFRESH_GRANT_INVALID")
+        if grant.classification == "PRIVATE_CURRENT":
+            # Child workers prove code enrollment independently of a parent's
+            # launch document or the ability to construct a library object.
+            enrolled = [
+                row
+                for row in PRODUCTION_APPROVALS
+                if canonical_sha256(row.model_dump(mode="json")) == grant.approval_sha256
+            ]
+            if (
+                len(enrolled) != 1
+                or enrolled[0].status != "APPROVED_REVIEWED"
+                or enrolled[0].ledger_id != self.ledger_id
+                or not enrolled[0].not_before <= now < enrolled[0].expires_at
+                or enrolled[0].source_scopes != grant.request.source_scopes
+                or any(
+                    getattr(enrolled[0], name) != getattr(grant.request, name)
+                    for name in (
+                        "authorization_id",
+                        "implementation_sha",
+                        "review_sha256",
+                        "operator_ref",
+                        "purpose",
+                        "season_code",
+                        "mode",
+                    )
+                )
+                or grant.request.horizon not in enrolled[0].horizons
+            ):
+                raise AuthorizationError("REFRESH_GRANT_INVALID")
         if not grant.issued_at <= now < grant.expires_at or now >= grant.request.deadline_at:
             raise AuthorizationError("REFRESH_GRANT_EXPIRED", "EXPIRED")
 

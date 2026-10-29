@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.dashboard.authorization import (
     PRODUCTION_APPROVALS,
     AuthorizationError,
@@ -213,6 +214,31 @@ def test_private_approval_cannot_enter_owned_injection(tmp_path):
     )
     with pytest.raises(AuthorizationError, match="OWNED_SOURCE_INJECTION_REQUIRED"):
         RefreshAuthorizer.for_owned_sources(private, ledger)
+
+
+def test_library_reservation_cannot_enroll_private_approval(tmp_path):
+    ledger, approval, request, authorizer = setup(tmp_path)
+    owned = authorizer.authorize(request)
+    scopes = tuple(
+        row.model_copy(update={"source_kind": "RIGHTS_QUALIFIED_PRIVATE"})
+        for row in approval.source_scopes
+    )
+    private = approval.model_copy(
+        update={"classification": "PRIVATE_CURRENT", "source_scopes": scopes}
+    )
+    forged = owned.model_copy(
+        update={
+            "reservation_id": "e" * 64,
+            "classification": "PRIVATE_CURRENT",
+            "approval_sha256": canonical_sha256(private.model_dump(mode="json")),
+            "request": request.model_copy(update={"source_scopes": scopes}),
+        }
+    )
+    with pytest.raises(AuthorizationError, match="PRODUCTION_APPROVAL_NOT_ENROLLED"):
+        ledger.reserve(private, forged)
+    with pytest.raises(AuthorizationError, match="REFRESH_GRANT_INVALID"):
+        ledger.claim(forged, WORKER, now=NOW)
+    assert len(list(ledger.path.glob("[0-9]*.json"))) == 1
 
 
 def test_one_shot_spent_before_worker_and_survives_restart(tmp_path):
