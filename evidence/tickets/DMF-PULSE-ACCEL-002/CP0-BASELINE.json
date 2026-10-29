@@ -1,0 +1,40 @@
+{
+  "authority_resolution": "ADR-OPS-006 ACCEPTED; proposed DMFP-16/18 portions not adopted; narrow private UI only",
+  "captured_at": "2026-10-29T04:33:24.679826+00:00",
+  "new_live_acquisition_authorized": false,
+  "original_worktree": "UNMODIFIED_DIRTY_AVAILABILITY_WORKTREE",
+  "parent": "02576a563179e0a8d3311fc5e82c770905975f61",
+  "parent_ci": {
+    "jobs": 20,
+    "run_id": 40795681541,
+    "status": "SUCCESS"
+  },
+  "parent_git_blob_sha256": {
+    "config/rights/fpl_profiles.json": "1691229b120054b8d4c65c7d74e5a0f6d9d11947f1a8f261d26649314268011d",
+    "config/rights/odds_profiles.json": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+    "specs/manifests/authority_manifest.json": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "src/dmf_pulse/availability/projection.py": "a9189e22cac46ba327a20346dc531257397eee537cc545081206bfde7bc8d577",
+    "src/dmf_pulse/fpl_points/models.py": "25112ee7e5bf69980d292da981336120b120e3fcffea0a6c0e3bf56e068a956c",
+    "src/dmf_pulse/private_v1/one_command.py": "7fad44ff46fd25e5d83930f18734d95e7b8d73d585559dd6fe35ea49ea0028ed",
+    "src/dmf_pulse/private_v1/rolling.py": "2618ed7b9766720bb9cda694baea8f58a6dd94bb2b2996f8ca66225c6a62ce61",
+    "src/dmf_pulse/private_v1/service.py": "4319f56d11eb3eb130c11613247b5697f3820acac4b297bb66501a300fa38855"
+  },
+  "programme": "DMF-PULSE-ACCEL-002",
+  "protected": {
+    "a02": "PERMANENTLY_CONSUMED",
+    "a03": "PERMANENTLY_CONSUMED",
+    "a04_authority_created": false,
+    "metadata_candidate": "INACTIVE / PROPOSED_UNAPPROVED",
+    "p01_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+    "p01_scored": false,
+    "p01_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+    "production_active": false,
+    "team_strength": "SHADOW_ONLY"
+  },
+  "references": {
+    "HEAD": "02576a563179e0a8d3311fc5e82c770905975f61",
+    "origin/main": "99418f3316277f4dae347d80358d5dd5a09655b2",
+    "origin/readiness/DMF-PULSE-ACCEL-001-release": "02576a563179e0a8d3311fc5e82c770905975f61"
+  },
+  "request_byte_sha256": "98f4b71aa6410e235a5194a41d6128c7bf61d272e5c3cf670fd15cfaf4cec71d"
+}

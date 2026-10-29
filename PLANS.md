@@ -1,5 +1,26 @@
 # DMF Pulse execution plans
 
+## DMF-PULSE-ACCEL-002 — Seb's Desk
+
+- [x] CP0 isolate immutable ACCEL-001 parent; fetch references; resolve authority,
+  rights, transient projection seam and evaluation contracts with read-only audits.
+- [ ] CP1 local FastAPI application, authenticated loopback lifecycle, typed views,
+  bounded single-flight refresh, progress, expiry and cleanup.
+- [ ] CP2 actual one-command integration, decisions and controlled numerical parity.
+- [ ] CP3 all-player Stage-9 table, fixture minutes, distribution, components,
+  same-horizon comparison and explicit catalogue missingness.
+- [ ] CP4 immutable prospective player forecasts, finalized labels, Stage-12
+  evaluation, rights-gated PostgreSQL ledger and Model Performance view.
+- [ ] CP5 strict offline GW-wide actual-points adapter, current source/terms
+  research, rights alternatives and data-quality diagnostics.
+- [ ] CP6 real-stack synthetic demonstrations, independent five-scope review,
+  wheel/security/migration/manifests/coverage gates, checkpoint publication and
+  final exact-SHA full CI green. External receipts bind final publication.
+
+No live provider acquisition during implementation/tests; ordinary live Refresh
+fails closed without independently eligible market approval. Preserve all P01,
+A02/A03, inactive metadata and shadow-only restrictions and dirty original tree.
+
 ## CURRENT-TEAM-STRENGTH-001P-L8 Phase A
 
 - [x] Verify exact D7 parent and isolate a clean L8 worktree.

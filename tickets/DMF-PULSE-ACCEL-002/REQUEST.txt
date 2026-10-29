@@ -1,0 +1,1171 @@
+# DMF PULSE — ACCELERATION WAVE 002
+## SEB'S DESK: ONE-CLICK DASHBOARD, PLAYER xPTS EXPLORER, EVALUATION ENGINE AND EXPANDED DATA FOUNDATION
+### FULL IMPLEMENTATION — AMBITIOUS / GIT-FIRST / RESUMABLE / INDEPENDENTLY REVIEWED
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Immutable ACCEL-001 integrated engineering release:
+`02576a563179e0a8d3311fc5e82c770905975f61`
+
+Integrated release branch:
+`readiness/DMF-PULSE-ACCEL-001-release`
+
+ACCEL-001 exact-SHA CI:
+https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40795681541
+
+Programme:
+`DMF-PULSE-ACCEL-002`
+
+Preferred new branch:
+`readiness/DMF-PULSE-ACCEL-002-sebs-desk`
+
+## 1. MISSION
+
+You are implementing the next major evolution of DMF Pulse.
+
+The previous work built a sophisticated FPL prediction and optimisation system. This programme must move the project decisively toward a usable, data-rich, measurable private application.
+
+**The objective is to give Sebastian a local dashboard that he can open, refresh with one click, inspect recommended FPL decisions, browse player expected-points predictions, understand their derivation, and eventually measure them against actual outcomes.**
+
+This is primarily an IMPLEMENTATION task.
+
+It is not another architecture study.
+
+The required end state is meaningful working software, not standalone UI mock-ups, speculative model improvements or a large document about future possibilities.
+
+There are four major workstreams:
+
+1. **SEB'S DESK:** local, private, interactive browser dashboard with one-click recommendation refresh.
+2. **PLAYER LAB:** sortable, searchable player projections and detailed model breakdowns, using existing Stage-7/8/9 outputs.
+3. **EVALUATION LAB:** executable frozen-prediction-versus-actual evaluation foundation, synthetic-first and ready for rights-qualified real outcomes.
+4. **DATA EXPANSION:** ambitious review and implementation of additional high-value FPL data contracts, historical evidence paths, data-quality controls and qualified acquisition strategies.
+
+Complete as much of all four as valid authority and engineering constraints permit.
+
+Do not spend the whole session on planning, a narrow bug or one UI component.
+
+Use independently reviewable checkpoints, durable commits and exact-SHA CI to make long execution resumable.
+
+---
+
+## 2. STARTUP AND AUTHORITY
+
+First fetch GitHub and verify:
+
+- current main;
+- ACCEL-001 integrated release;
+- immutable programme parent;
+- relevant later branches;
+- accepted Stage-7/8/9/10/11/12/13/14/15 interfaces;
+- accepted FPL/current-state integration;
+- all approved rights profiles;
+- controlling DMFP-00/01/03/04/05/09/15/16/17/18/20 decisions;
+- active manifest and ticket rules;
+- existing worktrees and dirty changes.
+
+Use ACCEL-001's release as the implementation starting point if ancestry and authority verify.
+
+Do not assume ACCEL-001 was human-accepted or merged.
+
+Do not merge into main, create a PR, tag, rewrite history or record acceptance.
+
+Respect the original dirty Availability worktree.
+
+Create a clean dedicated worktree.
+
+Read:
+
+- `AGENTS.md`;
+- `PLANS.md`;
+- ACCEL-001 audit and gap register;
+- ACCEL-001 delivery reports;
+- accepted source-rights profiles;
+- existing private one-command runbooks;
+- Stage-9 projection models;
+- evaluation services;
+- DMFP-16 and DMFP-18;
+- accepted security and UI ADRs.
+
+Resolve actual authority precedence before modifying source contracts.
+
+For any proposed runtime dependency, assess compatibility with accepted architecture, pinning, lockfiles, packaging, Windows and Linux.
+
+Do not treat a PROPOSED architectural specification as already accepted.
+
+---
+
+## 3. CONCRETE PRODUCT GOAL
+
+The target user experience:
+
+**Start DMF Pulse locally → open dashboard → click Refresh → see Sebastian's latest recommendation → inspect squad, player predictions and alternatives.**
+
+The dashboard should make the current FPL engine useful without requiring terminal inspection or reading JSON artifacts.
+
+Target major navigation:
+
+- **MY TEAM**
+- **PLAYERS**
+- **DECISIONS**
+- **MODEL PERFORMANCE**
+- **DATA HEALTH**
+
+Keep the first version focused and genuinely functional.
+
+Avoid a heavy frontend stack unless its additional complexity provides clear value.
+
+Preferred engineering direction:
+
+- one local Python application;
+- a versioned, strictly typed view-model layer;
+- a small internal HTTP API;
+- a lightweight responsive browser interface;
+- same-origin requests;
+- no separate Node/build infrastructure unless justified;
+- reuse existing calculation/application services.
+
+The DMFP-16 architecture proposes FastAPI. Verify the accepted architectural status and use FastAPI with a minimal pinned ASGI runtime if governance permits. Otherwise implement the nearest compliant complete local vertical slice and record the precise framework decision requiring approval.
+
+No duplicate FPL model.
+
+No duplicate optimisation engine.
+
+No fabricated dashboard data.
+
+---
+
+## 4. WORKSTREAM A — SEB'S DESK DASHBOARD
+
+### 4.1 Local application
+
+Implement a documented command such as:
+
+`dmf dashboard`
+
+It must start the private application locally.
+
+Requirements:
+
+- bind to loopback by default;
+- single-operator private use;
+- no public deployment;
+- no unauthenticated LAN exposure;
+- no external cloud dependency for the UI;
+- Windows PowerShell and Linux compatibility;
+- explicit startup and shutdown lifecycle;
+- user-friendly startup instructions.
+
+Ideally provide a convenient local Windows launcher that does not embed credentials.
+
+### 4.2 One-click Refresh
+
+The dashboard must contain a genuine, working **Refresh Recommendations** control.
+
+Its implementation must reuse:
+
+`PrivateV1OneCommandService`
+
+and the already accepted downstream application services.
+
+Do not invoke an independent approximation of the recommendation model.
+
+An operator-initiated refresh should:
+
+1. Validate the current private access context.
+2. Resolve eligible current FPL and market inputs using existing approved transport where authorized.
+3. Build the current decision request.
+4. Execute the existing Stage-7/8/9/10/11 decision chain.
+5. Preserve the accepted one-GW or three-GW horizon.
+6. Render a strictly validated decision view.
+7. Display execution success, warning or typed failure.
+8. Enforce deadline and information-cutoff rules at the existing service and publication boundaries.
+
+Refresh must not trigger an FPL account write.
+
+No transfer submission, captain change, chip activation or lineup update.
+
+No silent background scraping or scheduled refresh.
+
+No fabricated successful recommendation when a source is unavailable.
+
+### 4.3 Operational execution
+
+Provide:
+
+- pending/running/complete/blocked states;
+- stage-level progress;
+- safe error messages;
+- source freshness;
+- information cutoff;
+- official deadline and expiry;
+- recommendation identity and code provenance;
+- stale/expired outcome rejection.
+
+Multiple clicks must not launch overlapping uncontrolled provider requests or duplicate expensive models.
+
+Define safe single-flight or equivalent operation semantics.
+
+Do not leave abandoned workers retaining sensitive information.
+
+A refresh must either present one coherent completed decision or fail clearly.
+
+Do not serve a stale decision as current.
+
+### 4.4 My Team view
+
+Show, using actual engine results:
+
+- Gameweek;
+- recommended transfers;
+- current and resulting 15-player squad;
+- starting XI and formation;
+- ordered bench and goalkeeper;
+- captain and vice;
+- number of free transfers;
+- transfer hits;
+- expected points;
+- comparison against doing nothing;
+- immediate and three-GW horizon gain where available;
+- scenario range;
+- uncertainty and warnings;
+- fallback player assumptions;
+- bounded solver scope;
+- publication/expiry status.
+
+Do not invent chip or rank recommendations.
+
+If the active private path is NO_CHIP_EXPLICIT or POINTS_MODE_ONLY, display those limitations honestly.
+
+If the source supports only one-GW confidence, do not present it as three-GW confidence.
+
+### 4.5 Decision comparisons
+
+Expose the existing no-transfer comparison and candidate frontier.
+
+Where valid:
+
+- expected gain;
+- paired distribution;
+- downside;
+- probability of improvement;
+- legal alternative plans;
+- short explanation of the tradeoff.
+
+All alternatives must come from actual evaluated candidates.
+
+Do not generate plausible-looking but unevaluated alternatives.
+
+### 4.6 Security and privacy
+
+Live operator credentials must remain server-side or within the accepted secure local credential mechanism.
+
+No token in browser JavaScript, query strings, application logs, Git evidence, HTML files or screenshots.
+
+Use safe loopback-session authorization, appropriate CSRF protections, response no-store controls, strict content security, input validation and no credential-bearing error messages.
+
+The existing private FPL profile denies caching, persistent raw data, derived storage and backups.
+
+Treat transient in-process presentation as distinct from a persistent cache. Define its exact lifetime and prove it respects the existing profile.
+
+If the current profile cannot support a proposed temporary representation, use a one-time response or safer equivalent.
+
+No localStorage, IndexedDB or durable browser persistence for live manager or provider-derived data.
+
+No live provider traffic in automated tests.
+
+---
+
+## 5. WORKSTREAM B — PLAYER LAB
+
+This is a mandatory substantial implementation.
+
+The purpose is to expose the existing player projection machinery, rather than merely the optimizer's chosen squad.
+
+Inspect:
+
+`src/dmf_pulse/fpl_points/models.py`
+
+`src/dmf_pulse/fpl_points/summaries.py`
+
+`src/dmf_pulse/fpl_points/gameweek_summaries.py`
+
+`src/dmf_pulse/fpl_points/service.py`
+
+`src/dmf_pulse/private_v1/service.py`
+
+`src/dmf_pulse/private_v1/one_command.py`
+
+and current identity, fixture, Stage-7 and Stage-8 models.
+
+Existing `GameweekPlayerProjectionSummary` already contains expected points, distribution, selected thresholds, component breakdowns, Monte Carlo uncertainty and source lineage.
+
+Reuse these contracts.
+
+### 5.1 All-player explorer
+
+Implement a browser page showing every player for whom the active model has a valid projection.
+
+Aim to cover the complete official current player universe, subject to actual valid model inputs.
+
+Do not quietly drop players or use zero points to fill missing projections.
+
+Show explicit:
+
+- total current players;
+- players with valid projections;
+- blocked/unavailable projections;
+- reason categories;
+- source and model coverage.
+
+Sortable/filterable columns should include, where supported:
+
+- player;
+- team;
+- position;
+- current price;
+- upcoming fixture;
+- current-GW xPts;
+- three-GW xPts where actually modelled;
+- selected longer-horizon value only if actually calculated;
+- xPts per price;
+- expected minutes;
+- start probability;
+- probability of 60+ minutes;
+- goals and assists contribution;
+- clean-sheet contribution;
+- bonus contribution;
+- confidence;
+- missing/fallback source warnings.
+
+Use nullable/blocked output when the source lacks a valid value.
+
+Do not invent future fixtures, minutes, probabilities or prices.
+
+### 5.2 Individual player page
+
+Clicking a player should open an evidence-backed projection report.
+
+Show:
+
+1. Current xPts and outcome distribution.
+2. Expected points by future fixture when valid.
+3. Goal, assist, clean-sheet, appearance and bonus contributions.
+4. The complete relevant scoring-component breakdown.
+5. Starting and minutes assumptions.
+6. Probabilities and percentiles.
+7. Scenario and Monte Carlo quality.
+8. Data freshness and historical evidence limitations.
+9. Exact model/rules/source provenance.
+10. Role in the proposed squad or transfer frontier.
+
+Use the actual 13-component Stage-9 points model.
+
+Ensure expected component means reconcile with total xPts within the existing numerical contract.
+
+Do not present independent error bars for correlated scoring components.
+
+### 5.3 Explainability
+
+Create a deterministic explanation view from real model inputs and outputs.
+
+Examples of useful supported explanations:
+
+- xPts comes from goals, assists, appearance, clean sheets and bonus;
+- minutes uncertainty contributes to the forecast distribution;
+- this player uses a positional historical fallback;
+- current evidence is Grade E;
+- this projection is driven by a prior-only match input;
+- this player benefits from a favorable projected goal distribution.
+
+Do not assert causal attribution if the model did not calculate it.
+
+Distinguish:
+
+- scoring decomposition;
+- input lineage;
+- uncertainty;
+- sensitivity;
+- genuine decision counterfactual.
+
+If a sensitivity is not computed, do not invent it in prose.
+
+### 5.4 Model output integration
+
+The private core currently exposes complete Gameweek projections internally.
+
+Implement the narrowest rights-safe typed service boundary allowing the dashboard to access these results during the active operator session.
+
+Do not recalculate projections separately for the UI.
+
+Do not modify sealed production decision hashes merely to add display fields.
+
+Where source-code identity affects provenance, use the existing authenticated code-identity mechanism and compare numerical outputs under an explicitly labelled controlled-provenance test.
+
+### 5.5 Required demonstration
+
+From an actual synthetic end-to-end model run:
+
+- render a complete player table;
+- select one player;
+- view their xPts distribution and component breakdown;
+- compare two players over the same validated horizon;
+- demonstrate blocked/missingness states;
+- demonstrate that the model output and displayed values agree exactly.
+
+A static hard-coded player table is not acceptance.
+
+---
+
+## 6. WORKSTREAM C — EVALUATION LAB
+
+The objective is to build the actual engineering foundation needed for:
+
+**Predicted points → frozen forecast → finalized actual points → scoring → model diagnostics → future improvement.**
+
+Inspect existing Stage-12 and Stage-9 evaluation code.
+
+Do not duplicate its metrics or create new statistical rules unnecessarily.
+
+### 6.1 Forecast snapshot contract
+
+Implement a source- and rights-aware projection snapshot contract including:
+
+- canonical player;
+- season;
+- Gameweek;
+- fixture/horizon;
+- predicted mean;
+- probability distribution;
+- selected component expectations;
+- model/rules versions;
+- input and information cutoff;
+- source vintages and identities;
+- prediction generation time;
+- reproducibility hash;
+- dataset mode;
+- permitted retention classification.
+
+Forecast identity must be fixed before outcomes are known.
+
+Post-outcome forecasts cannot masquerade as pre-deadline predictions.
+
+Actual P01 is a separate frozen experiment and must remain unchanged.
+
+### 6.2 Real-outcome label contract
+
+Develop strict typed adapters for finalized player results.
+
+Consider the actual FPL gameweek live-result structure as a candidate source, but do not access it without the necessary source authorization.
+
+Require:
+
+- finalization status;
+- correction policy;
+- official points and relevant components;
+- exact player/GW identity;
+- strict numeric types;
+- source time;
+- usable time;
+- rights/provenance;
+- no ambiguous mappings.
+
+A live interim score is not automatically a finalized label.
+
+### 6.3 Matching and evaluation
+
+Reuse existing:
+
+- point metrics;
+- probability metrics;
+- distribution scoring;
+- calibration;
+- temporal leakage protection;
+- walk-forward folds;
+- benchmarks;
+- decision regret where justified.
+
+Implement a complete testable evaluation pipeline.
+
+Acceptance must include:
+
+- correct alignment across players and Gameweeks;
+- no missing labels silently treated as zero;
+- no outcomes in prediction-time features;
+- no hidden model refitting;
+- clear separation of forecast accuracy and decision quality;
+- baseline comparisons;
+- error breakdown by Gameweek and player position;
+- forecast-volume/sample-size disclosure.
+
+Use synthetic and qualified retained evidence for real executable tests.
+
+### 6.4 Evaluation dashboard
+
+Implement a MODEL PERFORMANCE page.
+
+With authorized real evidence, it should support:
+
+- predicted vs actual points;
+- MAE and RMSE;
+- bias;
+- calibration and probability diagnostics;
+- confidence-band coverage;
+- error by position;
+- error by expected-minutes band;
+- error by Gameweek;
+- model/version comparison;
+- rolling performance;
+- sample size and missingness.
+
+If no eligible real longitudinal evidence exists, show:
+
+`NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT`
+
+Do not display synthetic measurements as real historical success.
+
+### 6.5 Longitudinal research foundation
+
+Design and implement a governed storage schema using the existing PostgreSQL architecture where appropriate.
+
+Persistent writes are permitted only for synthetic or independently rights-qualified data classes.
+
+For the current private official-FPL profile, do not store real raw or derived results in a historical database.
+
+Implement and test the denial boundary explicitly.
+
+The objective is to ensure that once a qualifying data source and permission are obtained, longitudinal evaluation can begin without rebuilding the schema, metrics and UI.
+
+### 6.6 Future model improvement
+
+Prepare a proper champion/challenger evaluation mechanism.
+
+Minimum:
+
+- immutable forecasts;
+- predeclared metrics;
+- chronological holdout;
+- calibration report;
+- baseline comparison;
+- paired evaluation;
+- cohort coverage;
+- no hindsight;
+- no automatic model promotion.
+
+Player starts/minutes and player-event allocation are priority candidates for improvement.
+
+Do not promote new parameters on the strength of synthetic tests.
+
+---
+
+## 7. WORKSTREAM D — EXPANDED DATA CAPABILITY
+
+This workstream is strategically important.
+
+DMF Pulse should become more data-rich and competitive with leading FPL analytics tools.
+
+Do not interpret previous conservative data scopes as permanent design goals.
+
+Actively investigate how to obtain the maximum useful lawful, reliable and economical football evidence for a private analytical application.
+
+At the same time, do not treat publicly accessible JSON routes as a licence, or assume another company's features establish its source permissions.
+
+### 7.1 Research the current landscape
+
+Examine current:
+
+- 2026/27 official FPL terms:
+  https://fantasy.premierleague.com/help/terms
+- current official FPL web application data surfaces;
+- existing accepted DMF rights and provider profiles;
+- unofficial endpoint documentation, clearly labelled non-authoritative;
+- Fantasy Football Hub's publicly documented features;
+- zero-cost and low-cost historical football/player data;
+- appropriately licensed event, minutes, xG/xA and player-performance sources;
+- current OpenFootball/odds constraints.
+
+Investigate competitors for feature benchmarking, not for undocumented claims about their collection methods or rights.
+
+Official terms currently prohibit automated systems accessing/extracting game information. State this clearly in any proposed access expansion.
+
+Do not misrepresent an operator's acceptance of contractual risk as legal permission.
+
+### 7.2 Data inventory and priority
+
+Create a route-by-route and provider-by-provider matrix.
+
+For every data family record:
+
+- endpoint/source;
+- field coverage;
+- season coverage;
+- current freshness;
+- public or authenticated;
+- required permissions;
+- known contractual/IP restrictions;
+- transient-access status;
+- storage permission;
+- derived-storage permission;
+- training permission;
+- public display permission;
+- request cost;
+- endpoint stability;
+- model usefulness;
+- alternative licensed source;
+- approval decision required.
+
+Priority data families:
+
+**Current official FPL context**
+
+- complete player roster;
+- player prices;
+- status/availability flags;
+- teams;
+- fixtures;
+- Gameweeks;
+- current ownership;
+- current underlying performance fields.
+
+**Actual player results**
+
+- completed GW player points;
+- minutes;
+- goals and assists;
+- bonus/BPS as available;
+- clean sheets and goals conceded;
+- cards;
+- saves;
+- defensive contributions where available;
+- match/GW-specific FPL scoring components.
+
+**Player historical evidence**
+
+- prior game-by-game performance;
+- starts/minutes;
+- current and past season summaries;
+- underlying goal/assist evidence;
+- player role or positional priors;
+- uncertainty and missingness.
+
+**Private management context**
+
+- own manager state;
+- official purchase/selling price;
+- free transfers;
+- team picks;
+- captain/vice;
+- own historic decisions where authorized.
+
+**Football model evidence**
+
+- team-level scores;
+- goal/assist event probabilities;
+- player roles;
+- lineup reliability;
+- shot/expected-goal indicators where available;
+- independent lawful benchmarks.
+
+### 7.3 Efficient bulk-source strategy
+
+Evaluate the following known FPL JSON route families as engineering candidates:
+
+- `bootstrap-static/`;
+- `fixtures/`;
+- `event/{gameweek}/live/`;
+- `event-status/`;
+- `element-summary/{player_id}/`;
+- relevant own-entry state/history routes.
+
+Never assume a route is active merely because it appears in historical documentation.
+
+Avoid inefficiently retrieving hundreds of player-detail responses when a single authorized Gameweek-wide result covers the needed fields.
+
+Prefer:
+
+- bulk endpoint selection;
+- request coalescing;
+- bounded concurrency;
+- explicit allowlists;
+- conditional retrieval where permitted;
+- configurable and conservative request budgets;
+- exponential backoff for transient failures;
+- clear 429/403 behavior;
+- no circumvention;
+- validation and schema-drift alerts.
+
+Caching is allowed only when the applicable rights profile actually permits it.
+
+The current private FPL profile does not.
+
+No credential sharing, proxy rotation, user-agent impersonation to evade blocks, CAPTCHA bypass or attempts to circumvent provider rate limits.
+
+### 7.4 Implement useful new ingestion code
+
+Do not stop at a document listing endpoints.
+
+Implement at least one complete additional, typed, offline-testable FPL data-adapter vertical slice, preferentially the **Gameweek-wide official player actuals / points-component source** because it directly advances our evaluation objective.
+
+Include:
+
+- strict response contracts;
+- complete player ID mapping;
+- match/GW identity;
+- raw/provider-to-canonical transformation;
+- finality and correction states;
+- fail-closed validation;
+- explicit missingness;
+- bounded resource use;
+- rights-before-transport enforcement;
+- source versions and timestamps;
+- synthetic adversarial fixtures;
+- standalone installed-wheel tests.
+
+If appropriate, also implement a targeted player-history adapter for richer starts/minutes and event research.
+
+Do not activate newly introduced live transport routes under an unrelated existing approval.
+
+This engineering programme authorizes offline development and verification, not expanded live data acquisition.
+
+### 7.5 Rights decision alternatives
+
+Create a concrete owner decision document comparing:
+
+**Option A — Existing private low-volume scope**
+
+Reuse the already accepted operator-initiated transient integration. No new storage/training entitlement.
+
+**Option B — Expanded private data-access experiment**
+
+Specify new endpoint families, intended request volumes, user-triggering, credentials, collection purpose and contractual exposure. Clearly identify that the existing official terms prohibit automated extraction. Require a fresh explicit owner decision and appropriate legal/source-rights review before execution.
+
+**Option C — Independently licensed evidence**
+
+Use appropriate licensed/open football datasets for historical retention, longitudinal evaluation and model training, keeping FPL private data separate.
+
+Recommend a viable combination.
+
+Do not claim that user approval overrides third-party licence restrictions.
+
+No blanket `ALLOW` policy.
+
+No silently expanded source scope.
+
+Do not execute Options B or C merely by implementing their candidate code.
+
+### 7.6 Aggressive data-quality engineering
+
+Implement high-value quality tools where useful:
+
+- completeness by player and Gameweek;
+- expected-versus-observed player counts;
+- missing fields;
+- source freshness;
+- schema drift;
+- season/identity changes;
+- correction/revision detection;
+- failed and excluded rows;
+- model-ready feature classification;
+- vintage and cutoff correctness.
+
+The objective is to make richer data usable for models, not merely accumulate JSON.
+
+---
+
+## 8. KEEP THE CURRENT ENGINE CORRECT
+
+Existing numerical and legal decisions must remain correct.
+
+Preserve:
+
+- current FPL rules;
+- bank and purchase/selling-price logic;
+- transfer hits and free-transfer transitions;
+- lineup legality;
+- captain/vice calculation;
+- official-deadline protections;
+- Monte Carlo scenario coherence;
+- one-GW backward compatibility;
+- three-GW bounded search disclosures;
+- no-chip and points-only restrictions;
+- P01 immutability;
+- team-strength shadow-only status;
+- source-rights gates.
+
+No dashboard code should alter numerical decisions.
+
+No new pipeline may make a research-only model operational.
+
+If current outputs have changed due solely to authenticated code provenance, independently demonstrate unchanged decision-relevant numerical behavior with a clearly labelled synthetic controlled-provenance test.
+
+Do not weaken production code authentication to make comparisons pass.
+
+---
+
+## 9. P01 AND EARLIER RELEASE PROTECTION
+
+The original P01 forecast remains frozen:
+
+Semantic SHA:
+
+`96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a`
+
+Byte SHA:
+
+`e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee`
+
+A02 and A03 remain permanently consumed.
+
+ACCEL-001's candidate OpenLigaDB display-name policy remains:
+
+`INACTIVE / PROPOSED_UNAPPROVED`
+
+No A04 authority is created.
+
+No P01 actual scoring.
+
+No accidental metadata-policy activation.
+
+No production activation.
+
+The new player-evaluation workstream is separate from P01 team-strength retrospective/prospective scoring.
+
+Do not make the dashboard wait for A04.
+
+---
+
+## 10. IMPLEMENTATION CHECKPOINTS
+
+This is one coordinated large programme, not a demand for a sequence of additional user prompts.
+
+### CP0 — Authority and integration baseline
+
+- verify Git references;
+- verify ACCEL-001 exact SHA;
+- inspect current relevant code;
+- reconcile approved rights/UI architecture;
+- create programme plan;
+- freeze source and numerical baselines.
+
+### CP1 — Local web application
+
+- build local server;
+- typed decision view models;
+- working browser shell;
+- refresh request lifecycle;
+- progress;
+- deadline/freshness status;
+- source-injected synthetic end-to-end tests.
+
+### CP2 — Real recommendation integration
+
+- integrate existing one-command service;
+- My Team page;
+- XI/bench/captain;
+- transfer frontier;
+- no-transfer comparison;
+- quality and limitation presentation;
+- real-stack injected end-to-end proof;
+- no numerical change.
+
+### CP3 — Player Lab
+
+- all-player projection availability;
+- searchable/sortable table;
+- per-player detail;
+- xPts distribution;
+- scoring decomposition;
+- evidence/uncertainty;
+- fixture/horizon display;
+- identity and numerical reconciliation tests.
+
+### CP4 — Evaluation Lab
+
+- frozen projection contract;
+- strict final-label contract;
+- source rights and retention gates;
+- alignment and scorecard;
+- synthetic/qualified-data ledger;
+- evaluation dashboard;
+- model comparison and holdout contracts.
+
+### CP5 — Expanded data foundation
+
+- current FPL terms/source study;
+- competitor feature comparison;
+- route/source rights matrix;
+- at least one substantive offline typed player-outcome adapter;
+- efficient acquisition architecture;
+- actionable owner rights decisions;
+- error, data-quality and quota observability.
+
+### CP6 — System hardening
+
+- complete end-to-end synthetic workflow;
+- independent review;
+- remediation;
+- static and security gates;
+- built-wheel tests;
+- complete CI;
+- exact-SHA publication;
+- runnable operator instructions.
+
+Durably commit and push completed checkpoints according to the repository's active worktree/publication authority.
+
+No force push or unapproved history rewrite.
+
+If a workstream becomes rights-blocked, preserve its completed offline implementation and advance the independent workstreams.
+
+---
+
+## 11. MANDATORY ACCEPTANCE DEMONSTRATIONS
+
+These demonstrations determine whether the programme succeeded.
+
+### Demonstration 1 — Open and refresh
+
+Start a local dashboard.
+
+Click Refresh.
+
+Execute the real underlying private application stack with injected, rights-safe synthetic sources.
+
+Display progress.
+
+Produce a valid recommendation.
+
+Show squad, XI, captain, vice, transfers and comparison.
+
+Prove a second click cannot create conflicting concurrent runs.
+
+Prove expired recommendations fail.
+
+### Demonstration 2 — Player xPts
+
+From the same model run:
+
+- display the player table;
+- show complete projection coverage/missingness;
+- select a player;
+- show xPts and component breakdown;
+- show uncertainty and provenance;
+- compare two players;
+- prove displayed numerical values equal the underlying Stage-9 summaries.
+
+### Demonstration 3 — Results evaluation
+
+Freeze a synthetic forecast before its declared cutoff.
+
+Supply finalized synthetic outcome labels afterward.
+
+Join without leakage.
+
+Produce MAE, bias, appropriate probability/distribution scores and cohort diagnostics.
+
+Show the result in MODEL PERFORMANCE.
+
+Reject wrong-season, wrong-player, nonfinal and post-hoc forecast substitutions.
+
+### Demonstration 4 — Data acquisition contract
+
+Pass a synthetic valid FPL-style Gameweek result payload into the new adapter.
+
+Validate all player identities, points and finalized status.
+
+Produce a complete typed evaluation-ready result.
+
+Demonstrate failure for:
+
+- missing player;
+- duplicate player;
+- wrong Gameweek;
+- wrong season;
+- unfinalized result;
+- malformed points component;
+- inconsistent total;
+- provider schema drift;
+- unauthorized retention;
+- unauthorized transport.
+
+### Demonstration 5 — Privacy
+
+Verify:
+
+- no real provider network calls during tests;
+- no credentials in browser payloads or logs;
+- no real private FPL artifacts on disk;
+- no unauthorized persistent player data;
+- no provider bodies in review packs;
+- no public network listener;
+- correct cache and no-store behavior;
+- safe cleanup after cancellation/error/shutdown;
+- no production activation.
+
+A dashboard that only displays hardcoded examples does not pass.
+
+---
+
+## 12. QUALITY, INDEPENDENT REVIEW AND CI
+
+Maintain existing quality requirements:
+
+- Python 3.13;
+- frozen uv dependency integrity;
+- Ruff;
+- strict mypy;
+- source and provider contract tests;
+- property and adversarial tests;
+- Stage-7/8/9 regression tests;
+- Stage-10/11 optimisation regression tests;
+- one-GW and three-GW accepted behavior;
+- full applicable PostgreSQL/migration gates;
+- clean installed-wheel tests;
+- security and secret scanning;
+- manifest/repository validation;
+- existing coverage floors;
+- complete mandatory GitHub Actions workflow.
+
+Do not silence coverage by excluding new modules.
+
+Run separate independent reviews for:
+
+1. source rights and data retention;
+2. dashboard security and credentials;
+3. numerical projection and decision parity;
+4. evaluation leakage and statistical validity;
+5. cross-workstream integration.
+
+Resolve all valid P0, P1 and material P2 issues.
+
+Keep real failures and their remediation evidence.
+
+Require the final pushed SHA to pass the complete exact-SHA CI.
+
+If the current workflow remains twenty jobs, require 20/20.
+
+No PR, merge, tag or human acceptance.
+
+---
+
+## 13. REQUIRED FINAL HANDOFF
+
+Report five things clearly.
+
+### A. What Sebastian can now use
+
+Exact startup command.
+
+How to open the local dashboard.
+
+How Refresh works.
+
+What displays immediately.
+
+How to browse all players.
+
+How to inspect xPts.
+
+What works from an installed wheel.
+
+Which parts remain synthetic/offline-only.
+
+### B. Player data coverage
+
+- number of players in the test/live-qualified catalogue;
+- how many projections succeeded;
+- blocked/missing cases;
+- covered horizons;
+- scoring-component support;
+- confidence and evidence limitations.
+
+Do not use synthetic counts as real current-season facts.
+
+### C. Evaluation progress
+
+- actual forecast/label contracts implemented;
+- scoring methods;
+- synthetic acceptance;
+- real longitudinal cohort status;
+- rights-blocked storage;
+- what is required to evaluate genuine future FPL Gameweeks.
+
+### D. Expanded data plan
+
+Give a prioritized source and route table:
+
+- evidence value;
+- implementation status;
+- terms/rights position;
+- access frequency;
+- storage/training status;
+- required owner approval;
+- current recommendation.
+
+Explain specifically how DMF Pulse can increase useful current and historical player evidence without wasteful requests or unsupported provenance.
+
+### E. Release and next milestones
+
+Provide:
+
+- checkpoints;
+- final SHAs;
+- GitHub branches;
+- exact-SHA CI;
+- test counts;
+- coverage;
+- independent review status;
+- runnable demonstrations;
+- remaining blockers;
+- prioritized next engineering tasks.
+
+Separate engineering completion from human acceptance and production activation.
+
+---
+
+## 14. SUCCESS DEFINITION
+
+### Minimum required engineering outcome
+
+1. Working local dashboard with genuine application integration.
+2. Clickable Refresh workflow demonstrated through the real engine and injected safe sources.
+3. My Team decision display.
+4. Player xPts explorer with real Stage-9 model outputs.
+5. Player-level breakdown, uncertainty and provenance.
+6. Executable synthetic forecast-versus-actual evaluation pipeline.
+7. At least one additional typed player-data ingestion adapter.
+8. Concrete expanded-data strategy with explicit rights decisions.
+9. Independent review and exact-SHA green CI.
+
+### Stretch outcome
+
+- A polished, responsive dashboard runnable with minimal local setup.
+- Current and three-GW player exploration.
+- Fully connected evaluation charts.
+- A documented, efficient operator-initiated data-refresh path using only already approved source access.
+- More than one new player-evidence contract.
+- A viable rights-qualified plan for starting real longitudinal evaluation immediately after the relevant source approval.
+
+Do not claim live historical validation if none occurred.
+
+Do not claim source permission from endpoint accessibility.
+
+Do not count future designs as implemented capabilities.
+
+**The next release should visibly transform DMF Pulse from a command-line decision engine into an inspectable private FPL application.**
+
+At the end, answer:
+
+1. Can Sebastian open a dashboard?
+2. Can he click Refresh and receive his recommendation?
+3. Can he browse actual model xPts for every eligible player?
+4. Can he see how each projection was calculated?
+5. Can he compare valid stored predictions with finalized results?
+6. What additional data could materially improve the predictions?
+7. Which data-access permissions are still required?
+8. What is the most valuable next step after this release?
+
+Work as aggressively as the approved engineering and data authorities permit.
+
+Complete the maximum number of genuinely useful, testable capabilities in this execution.
+
+`DMF_PULSE_ACCELERATION_WAVE_002_FINAL_HANDOFF`
