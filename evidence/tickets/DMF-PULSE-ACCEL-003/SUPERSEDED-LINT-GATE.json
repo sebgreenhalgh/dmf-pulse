@@ -1,0 +1,57 @@
+{
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "provider_calls": 0,
+  "records": [
+    {
+      "command": [
+        "uv",
+        "sync",
+        "--all-groups",
+        "--frozen",
+        "--offline"
+      ],
+      "duration_seconds": 0.05,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:46:23.533519+00:00",
+      "label": "frozen-sync",
+      "log": "review_pack/local-frozen-sync.log",
+      "log_sha256": "0223f0f30f9631ecb77f4d8045fe9c619443fe301a1ec63d1d25dc182785250c",
+      "started_at": "2026-10-29T19:46:23.483283+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "duration_seconds": 0.193,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:46:23.727487+00:00",
+      "label": "format",
+      "log": "review_pack/local-format.log",
+      "log_sha256": "411fcf1ed834906dbb09d947a17c6d2fe140e696e4321610d139bbb83fd63fcd",
+      "started_at": "2026-10-29T19:46:23.534723+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "duration_seconds": 0.198,
+      "exit_code": 1,
+      "finished_at": "2026-10-29T19:46:23.925911+00:00",
+      "label": "lint",
+      "log": "review_pack/local-lint.log",
+      "log_sha256": "679dac6c02883aadfb4932568afec89837316fc50c126510b4515275b7b02505",
+      "started_at": "2026-10-29T19:46:23.728149+00:00"
+    }
+  ],
+  "schema_version": "accel003-local-gates-v1",
+  "status": "INCOMPLETE_OR_FAILED"
+}

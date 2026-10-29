@@ -1,0 +1,54 @@
+{
+  "final_checks_all_pass": true,
+  "final_focused_tests": 113,
+  "final_scoped_branch_coverage_percent": 93.93939393939394,
+  "full_checks_all_pass": true,
+  "full_regression_tests": 168,
+  "implementation_commit": "cd2e54c2f474980c95743495fe2d43e9f2b8c115",
+  "independent_review": {
+    "checks": 41,
+    "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\review_pack\\accel003-independent-pg-control-review.json",
+    "post_review_delta": "Private-current test-database selector fails before connection; receipt attribution corrected. Final source binding supplied to reviewer.",
+    "sha256": "e84eb83c93d7c647daeb3d9683f93820041135027aaaa79326d9a07b134e3be8",
+    "unresolved_material_findings": 0
+  },
+  "limitations": [
+    "Installed-wheel and full launch/runtime integration belong to the parent integration gate.",
+    "Root authorization qualified_deadline_at change is not part of this branch and requires parent integration checks.",
+    "Privileged DBA and complete configured database replacement remain explicit trust boundaries."
+  ],
+  "original_shared_policy_dependency": "f0c36ddad4d9badfef5514c17c6b70c5a4980854",
+  "production_enrollments": 0,
+  "provider_requests": 0,
+  "real_data_or_credentials": false,
+  "receipts": {
+    "control-final-checks.json": "634fd19b7e9aac5622efeade42e2f409d1c7955383aeb439667ea8be50c84be2",
+    "control-final-coverage.json": "80afd5e3fe3489046172b637d82f54e4e95d6836cdef78bd2b1945a21d0a7880",
+    "control-full-regression.json": "f15899da7ef2a772eab46dc0b52f9c05e1046e9a0d2ed1b6d5a99750de652b37",
+    "control-full-regression.log": "5af22d83fdd474cdd1fe3623d5b50c6e0d466f53a217e09e9265a0bb5deae4fb",
+    "control-offline.sql": "a81c036716295a428acdaea5d21423fbf72d696b23dc0a12256956c75f2da7e2",
+    "control-roundtrip.json": "52b015de4c9de43249c140b67fa331049e3b55e6bc91713b1151bd6bd95035bc",
+    "control-superseded-migration-environment.json": "6d99f1b23b38efd65ea0127fdd4af778b007d6d6dc92bfa04d2a2b9af889caa1"
+  },
+  "recorded_at": "2026-10-29T19:34:22.839525+00:00",
+  "schema_head": "20261029_0008",
+  "schema_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f",
+  "schema_version": "accel003-postgres-control-handoff-v1",
+  "scoped_coverage_floor_percent": 90,
+  "source_sha256": {
+    "scripts/test_migration_matrix.py": "b4fab2e24e562f1de47e6d48adf00ef6fed8f7c7020cff9ff45b6f69ba1d8da2",
+    "scripts/verify_wheel.py": "c6017af84102a5d3223c8dfce76fdd4e68ce577830c599fe6d4d11d7d6413adc",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "a384a4d81b400a0f9cd8580786a2b2452135f7f24c1f15a8a5a48c8ef3a592d2",
+    "src/dmf_pulse/data_model/tables.py": "d2012e8e9f2b1ea77fe456619a95f500c540597b8f6bd418fdbaa7e3b8b00e1a",
+    "src/dmf_pulse/database/doctor.py": "5bba8df09c0655ba6e33ce2a5127c9a61078f50948f8d338982340fc5612476a",
+    "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c",
+    "src/dmf_pulse/ingestion/fpl/service.py": "66d7191fcad6bc4f5edcaefdba11a4aa46c8191a4263fb6c3f996b1012fad9f5",
+    "tests/integration/conftest.py": "9f60be9b0e38bc247dbc2c94535abe38aee299c621f9733cbe21e642ecb30698",
+    "tests/integration/dashboard/test_postgres_authorization.py": "bf81dd1c1c985a54567ec83169bcc155f1e99aab28c942dfc22b8514cb4d6dea",
+    "tests/integration/migrations/test_migrations.py": "827d8e98164ed36ee2edf57d0fb8cb3f641a875fea8ca2f471ef14b4fcd3bd20",
+    "tests/unit/dashboard/test_postgres_control_contract.py": "afff38894f83388d93ea77b950b1783e0bc6a300025de314778786d68965379f",
+    "tests/unit/database/test_dat003_branch_contracts.py": "3f5f5b5aca7ef46394b6ebca55f8c52bebd34dbb3a1d9756b2a081a4729b43ac"
+  },
+  "superseded_failure_retained": "Initial full migration invocation omitted mandatory DMF_ENVIRONMENT=TEST; corrected invocation passed without guard relaxation.",
+  "worktree_dependency_copy_not_for_cherry_pick": "1d943ea"
+}

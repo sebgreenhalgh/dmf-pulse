@@ -1,0 +1,468 @@
+{
+  "acceptance_before_any_optimization": [
+    "Predeclare candidate, source/dependency hashes and a bounded paired baseline/candidate measurement sequence under identical coverage/host/load; no selective retry.",
+    "Exact collected nodeids, parametrization and complete no-duplicate partition preserved; full112D4nodes remain blocking.",
+    "Captured values are repository-owned and authenticated; fixture consumers cannot mutate shared state or suppress real authority/custody/admission checks.",
+    "Meaningful repeated setup/call/teardown reduction and unchanged complete branch union, failure localization, canary redaction, numerical outputs and process isolation independently demonstrated.",
+    "Unchanged full tests, coverage floors, performance smoke, wheel, database, secrets and exact-SHA20jobCI pass before a speedup claim."
+  ],
+  "classification": "HISTORICAL_MEASURED_EVIDENCE_PLUS_STATIC_INFERENCE_NO_NEW_BENCHMARK",
+  "companion_markdown_sha256": "683e88beaff49e27a6e910f872c9762bce64ccd1dcd10e5ac1851043ca353e06",
+  "credential_reads": 0,
+  "new_test_executions": 0,
+  "older_estimate": {
+    "classification": "PROGRESS_LOG_INTERVAL_ESTIMATE_NOT_PYTEST_MODULE_OR_NODE_DURATION",
+    "job_id": 123307905913,
+    "raw_log_sha256": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b",
+    "run_id": 40831728997,
+    "runtime_manifest_source_kind": "estimated",
+    "seconds": 2551.107
+  },
+  "opportunities": [
+    {
+      "kind": "MEASURE_NEXT",
+      "proposal": "On the final exact source/dependency SHA, run D4 sequentially with unchanged branch coverage and all112nodes, recording per-node setup/call/teardown plus module capture/preparation boundaries. Keep failed attempts and host/runner details. Also profile shard11, whose historical2395s nearly matchesD4."
+    },
+    {
+      "kind": "CANDIDATE_NOT_IMPLEMENTED",
+      "proposal": "Factor only byte-authenticated repository-owned immutable fixture construction from per-node full-seam execution if profiling shows a material share; keep each independently injected authority/prepared-callback/projection failure exercised. Fresh monkeypatch/iterators/deep copies per test; authenticated expected semantics, no pickled provider-shaped cross-run cache."
+    },
+    {
+      "kind": "CANDIDATE_NOT_IMPLEMENTED",
+      "proposal": "Partition by capture dependency groups only if isolated measurements prove duplicated capture cost is smaller than parallel body savings. Keep22rolling consumers and23full-seam consumers grouped, preserve112exact nodeids/branch union, negative canary identity and at least one uncaptured real seam. Generic node split is unsupported."
+    },
+    {
+      "kind": "DO_NOT_DO",
+      "proposal": "More shards alone cannot shorten an intact D4 module. Do not bypass guards, reuse privileged closures or transient provider/manager bodies, replace end-to-end checks with synthetic assertions, persist source outputs, lower gates, increase timeouts or claim speedup from estimates."
+    }
+  ],
+  "parent_exact_ci": {
+    "all_selected_tests": 6142,
+    "d4_module_alone": true,
+    "d4_nodes": 112,
+    "d4_output_locators": [
+      {
+        "line": 537,
+        "text": "2026-10-29T13:59:13.4838250Z tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py ..... [  4%]"
+      },
+      {
+        "line": 541,
+        "text": "2026-10-29T14:41:05.1944269Z ======================= 112 passed in 2515.64s (0:41:55) ======================="
+      }
+    ],
+    "d4_pytest_session_seconds": 2515.64,
+    "d4_pytest_step_seconds": 2519.0,
+    "d4_raw_log_sha256": "d0ac1cbf0b8f5719a9b66f581234f817508d3d4177767628705a46f7615c3267",
+    "d4_session_limit": "Measured pytest total for the complete single-module112node session, not individual fixture/setup/call durations.",
+    "finish_gap_limit": "Historical counterfactual bound only: if all other start/finish times stayed fixed, removing all D4 cost could advance the coverage barrier by at most128s. No future runtime or optimization speedup is claimed.",
+    "head_sha": "8b74d5f3dc41eb1246ae82388ec6aab3743241b8",
+    "mandatory_jobs": 20,
+    "median_shard_pytest_step_seconds": 1075.0,
+    "next_slowest_pytest_step_seconds": 2395.0,
+    "plan_archive_sha256": "75cea3459de39eda3747d7e85263a4de852c93e500a9cfa4aa5714846e2c11cd",
+    "plan_member_sha256": "62d6811aa9458fb87f039e7054d64a1fb7912bac20f5b434936ff4bab3888387",
+    "raw_metadata_sha256": "848458cb452a08cd959e202df30f6a6ae809577771949ea93346d0e31eae339c",
+    "realized_schedule_d4_only_finish_gap_seconds": 128.0,
+    "run_id": 40886756682,
+    "shard_step_timings_seconds": [
+      {
+        "job_completed_at": "2026-10-29T14:41:10Z",
+        "job_id": 123493099576,
+        "job_seconds": 2546.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 0 of 16",
+        "pytest_completed_at": "2026-10-29T14:41:05Z",
+        "pytest_started_at": "2026-10-29T13:59:06Z",
+        "pytest_step_seconds": 2519.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:39:02Z",
+        "job_id": 123493099689,
+        "job_seconds": 2418.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 11 of 16",
+        "pytest_completed_at": "2026-10-29T14:38:58Z",
+        "pytest_started_at": "2026-10-29T13:59:03Z",
+        "pytest_step_seconds": 2395.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:28:19Z",
+        "job_id": 123493099751,
+        "job_seconds": 1775.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 12 of 16",
+        "pytest_completed_at": "2026-10-29T14:28:14Z",
+        "pytest_started_at": "2026-10-29T13:59:05Z",
+        "pytest_step_seconds": 1749.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:21:19Z",
+        "job_id": 123493100022,
+        "job_seconds": 1355.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 7 of 16",
+        "pytest_completed_at": "2026-10-29T14:21:16Z",
+        "pytest_started_at": "2026-10-29T13:59:05Z",
+        "pytest_step_seconds": 1331.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:20:45Z",
+        "job_id": 123493099633,
+        "job_seconds": 1321.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 15 of 16",
+        "pytest_completed_at": "2026-10-29T14:20:42Z",
+        "pytest_started_at": "2026-10-29T13:59:08Z",
+        "pytest_step_seconds": 1294.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:19:33Z",
+        "job_id": 123493099619,
+        "job_seconds": 1249.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 2 of 16",
+        "pytest_completed_at": "2026-10-29T14:19:28Z",
+        "pytest_started_at": "2026-10-29T13:59:04Z",
+        "pytest_step_seconds": 1224.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:19:08Z",
+        "job_id": 123493099730,
+        "job_seconds": 1224.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 13 of 16",
+        "pytest_completed_at": "2026-10-29T14:19:01Z",
+        "pytest_started_at": "2026-10-29T13:59:19Z",
+        "pytest_step_seconds": 1182.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:18:01Z",
+        "job_id": 123493099508,
+        "job_seconds": 1157.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 4 of 16",
+        "pytest_completed_at": "2026-10-29T14:17:54Z",
+        "pytest_started_at": "2026-10-29T13:59:06Z",
+        "pytest_step_seconds": 1128.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:16:17Z",
+        "job_id": 123493099637,
+        "job_seconds": 1053.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 8 of 16",
+        "pytest_completed_at": "2026-10-29T14:16:11Z",
+        "pytest_started_at": "2026-10-29T13:59:09Z",
+        "pytest_step_seconds": 1022.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:15:53Z",
+        "job_id": 123493099567,
+        "job_seconds": 1029.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 6 of 16",
+        "pytest_completed_at": "2026-10-29T14:15:50Z",
+        "pytest_started_at": "2026-10-29T13:59:02Z",
+        "pytest_step_seconds": 1008.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:15:53Z",
+        "job_id": 123493099687,
+        "job_seconds": 1029.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 9 of 16",
+        "pytest_completed_at": "2026-10-29T14:15:49Z",
+        "pytest_started_at": "2026-10-29T13:59:05Z",
+        "pytest_step_seconds": 1004.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:15:54Z",
+        "job_id": 123493099584,
+        "job_seconds": 1030.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 5 of 16",
+        "pytest_completed_at": "2026-10-29T14:15:49Z",
+        "pytest_started_at": "2026-10-29T13:59:06Z",
+        "pytest_step_seconds": 1003.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:13:38Z",
+        "job_id": 123493099642,
+        "job_seconds": 894.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 10 of 16",
+        "pytest_completed_at": "2026-10-29T14:13:34Z",
+        "pytest_started_at": "2026-10-29T13:59:08Z",
+        "pytest_step_seconds": 866.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:12:45Z",
+        "job_id": 123493099933,
+        "job_seconds": 841.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 14 of 16",
+        "pytest_completed_at": "2026-10-29T14:12:40Z",
+        "pytest_started_at": "2026-10-29T13:59:06Z",
+        "pytest_step_seconds": 814.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:08:35Z",
+        "job_id": 123493099639,
+        "job_seconds": 591.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 3 of 16",
+        "pytest_completed_at": "2026-10-29T14:08:31Z",
+        "pytest_started_at": "2026-10-29T13:59:04Z",
+        "pytest_step_seconds": 567.0
+      },
+      {
+        "job_completed_at": "2026-10-29T14:06:53Z",
+        "job_id": 123493099628,
+        "job_seconds": 489.0,
+        "job_started_at": "2026-10-29T13:58:44Z",
+        "name": "Coverage shard 1 of 16",
+        "pytest_completed_at": "2026-10-29T14:06:49Z",
+        "pytest_started_at": "2026-10-29T13:59:04Z",
+        "pytest_step_seconds": 465.0
+      }
+    ],
+    "source": "Retained exact-SHA GH metadata/raw logs and publication artifact digests independently recomputed; no new network request.",
+    "successful_jobs": 20,
+    "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40886756682"
+  },
+  "prior_reuse_experiment": {
+    "after_seconds": 411.57,
+    "before_seconds": 412.76,
+    "disposition": "REVERTED_NO_MATERIAL_BENEFIT",
+    "scope_limit": "Earlier D3 setup reuse experiment; different source SHA/host/no coverage, not a D4 controlled experiment.",
+    "source": "CI-TEST-RATIONALISATION-001/runtime_profile.json"
+  },
+  "protected_audit": {
+    "a02_a03_consumption_configs_unchanged": true,
+    "a04_authority_added": false,
+    "authority_manifest_sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac",
+    "authority_matches": true,
+    "captured_at": "2026-10-29T19:39:33.275460+00:00",
+    "changed_numerical_paths": [],
+    "classification": "READ_ONLY_INTERIM_WORKING_TREE_AUDIT_FINAL_FREEZE_REQUIRED",
+    "credential_reads": 0,
+    "final_audit_ready": false,
+    "numerical_baseline_python_files_checked": 157,
+    "numerical_manifest_sha256": "768725f1a0bd2e8c0440df07bae76fed2ec02d2dc7ce44511cde54a4cd705435",
+    "original_dirty_file_bytes_not_baselined": true,
+    "original_head": "4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb",
+    "original_head_matches": true,
+    "original_status_matches": true,
+    "original_status_sha256": "f4b88b6a4cf32618a9c192b7addace05e2520802b6f696d0cfb94a292bb84abd",
+    "original_worktree_limit": "CP0 binds HEAD and status, not every pre-existing dirty file byte. Matching status does not prove byte equality of all dirty files.",
+    "p01": {
+      "actions": "READ_BYTES_AND_STORED_IDENTITY_ONLY_NO_VALIDATOR_NO_MODEL_NO_SCORE",
+      "byte_match": true,
+      "byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+      "semantic_match": true,
+      "stored_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a"
+    },
+    "protected_all_match": true,
+    "protected_paths": {
+      ".github/workflows/ci.yml": {
+        "expected": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+        "head_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+        "matches": true,
+        "working_sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392"
+      },
+      ".secret-scan-allowlist.json": {
+        "expected": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad",
+        "head_sha256": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad",
+        "matches": true,
+        "working_sha256": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad"
+      },
+      "config/evaluation/team_strength_p01_a02_consumption.json": {
+        "expected": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+        "head_sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+        "matches": true,
+        "working_sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486"
+      },
+      "config/evaluation/team_strength_p01_fallback_a02.json": {
+        "expected": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+        "head_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+        "matches": true,
+        "working_sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32"
+      },
+      "config/evaluation/team_strength_p01_fallback_a03.json": {
+        "expected": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+        "head_sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+        "matches": true,
+        "working_sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c"
+      },
+      "config/models/current_team_strength_governance.json": {
+        "expected": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+        "head_sha256": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+        "matches": true,
+        "working_sha256": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3"
+      },
+      "config/rights/fpl_profiles.json": {
+        "expected": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+        "head_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+        "matches": true,
+        "working_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57"
+      },
+      "config/rights/odds_profiles.json": {
+        "expected": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+        "head_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+        "matches": true,
+        "working_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc"
+      },
+      "config/rights/openfootball_profiles.json": {
+        "expected": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+        "head_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+        "matches": true,
+        "working_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545"
+      },
+      "config/rights/openligadb_p01_fallback.json": {
+        "expected": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+        "head_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+        "matches": true,
+        "working_sha256": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24"
+      },
+      "scripts/verify_team_strength_coverage.py": {
+        "expected": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a",
+        "head_sha256": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a",
+        "matches": true,
+        "working_sha256": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a"
+      }
+    },
+    "provider_calls": 0,
+    "root_head": "bac1778db5a9a2cfe778bea867c4e5a2b8b73986",
+    "root_status_sha256": "0e0fa88d1006244fd852ea7b0d8cb15bca15bf3f1804a693bd86173294db925b",
+    "root_worktree_clean": false,
+    "tracked_mutations_by_reviewer": 0
+  },
+  "provider_calls": 0,
+  "recommendation": "Complete A-D integration and unchanged acceptance first. Do not add shards, split D4, change cache policy, timeout, coverage or workflows in ACCEL-003. A separate bounded setup/call/teardown profile is justified; no implementation benefit is established.",
+  "recorded_at": "2026-10-29T19:39:33.600646+00:00",
+  "retained_review_helper_failure": "Initial helper compared the raw-metadata file to a different packaged CI-observation member hash. It asserted before any receipt write. Corrected exact binding uses publication.ci.raw_metadata_sha256 and requires identical jobs in retained CI-LATEST; neither input was altered.",
+  "schema_version": "accel003-independent-performance-assessment-v1",
+  "source_receipts_sha256": {
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ACCEL-002-FINAL\\CI-FINAL-RAW-METADATA.json": "848458cb452a08cd959e202df30f6a6ae809577771949ea93346d0e31eae339c",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ACCEL-002-FINAL\\CI-LATEST.json": "f9034d1370bee90d58d109782d5467a3b498990ce52acfadf1479fd356fc7591",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ACCEL-002-FINAL\\FINAL-PUBLICATION-RECEIPT.json": "be2cf36088967a086827a7d9eeb54a40f1081ce86063398f67409029d01ab4af",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ACCEL-002-FINAL\\INDEPENDENT-FINAL-ZIP-REVIEW.json": "092af0837211b16ed0ca7f2d7fc28bbdd6b6f411e2bdf2f59d475e58cede164e",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ACCEL-002-FINAL\\ci-job-123493099576.log": "d0ac1cbf0b8f5719a9b66f581234f817508d3d4177767628705a46f7615c3267",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ACCEL-002-FINAL\\coverage-plan-8b74d5f3dc41eb1246ae82388ec6aab3743241b8.zip": "75cea3459de39eda3747d7e85263a4de852c93e500a9cfa4aa5714846e2c11cd",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\review_pack\\ci-job-123307905913.log": "b4786077a9c7ea265d2b7ebbb2b8bf734f1f56f0d70e75c46de8b6d3a578786b",
+    "config\\testing\\runtime_history.json": "b6742304136a59b4caa48a6ff07294d2f331804808d474cfe1a9aeb627287df5",
+    "evidence\\tickets\\CI-TEST-RATIONALISATION-001\\runtime_profile.json": "f105cbbf2fced7b11333175018155d8715e5d4543160e7eee3fe427d152c78c5",
+    "evidence\\tickets\\DMF-PULSE-ACCEL-002\\CI-D4-REBALANCE.json": "00523685ff0fa2d866d02ff1cf27d2e08c7d391f850477971e16f5d5de88f9ed",
+    "evidence\\tickets\\DMF-PULSE-ACCEL-003\\CP0-BASELINE.json": "2c3696e06bc65dd05504be03ee3296c8a55c5db9ee18e5d63b767c485f1a6214",
+    "scripts\\ci_coverage_shards.py": "35d6376527fd31b33f5b58386c85b4b8c6e7db92459339bcacbb1f3057ca6d44",
+    "tests\\conftest.py": "5be6b83908f93a6096a78c7abcb5cecef79ffd3a29d166398628cdb48eaf3864",
+    "tests\\integration\\conftest.py": "9f60be9b0e38bc247dbc2c94535abe38aee299c621f9733cbe21e642ecb30698",
+    "tests\\unit\\private_v1\\e2e_test_support.py": "74e6cac22087eb7050aa54d70c43ca306813b6b51022c8ad29d4f5868bc157d8",
+    "tests\\unit\\private_v1\\test_team_strength_d3_seam.py": "b48243c6576e59d39555a1326a51557302b8f8a4db05c1517027e9d787c207fd",
+    "tests\\unit\\private_v1\\test_team_strength_d4_rolling_diagnostics.py": "05c7c1e26eff5fd2cfc87915d31ac774b238eb290ae455c91a1676e1cb311fbb",
+    "tests\\unit\\private_v1\\test_team_strength_l1.py": "d30b5fcb6c0975f52d4e34bd42b19b0a21fa84a374c5bd449681d0497684d3d1"
+  },
+  "static_population": {
+    "captured_full_seam_consumers": 23,
+    "captured_rolling_consumers": 22,
+    "cheap_contract_nodes": 65,
+    "inference_limits": "Capture scope and invocation counts are proven statically and by frozen nodeids. Their cost shares and any immutability-safe reuse benefit are not measured. Frozen Pydantic objects may contain mutable nested values; object sharing needs mutation-isolation proof.",
+    "module_fixture_captures": [
+      {
+        "fixture": "captured_rolling_pipeline",
+        "line": 42,
+        "observed_static_invocations": "One complete rolling recommendation including three fixture projections and two optimizations per importing test module/process.",
+        "scope": "module"
+      },
+      {
+        "fixture": "captured_full_seam_pipeline",
+        "line": 89,
+        "observed_static_invocations": "One baseline full seam to BUILD_STAGE11_WORK; captures automatic rolling minutes plus three projections and two optimizations per importing test module/process.",
+        "scope": "module"
+      }
+    ],
+    "node_groups": {
+      "test_allowlisted_rolling_codes_round_trip_without_private_text": {
+        "captured_fixtures": [],
+        "line": 230,
+        "parameterized_node_count": 21
+      },
+      "test_dynamic_optimizer_result_is_closed_through_real_rolling_service": {
+        "captured_fixtures": [
+          "captured_rolling_pipeline"
+        ],
+        "line": 413,
+        "parameterized_node_count": 2
+      },
+      "test_every_declared_phase_is_wired_into_real_rolling_service_source": {
+        "captured_fixtures": [],
+        "line": 339,
+        "parameterized_node_count": 1
+      },
+      "test_every_phase_failure_is_injected_through_real_rolling_service": {
+        "captured_fixtures": [
+          "captured_rolling_pipeline"
+        ],
+        "line": 373,
+        "parameterized_node_count": 20
+      },
+      "test_every_phase_survives_complete_d1_d2_d3_one_command_seam": {
+        "captured_fixtures": [
+          "captured_full_seam_pipeline"
+        ],
+        "line": 504,
+        "parameterized_node_count": 20
+      },
+      "test_every_rolling_phase_has_closed_generic_and_typed_failure": {
+        "captured_fixtures": [],
+        "line": 194,
+        "parameterized_node_count": 40
+      },
+      "test_optimizer_failure_survives_complete_d1_d2_d3_one_command_seam": {
+        "captured_fixtures": [
+          "captured_full_seam_pipeline"
+        ],
+        "line": 547,
+        "parameterized_node_count": 2
+      },
+      "test_ordinary_rolling_boundary_has_no_observer_and_preserves_exception_identity": {
+        "captured_fixtures": [],
+        "line": 250,
+        "parameterized_node_count": 1
+      },
+      "test_real_rolling_service_localises_after_stage8_before_stage9": {
+        "captured_fixtures": [],
+        "line": 451,
+        "parameterized_node_count": 1
+      },
+      "test_resource_identity_survives_complete_d1_d2_d3_d4_one_command_seam": {
+        "captured_fixtures": [
+          "captured_full_seam_pipeline"
+        ],
+        "line": 583,
+        "parameterized_node_count": 1
+      },
+      "test_resource_limit_identity_and_safe_counters_reach_terminal_diagnostic": {
+        "captured_fixtures": [],
+        "line": 260,
+        "parameterized_node_count": 1
+      },
+      "test_rolling_failure_survives_complete_d1_d2_d3_one_command_seam": {
+        "captured_fixtures": [],
+        "line": 482,
+        "parameterized_node_count": 1
+      },
+      "test_unknown_optimizer_code_is_never_null_or_disclosed": {
+        "captured_fixtures": [],
+        "line": 239,
+        "parameterized_node_count": 1
+      }
+    },
+    "repeated_preparation": "Each of23 captured full-seam consumers still calls _full_seam: reconstruct owned transports/source bodies, run admitted one-command preparation under authority/code/read-only guards, then inject captured stages. One additional full-seam failure node runs without that capture; setup-vs-body cost is not measured.",
+    "source_unchanged_from_parent": true,
+    "standalone_stage8_stage9_localisation_nodes": 1,
+    "uncaptured_full_seam_nodes": 1
+  },
+  "tracked_edits": 0,
+  "workflow_or_timeout_or_coverage_changes": 0
+}

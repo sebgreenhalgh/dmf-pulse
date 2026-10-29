@@ -1,0 +1,119 @@
+{
+  "credentials_accessed": false,
+  "excluded_pending_scope": [
+    "Root current.py/current_sources.py/runtime prototypes",
+    "Installed package identity resolution",
+    "Full worker source freshness, credential and transport ordering"
+  ],
+  "file_sha256": {
+    "config/rights/candidates/accel003_odds_operator_refresh_v1.json": "b63354c84b83a9ceec3e4a04e825d3842b4b71c6beeb9154f48b8f6401dc6a0e",
+    "src/dmf_pulse/dashboard/authorization.py": "4a34e736d3d398aea6eeeaf3d590d79d03b08087947a3304dd4d3459fd60e7c5",
+    "src/dmf_pulse/ingestion/odds/transient.py": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
+    "src/dmf_pulse/private_v1/prior_only_candidate.py": "c64c9d26865b33c2584a1e0e884591afe4b36ae97ac7ec2cf9e4f8eca5a9c4fa",
+    "tests/unit/dashboard/test_live_authorization.py": "8eb98af4b4b3c760ae80423fe32a669789257cc031e8852c1a3bef6ccff19cd1",
+    "tests/unit/ingestion/test_operator_odds_transient.py": "325ca8aea25c0243c3ca918476e5b710de6ed5d312e7c0f6412a5c4ce29d210e",
+    "tests/unit/private_v1/test_prior_only_candidate.py": "90db250f35a070d4f2298d2bd7c7fd6894db41e2ca2f92c4e3f45e00ea1e1401",
+    "tickets/DMF-PULSE-ACCEL-003/MARKET-POLICY.md": "2d8704c7fd02563db59802fb9cc40e8d2305aa5ac30324f0895e14a680b7a98c",
+    "tickets/DMF-PULSE-ACCEL-003/PRIOR-ONLY-CANDIDATE.md": "32a098a47761b85475bd0d1bc4fd2001dee80d568e7024240d44d7fc3b3ad25d"
+  },
+  "findings": [
+    {
+      "description": "Future enrolled PRIVATE_CURRENT public-library grants could widen approved30sacquisition/900srun to2400s/3000s; reserve+child claim/check/attempt at1200s accepted. Current empty registry prevents actual live authority.",
+      "id": "CP2-I01",
+      "location": "src/dmf_pulse/dashboard/authorization.py:DurableUsageLedger.reserve/_valid_grant",
+      "pre_remediation_receipt": "accel003-cp2-independent-attacks-pre-remediation.json",
+      "required_remediation": "One shared pure issuance-scope/quota/window helper; exact min expiry and approved acquisition window enforced both at reserve and independently in child.",
+      "severity": "MATERIAL_P2",
+      "status": "AUTHOR_REMEDIATING; independent initial attack reproduced, pure-helper working delta rejects"
+    },
+    {
+      "description": "Pydantic LiteralTrue normalizes numeric1 into explicit retention approval despite strict=True. Does not enroll production.",
+      "id": "CP2-I02",
+      "location": "src/dmf_pulse/dashboard/authorization.py:OperatorRefreshApproval.control_metadata_retention_approved",
+      "required_remediation": "Before-validator requires value is True; reject1 and stringtrue.",
+      "severity": "P3",
+      "status": "AUTHOR_NOTIFIED"
+    },
+    {
+      "authority_sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72",
+      "description": "Accepted PostgreSQL authoritative operational/control-plane state conflicts with claiming sole JSON usage ledger production-ready through source approval alone. Owned-only current engineering is safe with empty registry.",
+      "id": "CP2-I03",
+      "location": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt:490 ADR-DATA-002; authorization.py:DurableUsageLedger",
+      "required_remediation": "Explicit owned-only bound and production PostgreSQL backend or separately accepted architectural exception; do not imply owner source approval alone resolves it.",
+      "severity": "AUTHORITY_READINESS_CONCERN",
+      "status": "ROOT_ASSESSING"
+    },
+    {
+      "description": "Deep sub16KiB corrupt JSON can raise RecursionError outside typed ledger-corruption normalization; remains fail-closed.",
+      "id": "CP2-I04",
+      "location": "src/dmf_pulse/dashboard/authorization.py:DurableUsageLedger._transaction/_read_object",
+      "required_remediation": "Normalize RecursionError/UnicodeError and exercise bounded corrupt-record attack.",
+      "severity": "P3",
+      "status": "AUTHOR_NOTIFIED"
+    }
+  ],
+  "latest_attack_results": {
+    "authorization_sha256": "0a83a827ed9da1eb598fb1306cf29e26a0435f889a089ae635db1156f87d3a89",
+    "credentials_accessed": false,
+    "observed_at": "2026-10-29T19:08:55.891477+00:00",
+    "production_enrollment_created": false,
+    "provider_calls": 0,
+    "results": [
+      {
+        "case": "control-retention-flag-1",
+        "normalized_type": "bool",
+        "rejected": false
+      },
+      {
+        "case": "control-retention-flag-true",
+        "rejected": true
+      },
+      {
+        "case": "unregistered-private-reservation",
+        "code": "PRODUCTION_APPROVAL_NOT_ENROLLED",
+        "rejected": true
+      },
+      {
+        "case": "enrolled-grant-widened-run-acquisition-windows",
+        "code": "ACQUISITION_WINDOW_EXCEEDED",
+        "rejected": true
+      }
+    ],
+    "schema_version": "accel003-cp2-independent-attacks-v1",
+    "source_worktree": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET",
+    "test_only_registry_mutation": true
+  },
+  "positive_findings": [
+    "No active rights profile changes; candidate is PROPOSED_INACTIVE with unresolved account/budget/code/approval fieldsnull.",
+    "Production enrollment cannot come from runtime JSON, environment or browser; owned-source injection cannot classify real authority.",
+    "One-shot and budget reservations precede worker/credential/transport and are never refunded after startup, cancellation,429or failure.",
+    "Hash chain, create-only writes, exclusive lock, identity binding and crash/corruption rejection prevent silent history resets within trusted local-OS boundary.",
+    "New injected Odds profile/quota checks precede credential presence checks, and maximum_attempts narrows to1; legacy defaults remain.",
+    "Prior-only slice invokes unchanged accepted Stage8 with empty constraints, confidenceD, inactive owned labels; constructs no Odds availability observations or private workflow state."
+  ],
+  "primary_source_research": [
+    {
+      "displayed_updated": "2026-08-31",
+      "supports": "Vendor permits analytical dashboards, derived values, retention and model training; competing raw data feeds are restricted. This does not prove account plan/quota or grant internal approval.",
+      "url": "https://the-odds-api.com/terms-and-conditions.html"
+    },
+    {
+      "supports": "GET odds request cost depends on requested markets and regions: current h2h/totals and UK imply conservative two-credit reservation per attempt for either horizon. Availability is not guaranteed.",
+      "url": "https://the-odds-api.com/liveapi/guides/v4/"
+    }
+  ],
+  "production_enrollment_created": false,
+  "production_registry_empty": true,
+  "provider_calls": 0,
+  "reviewed_at": "2026-10-29T19:12:22.151968+00:00",
+  "schema_version": "accel003-cp2-independent-review-v1",
+  "scope": [
+    "Approval/quota/grant/consumption code",
+    "Candidate rights configuration",
+    "Narrow Odds injection seam",
+    "Inactive prior-only fixture composition"
+  ],
+  "source_head": "ae9a68eb99398f3277d6ecd7a103929f91f4ae81",
+  "source_worktree": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET",
+  "status": "REMEDIATION_IN_PROGRESS"
+}

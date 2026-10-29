@@ -1,0 +1,28 @@
+{
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "counts": {
+    "errors": 6,
+    "failed": 2,
+    "passed": 20
+  },
+  "duration_seconds": 227.86,
+  "findings": [
+    {
+      "result": "Six fixture setup errors: real models completed, but progress delivery requires multiple bounded polls rather than one. Corrected normal polling; no product limit changed.",
+      "scope": "ASGI harness"
+    },
+    {
+      "result": "Test expected a different one-shot code than the implemented ONE_SHOT_CONSUMED; corrected assertion.",
+      "scope": "Assertion spelling"
+    },
+    {
+      "result": "An expired request returned401 before cancelling the worker. Fixed middleware to cancel before that return; retained and independently reviewed.",
+      "scope": "Immediate expired-session cleanup"
+    }
+  ],
+  "original_bytes": 43116,
+  "original_sha256": "f3b30c32e7bc5abe2277655203b86d48a05cf5f44ecb0056877c145e9d53eb36",
+  "presentation_note": "Bounded summary replaces a repeated source-code traceback in Git. Full original transcript remains unchanged at its hashed ignored path; source expression false positives do not require scanner exceptions.",
+  "schema_version": "accel003-superseded-failure-summary-v1",
+  "source_log": "review_pack/current-mode-tests-second.log"
+}

@@ -1,0 +1,11 @@
+{
+  "cause": "Invocation omitted DMF_ENVIRONMENT=TEST. Existing resolve_test_database_url correctly rejected replay access with DATABASE_REFERENCE_INVALID: the test database URL is available only in the TEST environment.",
+  "command": "PYTHONPATH=src DMF_TEST_DATABASE_URL=<authorized separate synthetic DB> python -m pytest tests/integration/migrations/test_migrations.py -q --tb=short --basetemp review_pack/pytest-control-migrations-v1 -o cache_dir=review_pack/pytest-cache-migrations",
+  "exit_code": 1,
+  "failed": 57,
+  "first_failure": "tests/integration/migrations/test_migrations.py::test_publication_first_allows_later_blocking_quality_knowledge",
+  "passed": 6,
+  "remediation": "Set DMF_ENVIRONMENT=TEST for the authorized synthetic integration run. No guard, source policy, numerical model or test assertion was relaxed.",
+  "schema_version": "control-superseded-migration-run-v1",
+  "seconds": "103.73"
+}

@@ -43,7 +43,7 @@ class TeamView(PresentationModel):
 class DeskView(PresentationModel):
     schema_version: Literal["sebs-desk-v1"] = "sebs-desk-v1"
     job_id: str
-    dataset_mode: Literal["SYNTHETIC_DEMONSTRATION", "PRIVATE_TRANSIENT"]
+    dataset_mode: Literal["SYNTHETIC_DEMONSTRATION", "SYNTHETIC_CURRENT_MODE", "PRIVATE_TRANSIENT"]
     generated_at: datetime
     deadline_at: datetime
     expires_at: datetime
@@ -88,7 +88,7 @@ def desk_view(
     result: OneCommandResult,
     *,
     job_id: str,
-    mode: Literal["SYNTHETIC_DEMONSTRATION", "PRIVATE_TRANSIENT"],
+    mode: Literal["SYNTHETIC_DEMONSTRATION", "SYNTHETIC_CURRENT_MODE", "PRIVATE_TRANSIENT"],
     generated_at: datetime,
     expires_at: datetime,
 ) -> DeskView:

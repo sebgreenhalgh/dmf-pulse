@@ -278,9 +278,8 @@ def request(
 
 
 def _case(horizon: int, root: Path) -> dict[str, Any]:
-    from dmf_pulse.dashboard.current import CurrentRefreshSession
-
     from dmf_pulse.dashboard.app import create_app
+    from dmf_pulse.dashboard.current import CurrentRefreshSession
     from dmf_pulse.dashboard.runtime import DeskRuntime, ProcessWorker
     from dmf_pulse.dashboard.synthetic import DEMO_TIME
     from dmf_pulse.private_v1.one_command import OneCommandResult
@@ -440,11 +439,11 @@ def _case(horizon: int, root: Path) -> dict[str, Any]:
 
 
 def _cli(root: Path) -> dict[str, Any]:
-    from dmf_pulse.player_evidence.demo import owned_demo
-    from dmf_pulse.player_lab.runner import operational_synthetic_evaluation
     from typer.testing import CliRunner
 
     from dmf_pulse.cli.app import app
+    from dmf_pulse.player_evidence.demo import owned_demo
+    from dmf_pulse.player_lab.runner import operational_synthetic_evaluation
 
     runner = CliRunner()
     cohort, labels, report = (
@@ -496,7 +495,6 @@ def _paused_current_worker(pipe: Any, horizon: int, launch: Any, phase: str) -> 
     """Owned-only process harness; no product pause flag or alternate engine."""
     from dmf_pulse.dashboard.current import current_worker
     from dmf_pulse.dashboard.current_sources import OwnedFplTransport
-
     from dmf_pulse.private_v1.service import PrivateV1RecommendationService
 
     assert launch.grant.classification == "OWNED_SYNTHETIC"
@@ -517,9 +515,8 @@ def _paused_current_worker(pipe: Any, horizon: int, launch: Any, phase: str) -> 
 
 
 def _cancellation(phase: str, root: Path) -> dict[str, Any]:
-    from dmf_pulse.dashboard.current import CurrentRefreshSession
-
     from dmf_pulse.dashboard.app import create_app
+    from dmf_pulse.dashboard.current import CurrentRefreshSession
     from dmf_pulse.dashboard.runtime import DeskRuntime, ProcessWorker
     from dmf_pulse.dashboard.synthetic import DEMO_TIME
 

@@ -1,0 +1,44 @@
+{
+  "checks": [
+    {
+      "case": "constructor-read-free",
+      "pass": true
+    },
+    {
+      "case": "reserve",
+      "code": "PRIVATE_CONTROL_DATABASE_REQUIRED",
+      "connection_calls": 0,
+      "pass": true
+    },
+    {
+      "case": "claim",
+      "code": "PRIVATE_CONTROL_DATABASE_REQUIRED",
+      "connection_calls": 0,
+      "pass": true
+    },
+    {
+      "case": "check",
+      "code": "PRIVATE_CONTROL_DATABASE_REQUIRED",
+      "connection_calls": 0,
+      "pass": true
+    },
+    {
+      "case": "attempt",
+      "code": "PRIVATE_CONTROL_DATABASE_REQUIRED",
+      "connection_calls": 0,
+      "pass": true
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "complements": "accel003-independent-pg-control-review.json: 41 earlier independent SQL/concurrency/restart/corruption checks; final source-selector delta only",
+  "credential_access": false,
+  "database_calls": 0,
+  "observed_at": "2026-10-29T19:37:31.942125+00:00",
+  "provider_calls": 0,
+  "schema_version": "accel003-independent-pg-final-delta-v1",
+  "source_sha256": {
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "a384a4d81b400a0f9cd8580786a2b2452135f7f24c1f15a8a5a48c8ef3a592d2",
+    "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c"
+  },
+  "status": "PASS"
+}

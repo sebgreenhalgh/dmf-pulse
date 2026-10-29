@@ -22,6 +22,8 @@ from dmf_pulse.cli.fpl_points import fpl_points_app
 from dmf_pulse.cli.ingest_cmd import ingest_app
 from dmf_pulse.cli.market_cmd import market_app
 from dmf_pulse.cli.optimise import optimise_app
+from dmf_pulse.cli.player_evidence import player_evidence_app
+from dmf_pulse.cli.player_lab import player_lab_app
 from dmf_pulse.cli.prices import prices_app
 from dmf_pulse.cli.private_v1 import private_v1_app
 from dmf_pulse.cli.pulse import pulse_command
@@ -51,6 +53,8 @@ app.add_typer(market_app, name="market")
 app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
 app.add_typer(optimise_app, name="optimise")
+app.add_typer(player_evidence_app, name="player-evidence")
+app.add_typer(player_lab_app, name="player-lab")
 app.add_typer(prices_app, name="prices")
 app.add_typer(private_v1_app, name="private-v1")
 app.add_typer(rank_app, name="rank")

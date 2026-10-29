@@ -1,0 +1,97 @@
+{
+  "model_fit_training_or_activation": false,
+  "provider_requests": 0,
+  "real_data_or_credentials_used": false,
+  "results": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/dmf_pulse/player_evidence",
+        "src/dmf_pulse/cli/player_evidence.py",
+        "tests/unit/player_evidence",
+        "tests/integration/player_evidence"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:02:10.203242+00:00",
+      "log": "review_pack\\cp4-check-0.log",
+      "log_sha256": "2ce9758b9f8abd876ec3e76c589e099e8b05377b1e7ea2331e81ee80f07bdff8",
+      "started_at": "2026-10-29T19:02:10.109386+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/dmf_pulse/player_evidence",
+        "src/dmf_pulse/cli/player_evidence.py",
+        "tests/unit/player_evidence",
+        "tests/integration/player_evidence"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:02:10.304255+00:00",
+      "log": "review_pack\\cp4-check-1.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-29T19:02:10.203405+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse/player_evidence",
+        "src/dmf_pulse/cli/player_evidence.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:02:10.841239+00:00",
+      "log": "review_pack\\cp4-check-2.log",
+      "log_sha256": "e2702f9afc4c0f80ff1e8624f77af7a7d2689ca184512114aae5967a76229ba8",
+      "started_at": "2026-10-29T19:02:10.304380+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/player_evidence",
+        "tests/integration/player_evidence",
+        "-q",
+        "--tb=short",
+        "--basetemp",
+        "review_pack/pytest-cp4-final",
+        "--cov=dmf_pulse.player_evidence",
+        "--cov=dmf_pulse.cli.player_evidence",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:review_pack/cp4-coverage.json",
+        "--cov-fail-under=90"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:02:14.233486+00:00",
+      "log": "review_pack\\cp4-check-3.log",
+      "log_sha256": "5a768e341786bf0245f7cf6e887e994637a23cc51cefca512108e1437867a0bd",
+      "started_at": "2026-10-29T19:02:10.841330+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:02:14.591057+00:00",
+      "log": "review_pack\\cp4-check-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-29T19:02:14.233606+00:00"
+    }
+  ],
+  "schema_version": "cp4-owned-engineering-checks-v1",
+  "superseded_receipts": [
+    "cp4-superseded-temp-failure.json",
+    "cp4-superseded-static-findings.json"
+  ]
+}

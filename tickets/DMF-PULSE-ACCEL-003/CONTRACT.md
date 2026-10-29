@@ -18,6 +18,10 @@ terms control; owner risk acceptance supplies no third-party licence.
   coherent same-run player/team/decision views; secure process cleanup.
 - CP2: exact inactive market policy proposal, plan/account evidence, traceable
   quota/call accounting and durable grant consumption; no active registry entry.
+  Accepted ADR-DATA-002 requires PostgreSQL authority for production control
+  records. Add a canonical control-only PostgreSQL backend/migration; the local
+  JSON ledger is restricted to owned synthetic engineering. Neither backend
+  permits provider input, credentials or private forecast retention.
   Assess a separately selected, inactive prior-only application candidate using
   accepted Stage-8 mathematics, without fabricated market evidence or fallback.
 - CP3: versioned cohort custody, full-cohort runner/CLI, authenticated diagnostic
@@ -34,6 +38,9 @@ new inactive authorization/candidate contracts; narrow injection seams in the
 existing private one-command and source clients; player_lab companion modules
 and CLI; new player_evidence modules; focused tests; operator/programme docs;
 portable verification scripts and exact repository/evidence manifests. Existing
+control-only database schema/migration and expected-schema plumbing are also in
+scope to satisfy accepted ADR-DATA-002; existing data admission gates remain.
+Existing
 numerical kernels, active rights profiles, historical sealed artifacts, default
 model policies, workflow permissions, coverage floors and secret scanner rules
 remain protected. No new dependency is planned.

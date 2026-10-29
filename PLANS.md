@@ -9,13 +9,13 @@ provider rights, retention, training, model promotion and activation are separat
 - [x] CP0 fetch refs; isolate parent; authenticate 359 unchanged source files,
   four existing exact-parent numerical baselines, eleven protected blobs and
   P01 pins; preserve original dirty Availability worktree; freeze contract.
-- [ ] CP1 current-mode process worker, pre-transport authorization and full-stack
+- [x] CP1 current-mode process worker, pre-transport authorization and full-stack
   injected one-/three-GW acceptance with coherent same-run views.
-- [ ] CP2 inactive operator market proposal, account/plan/quota/consumption
+- [x] CP2 inactive operator market proposal, account/plan/quota/consumption
   boundaries and explicit prior-only candidate assessment.
-- [ ] CP3 operational full-cohort evaluation runner/CLI, diagnostic sidecars,
+- [x] CP3 operational full-cohort evaluation runner/CLI, diagnostic sidecars,
   compatibility proposal, future cohort plan and Model Performance integration.
-- [ ] CP4 typed temporal starts/minutes evidence, identity/revisions/missingness,
+- [x] CP4 typed temporal starts/minutes evidence, identity/revisions/missingness,
   licensed/open source assessment and chronological holdout plan.
 - [ ] CP5 adversarial independent review, parity, all unchanged release gates,
   clean installed wheel, capped pack, final pushed SHA and complete 20/20 CI.
@@ -24,6 +24,20 @@ No real provider requests or credentials during this programme. The production
 refresh registry remains unapproved; real cohort size stays zero unless all
 separate permissions are granted before collection. P01 remains unscored;
 A02/A03 stay consumed, A04 absent and team strength shadow-only.
+
+CP2/CP4 independent reviews clear their scoped implementations. Canonical
+control migration0008 satisfies accepted ADR-DATA-002; SQL concurrency, restart,
+rollback and append-only checks are clear. The shared grant-window defect and
+immediate expired-browser-session cleanup defect were reproduced and fixed.
+Final current-mode integration/numerical review, installed-wheel acceptance and
+exact-SHA CI remain required; checkpoint publication is not human acceptance.
+
+CP1 source freeze: 45 full current-mode cases, 29 independent publication attacks,
+complete one-/three-GW numerical comparison and final 20-scope independent review
+clear. The full-presentation IPC binding defect is fixed with an authenticated
+grant/decision/presentation/actionability envelope and repeated publication checks.
+Ruff, mypy377, frozen sync/build, 191 targeted cohort/evidence cases and secret scan
+pass. Installed-wheel release proof and final exact-SHA CI remain external gates.
 
 ## DMF-PULSE-ACCEL-002 — Seb's Desk
 

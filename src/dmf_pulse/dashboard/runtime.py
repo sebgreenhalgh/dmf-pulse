@@ -13,6 +13,15 @@ from threading import RLock
 from time import monotonic
 from typing import Literal, Protocol
 
+from dmf_pulse.dashboard.authorization import AuthorizationError
+from dmf_pulse.dashboard.current import (
+    CurrentEligibility,
+    CurrentLaunch,
+    CurrentRefreshSession,
+    CurrentWorkerResult,
+    current_worker,
+    validate_current_result,
+)
 from dmf_pulse.dashboard.views import DeskView, PlayerDetail, desk_view, player_detail
 from dmf_pulse.private_v1.actionability import checked_report
 from dmf_pulse.private_v1.errors import PrivateV1Error
@@ -84,10 +93,18 @@ def _demo_worker(pipe: Connection, horizon: Literal[1, 3]) -> None:
 
 
 class ProcessWorker:
-    def __init__(self, horizon: Literal[1, 3]) -> None:
+    def __init__(
+        self,
+        horizon: Literal[1, 3],
+        *,
+        _target: Callable[..., None] = _demo_worker,
+        _arguments: tuple[object, ...] = (),
+    ) -> None:
         context = multiprocessing.get_context("spawn")
         self._reader, sender = context.Pipe(duplex=False)
-        self._process = context.Process(target=_demo_worker, args=(sender, horizon), daemon=True)
+        self._process = context.Process(
+            target=_target, args=(sender, horizon, *_arguments), daemon=True
+        )
         try:
             self._process.start()
         finally:
@@ -118,6 +135,10 @@ class ProcessWorker:
         self._process.close()
 
 
+def _current_process(launch: CurrentLaunch) -> Worker:
+    return ProcessWorker(launch.grant.request.horizon, _target=current_worker, _arguments=(launch,))
+
+
 class DeskRuntime:
     """One operator/run; all derived presentation is discarded at the earliest limit."""
 
@@ -126,6 +147,8 @@ class DeskRuntime:
         *,
         demo: bool = False,
         worker_factory: Callable[[Literal[1, 3]], Worker] = ProcessWorker,
+        current_session: CurrentRefreshSession | None = None,
+        current_worker_factory: Callable[[CurrentLaunch], Worker] = _current_process,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         elapsed_clock: Callable[[], float] = monotonic,
         lifetime_seconds: int = 900,
@@ -134,6 +157,12 @@ class DeskRuntime:
         if not 1 <= lifetime_seconds <= 900 or not 1 <= run_timeout_seconds <= 900:
             raise ValueError("runtime bounds exceed private lifetime")
         self.demo = demo
+        if demo and current_session is not None:
+            raise ValueError("demo and current execution contexts cannot be combined")
+        self._current = None if demo else current_session or CurrentRefreshSession()
+        self._current_factory = current_worker_factory
+        self._active_launch: CurrentLaunch | None = None
+        self._current_result: CurrentWorkerResult | None = None
         self._factory = worker_factory
         self._clock = clock
         self._elapsed = elapsed_clock
@@ -164,6 +193,12 @@ class DeskRuntime:
         self._result = None
         self._view = None
         self._publication_floor = None
+        self._active_launch = None
+        self._current_result = None
+        if self._current is not None:
+            self._current.record_failure(
+                AuthorizationError(code, "EXPIRED" if status == "EXPIRED" else "BLOCKED")
+            )
         self._state = JobState(status=status, job_id=self._state.job_id, error_code=code)
         self._stop_worker()
 
@@ -176,6 +211,8 @@ class DeskRuntime:
                 # a replacement with a worker whose termination was not confirmed.
                 self._closed = True
                 self._state = JobState(status="BLOCKED", error_code="WORKER_CLEANUP_FAILED")
+                if self._current is not None:
+                    self._current.record_failure(AuthorizationError("WORKER_CLEANUP_FAILED"))
                 return False
             self._worker = None
         return True
@@ -191,12 +228,20 @@ class DeskRuntime:
             if self._state.error_code == "WORKER_CLEANUP_FAILED":
                 return self._state
             self._state = JobState(status="RUNNING", job_id=token_hex(16))
-            if not self.demo:
-                self._discard("BLOCKED", "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED")
-                return self._state
             self._started = self._elapsed()
             try:
-                self._worker = self._factory(horizon)
+                if self.demo:
+                    self._worker = self._factory(horizon)
+                else:
+                    if self._current is None:
+                        raise AuthorizationError("OPERATOR_CONTROL_CONTEXT_REQUIRED")
+                    launch = self._current.prepare(horizon)
+                    self._active_launch = launch
+                    self._worker = self._current_factory(launch)
+            except AuthorizationError as error:
+                self._discard("EXPIRED" if error.state == "EXPIRED" else "BLOCKED", error.code)
+                if self._current is not None:
+                    self._current.record_failure(error)
             except Exception:
                 self._discard("BLOCKED", "WORKER_START_FAILED")
             return self._state
@@ -205,6 +250,8 @@ class DeskRuntime:
         with self._lock:
             try:
                 self._tick()
+            except AuthorizationError as error:
+                self._discard("EXPIRED" if error.state == "EXPIRED" else "BLOCKED", error.code)
             except PrivateV1Error as error:
                 if error.code == "DECISION_DEADLINE_PASSED":
                     self._discard("EXPIRED", "DECISION_DEADLINE_PASSED")
@@ -217,6 +264,14 @@ class DeskRuntime:
     def _tick(self) -> None:
         if self._closed:
             return
+        if self._active_launch is not None:
+            now = self._now()
+            if self._current is None:
+                raise AuthorizationError("OPERATOR_CONTROL_CONTEXT_REQUIRED")
+            self._current.check_publication(self._active_launch.grant, now)
+            if now >= self._active_launch.grant.expires_at:
+                self._discard("EXPIRED", "AUTHORIZATION_EXPIRED")
+                return
         if self._worker is not None:
             if self._elapsed() - self._started >= self._timeout:
                 self._discard("BLOCKED", "RUN_TIMEOUT")
@@ -234,13 +289,55 @@ class DeskRuntime:
                     self._state = self._state.model_copy(
                         update={"stages": (*self._state.stages[-31:], safe)}
                     )
-                elif kind == "result" and isinstance(value, OneCommandResult):
+                elif kind == "result" and self.demo and isinstance(value, OneCommandResult):
                     self._accept(value)
                     break
+                elif (
+                    kind == "current_result"
+                    and not self.demo
+                    and isinstance(value, CurrentWorkerResult)
+                ):
+                    self._accept(value.result, envelope=value)
+                    break
+                elif kind == "error" and value in {
+                    "CREDENTIAL_UNAVAILABLE",
+                    "QUOTA_EXHAUSTED",
+                    "MANAGER_OR_FIXTURE_MAPPING_INVALID",
+                    "DECISION_DEADLINE_PASSED",
+                    "AUTHORIZATION_EXPIRED",
+                    "ACQUISITION_CUTOFF_PASSED",
+                    "SOURCE_REQUEST_BUDGET_EXHAUSTED",
+                    "SOURCE_ROUTE_NOT_AUTHORIZED",
+                    "CURRENT_SOURCE_OR_RUN_BLOCKED",
+                    "SOURCE_NOT_AVAILABLE",
+                    "SOURCE_AUTHENTICATION_REJECTED",
+                    "SOURCE_AUTHENTICATION_OR_REQUEST_REJECTED",
+                    "SOURCE_RESPONSE_INVALID",
+                }:
+                    self._discard(
+                        "EXPIRED"
+                        if value
+                        in {
+                            "DECISION_DEADLINE_PASSED",
+                            "AUTHORIZATION_EXPIRED",
+                            "ACQUISITION_CUTOFF_PASSED",
+                        }
+                        else "BLOCKED",
+                        str(value),
+                    )
+                    if value == "SOURCE_NOT_AVAILABLE" and self._current is not None:
+                        self._current.record_failure(
+                            AuthorizationError(value, "SOURCE_NOT_AVAILABLE")
+                        )
+                    return
                 else:
                     self._discard("BLOCKED", "RECOMMENDATION_BLOCKED")
                     return
         if self._result is not None:
+            if not self.demo:
+                if self._current_result is None or self._active_launch is None:
+                    raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
+                validate_current_result(self._current_result, self._active_launch)
             if self._elapsed() - self._completed >= self._lifetime:
                 self._discard("EXPIRED", "PRESENTATION_LIFETIME_ENDED")
                 return
@@ -253,23 +350,55 @@ class DeskRuntime:
                 raise ValueError("publication clock reversed")
             self._publication_floor = now
 
-    def _accept(self, value: OneCommandResult) -> None:
+    def _accept(
+        self, value: OneCommandResult, *, envelope: CurrentWorkerResult | None = None
+    ) -> None:
         now = self._now()
         checked_report(value, clock=lambda: now)
+        if not self.demo:
+            launch = self._active_launch
+            if (
+                launch is None
+                or envelope is None
+                or value.actionability.deadline_at != launch.grant.request.deadline_at
+                or value.decision.information_cutoff != launch.grant.request.information_cutoff
+                or value.presentation is None
+                or len(value.presentation.gameweeks) != launch.grant.request.horizon
+            ):
+                raise ValueError("worker result differs from the authorized information set")
+            validate_current_result(envelope, launch)
         if not self._stop_worker():
             return
         expires = min(value.actionability.deadline_at, now + timedelta(seconds=self._lifetime))
+        if self._active_launch is not None:
+            expires = min(expires, self._active_launch.grant.expires_at)
         self._view = desk_view(
             value,
             job_id=str(self._state.job_id),
-            mode="SYNTHETIC_DEMONSTRATION" if self.demo else "PRIVATE_TRANSIENT",
+            mode="SYNTHETIC_DEMONSTRATION"
+            if self.demo
+            else "SYNTHETIC_CURRENT_MODE"
+            if self.synthetic_sources
+            else "PRIVATE_TRANSIENT",
             generated_at=now,
             expires_at=expires,
         )
         self._result = value
+        self._current_result = envelope
         self._publication_floor = now
         self._completed = self._elapsed()
         self._state = self._state.model_copy(update={"status": "COMPLETE"})
+        if self._current is not None:
+            self._current.completed()
+
+    @property
+    def synthetic_sources(self) -> bool:
+        return self.demo or (self._current is not None and self._current.owned_sources)
+
+    def eligibility(self) -> CurrentEligibility | None:
+        with self._lock:
+            self.tick()
+            return None if self._current is None else self._current.eligibility()
 
     def view(self) -> DeskView | None:
         with self._lock:

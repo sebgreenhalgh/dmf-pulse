@@ -1,0 +1,31 @@
+{
+  "authorization_sha256": "0a83a827ed9da1eb598fb1306cf29e26a0435f889a089ae635db1156f87d3a89",
+  "credentials_accessed": false,
+  "observed_at": "2026-10-29T19:08:55.891477+00:00",
+  "production_enrollment_created": false,
+  "provider_calls": 0,
+  "results": [
+    {
+      "case": "control-retention-flag-1",
+      "normalized_type": "bool",
+      "rejected": false
+    },
+    {
+      "case": "control-retention-flag-true",
+      "rejected": true
+    },
+    {
+      "case": "unregistered-private-reservation",
+      "code": "PRODUCTION_APPROVAL_NOT_ENROLLED",
+      "rejected": true
+    },
+    {
+      "case": "enrolled-grant-widened-run-acquisition-windows",
+      "code": "ACQUISITION_WINDOW_EXCEEDED",
+      "rejected": true
+    }
+  ],
+  "schema_version": "accel003-cp2-independent-attacks-v1",
+  "source_worktree": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET",
+  "test_only_registry_mutation": true
+}

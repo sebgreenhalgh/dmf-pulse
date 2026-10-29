@@ -1,0 +1,116 @@
+{
+  "provider_requests": 0,
+  "real_data_or_credentials": false,
+  "results": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/dmf_pulse/dashboard/postgres_authorization.py",
+        "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py",
+        "src/dmf_pulse/database/doctor.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/ingestion/fpl/service.py",
+        "tests/unit/dashboard/test_postgres_control_contract.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "tests/integration/conftest.py",
+        "tests/integration/migrations/test_migrations.py",
+        "tests/unit/database/test_dat003_branch_contracts.py",
+        "scripts/test_migration_matrix.py",
+        "scripts/verify_wheel.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:26:14.297734+00:00",
+      "log": "review_pack\\control-check-0.log",
+      "log_sha256": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+      "started_at": "2026-10-29T19:26:14.182165+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/dmf_pulse/dashboard/postgres_authorization.py",
+        "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py",
+        "src/dmf_pulse/database/doctor.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/ingestion/fpl/service.py",
+        "tests/unit/dashboard/test_postgres_control_contract.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "tests/integration/conftest.py",
+        "tests/integration/migrations/test_migrations.py",
+        "tests/unit/database/test_dat003_branch_contracts.py",
+        "scripts/test_migration_matrix.py",
+        "scripts/verify_wheel.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:26:14.422708+00:00",
+      "log": "review_pack\\control-check-1.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-29T19:26:14.297923+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse/dashboard/postgres_authorization.py",
+        "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py",
+        "src/dmf_pulse/database/doctor.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/ingestion/fpl/service.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:26:17.022607+00:00",
+      "log": "review_pack\\control-check-2.log",
+      "log_sha256": "718df785efbbd4b57e63b5f64aff2c5b5592e433447681f759b307f97a3ec96a",
+      "started_at": "2026-10-29T19:26:14.422834+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/dashboard/test_postgres_control_contract.py",
+        "tests/unit/dashboard/test_live_authorization.py",
+        "tests/unit/database/test_dat003_branch_contracts.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "tests/integration/migrations/test_migrations.py",
+        "-q",
+        "--tb=short",
+        "--basetemp",
+        "review_pack/pytest-control-final",
+        "-o",
+        "cache_dir=review_pack/pytest-cache-final",
+        "--cov=dmf_pulse.dashboard.postgres_authorization",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:review_pack/control-coverage.json",
+        "--cov-fail-under=85"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:29:55.654980+00:00",
+      "log": "review_pack\\control-check-3.log",
+      "log_sha256": "5af22d83fdd474cdd1fe3623d5b50c6e0d466f53a217e09e9265a0bb5deae4fb",
+      "started_at": "2026-10-29T19:26:17.022702+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:29:55.727256+00:00",
+      "log": "review_pack\\control-check-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-29T19:29:55.655156+00:00"
+    }
+  ],
+  "schema_version": "postgres-control-checks-v1",
+  "superseded_failure_receipt": "control-superseded-migration-environment.json"
+}

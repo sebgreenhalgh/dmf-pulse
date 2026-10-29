@@ -1,0 +1,15 @@
+........................................................................ [ 37%]
+........................................................................ [ 75%]
+...............................................                          [100%]
+============================ slowest 10 durations =============================
+1.52s call     tests/contract/player_lab/test_cli.py::test_export_freeze_then_labels_then_score_and_demo_match
+0.45s call     tests/unit/scripts/test_dashboard_wheel_cli.py::test_installed_parser_probe_checks_values_without_starting_the_server
+0.40s call     tests/unit/player_lab/test_cohort_runner.py::test_report_inherits_kernels_and_exposes_full_components_minutes_and_holdout
+0.37s setup    tests/unit/player_lab/test_cohort_runner.py::test_report_inherits_kernels_and_exposes_full_components_minutes_and_holdout
+0.30s call     tests/unit/player_lab/test_cohort_runner.py::test_evaluation_clock_cannot_reverse
+0.29s call     tests/contract/player_lab/test_cli.py::test_wrong_labels_cannot_emit_report_and_missing_file_is_typed
+0.28s call     tests/unit/player_lab/test_cohort_runner.py::test_complete_correction_vintage_is_separate_and_mixed_vintage_is_blocked
+0.13s call     tests/contract/player_lab/test_cli.py::test_self_resealed_forecast_metadata_is_not_original_custody
+0.10s call     tests/unit/player_lab/test_cohort_runner.py::test_full_registered_population_precedes_every_outcome_body
+0.06s call     tests/unit/player_lab/test_cohort_runner.py::test_unavailable_expected_minutes_are_counted_and_never_imputed
+191 passed in 6.53s

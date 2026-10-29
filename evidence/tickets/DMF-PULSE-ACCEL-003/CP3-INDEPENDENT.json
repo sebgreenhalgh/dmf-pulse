@@ -1,0 +1,223 @@
+{
+  "checks": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/player_lab/test_cohort_runner.py",
+        "tests/unit/player_lab/test_actuals_compatibility.py",
+        "tests/contract/player_lab/test_cli.py",
+        "-q",
+        "--tb=short",
+        "--basetemp",
+        "review_pack/independent-cp3-review-final"
+      ],
+      "exit_code": 0,
+      "log": "review_pack\\independent-cp3-check-0.log",
+      "log_sha256": "33194c84d7a883d87962721febe6c3cf7850128a1c9a813e4027fbfd3a030973",
+      "output": "...........................................                              [100%]\r\n43 passed in 3.52s\r\n"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/dmf_pulse/player_lab/cohort.py",
+        "src/dmf_pulse/player_lab/runner.py",
+        "src/dmf_pulse/player_lab/diagnostics.py",
+        "src/dmf_pulse/player_lab/compatibility.py",
+        "src/dmf_pulse/cli/player_lab.py"
+      ],
+      "exit_code": 0,
+      "log": "review_pack\\independent-cp3-check-1.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/dmf_pulse/player_lab/cohort.py",
+        "src/dmf_pulse/player_lab/runner.py",
+        "src/dmf_pulse/player_lab/diagnostics.py",
+        "src/dmf_pulse/player_lab/compatibility.py",
+        "src/dmf_pulse/cli/player_lab.py"
+      ],
+      "exit_code": 0,
+      "log": "review_pack\\independent-cp3-check-2.log",
+      "log_sha256": "f114d83b30c5c657ee43a847a45bafccaea255d82673feb87c26d252c61e29c1",
+      "output": "5 files already formatted\n"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse/player_lab/cohort.py",
+        "src/dmf_pulse/player_lab/runner.py",
+        "src/dmf_pulse/player_lab/diagnostics.py",
+        "src/dmf_pulse/player_lab/compatibility.py",
+        "src/dmf_pulse/cli/player_lab.py"
+      ],
+      "exit_code": 0,
+      "log": "review_pack\\independent-cp3-check-3.log",
+      "log_sha256": "718df785efbbd4b57e63b5f64aff2c5b5592e433447681f759b307f97a3ec96a",
+      "output": "Success: no issues found in 5 source files\r\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "log": "review_pack\\independent-cp3-check-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    }
+  ],
+  "credentials_inspected": false,
+  "disposition": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "findings": [],
+  "independent_adversarial_probes": {
+    "count": 16,
+    "passed": 16,
+    "receipt_path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-EVAL\\review_pack\\independent-cp3-probes.json",
+    "receipt_sha256": "ebea0d2398c98e29a0981a9f5d95813873c80e2f2b892f2f7ee9a77635921261",
+    "results": [
+      {
+        "case": "freeze_closes_all16_before_any_actuals_body",
+        "status": "PASS"
+      },
+      {
+        "case": "complete_oracle_real0_unavailable_benchmarks_no_skill_and_stable_seal",
+        "status": "PASS"
+      },
+      {
+        "case": "self_resealed_forecast_receipt_and_matching_bundle_rejected",
+        "status": "PASS"
+      },
+      {
+        "case": "self_resealed_protocol_matching_labels_rejected_by_original_custody",
+        "status": "PASS"
+      },
+      {
+        "case": "whole_cohort_blocks_missing_target_without_attrition_filter",
+        "status": "PASS"
+      },
+      {
+        "case": "duplicate_targets_fail_before_scoring",
+        "status": "PASS"
+      },
+      {
+        "case": "arithmetically_consistent_resealed_label_rejected_by_qualified_bytes",
+        "status": "PASS"
+      },
+      {
+        "case": "every_dependency_private_retention_rejected_before_ledger_write",
+        "status": "PASS"
+      },
+      {
+        "case": "raw_minute_source_byte_tamper_rejected_even_valid_json_whitespace",
+        "status": "PASS"
+      },
+      {
+        "case": "raw_minutes_context_reseal_cannot_change_registered_context",
+        "status": "PASS"
+      },
+      {
+        "case": "positive_minutes_cannot_become_start_or_fixture_probability",
+        "status": "PASS"
+      },
+      {
+        "case": "complete_correction_vintage_new_report_original_stable_mixed_vintage_rejected",
+        "status": "PASS"
+      },
+      {
+        "case": "premature_label_clock_rejected",
+        "status": "PASS"
+      },
+      {
+        "case": "empty_custody_cannot_authenticate_resealed_exports",
+        "status": "PASS"
+      },
+      {
+        "case": "sparse_fixture_component_never_zero_filled",
+        "status": "PASS"
+      },
+      {
+        "case": "command_three_phase_exports_exact_service_and_no_overwrite",
+        "status": "PASS"
+      }
+    ]
+  },
+  "independent_public_document_research": {
+    "deadline": {
+      "method": "Official-domain search index; direct open access error",
+      "supported_fact": "Published2026-10-29; GW9 deadline Saturday2026-10-31 11:00GMT. Inactive future candidate only; current authoritative runtime deadline still required before any live freeze.",
+      "url": "https://www.premierleague.com/es/news/4750452/everything-you-need-for-gameweek-9-of-fpl-with-the-latest-tips-and-advice"
+    },
+    "finality": {
+      "method": "Official-domain indexed HTML",
+      "supported_fact": "2026/27 final scores confirmed09:00UK time day after final GW match; live bonus remains provisional before review/lock.",
+      "urls": [
+        "https://www.premierleague.com/en/news/4680230/whats-new-in-202627-fantasy-league-rankings-change-in-real-time",
+        "https://www.premierleague.com/en/news/4679873"
+      ]
+    },
+    "provider_json_requested": false,
+    "retrieval_date": "2026-10-29 UTC"
+  },
+  "integration_limits": [
+    "Root CLI app registration/dashboard Model Performance integration not in reviewed CP3 commit.",
+    "Clean installed-wheel outside-source command run remains root release acceptance; source CliRunner success is not represented as wheel proof.",
+    "No generic real-source import/trusted real issuance/persistent real cohort implemented or authorized; real cohort remains0."
+  ],
+  "model_changes_or_activation": false,
+  "nonblocking_observations": [
+    {
+      "detail": "Reliability bin dictionaries are typed object values: Decimal entries serialize to strings and deserialize as strings, so Python model equality differs after JSON roundtrip. JSON representation and authenticated semantic SHA remain identical. Independent probes now check that intended public serialization identity. No inherited metric/schema change requested.",
+      "locator": "src/dmf_pulse/evaluation/models.py::CalibrationResult.reliability",
+      "priority": "P3_INHERITED"
+    }
+  ],
+  "provider_requests": 0,
+  "real_cohort_size": 0,
+  "reviewed_at": "2026-10-29T19:09:43.167037+00:00",
+  "reviewed_files": {
+    "src/dmf_pulse/cli/player_lab.py": "5f9a481567bb32662ecdf71dc5bbd86ac1c690e661cc46e350381f78a7563c43",
+    "src/dmf_pulse/player_lab/cohort.py": "945529fb39516674e34e2f491f0708c2095d305f15a4ae6eab6ddc91f8599c63",
+    "src/dmf_pulse/player_lab/compatibility.py": "06500c5e6536af2f2576589d00d43aafef3dfbfd52313f0354fd6dd8c7922b67",
+    "src/dmf_pulse/player_lab/diagnostics.py": "f118962dde0334babf1865120c140b3adcced758daa59a70de851803d0becfb8",
+    "src/dmf_pulse/player_lab/runner.py": "6b370b413c547290cf749d3655dd40ee9e3e6cea3d3662ed42d96db06ee8978c",
+    "tests/contract/player_lab/test_cli.py": "e3864e5b629171d0c6764fb167e88e4546818245a7f49f1b538207cbb37ca838",
+    "tests/unit/player_lab/test_actuals_compatibility.py": "673f6cace20a6d237d4883425e948cc519e09962649cfd00f578839d28816b01",
+    "tests/unit/player_lab/test_cohort_runner.py": "fe95e3d98016e5624977d9d2024d4a7fb2a136d72d5cea53454b2ba61ea1b124",
+    "tickets/DMF-PULSE-ACCEL-003/ACTUALS-COMPATIBILITY.md": "0d5ec76760448b19fdbbe3b2b8438fff04ca141b52fc79918e248c46a52a4530",
+    "tickets/DMF-PULSE-ACCEL-003/COHORT-PROTOCOL.md": "e3179391d82918f7068a92881ec98eaee059554450914f55ea387f1557067ae0",
+    "tickets/DMF-PULSE-ACCEL-003/EVALUATION-RUNBOOK.md": "26e820b379f9ce69992c51d8d90bf2c817128027c88f63b9bb9f24766c51b2aa"
+  },
+  "reviewed_sha": "7fe75cd69f906833de85e8631b1e21cb40cafa7b",
+  "reviewed_worktree_clean": true,
+  "reviewer": "Independent CP4 author reviewing CP3; no CP3 implementation authorship",
+  "schema_version": "accel003-cp3-independent-review-v1",
+  "scope_conclusions": [
+    "All sixteen exact registered two-model forecasts close before an actuals body is read; eight target population joins are exact season/GW/player/fixture identities.",
+    "Original in-memory synthetic custody rejects self-resealed forecast receipts and protocol wrappers even when final bundle hashes are recomputed.",
+    "All retained dependencies pass registry/profile checks; private FPL retention is denied before ledger registration and real source registries remain closed.",
+    "Minutes sidecars authenticate original source bytes and semantic context, derive original per-fixture counts, and never infer starts or frozen probabilities.",
+    "Sparse/missing outcomes block the whole cohort; full correction vintages produce a separate report while mixed GW revisions reject.",
+    "Existing Stage-12 kernels compose metrics; all B0-B5 benchmarks unavailable; diagnostic zero is explicitly not a benchmark; tiny sample supports no skill, superiority, uncertainty or promotion claim.",
+    "Three-phase CLI exports authenticate the exact owned source fixture and refuse overwrite; JSON reports and semantic hashes reproduce exactly."
+  ],
+  "superseded_probe_history": {
+    "path": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-EVAL\\review_pack\\independent-cp3-probes-superseded-python-equality.json",
+    "reason": "Two reviewer assertions initially demanded Python equality after JSON roundtrip; inspected inherited object-typed calibration reliability bins. Corrected probes require exact JSON and semantic SHA equality, which pass. No product source or acceptance gate changed."
+  },
+  "tracked_edits_performed": false
+}

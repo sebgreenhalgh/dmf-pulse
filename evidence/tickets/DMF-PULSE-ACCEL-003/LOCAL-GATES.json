@@ -1,0 +1,129 @@
+{
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "provider_calls": 0,
+  "records": [
+    {
+      "command": [
+        "uv",
+        "sync",
+        "--all-groups",
+        "--frozen",
+        "--offline"
+      ],
+      "duration_seconds": 0.038,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:51:15.347258+00:00",
+      "label": "frozen-sync",
+      "log": "review_pack/local-gates-round2/frozen-sync.log",
+      "log_sha256": "c0cc5e991f107a64471ebd482260abde2f93c36e72363fa5a012b154447b9ffe",
+      "started_at": "2026-10-29T19:51:15.308943+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "duration_seconds": 0.187,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:51:15.535234+00:00",
+      "label": "format",
+      "log": "review_pack/local-gates-round2/format.log",
+      "log_sha256": "411fcf1ed834906dbb09d947a17c6d2fe140e696e4321610d139bbb83fd63fcd",
+      "started_at": "2026-10-29T19:51:15.348105+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "duration_seconds": 0.196,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:51:15.732061+00:00",
+      "label": "lint",
+      "log": "review_pack/local-gates-round2/lint.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-29T19:51:15.536081+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "duration_seconds": 1.523,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:51:17.256162+00:00",
+      "label": "typing",
+      "log": "review_pack/local-gates-round2/typing.log",
+      "log_sha256": "f3eae03b5d08ff9e522bf62f15991a536feec9b6c2c7e55d23f11b1a8a241de0",
+      "started_at": "2026-10-29T19:51:15.732790+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "build"
+      ],
+      "duration_seconds": 9.998,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:51:27.254663+00:00",
+      "label": "build",
+      "log": "review_pack/local-gates-round2/build.log",
+      "log_sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47",
+      "started_at": "2026-10-29T19:51:17.256877+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/unit/player_lab/test_cohort_runner.py",
+        "tests/unit/player_lab/test_actuals_compatibility.py",
+        "tests/contract/player_lab/test_cli.py",
+        "tests/unit/player_evidence",
+        "tests/integration/player_evidence",
+        "tests/unit/private_v1/test_prior_only_candidate.py",
+        "tests/unit/ingestion/test_operator_odds_transient.py",
+        "tests/unit/scripts/test_accel003_wheel_probe.py",
+        "tests/unit/scripts/test_dashboard_wheel_cli.py",
+        "-q",
+        "--durations=10",
+        "--basetemp",
+        "review_pack/pytest-cohort-evidence-final",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "duration_seconds": 18.556,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:51:45.812270+00:00",
+      "label": "cohort-evidence",
+      "log": "review_pack/local-gates-round2/cohort-evidence.log",
+      "log_sha256": "ca0dbe6d01cd9086698469990709380139741c31299768a4b98e22c908f5ad44",
+      "started_at": "2026-10-29T19:51:27.255837+00:00"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "python",
+        "scripts/scan_secrets.py"
+      ],
+      "duration_seconds": 26.641,
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:52:12.453994+00:00",
+      "label": "secret-scan",
+      "log": "review_pack/local-gates-round2/secret-scan.log",
+      "log_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7",
+      "started_at": "2026-10-29T19:51:45.813438+00:00"
+    }
+  ],
+  "schema_version": "accel003-local-gates-v1",
+  "status": "PASS"
+}

@@ -1,0 +1,132 @@
+{
+  "checks": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/dmf_pulse/dashboard/postgres_authorization.py",
+        "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py",
+        "src/dmf_pulse/database/doctor.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/ingestion/fpl/service.py",
+        "tests/unit/dashboard/test_postgres_control_contract.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "tests/integration/conftest.py",
+        "tests/integration/migrations/test_migrations.py",
+        "tests/unit/database/test_dat003_branch_contracts.py",
+        "scripts/test_migration_matrix.py",
+        "scripts/verify_wheel.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:31:21.818707+00:00",
+      "log": "review_pack\\control-final-check-0.log",
+      "log_sha256": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+      "started_at": "2026-10-29T19:31:21.723199+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/dmf_pulse/dashboard/postgres_authorization.py",
+        "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py",
+        "src/dmf_pulse/database/doctor.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/ingestion/fpl/service.py",
+        "tests/unit/dashboard/test_postgres_control_contract.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "tests/integration/conftest.py",
+        "tests/integration/migrations/test_migrations.py",
+        "tests/unit/database/test_dat003_branch_contracts.py",
+        "scripts/test_migration_matrix.py",
+        "scripts/verify_wheel.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:31:21.923804+00:00",
+      "log": "review_pack\\control-final-check-1.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-29T19:31:21.818895+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse/dashboard/postgres_authorization.py",
+        "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py",
+        "src/dmf_pulse/database/doctor.py",
+        "src/dmf_pulse/data_model/tables.py",
+        "src/dmf_pulse/ingestion/fpl/service.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:31:22.549482+00:00",
+      "log": "review_pack\\control-final-check-2.log",
+      "log_sha256": "718df785efbbd4b57e63b5f64aff2c5b5592e433447681f759b307f97a3ec96a",
+      "started_at": "2026-10-29T19:31:21.923920+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/dashboard/test_postgres_control_contract.py",
+        "tests/unit/dashboard/test_live_authorization.py",
+        "tests/unit/database/test_dat003_branch_contracts.py",
+        "tests/unit/database/test_migration_statement_execution.py",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "-q",
+        "--tb=short",
+        "--basetemp",
+        "review_pack/pytest-control-post-binding",
+        "-o",
+        "cache_dir=review_pack/pytest-cache-post-binding",
+        "--cov=dmf_pulse.dashboard.postgres_authorization",
+        "--cov-branch",
+        "--cov-report=term-missing",
+        "--cov-report=json:review_pack/control-final-coverage.json",
+        "--cov-fail-under=90"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:31:58.979235+00:00",
+      "log": "review_pack\\control-final-check-3.log",
+      "log_sha256": "834272aaa3910081c5f17e3993a9abb477fbdf3977f19e6b2cf0749910d61f39",
+      "started_at": "2026-10-29T19:31:22.549580+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:31:59.060006+00:00",
+      "log": "review_pack\\control-final-check-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-29T19:31:58.979398+00:00"
+    }
+  ],
+  "explicit0007_roundtrip": "control-roundtrip.json",
+  "full_migration_regression": "control-full-regression.json",
+  "provider_requests": 0,
+  "real_data_or_credentials": false,
+  "schema_version": "refresh-control-final-checks-v1",
+  "source_sha256": {
+    "scripts/test_migration_matrix.py": "b4fab2e24e562f1de47e6d48adf00ef6fed8f7c7020cff9ff45b6f69ba1d8da2",
+    "scripts/verify_wheel.py": "c6017af84102a5d3223c8dfce76fdd4e68ce577830c599fe6d4d11d7d6413adc",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "a384a4d81b400a0f9cd8580786a2b2452135f7f24c1f15a8a5a48c8ef3a592d2",
+    "src/dmf_pulse/data_model/tables.py": "d2012e8e9f2b1ea77fe456619a95f500c540597b8f6bd418fdbaa7e3b8b00e1a",
+    "src/dmf_pulse/database/doctor.py": "5bba8df09c0655ba6e33ce2a5127c9a61078f50948f8d338982340fc5612476a",
+    "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c",
+    "src/dmf_pulse/ingestion/fpl/service.py": "66d7191fcad6bc4f5edcaefdba11a4aa46c8191a4263fb6c3f996b1012fad9f5",
+    "tests/integration/conftest.py": "9f60be9b0e38bc247dbc2c94535abe38aee299c621f9733cbe21e642ecb30698",
+    "tests/integration/dashboard/test_postgres_authorization.py": "bf81dd1c1c985a54567ec83169bcc155f1e99aab28c942dfc22b8514cb4d6dea",
+    "tests/integration/migrations/test_migrations.py": "827d8e98164ed36ee2edf57d0fb8cb3f641a875fea8ca2f471ef14b4fcd3bd20",
+    "tests/unit/dashboard/test_postgres_control_contract.py": "afff38894f83388d93ea77b950b1783e0bc6a300025de314778786d68965379f",
+    "tests/unit/database/test_dat003_branch_contracts.py": "3f5f5b5aca7ef46394b6ebca55f8c52bebd34dbb3a1d9756b2a081a4729b43ac"
+  },
+  "superseded_environment_failure": "control-superseded-migration-environment.json"
+}

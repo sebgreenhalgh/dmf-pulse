@@ -1,0 +1,151 @@
+{
+  "classification": "OWNED_SYNTHETIC_NO_PROVIDER_CALLS",
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/dashboard/test_live_authorization.py",
+        "tests/unit/ingestion/test_operator_odds_transient.py",
+        "tests/unit/private_v1/test_prior_only_candidate.py",
+        "tests/unit/ingestion/test_one_command_odds_transient.py",
+        "tests/security/test_odds_429_retry_policy.py",
+        "-q",
+        "--basetemp",
+        "review_pack/pytest-market-hooks",
+        "-p",
+        "no:cacheprovider",
+        "--tb=short"
+      ],
+      "completed_at": "2026-10-29T19:15:08.880780+00:00",
+      "exit_code": 0,
+      "log": "review_pack\\market-hooks-focused.log",
+      "name": "focused",
+      "sha256": "d413944281ea3d7bdc5f5afa096b06e26fbeb9e43c67ae9c169409a5fe717e2b",
+      "started_at": "2026-10-29T19:15:05.853422+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/dmf_pulse/dashboard/authorization.py",
+        "src/dmf_pulse/ingestion/odds/transient.py",
+        "src/dmf_pulse/private_v1/prior_only_candidate.py",
+        "tests/unit/dashboard/test_live_authorization.py",
+        "tests/unit/ingestion/test_operator_odds_transient.py",
+        "tests/unit/private_v1/test_prior_only_candidate.py"
+      ],
+      "completed_at": "2026-10-29T19:15:08.968951+00:00",
+      "exit_code": 0,
+      "log": "review_pack\\market-hooks-format.log",
+      "name": "format",
+      "sha256": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209",
+      "started_at": "2026-10-29T19:15:08.881120+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/dmf_pulse/dashboard/authorization.py",
+        "src/dmf_pulse/ingestion/odds/transient.py",
+        "src/dmf_pulse/private_v1/prior_only_candidate.py",
+        "tests/unit/dashboard/test_live_authorization.py",
+        "tests/unit/ingestion/test_operator_odds_transient.py",
+        "tests/unit/private_v1/test_prior_only_candidate.py"
+      ],
+      "completed_at": "2026-10-29T19:15:09.063651+00:00",
+      "exit_code": 0,
+      "log": "review_pack\\market-hooks-lint.log",
+      "name": "lint",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "started_at": "2026-10-29T19:15:08.969192+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse/dashboard/authorization.py",
+        "src/dmf_pulse/ingestion/odds/transient.py",
+        "src/dmf_pulse/private_v1/prior_only_candidate.py"
+      ],
+      "completed_at": "2026-10-29T19:15:09.548917+00:00",
+      "exit_code": 0,
+      "log": "review_pack\\market-hooks-typing.log",
+      "name": "typing",
+      "sha256": "8228fcc5ce46d42d01caf3cd941f4e9c5f2bcc372bb5b147a2f0572d2dd675a8",
+      "started_at": "2026-10-29T19:15:09.063992+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "completed_at": "2026-10-29T19:15:09.601541+00:00",
+      "exit_code": 0,
+      "log": "review_pack\\market-hooks-diff.log",
+      "name": "diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-29T19:15:09.549182+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003-MARKET\\.venv\\Scripts\\python.exe",
+        "scripts/scan_secrets.py"
+      ],
+      "completed_at": "2026-10-29T19:15:31.526252+00:00",
+      "exit_code": 0,
+      "log": "review_pack\\market-hooks-secrets.log",
+      "name": "secrets",
+      "sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7",
+      "started_at": "2026-10-29T19:15:09.601785+00:00"
+    }
+  ],
+  "owned_files": [
+    {
+      "path": "src/dmf_pulse/dashboard/authorization.py",
+      "sha256": "60ec69c62ed37a6a324823c347a1aa9f562994dbd24e58cca6e6b67a111b5c52"
+    },
+    {
+      "path": "src/dmf_pulse/ingestion/odds/transient.py",
+      "sha256": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50"
+    },
+    {
+      "path": "src/dmf_pulse/private_v1/prior_only_candidate.py",
+      "sha256": "c64c9d26865b33c2584a1e0e884591afe4b36ae97ac7ec2cf9e4f8eca5a9c4fa"
+    },
+    {
+      "path": "tests/unit/dashboard/test_live_authorization.py",
+      "sha256": "d6982e11efd31a84aff9314c4fc3b0711207452f9b66e9cdb6bb695dc8ab34b4"
+    },
+    {
+      "path": "tests/unit/ingestion/test_operator_odds_transient.py",
+      "sha256": "325ca8aea25c0243c3ca918476e5b710de6ed5d312e7c0f6412a5c4ce29d210e"
+    },
+    {
+      "path": "tests/unit/private_v1/test_prior_only_candidate.py",
+      "sha256": "90db250f35a070d4f2298d2bd7c7fd6894db41e2ca2f92c4e3f45e00ea1e1401"
+    }
+  ],
+  "parent": "9098ba89ba524fbf3235ad57d22d07e376e22e82",
+  "retained_initial_failures": [
+    {
+      "reason": "future quota test crossed earlier acquisition-window guard; test clock/cutoff corrected without weakening guards",
+      "result": "29passed1failed initial authorizer test",
+      "source": "tool transcript"
+    },
+    {
+      "reason": "Windows shared pytest temp ACL denied; isolated --basetemp initially lacked parent review_pack; explicit owned directory created, tests then39passed",
+      "result": "39setup errors",
+      "source": "tool transcript"
+    }
+  ],
+  "schema_version": "accel003-market-author-checks-v1"
+}

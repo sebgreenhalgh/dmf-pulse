@@ -1,0 +1,132 @@
+{
+  "provider_requests": 0,
+  "real_cohort_size": 0,
+  "results": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "src/dmf_pulse/player_lab/cohort.py",
+        "src/dmf_pulse/player_lab/runner.py",
+        "src/dmf_pulse/player_lab/diagnostics.py",
+        "src/dmf_pulse/player_lab/compatibility.py",
+        "src/dmf_pulse/cli/player_lab.py",
+        "tests/unit/player_lab/test_cohort_runner.py",
+        "tests/unit/player_lab/test_actuals_compatibility.py",
+        "tests/contract/player_lab/test_cli.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:00:57.992353+00:00",
+      "log": "cp3-check-0.log",
+      "log_sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "started_at": "2026-10-29T19:00:57.880246+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/dmf_pulse/player_lab/cohort.py",
+        "src/dmf_pulse/player_lab/runner.py",
+        "src/dmf_pulse/player_lab/diagnostics.py",
+        "src/dmf_pulse/player_lab/compatibility.py",
+        "src/dmf_pulse/cli/player_lab.py",
+        "tests/unit/player_lab/test_cohort_runner.py",
+        "tests/unit/player_lab/test_actuals_compatibility.py",
+        "tests/contract/player_lab/test_cli.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:00:58.089535+00:00",
+      "log": "cp3-check-1.log",
+      "log_sha256": "3fa62c94b1301255f0c64c429c668a4fabc4cb9d3848edb2790b607266d16092",
+      "started_at": "2026-10-29T19:00:57.992571+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\.venv\\Scripts\\python.exe",
+        "-m",
+        "mypy",
+        "src/dmf_pulse/player_lab/cohort.py",
+        "src/dmf_pulse/player_lab/runner.py",
+        "src/dmf_pulse/player_lab/diagnostics.py",
+        "src/dmf_pulse/player_lab/compatibility.py",
+        "src/dmf_pulse/cli/player_lab.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:00:58.705654+00:00",
+      "log": "cp3-check-2.log",
+      "log_sha256": "718df785efbbd4b57e63b5f64aff2c5b5592e433447681f759b307f97a3ec96a",
+      "started_at": "2026-10-29T19:00:58.090008+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-002\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/unit/player_lab",
+        "tests/contract/player_lab",
+        "-q",
+        "--basetemp=review_pack/pytest-cp3-final",
+        "--tb=short",
+        "--cov=dmf_pulse.player_lab.cohort",
+        "--cov=dmf_pulse.player_lab.runner",
+        "--cov=dmf_pulse.player_lab.diagnostics",
+        "--cov=dmf_pulse.player_lab.compatibility",
+        "--cov=dmf_pulse.cli.player_lab",
+        "--cov-report=term-missing",
+        "--cov-fail-under=0"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:01:07.366643+00:00",
+      "log": "cp3-check-3.log",
+      "log_sha256": "516f8f7e780114ec6cc779b844fb675031ada9d83e8359c8d4481470e90dbe3e",
+      "started_at": "2026-10-29T19:00:58.705868+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-29T19:01:07.577088+00:00",
+      "log": "cp3-check-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at": "2026-10-29T19:01:07.366901+00:00"
+    }
+  ],
+  "schema_version": "accel003-cp3-author-checks-v1",
+  "source_sha256": {
+    "src/dmf_pulse/cli/player_lab.py": "5f9a481567bb32662ecdf71dc5bbd86ac1c690e661cc46e350381f78a7563c43",
+    "src/dmf_pulse/player_lab/cohort.py": "945529fb39516674e34e2f491f0708c2095d305f15a4ae6eab6ddc91f8599c63",
+    "src/dmf_pulse/player_lab/compatibility.py": "06500c5e6536af2f2576589d00d43aafef3dfbfd52313f0354fd6dd8c7922b67",
+    "src/dmf_pulse/player_lab/diagnostics.py": "f118962dde0334babf1865120c140b3adcced758daa59a70de851803d0becfb8",
+    "src/dmf_pulse/player_lab/runner.py": "6b370b413c547290cf749d3655dd40ee9e3e6cea3d3662ed42d96db06ee8978c",
+    "tests/contract/player_lab/test_cli.py": "e3864e5b629171d0c6764fb167e88e4546818245a7f49f1b538207cbb37ca838",
+    "tests/unit/player_lab/test_actuals_compatibility.py": "673f6cace20a6d237d4883425e948cc519e09962649cfd00f578839d28816b01",
+    "tests/unit/player_lab/test_cohort_runner.py": "fe95e3d98016e5624977d9d2024d4a7fb2a136d72d5cea53454b2ba61ea1b124"
+  },
+  "superseded_local_attempts": [
+    {
+      "cause": "Sandbox denies default user temp directory; use explicit workspace basetemp.",
+      "result": "21 setup errors"
+    },
+    {
+      "cause": "Explicit basetemp parent did not yet exist; created ignored review_pack directory.",
+      "result": "21 setup errors"
+    },
+    {
+      "cause": "Unbounded bytes parameter repr generated a Windows path component; explicit bounded test IDs added.",
+      "result": "39 passed,2 setup errors"
+    },
+    {
+      "cause": "First corrected focused checkpoint; later three substantive diagnostics tests added.",
+      "result": "40 passed"
+    }
+  ],
+  "tracked_legacy_changes": false
+}

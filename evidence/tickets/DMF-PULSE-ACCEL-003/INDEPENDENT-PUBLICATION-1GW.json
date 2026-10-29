@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "case": "valid",
+      "error": null,
+      "pass": true,
+      "state": "COMPLETE"
+    },
+    {
+      "case": "bare-result",
+      "error": "RECOMMENDATION_BLOCKED",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "wrong-grant",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "wrong-claim-token",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "changed-name-stale-hash",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "changed-name-recomputed-hash-stale-mac",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "signed-wrong-gameweek",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "signed-wrong-gw-result-hash",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "signed-wrong-deadline",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "signed-wrong-capture",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "signed-duplicate-fixture",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "signed-wrong-fixture-gameweek",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "retained-nested-mutation",
+      "error": "WORKER_RESULT_BINDING_INVALID",
+      "pass": true,
+      "state": "BLOCKED"
+    },
+    {
+      "case": "authorization-expiry",
+      "error": "AUTHORIZATION_EXPIRED",
+      "pass": true,
+      "state": "EXPIRED"
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "credentials_accessed": false,
+  "issued_owned_test_code_identity": "2b48f4d1f0497c6692ae299d0b3e42fef59c734a",
+  "observed_at": "2026-10-29T19:49:32.896685+00:00",
+  "pin_reason": "Use completed actual owned result captured before the final expression-only scanner delta; no production authority. Pure current result acceptance and mutation checks execute final validator/HMAC/runtime code.",
+  "provider_calls": 0,
+  "result_byte_sha256": "883dc60c38d998b8fadad97622e92baf41468e24aefe3f0a4dac5eb82dde9b7f",
+  "schema_version": "accel003-independent-current-publication-v1",
+  "source_sha256": {
+    "app.py": "c8c8e82537b7f1a7b3ce497bd6b484382e9fada4cb3dc474d56d6b36e503098d",
+    "current.py": "7f9235bfb052b2510401e3d76bb34d996ea62a7af7b0dc76b9d65e411aae39fa",
+    "current_sources.py": "b1d166b7dbc367891f0532c7ab4ff7694d8c99d5def02f0583549542f0563880",
+    "runtime.py": "040381fc458009ea3c8bba6f2e6e8f4391b702a5b3a2e1631688c36c1cbff644"
+  },
+  "status": "PASS",
+  "test_only_fingerprint_pin": true
+}

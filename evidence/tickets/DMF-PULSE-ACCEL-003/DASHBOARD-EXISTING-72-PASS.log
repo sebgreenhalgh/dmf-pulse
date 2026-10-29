@@ -1,0 +1,8 @@
+........................................................................ [100%]
+============================= slowest 5 durations =============================
+58.98s setup    tests/unit/dashboard/test_dashboard.py::test_real_stack_refresh_player_table_detail_comparison_and_evaluation
+1.06s call     tests/unit/dashboard/test_dashboard.py::test_real_stack_refresh_player_table_detail_comparison_and_evaluation
+0.24s call     tests/unit/dashboard/test_live_authorization.py::test_child_process_claim_uses_same_durable_grant
+0.03s call     tests/unit/dashboard/test_dashboard.py::test_pairing_validation_rate_bound_assets_live_block_and_logout
+0.01s call     tests/unit/dashboard/test_live_authorization.py::test_every_attempt_requires_exact_claim_route_and_remaining_cap
+72 passed in 62.54s (0:01:02)

@@ -1,0 +1,426 @@
+{
+  "component_review_bindings": [
+    {
+      "actual_sha256": "5f9a481567bb32662ecdf71dc5bbd86ac1c690e661cc46e350381f78a7563c43",
+      "expected_sha256": "5f9a481567bb32662ecdf71dc5bbd86ac1c690e661cc46e350381f78a7563c43",
+      "matches": true,
+      "path": "src/dmf_pulse/cli/player_lab.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "945529fb39516674e34e2f491f0708c2095d305f15a4ae6eab6ddc91f8599c63",
+      "expected_sha256": "945529fb39516674e34e2f491f0708c2095d305f15a4ae6eab6ddc91f8599c63",
+      "matches": true,
+      "path": "src/dmf_pulse/player_lab/cohort.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "06500c5e6536af2f2576589d00d43aafef3dfbfd52313f0354fd6dd8c7922b67",
+      "expected_sha256": "06500c5e6536af2f2576589d00d43aafef3dfbfd52313f0354fd6dd8c7922b67",
+      "matches": true,
+      "path": "src/dmf_pulse/player_lab/compatibility.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "f118962dde0334babf1865120c140b3adcced758daa59a70de851803d0becfb8",
+      "expected_sha256": "f118962dde0334babf1865120c140b3adcced758daa59a70de851803d0becfb8",
+      "matches": true,
+      "path": "src/dmf_pulse/player_lab/diagnostics.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "6b370b413c547290cf749d3655dd40ee9e3e6cea3d3662ed42d96db06ee8978c",
+      "expected_sha256": "6b370b413c547290cf749d3655dd40ee9e3e6cea3d3662ed42d96db06ee8978c",
+      "matches": true,
+      "path": "src/dmf_pulse/player_lab/runner.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "e3864e5b629171d0c6764fb167e88e4546818245a7f49f1b538207cbb37ca838",
+      "expected_sha256": "e3864e5b629171d0c6764fb167e88e4546818245a7f49f1b538207cbb37ca838",
+      "matches": true,
+      "path": "tests/contract/player_lab/test_cli.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "673f6cace20a6d237d4883425e948cc519e09962649cfd00f578839d28816b01",
+      "expected_sha256": "673f6cace20a6d237d4883425e948cc519e09962649cfd00f578839d28816b01",
+      "matches": true,
+      "path": "tests/unit/player_lab/test_actuals_compatibility.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "fe95e3d98016e5624977d9d2024d4a7fb2a136d72d5cea53454b2ba61ea1b124",
+      "expected_sha256": "fe95e3d98016e5624977d9d2024d4a7fb2a136d72d5cea53454b2ba61ea1b124",
+      "matches": true,
+      "path": "tests/unit/player_lab/test_cohort_runner.py",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "45c352f42099f2a6f0c509b3ee548613c3f11ed591408d235ffee3a1e9a18c13",
+      "expected_sha256": "0d5ec76760448b19fdbbe3b2b8438fff04ca141b52fc79918e248c46a52a4530",
+      "line_ending_delta_detail": "Reviewed original CP3 worktree bytes match independent receipt; exact UTF8 content identical after CRLF/LF normalization. No source/test/contract text or policy exception.",
+      "line_ending_delta_reviewed": true,
+      "matches": false,
+      "path": "tickets/DMF-PULSE-ACCEL-003/ACTUALS-COMPATIBILITY.md",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "0efad710a05351cad4c9eb4b1197c2a1dec620ef0f88e70147d3dd43ac1308ae",
+      "expected_sha256": "e3179391d82918f7068a92881ec98eaee059554450914f55ea387f1557067ae0",
+      "line_ending_delta_detail": "Reviewed original CP3 worktree bytes match independent receipt; exact UTF8 content identical after CRLF/LF normalization. No source/test/contract text or policy exception.",
+      "line_ending_delta_reviewed": true,
+      "matches": false,
+      "path": "tickets/DMF-PULSE-ACCEL-003/COHORT-PROTOCOL.md",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "feb06d567eff176dec5e3826e738326c5245eec1b89a3d496639c1a93b1fc615",
+      "expected_sha256": "26e820b379f9ce69992c51d8d90bf2c817128027c88f63b9bb9f24766c51b2aa",
+      "line_ending_delta_detail": "Reviewed original CP3 worktree bytes match independent receipt; exact UTF8 content identical after CRLF/LF normalization. No source/test/contract text or policy exception.",
+      "line_ending_delta_reviewed": true,
+      "matches": false,
+      "path": "tickets/DMF-PULSE-ACCEL-003/EVALUATION-RUNBOOK.md",
+      "review": "CP3"
+    },
+    {
+      "actual_sha256": "7baea649fd85a1532c080b41a9e1b8ec7d46aac65db59075017d4c32efce7e37",
+      "expected_sha256": "7baea649fd85a1532c080b41a9e1b8ec7d46aac65db59075017d4c32efce7e37",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/__init__.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "09ea247806a3c7e1429e54b6ffa21f9297fe23f70fdfbd95aa69df068b0bd870",
+      "expected_sha256": "09ea247806a3c7e1429e54b6ffa21f9297fe23f70fdfbd95aa69df068b0bd870",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/contracts.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "263ac6e8f4db4214a4c594e9f3ee365c5b9e6c51232a50e64bac6ab59e256bbe",
+      "expected_sha256": "263ac6e8f4db4214a4c594e9f3ee365c5b9e6c51232a50e64bac6ab59e256bbe",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/demo.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "141f11eb75a9c584ff2681ebfbf8e725028bbc8b465e645ff4608eb8237b8071",
+      "expected_sha256": "141f11eb75a9c584ff2681ebfbf8e725028bbc8b465e645ff4608eb8237b8071",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/features.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "a477371db8658445ebca72e26a58b8475c47f95bf1c52121ed6316c039e4b796",
+      "expected_sha256": "a477371db8658445ebca72e26a58b8475c47f95bf1c52121ed6316c039e4b796",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/qualification.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "e462e88b017f2c613f4961f3a8c9ae550cb2dfa159026d2fafc40454d1a2a582",
+      "expected_sha256": "e462e88b017f2c613f4961f3a8c9ae550cb2dfa159026d2fafc40454d1a2a582",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/resources/__init__.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "6369d05ed2c4616d4029bd11e658749ea7180696b9032dd20f36dd2e4a097d0c",
+      "expected_sha256": "6369d05ed2c4616d4029bd11e658749ea7180696b9032dd20f36dd2e4a097d0c",
+      "matches": true,
+      "path": "src/dmf_pulse/player_evidence/resources/owned-participation-v1.json",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "43288ed1445d8f115c253aa3373cde4f66efa43ac7f57ae6acc99611695750c4",
+      "expected_sha256": "43288ed1445d8f115c253aa3373cde4f66efa43ac7f57ae6acc99611695750c4",
+      "matches": true,
+      "path": "tests/unit/player_evidence/test_participation_features.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "d0da2e2c7b57ca609fb67115c246ddd7ebde89b7dcc2896165f0290ce72d727f",
+      "expected_sha256": "d0da2e2c7b57ca609fb67115c246ddd7ebde89b7dcc2896165f0290ce72d727f",
+      "matches": true,
+      "path": "tests/integration/player_evidence/test_owned_pipeline.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "c827036f12903b432715eca9f568c20586690bd6db468a308c20f7951d17cc22",
+      "expected_sha256": "c827036f12903b432715eca9f568c20586690bd6db468a308c20f7951d17cc22",
+      "matches": true,
+      "path": "src/dmf_pulse/cli/player_evidence.py",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "13e09c280c547b3f0a3e2a72390c7c8b33fab65286fa51b2a51ae796f898292e",
+      "expected_sha256": "13e09c280c547b3f0a3e2a72390c7c8b33fab65286fa51b2a51ae796f898292e",
+      "matches": true,
+      "path": "tickets/DMF-PULSE-ACCEL-003/PLAYER-EVIDENCE.md",
+      "review": "CP4"
+    },
+    {
+      "actual_sha256": "9e9028e6dd349d7b9c68a13efa2d57046535a5374fede3e9d886cbbf2943f789",
+      "expected_sha256": "9e9028e6dd349d7b9c68a13efa2d57046535a5374fede3e9d886cbbf2943f789",
+      "matches": true,
+      "path": "tickets/DMF-PULSE-ACCEL-003/HOLDOUT-PLAN.md",
+      "review": "CP4"
+    }
+  ],
+  "disposition": "ENGINEERING_REVIEW_CLEARED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2_RELEASE_GATES_PENDING",
+  "evidence": [
+    {
+      "path": "review_pack\\accel003-cp2-independent-review.json",
+      "sha256": "c96b0e47b71b15f724520129f25388729f2b9e314042ce84900a2bce19f798c0",
+      "status": "PASS_SCOPED_POLICY_REVIEW_NO_UNRESOLVED_MATERIAL_FINDINGS"
+    },
+    {
+      "path": "review_pack\\accel003-cp3-independent-review.json",
+      "sha256": "86e4983909c20aff8505f24e9907415ebec2869dd4d8cf6fbd96a6ab7eb2e53c",
+      "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+    },
+    {
+      "path": "review_pack\\accel003-cp4-independent-review.json",
+      "sha256": "d77049b9dbfa852475dbdd9c6ec7eaa68e331f8e3814666d08f9a0a4f3c23771",
+      "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+    },
+    {
+      "path": "review_pack\\accel003-independent-pg-control-review.json",
+      "sha256": "e84eb83c93d7c647daeb3d9683f93820041135027aaaa79326d9a07b134e3be8",
+      "status": "PASS"
+    },
+    {
+      "path": "review_pack\\accel003-independent-pg-final-delta.json",
+      "sha256": "1a8d608bc10c5b6b7df72070a63aa60e214bd63e85ae775e3d118c0ca08470d8",
+      "status": "PASS"
+    },
+    {
+      "path": "review_pack\\accel003-independent-mixed-presentation-pre-remediation.json",
+      "sha256": "432679bfe398fc560b0b5e3cfd8a9ba88556727d8484470c394536f4f4c34abd",
+      "status": null
+    },
+    {
+      "path": "review_pack\\accel003-current-independent-preflight.json",
+      "sha256": "365de4f21448942bbd630d30ade5fe2b22223c4ab004cc9a389e7c1af7198e78",
+      "status": "PASS"
+    },
+    {
+      "path": "review_pack\\accel003-current-independent-checks.json",
+      "sha256": "cdaed6b75acd7867feede09b58e21930f0590eab96237f8af011bc7de944fdc6",
+      "status": null
+    },
+    {
+      "path": "review_pack\\accel003-current-independent-publication.json",
+      "sha256": "26fc4b6dbf3eade11071b20d1d62861bf751b3eb191859538afc9968464cc09b",
+      "status": "PASS"
+    },
+    {
+      "path": "review_pack\\accel003-current-independent-publication-3gw.json",
+      "sha256": "780a2599af61bf9205b083f25185970feeef193e2add04058493fd716f04d0dd",
+      "status": "PASS"
+    },
+    {
+      "path": "review_pack\\accel003-current-independent-exact-model-parity.json",
+      "sha256": "abe5c0ded38c9e5688280a78864a37f2b45b5971c4802d4276dabf906b4da65a",
+      "status": "PASS_NUMERICAL_PARITY_WITH_EXPLICIT_SOURCE_DELTA"
+    },
+    {
+      "path": "review_pack\\accel003-independent-owned-expression-delta.json",
+      "sha256": "6c5b5aaaed0e67574b13bb041c30b2297d4553ab02bb38e8bcf859101ea9dc34",
+      "status": "PASS"
+    },
+    {
+      "path": "review_pack\\independent-numerical-initial-harness-error.json",
+      "sha256": "92b0dd5ebbc7b28b8ccaff1087414587a23228e649cae9500a474ec17656b630",
+      "status": null
+    },
+    {
+      "path": "review_pack\\independent-numerical-source-freeze-change.json",
+      "sha256": "76363c593ab8090224c746a760aacbf1606b9171295067b2c9cc4d05faee3ac1",
+      "status": null
+    }
+  ],
+  "findings": [
+    {
+      "description": "Same-cutoff presentation metadata or Stage9 identities could differ from a valid decision/report while current runtime accepted the result. Four actual owned mutations reproduced COMPLETE.",
+      "id": "A-I01",
+      "initial_receipt": "accel003-independent-mixed-presentation-pre-remediation.json",
+      "location": "src/dmf_pulse/dashboard/runtime.py:DeskRuntime._accept",
+      "severity": "MATERIAL_P2",
+      "status": "RESOLVED: authenticated CurrentWorkerResult HMAC, exact code/capture/deadline/GW/fixture validation on receipt and retained publication;29 independent final mutation checks pass."
+    },
+    {
+      "description": "Manually constructed future enrolled private grant widened acquisition/run windows.",
+      "id": "CP2-I01",
+      "severity": "MATERIAL_P2",
+      "status": "RESOLVED: shared issuance/scope/expiry/quota helper; final preflight/deadline and independent child attacks pass; current registry stays empty."
+    }
+  ],
+  "implementation_fingerprint": "184c31258cfbb9d87ad7c6e462244d72ad0a4718",
+  "limits": [
+    "Engineering clearance is not provider approval, real cohort qualification, promotion, production activation, human acceptance or merge permission.",
+    "Final exact-source installed-wheel proof/full unchanged mandatory20-job CI and protected audit/secret scan/manifests remain root release requirements.",
+    "1GW numerical source delta is explicitly qualified by identical compiled code; no full semantic-hash parity claim, timing claim or real predictive claim.",
+    "CP4 nonblocking inherited DTO/importer and calibration JSON type observations remain recorded in their independent receipts; they do not bypass current byte-qualified public service gates.",
+    "Original dirty worktree CP0 did not bind every dirty byte; matching HEAD/status cannot prove that stronger claim."
+  ],
+  "production_registry_empty": true,
+  "provider_calls": 0,
+  "real_cohort_size": 0,
+  "real_credentials_accessed": false,
+  "real_data_retained": false,
+  "reviewed_at": "2026-10-29T19:56:24.029190+00:00",
+  "reviewed_files_sha256": {
+    "scripts/accel003_wheel_probe.py": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539",
+    "scripts/verify_dashboard_browser.cjs": "71cb69ca77d125e874fb7a8578024a249eb446ace29d48156cd8d6edb7852a3a",
+    "src/dmf_pulse/cli/app.py": "cd19b429bf04bedbec03c1811c8848d46b88067594f7fcc0753a3aaa6e5a099d",
+    "src/dmf_pulse/cli/dashboard.py": "3d05d4c8a637bc7c6c6725650390243c1a51d3f782a99b6635f7cb055baa9d11",
+    "src/dmf_pulse/dashboard/app.py": "c8c8e82537b7f1a7b3ce497bd6b484382e9fada4cb3dc474d56d6b36e503098d",
+    "src/dmf_pulse/dashboard/authorization.py": "10ef60e37f2ee564719cdc8db1b28891bbc2d3c44cb3436a8c782ba58a3b84fb",
+    "src/dmf_pulse/dashboard/current.py": "7f9235bfb052b2510401e3d76bb34d996ea62a7af7b0dc76b9d65e411aae39fa",
+    "src/dmf_pulse/dashboard/current_sources.py": "b1d166b7dbc367891f0532c7ab4ff7694d8c99d5def02f0583549542f0563880",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "a384a4d81b400a0f9cd8580786a2b2452135f7f24c1f15a8a5a48c8ef3a592d2",
+    "src/dmf_pulse/dashboard/resources/desk.js": "ce25bdf53fbf0796da27d55e63044c4d6bcae989edbcd267a8b13f35bab5207c",
+    "src/dmf_pulse/dashboard/resources/production_refresh_enrollments.json": "f55100d3e4f538af4c08ae32ede4bc16eaf54092c4c8d9c73723adbe956b5d26",
+    "src/dmf_pulse/dashboard/runtime.py": "040381fc458009ea3c8bba6f2e6e8f4391b702a5b3a2e1631688c36c1cbff644",
+    "src/dmf_pulse/dashboard/views.py": "5314fedc1e9c95f1fd983471cc80c48ceea6ca113b59fdc2989e01055df0f779",
+    "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c",
+    "src/dmf_pulse/ingestion/odds/transient.py": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
+    "src/dmf_pulse/private_v1/one_command.py": "e30716fc2653cd8a1210db7d5486a933b6c1ffeb14db942dc4ca030fdbecc102",
+    "src/dmf_pulse/private_v1/prior_only_candidate.py": "c64c9d26865b33c2584a1e0e884591afe4b36ae97ac7ec2cf9e4f8eca5a9c4fa",
+    "tickets/DMF-PULSE-ACCEL-003/CONTRACT.md": "3fbd84a437efc1f153b1dc596140b75777ab27292ab4aa3faf370ce62043fba0"
+  },
+  "reviewed_head": "e1e4f7a15f4a2096196ff272c375345e5a915f6e",
+  "reviewed_source_state": "Explicit byte bindings of working-tree final package; pending root commit/publication; current integration authored by root, not this reviewer. CP3 independent clearance delegated to separate nonauthor reviewer receipt.",
+  "reviewer": "/root/accel003_evaluation_review",
+  "schema_version": "accel003-independent-integration-review-v1",
+  "scope_matrix": [
+    {
+      "evidence": "Empty installed production registry; exact source/profile/account/purpose/routes and separately qualified vendor/plan/owner/review/runtime gates. CP2 primary-doc research and CP0 dependency matrix; no new provider rights inferred.",
+      "number": 1,
+      "scope": "Source-rights correctness",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "CP2 direct and concurrent one-shot attacks; PostgreSQL41 independent SQL/restart/quota/concurrency checks plus5 final selector checks. Production cannot select the owned JSON/TEST backend.",
+      "number": 2,
+      "scope": "One-shot authority consumption",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "19 independent preflight attacks reach0 unauthorized credentials/database/factories; launch carries identifiers/control metadata, no credential values; accepted client rights gate and guarded route counting precede delegates.",
+      "number": 3,
+      "scope": "Credential isolation",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "113 targeted checks include singleflight/acquisition/model cancellation/cleanup/session-expiry. ProcessWorker join/terminate/kill path reviewed. Final installed-wheel actual-spawn proof remains a release gate.",
+      "number": 4,
+      "scope": "Worker lifecycle and cancellation",
+      "status": "CLEAR_WITH_RELEASE_PROOF_PENDING"
+    },
+    {
+      "evidence": "Private qualified_deadline_at exact at enrolled construction/shared issuer/reserve/child; runtime/code/cutoff/deadline bound; expiry901 and session3601 clear. No fabricated prospective runtime deadline.",
+      "number": 5,
+      "scope": "FPL deadline expiry",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Four initial mixed presentations accepted, retained as evidence. Final HMAC authenticates grant/decision/presentation/actionability;29 independent1/3GW acceptance/mutation/retained-publication checks pass. Exact GW/fixture maps and final3GW code identity checked.",
+      "number": 6,
+      "scope": "Single-run coherent player projections",
+      "status": "CLEAR_AFTER_MATERIAL_P2_REMEDIATION"
+    },
+    {
+      "evidence": "Source classification and dataset mode explicitly OWNED_SYNTHETIC/current-mode architecture; no REAL_RUN_COMPLETED from owned sessions. Real cohort0; accepted engine internal result status is not represented as a real provider execution claim.",
+      "number": 7,
+      "scope": "Actual-versus-synthetic labeling",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Acquisition guard binds exact cutoff, durable monotone checks, no sends after acquisition close; source capture/cutoff/deadline exact on publication. CP3/CP4 independent temporal/future revision exclusions remain intact.",
+      "number": 8,
+      "scope": "Source cutoff and future leakage",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Reviewer authored CP3, so independent clearance comes from CP4 author:43 tests and16 adversarial probes. Original custody rejects self-resealed cohorts/labels; all CP3 reviewed code/test bytes match integrated root; three named docs differ only CRLF/LF with exact normalized content.",
+      "number": 9,
+      "scope": "Forecast/label custody",
+      "status": "CLEAR_EXTERNAL_INDEPENDENT_RECEIPT"
+    },
+    {
+      "evidence": "Current invalid manager/fixture/market cases fail closed; CP3 exact player/GW/fixture/season population and CP4 canonical/transfer membership/time joins independently reviewed. No starts inferred from minutes.",
+      "number": 10,
+      "scope": "Player identity and season mapping",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Raw numeric/Decimal walks:79585 leaves1GW,235824 leaves3GW. Only numeric mismatch is synthetic control quota100vs98; no forecast/decision numeric or structural mismatch. Exact path comparator preserves all model/rules/dataset ids.1GW precedes expression-only placeholder edit with independently identical complete runtime bytecode/constants;3GW binds final fingerprint. Final installed-wheel exact-source proof pending.",
+      "number": 11,
+      "scope": "Numerical parity with existing CLI",
+      "status": "CLEAR_WITH_EXPLICIT_SOURCE_DELTA"
+    },
+    {
+      "evidence": "GOVERNED_PRIOR_ONLY stays inactive, owned, not connected to private workflow; unchanged Stage8 empty constraints/confidenceD; no fabricated Odds availability observations. Both current horizons remain MARKET_PRIMARY.",
+      "number": 12,
+      "scope": "No silent prior-only substitution",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Real registry admission and research DB gates unchanged; all raw/transformed/derived dependencies require qualification. New PG schema is control-only hashes/times/operation metadata;0 real cohort, no training/model activation.",
+      "number": 13,
+      "scope": "No unauthorized storage or training",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Reviewer used owned fixtures/control records only and read no credentials. Root reports unchanged scanner0 findings after final literal expression fix; final publication scanner/evidence manifest remains root release gate.",
+      "number": 14,
+      "scope": "No private provider data in Git",
+      "status": "CLEAR_FOR_REVIEWED_CONTENT_FINAL_SCAN_PENDING"
+    },
+    {
+      "evidence": "Installed registry empty, candidate profile inactive, active profiles and numerical model/rules/default policies unchanged; CP3/CP4 explicitly forbid promotion from synthetic evidence.",
+      "number": 15,
+      "scope": "No production/model activation",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Protected root audit confirms P01 stored semantic96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a and bytes unchanged, A02/A03 consumed, noA04. Original dirty worktree comparison binds HEAD/status rather than every pre-existing dirty byte; final protected audit is root gate.",
+      "number": 16,
+      "scope": "No P01 or historical artifact mutation",
+      "status": "CLEAR_WITH_PROTECTED_AUDIT_LIMIT"
+    },
+    {
+      "evidence": "Independent component tests/reviews pass; workflow/coverage/scanner protections unchanged. Full frozen sync/coverage/build/installed-wheel/manifest/scanner and final exact-SHA20/20 CI not yet asserted by this review.",
+      "number": 17,
+      "scope": "Full CI and packaging",
+      "status": "PENDING_ROOT_RELEASE_GATE"
+    },
+    {
+      "evidence": "Full cohort rejects sparse/partial/mixed vintages; absent components never become zero; explicit blank/DGW/correction/transfer adversarial tests. B0-B5 each unavailable with reason; missing starts/60+ estimates stay unavailable.",
+      "number": 18,
+      "scope": "Correct handling of missing results",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "Vendor terms do not qualify account plan, owner authority, FPL retention, live schema or every forecast dependency. Candidate unresolved nulls remain inactive. FutureGW9 indexed-official/direct-open caveat retained; expiry prevents proposal becoming authority.",
+      "number": 19,
+      "scope": "Unsupported provider-rights assumptions",
+      "status": "CLEAR"
+    },
+    {
+      "evidence": "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT; original and operational reports explicitly synthetic/tiny-sample; no calibration fit, decision skill, model superiority, training or promotion claim.",
+      "number": 20,
+      "scope": "False claims of real predictive accuracy",
+      "status": "CLEAR"
+    }
+  ],
+  "superseded_harness_history": [
+    "Initial independent numeric harness called model_dump on a dataclass after two1GW runs; corrected explicit serializer and immediate checkpoints.",
+    "Second pair rejected HMAC package change during source freeze. Third1GW completed before constant-folding edit; third3GW output checkpoints survived expected complete-package assertion, then independent raw comparison and exact expression-bytecode delta qualified both.",
+    "First independent pytest invocation used ACCEL002 editable environment and failed imports; second inserted root path only in parent and one subprocess import failed; final correct ACCEL003 frozen environment passed113 checks. Both actual failure receipts/logs retained."
+  ],
+  "tracked_edits_by_reviewer": false
+}

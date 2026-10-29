@@ -1,0 +1,232 @@
+{
+  "checks": [
+    {
+      "case": "reservation-committed-before-worker",
+      "pass": true
+    },
+    {
+      "case": "concurrent-initialize-canonical-account",
+      "pass": true
+    },
+    {
+      "case": "one-shot-survives-reinitialize",
+      "code": "ONE_SHOT_CONSUMED",
+      "error_type": "AuthorizationError",
+      "pass": true
+    },
+    {
+      "case": "new-ledger-id-cannot-reset-account",
+      "code": "USAGE_LEDGER_IDENTITY_MISMATCH",
+      "error_type": "AuthorizationError",
+      "pass": true
+    },
+    {
+      "case": "eight-concurrent-budget-reservations",
+      "pass": true
+    },
+    {
+      "case": "six-concurrent-worker-claims",
+      "pass": true
+    },
+    {
+      "case": "six-concurrent-route-attempts",
+      "pass": true
+    },
+    {
+      "case": "new-approval-id-cannot-reset-account-budget",
+      "code": "DAILY_BUDGET_EXHAUSTED",
+      "error_type": "AuthorizationError",
+      "pass": true
+    },
+    {
+      "case": "sql-null_kind",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-null_kind-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-null_sequence",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-null_sequence-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-bool_sequence",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-bool_sequence-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-null_at",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-null_at-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-null_reservation",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-null_reservation-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-null_period",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-null_period-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-bool_period",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-bool_period-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-extra_provider_body",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-extra_provider_body-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-wrong_account",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-wrong_account-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-clock_regression",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-clock_regression-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-orphan_claim",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-orphan_claim-rollback",
+      "pass": true
+    },
+    {
+      "case": "sql-unclaimed_attempt",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "sql-unclaimed_attempt-rollback",
+      "pass": true
+    },
+    {
+      "case": "append-only-ledger-UPDATE",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "append-only-ledger-DELETE",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "append-only-ledger-TRUNCATE",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "append-only-event-UPDATE",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "append-only-event-DELETE",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "append-only-event-TRUNCATE",
+      "code": "f405",
+      "error_type": "ProgrammingError",
+      "pass": true
+    },
+    {
+      "case": "non-UTC-session-fails-before-custody",
+      "code": "USAGE_LEDGER_SCHEMA_NOT_READY",
+      "error_type": "AuthorizationError",
+      "pass": true
+    },
+    {
+      "case": "constructor-no-connection-or-environment-resolution",
+      "pass": true
+    },
+    {
+      "case": "head-and-canonical-control-capability",
+      "pass": true
+    }
+  ],
+  "classification": "OWNED_SYNTHETIC_CONTROL_METADATA_ONLY",
+  "control_event_count": 4,
+  "control_ledger_count": 2,
+  "created_separate_database": true,
+  "database": "dmf_pulse_control_review_d2af3ea07146",
+  "excluded": "Final current-worker and private enrollment integration require separate review; no real production approval exists.",
+  "finished_at": "2026-10-29T19:30:46.812411+00:00",
+  "port": 55433,
+  "provider_calls": 0,
+  "real_credentials_accessed": false,
+  "schema_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f",
+  "schema_version": "accel003-independent-pg-control-review-v1",
+  "source_sha256": {
+    "src/dmf_pulse/dashboard/authorization.py": "60ec69c62ed37a6a324823c347a1aa9f562994dbd24e58cca6e6b67a111b5c52",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "a384a4d81b400a0f9cd8580786a2b2452135f7f24c1f15a8a5a48c8ef3a592d2",
+    "src/dmf_pulse/data_model/tables.py": "d2012e8e9f2b1ea77fe456619a95f500c540597b8f6bd418fdbaa7e3b8b00e1a",
+    "src/dmf_pulse/database/migrations/versions/20261029_0008_refresh_control.py": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c"
+  },
+  "started_at": "2026-10-29T19:30:44.496893+00:00",
+  "status": "PASS"
+}

@@ -3,6 +3,27 @@
 const $ = id => document.getElementById(id);
 let view = null, page = 'team', polling = null, expiry = null, paired = false, demo = false;
 let epoch = 0, expiresPerf = 0;
+let syntheticSources = false, providerEligibility = null;
+function applyContext(context) {
+  demo = context.demo;
+  syntheticSources = context.synthetic_sources;
+  providerEligibility = context.eligibility;
+  $('mode').textContent = demo ? 'SYNTHETIC DEMONSTRATION' : syntheticSources ? 'SYNTHETIC CURRENT-MODE ARCHITECTURE' : 'PRIVATE CURRENT';
+}
+function showEligibility(parent) {
+  if (!providerEligibility) return;
+  const c = card('Refresh eligibility', parent);
+  table(c, ['Control', 'Status'], [
+    ['Engineering', providerEligibility.engineering_status],
+    ['Execution architecture', providerEligibility.execution_mode],
+    ['Source classification', providerEligibility.source_classification],
+    ['Permission / run state', providerEligibility.state],
+    ['Reason', providerEligibility.error_code || 'None'],
+    ['Qualified deadline UTC', providerEligibility.deadline_at || 'No qualified current deadline observed'],
+    ['Qualified quota snapshot', providerEligibility.qualified_quota_snapshot_remaining ?? 'Unavailable']
+  ]);
+  c.append(text('p', 'Quota above is a qualified snapshot. A completed run shows its separately observed response quota. Refresh is operator-triggered; reloading this page makes no provider acquisition.'));
+}
 const requests = new Set();
 const fmt = (x, n = 2) => x === null || x === undefined ? 'Unavailable' : Number(x).toFixed(n);
 const text = (tag, value, cls) => { const e = document.createElement(tag); e.textContent = String(value); if (cls) e.className = cls; return e; };
@@ -130,10 +151,32 @@ async function showPerformance() {
     const h=report.synthetic_holdout;
     if(h){const holdout=card('Preregistered chronological paired holdout',c);holdout.append(text('p',`Development forecasts ${h.development_count}; holdout forecasts ${h.holdout_count}. Paired absolute-error delta (challenger minus champion): ${fmt(h.paired_absolute_error_delta)}. Promotion: ${h.promotion}.`));table(holdout,['Model','Holdout N','MAE','RMSE','Bias'],[h.champion,h.challenger].map(v=>[v.model_id,v.count,fmt(v.point_metrics.mae),fmt(v.point_metrics.rmse),fmt(v.point_metrics.signed_bias)]));}
     details(c,'Immutable forecast, label, metric and cohort identities',r);
+    const operational = report.operational_report;
+    if (operational) {
+      const cohort = card('Complete registered cohort runner', c);
+      cohort.append(text('p', `${operational.classification}: ${operational.population_players} owned players across ${operational.gameweek_count} synthetic Gameweeks; ${operational.scored_targets}/${operational.expected_targets} targets, attrition ${operational.attrition_count}. Real cohort size ${operational.real_cohort_size}.`));
+      table(cohort, ['Component', 'Champion MAE', 'Challenger MAE'], Object.entries(operational.champion_components).map(([name, value]) => [name, fmt(value.mae), fmt(operational.challenger_components[name].mae)]));
+      table(cohort, ['Model', 'Minute forecasts scored', 'Minute forecasts unavailable', 'Minutes MAE'], [['Champion', operational.champion_minutes], ['Challenger', operational.challenger_minutes]].map(([name, value]) => [name, value.scored_count, value.unavailable_forecast_count, fmt(value.mean_minutes?.mae)]));
+      table(cohort, ['Benchmark', 'Availability', 'Reason'], operational.benchmarks.map(b => [b.benchmark_id, b.status, b.reason]));
+      cohort.append(text('p', `${operational.uncertainty_status}. Starts and fixture-level 60+ diagnostics remain unavailable without qualified frozen probabilities and explicit labels. Promotion ${operational.promotion}.`));
+      details(cohort, 'Cohort custody, labels and complete diagnostic report', operational);
+    }
   } catch(e) {fail(e);}
 }
 function showHealth(){const c=card('Information set & publication');table(c,['Control','Observed value'],[['Source captured (UTC)',view.source_captured_at],['Information cutoff (UTC)',view.information_cutoff],['Official deadline (UTC)',view.deadline_at],['Presentation expires (UTC)',view.expires_at],['Horizon',view.gameweeks.join(', ')],['Decision identity',view.team.decision.semantic_sha256],['Dataset',view.dataset_mode],['Catalogue / valid / unavailable',`${view.catalogue_count} / ${view.projected_count} / ${view.blocked_count}`],['Retention','Memory only; cleared on supersession, failure, cancellation, expiry and shutdown']]);table(c,['Source','Mode','Received UTC','Usable UTC','Requests'],view.source_vintages.map(v=>[v.source,v.source_mode,v.received_at,v.usable_at,v.requests]));c.append(text('p',`Observed market quota remaining: ${view.market_quota_remaining ?? 'Unavailable'}. Historical score priors remain reconstructed; commit time is not a claim of current match evidence.`));details(c,'Exact source identities and commit times',view.source_vintages);details(c,'Source/rules/model lineage',view.team.decision.lineage);details(c,'Quality and exact engine report',view.team.report);}
-function render(){ if (view && performance.now() >= expiresPerf) clearPresentation(); $('content').replaceChildren();$('page-title').textContent=({team:'My team',players:'Player Lab',decisions:'Decisions',performance:'Model Performance',health:'Data Health'})[page]; if(page==='performance'){showPerformance();return;}if(!view){const c=card('Your next decision starts here');c.append(text('p','Click Refresh Recommendations to run the existing application stack. A blocked source is reported explicitly.'));return;}({team:showTeam,players:showPlayers,decisions:showDecisions,health:showHealth})[page](); }
+function render(){
+  if (view && performance.now() >= expiresPerf) clearPresentation();
+  $('content').replaceChildren();
+  $('page-title').textContent=({team:'My team',players:'Player Lab',decisions:'Decisions',performance:'Model Performance',health:'Data Health'})[page];
+  if(page==='performance'){showPerformance();return;}
+  if(page==='health') showEligibility($('content'));
+  if(!view){
+    const c=card('Your next decision starts here');
+    c.append(text('p',providerEligibility?.error_code || 'Click Refresh Recommendations to run the existing application stack. A blocked source is reported explicitly.'));
+    return;
+  }
+  ({team:showTeam,players:showPlayers,decisions:showDecisions,health:showHealth})[page]();
+}
 async function current(expectedJob){
   const started=performance.now(), generation=epoch;
   const value=await api('/api/desk');
@@ -144,19 +187,35 @@ async function current(expectedJob){
   $('mode').textContent=value.dataset_mode;$('notice').textContent=`Ready · GW ${value.gameweeks.join(' / ')} · Expires ${value.expires_at}`;
   if(expiry)clearTimeout(expiry);expiry=setTimeout(()=>{clearPresentation();$('notice').textContent='Presentation lifetime ended. Refresh again.';},remaining);render();
 }
-async function poll(){if(!paired||document.hidden)return;try{const state=await api('/api/status');$('stages').replaceChildren(...state.stages.map(s=>text('li',s)));if(state.status!=='COMPLETE'||!view)$('notice').textContent=({'RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED':'Live refresh is blocked: the existing market approval covers one earlier observation. Use the synthetic demo, or establish a separately eligible source approval.','RUN_TIMEOUT':'Refresh timed out and the worker was cleared.','WORKER_CLEANUP_FAILED':'Worker cleanup failed. This runtime is closed; restart the application.','PRESENTATION_LIFETIME_ENDED':'Presentation expired and was cleared.','DECISION_DEADLINE_PASSED':'The official deadline has passed. This recommendation is withheld.'})[state.error_code] || state.error_code || state.status;$('refresh').disabled=state.status==='RUNNING';if(state.status==='COMPLETE'){if(!view||view.job_id!==state.job_id)await current(state.job_id);}else if(state.status!=='PENDING'){clearPresentation();} }catch(e){fail(e);} }
-$('pair-form').onsubmit=async e=>{e.preventDefault();const code=$('pair-code').value;$('pair-code').value='';try{const r=await api('/api/session',{pairing_code:code});demo=r.demo;paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;$('mode').textContent=demo?'SYNTHETIC DEMONSTRATION':'PRIVATE · LIVE RIGHTS GATE';render();polling=setInterval(poll,700);}catch(error){$('pair-panel').append(text('p',error.message));}};
+async function poll(){
+  if(!paired||document.hidden)return;
+  try{
+    const state=await api('/api/status');
+    providerEligibility=await api('/api/eligibility');
+    $('stages').replaceChildren(...state.stages.map(s=>text('li',s)));
+    const reason=state.error_code || providerEligibility?.error_code;
+    if(state.status!=='COMPLETE'||!view)$('notice').textContent=({'RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED':'Live refresh requires a separately eligible source approval. No provider acquisition occurred.','RUN_TIMEOUT':'Refresh timed out and the worker was cleared.','WORKER_CLEANUP_FAILED':'Worker cleanup failed. This runtime is closed; restart the application.','PRESENTATION_LIFETIME_ENDED':'Presentation expired and was cleared.','DECISION_DEADLINE_PASSED':'The official deadline has passed. This recommendation is withheld.','AUTHORIZATION_REVOKED':'Refresh authorization was revoked. The recommendation was cleared.'})[reason] || reason || state.status;
+    $('refresh').disabled=state.status==='RUNNING';
+    if(state.status==='COMPLETE'){
+      if(!view||view.job_id!==state.job_id)await current(state.job_id);
+      else if(page==='health')render();
+    }else if(state.status!=='PENDING'){
+      clearPresentation();
+      if(page==='health')render();
+    }
+  }catch(e){fail(e);}
+}
+$('pair-form').onsubmit=async e=>{e.preventDefault();const code=$('pair-code').value;$('pair-code').value='';try{const r=await api('/api/session',{pairing_code:code});applyContext(r);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;render();polling=setInterval(poll,700);}catch(error){$('pair-panel').append(text('p',error.message));}};
 $('refresh').onclick=async()=>{clearPresentation();$('refresh').disabled=true;$('progress').open=true;try{await api('/api/refresh',{horizon:Number($('horizon').value)});await poll();}catch(e){fail(e);$('refresh').disabled=false;}};
 $('cancel').onclick=async()=>{clearPresentation();try{await api('/api/cancel',{});$('notice').textContent='Cancelled and cleared';$('refresh').disabled=false;}catch(e){fail(e);}};
-$('logout').onclick=async()=>{clearPresentation();if(polling)clearInterval(polling);paired=false;try{await api('/api/logout',{});}catch(e){fail(e);}$('workspace').hidden=true;$('pair-panel').hidden=false;$('pair-panel').replaceChildren(text('h2','Signed out'),text('p','Restart dmf dashboard to create a new private session.'));};
+$('logout').onclick=async()=>{clearPresentation();providerEligibility=null;if(polling)clearInterval(polling);paired=false;try{await api('/api/logout',{});}catch(e){fail(e);}$('workspace').hidden=true;$('pair-panel').hidden=false;$('pair-panel').replaceChildren(text('h2','Signed out'),text('p','Restart dmf dashboard to create a new private session.'));};
 document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{page=b.dataset.page;document.querySelectorAll('[data-page]').forEach(n=>n.classList.toggle('selected',n===b));render();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearPresentation();$('stages').replaceChildren();}else if(paired){poll();}});
-window.addEventListener('pagehide',clearPresentation);window.addEventListener('pageshow',()=>{if(paired)poll();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearPresentation();providerEligibility=null;$('stages').replaceChildren();}else if(paired){poll();}});
+window.addEventListener('pagehide',()=>{clearPresentation();providerEligibility=null;});window.addEventListener('pageshow',()=>{if(paired)poll();});
 
 // A reload resumes only a server-authenticated session; no private view is restored locally.
 api('/api/context').then(context=>{
   if(document.hidden||paired)return;
-  demo=context.demo;paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;
-  $('mode').textContent=demo?'SYNTHETIC DEMONSTRATION':'PRIVATE · LIVE RIGHTS GATE';
+  applyContext(context);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;
   render();polling=setInterval(poll,700);poll();
 }).catch(error=>{if(error.name!=='AbortError'&&error.message!=='SESSION_REQUIRED')fail(error);});

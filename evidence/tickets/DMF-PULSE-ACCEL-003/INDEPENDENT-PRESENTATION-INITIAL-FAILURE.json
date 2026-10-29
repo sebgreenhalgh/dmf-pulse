@@ -1,0 +1,35 @@
+{
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "credential_access": false,
+  "method": "Previously executed actual owned model decision and presentation from current-mode-probe; fresh valid actionability receipt for independent report; altered presentation only. The old decision code identity also differs from the new grant and is accepted by the same boundary.",
+  "observed_at": "2026-10-29T19:41:06.537023+00:00",
+  "provider_calls": 0,
+  "results": [
+    {
+      "accepted": true,
+      "case": "wrong-gameweek-identity",
+      "error": null,
+      "state": "COMPLETE"
+    },
+    {
+      "accepted": true,
+      "case": "wrong-gameweek-result-sha",
+      "error": null,
+      "state": "COMPLETE"
+    },
+    {
+      "accepted": true,
+      "case": "wrong-fixture-result-sha",
+      "error": null,
+      "state": "COMPLETE"
+    },
+    {
+      "accepted": true,
+      "case": "wrong-presentation-deadline",
+      "error": null,
+      "state": "COMPLETE"
+    }
+  ],
+  "runtime_sha256": "96f57ac9705df1efe5013e327a08092ce9f1a733b9b9e86c460f6315242111f2",
+  "schema_version": "accel003-independent-mixed-presentation-reproduction-v1"
+}

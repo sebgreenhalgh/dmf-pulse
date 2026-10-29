@@ -1,0 +1,136 @@
+{
+  "files": [
+    {
+      "bytes": 204,
+      "path": "review_pack/auth-cli-deadline.log",
+      "sha256": "cabfe63443aa5b0c6875067a6c44d1691141587ae6afa67e10bcdad5f49f98e5"
+    },
+    {
+      "bytes": 788,
+      "path": "review_pack/cp2-independent-check-0.log",
+      "sha256": "0192ce7c68b8c785cf50b9805a30dc9b604719953d51c672ee4d389e22e9abf1"
+    },
+    {
+      "bytes": 20,
+      "path": "review_pack/cp2-independent-check-1.log",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+    },
+    {
+      "bytes": 44,
+      "path": "review_pack/cp2-independent-check-2.log",
+      "sha256": "281a094c39385b4d7b53e5db635f52158036861433c2a4975b9039e77a627a24"
+    },
+    {
+      "bytes": 179,
+      "path": "review_pack/cp4-independent-tests.log",
+      "sha256": "919d3c501ed985f92bb32771cbce5038bc3c9d123cd29a1b5370389c175fa987"
+    },
+    {
+      "bytes": 204,
+      "path": "review_pack/current-cli-first.log",
+      "sha256": "599a4fc9cc812074385703c21e29f5d570fd12dd7a258fb273a7924c15abe6d7"
+    },
+    {
+      "bytes": 232,
+      "path": "review_pack/current-extra-checks.log",
+      "sha256": "7796950557f6c55c07fa692de24678444e00b4b5226a5f338c3e236c8c8dba3f"
+    },
+    {
+      "bytes": 234,
+      "path": "review_pack/current-fast-remediation.log",
+      "sha256": "f480da284896a4ddf725d909640ff99a0c38c66a5813f21d6e01f2d82ceb7908"
+    },
+    {
+      "bytes": 0,
+      "path": "review_pack/current-mode-binding-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 278,
+      "path": "review_pack/current-mode-probe-2.log",
+      "sha256": "b97ef8dd6fd357882daa581318ad9e87dc287b9f484276339a149de537f1338e"
+    },
+    {
+      "bytes": 3422,
+      "path": "review_pack/current-mode-probe.log",
+      "sha256": "583f9ee46f105444b06690fd543dc0f0d71c2ea80e6450c28082bf65b46e94da"
+    },
+    {
+      "bytes": 326068,
+      "path": "review_pack/current-mode-tests-first.log",
+      "sha256": "dc391f86e21f9d68e99953d0db6bdf1108654087dd9b8d9ce419c4a407254d62"
+    },
+    {
+      "bytes": 43116,
+      "path": "review_pack/current-mode-tests-second.log",
+      "sha256": "f3b30c32e7bc5abe2277655203b86d48a05cf5f44ecb0056877c145e9d53eb36"
+    },
+    {
+      "bytes": 3056,
+      "path": "review_pack/current-mode-tests-third.log",
+      "sha256": "0e9c51c245b05b0a58f9626326a5b30fb07e3a77610055c5458e87a6377a899b"
+    },
+    {
+      "bytes": 1620,
+      "path": "review_pack/dashboard-existing-check-second.log",
+      "sha256": "49337f35280c3aec80fcf973d17a518f82c5799c4f4dadfa4b8729f4a36944b9"
+    },
+    {
+      "bytes": 951510,
+      "path": "review_pack/dashboard-existing-check.log",
+      "sha256": "7604e058390b5c94bdf04dbbf2766f3fbfe9fa92746a644670fee23fc32d1bc0"
+    },
+    {
+      "bytes": 2732,
+      "path": "review_pack/independent-current-fast-initial-import-error.log",
+      "sha256": "2126dae042a892651e4440b866ea30b7af961e2c69eee676ad86208cbdb8aec5"
+    },
+    {
+      "bytes": 1446,
+      "path": "review_pack/independent-current-fast-prior-194340.log",
+      "sha256": "de4fcefe2fc423b8e503a45809180446269908b6c3ab5646dd871d12203677d8"
+    },
+    {
+      "bytes": 198,
+      "path": "review_pack/independent-current-fast.log",
+      "sha256": "bff83fdd7f39f01456b1de0034aa3fc180536cfcb22dbe507d2da030fffc4df8"
+    },
+    {
+      "bytes": 29,
+      "path": "review_pack/local-format.log",
+      "sha256": "411fcf1ed834906dbb09d947a17c6d2fe140e696e4321610d139bbb83fd63fcd"
+    },
+    {
+      "bytes": 27,
+      "path": "review_pack/local-frozen-sync.log",
+      "sha256": "0223f0f30f9631ecb77f4d8045fe9c619443fe301a1ec63d1d25dc182785250c"
+    },
+    {
+      "bytes": 2539,
+      "path": "review_pack/local-lint.log",
+      "sha256": "679dac6c02883aadfb4932568afec89837316fc50c126510b4515275b7b02505"
+    },
+    {
+      "bytes": 49738,
+      "path": "review_pack/postgres.log",
+      "sha256": "a1072baa459871e7d06ac0f0acecac8b2e52ee776820b70c801914584af78025"
+    },
+    {
+      "bytes": 64,
+      "path": "review_pack/repository-validation-9098ba89ba52.log",
+      "sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
+    },
+    {
+      "bytes": 1526,
+      "path": "review_pack/root-control-integration.log",
+      "sha256": "027245df26b4c414c301a8f2f24f4813a842688a41f900d5425162651f11f06b"
+    },
+    {
+      "bytes": 7768,
+      "path": "review_pack/root-secret-first.log",
+      "sha256": "8d218e40e798a5110abf18cde3183fd9d3ae2aeac8dfb55af0b65ca6dd7a8e4f"
+    }
+  ],
+  "retention_note": "Original ignored logs retained, including ACL/setup failures. Selected bounded copies normalized UTF16-to-UTF8 above; no provider response or model output body is copied.",
+  "schema_version": "accel003-diagnostic-inventory-v1"
+}

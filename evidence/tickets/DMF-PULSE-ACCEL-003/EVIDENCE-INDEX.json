@@ -1,9 +1,139 @@
 {
   "files": [
     {
+      "bytes": 99,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/AUTH-CLI-68-PASS.log",
+      "sha256": "659dfc90d4108489f08fa1dbc087e6e490ba13c57340c7892c841f3b975e232c"
+    },
+    {
+      "bytes": 4769,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CHECKPOINT-DIAGNOSTIC-INVENTORY.json",
+      "sha256": "ef200990501a3802143cbe91e9bc93137b4a8fe0844d28e3731323c93e0461c4"
+    },
+    {
+      "bytes": 4725,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-168-REGRESSION.json",
+      "sha256": "6fe63b953c0b380b003a8f2f168dd4e5ffa48fa222ab13f2d41f23dd54aa08da"
+    },
+    {
+      "bytes": 6369,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-AUTHOR-CHECKS.json",
+      "sha256": "445a3796984e7380d61dff61c2808a33ed3a56cee34bc4c3cd7408d206de69c9"
+    },
+    {
+      "bytes": 1356,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-INDEPENDENT-FINAL-DELTA.json",
+      "sha256": "d16a00a8ff85132c79b3d6fa053d967f697daba85e2aa6c506c429fdd8cdc9b6"
+    },
+    {
+      "bytes": 5818,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-INDEPENDENT.json",
+      "sha256": "e645fd8de631cb4f6e6e2b26c9b08c1acbe3796b84177c884260fb4f510fd27f"
+    },
+    {
+      "bytes": 1524,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-MIGRATION-ROUNDTRIP.json",
+      "sha256": "31284d2d56dcfd42ba2b76b524482271277d5865537edb2a77e4c86b44780a8d"
+    },
+    {
+      "bytes": 754,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-ROOT-44-PASS.log",
+      "sha256": "02049c72cbb58de35c3692101010d5076a5571f3c5c5c305eacb54e385877718"
+    },
+    {
+      "bytes": 3956,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-SUMMARY.json",
+      "sha256": "4ac9300a289f97fe68114958bb73cbd27c455b411ef54bd55a28893c50f67eb3"
+    },
+    {
+      "bytes": 920,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CONTROL-SUPERSEDED-ENVIRONMENT-FAILURE.json",
+      "sha256": "a30432fadaf6ad9b0dccb421f671b843a3b064892de4e4bd533044495d63f7c5"
+    },
+    {
       "bytes": 46286,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP0-BASELINE.json",
       "sha256": "2c3696e06bc65dd05504be03ee3296c8a55c5db9ee18e5d63b767c485f1a6214"
+    },
+    {
+      "bytes": 5835,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP2-AUTHOR-CHECKS.json",
+      "sha256": "20aaf5fca123e091a34a27309a82689fc8bfe65aa9827d0875ebd1b77eeab501"
+    },
+    {
+      "bytes": 11165,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP2-INDEPENDENT-FINAL.json",
+      "sha256": "c272e0eb89e2ffb1a40b3dfd1fc786d5d9b643aa290db8d5d4d3ad99a92e11a0"
+    },
+    {
+      "bytes": 933,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP2-INDEPENDENT-INITIAL-ATTACKS.json",
+      "sha256": "334e5c61376439867591dd13c8ac6bd179edca5003e5aff0934fe050a272497b"
+    },
+    {
+      "bytes": 7130,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP2-INDEPENDENT-INTERIM.json",
+      "sha256": "f369ce9b28532969d11ad2562b45aff2be1b947f3d975a6c202e8b6391768d97"
+    },
+    {
+      "bytes": 5362,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP3-AUTHOR-CHECKS.json",
+      "sha256": "abacf93f5bcad03e8f5265b2f3e6c44c9b2f753db0a3c63a99f15e76930131a2"
+    },
+    {
+      "bytes": 938,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP3-AUTHOR-INSTALLED-CLI.json",
+      "sha256": "55a4291a70003407fa941db3d98fdbd9649302295ff73996b779ce13e4d1bb9d"
+    },
+    {
+      "bytes": 10638,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP3-INDEPENDENT.json",
+      "sha256": "c9207d408da3a167589385a23779dbfc04dc3b512008aaa331af958baf23c2a7"
+    },
+    {
+      "bytes": 3328,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP4-AUTHOR-CHECKS.json",
+      "sha256": "db4b2af3a3f349eb459e7e0983b601723e0b3731e99cc2beb922e65d33079e7b"
+    },
+    {
+      "bytes": 2200,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP4-AUTHOR-SUMMARY.json",
+      "sha256": "6d5f3d05e90bf7be6d597a7cbed90d988b15fd69df041d1f1fa6870e0d5d1fdf"
+    },
+    {
+      "bytes": 7519,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CP4-INDEPENDENT.json",
+      "sha256": "a412dc58e683fe32d46a7877b3ce8cf6ef71bbeaa0fbdac0c77cac83c78489da"
+    },
+    {
+      "bytes": 99,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CURRENT-CLI-16-PASS.log",
+      "sha256": "e83003f61db32d90967a381cb41c9abfc094dfe1198dc6809dde2a817e3f03ba"
+    },
+    {
+      "bytes": 114,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CURRENT-MODE-22-FAULT-CASES-PASS.log",
+      "sha256": "d07f682f4a84e38839d541b1da5c912d2042c1785751310907a720f81211b59d"
+    },
+    {
+      "bytes": 1516,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CURRENT-MODE-45-PASS.log",
+      "sha256": "6fda07fa64622b081e8313827cea5b1dd5300bff7416fbe06f35c657fbe1234b"
+    },
+    {
+      "bytes": 1269,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CURRENT-MODE-SUPERSEDED-TEST-AND-SESSION-FAILURES.log",
+      "sha256": "26e5e817e0e9c6c8377bd6c0a8c48e43ac10450f3c3703aeb5d9baa0ebe881ec"
+    },
+    {
+      "bytes": 113,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/CURRENT-SCOPE-FINGERPRINT-3-PASS.log",
+      "sha256": "f45d262342467e372bb6d697ed695f7969b911213fe841c399aeed3d9205d223"
+    },
+    {
+      "bytes": 801,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/DASHBOARD-EXISTING-72-PASS.log",
+      "sha256": "835ea8b8442c1ca3cd4da411dde23111cdc04435ff4ff7c7a2ea62b01af63fc9"
     },
     {
       "bytes": 6293,
@@ -26,9 +156,94 @@
       "sha256": "342fedfdcdf28179b0fde93dcc026b73ef4f96eff5207fa7387aabbe7d092ccf"
     },
     {
+      "bytes": 905,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-EXPRESSION-DELTA.json",
+      "sha256": "3243efbe7aacd0d435d85d9c386e9ce00139145111eb0e8f25b60aba0ecdad9f"
+    },
+    {
+      "bytes": 23780,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-INTEGRATION.json",
+      "sha256": "186105735c284b3504637658c956d1af58200311a6581a33476af5d29cba7841"
+    },
+    {
+      "bytes": 1565141,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-NUMERICAL.json",
+      "sha256": "7d701aa95e6ea67017611f8267ffb4801811501c8c4ce8c6ca7cfd7710da35ea"
+    },
+    {
+      "bytes": 1137,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-PRESENTATION-INITIAL-FAILURE.json",
+      "sha256": "ad3bedb7ef010f835eeb80052c0392c1c665b3495ed232a5c3be312a3f79d474"
+    },
+    {
+      "bytes": 3059,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-PUBLICATION-1GW.json",
+      "sha256": "7738948cf64ab1739aff4f64b669284d5e8694532631013d00fc02b7fc152fc4"
+    },
+    {
+      "bytes": 3312,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-PUBLICATION-3GW.json",
+      "sha256": "b85372d35be21f38ab5ea3a28fcef597d12e4cdced0bb479ae44536ec48048b2"
+    },
+    {
+      "bytes": 3980,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-GATES.json",
+      "sha256": "2202af9eaad022f22869a56ea379f3ea61aea225552a873090427184da753a21"
+    },
+    {
+      "bytes": 505,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-build.log",
+      "sha256": "c81809ba8b5a6a93fcfb7663523d3938a0e7dc12e0fe7d00acce83e73bfdea47"
+    },
+    {
+      "bytes": 1565,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-cohort-evidence.log",
+      "sha256": "ca0dbe6d01cd9086698469990709380139741c31299768a4b98e22c908f5ad44"
+    },
+    {
+      "bytes": 29,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-format.log",
+      "sha256": "411fcf1ed834906dbb09d947a17c6d2fe140e696e4321610d139bbb83fd63fcd"
+    },
+    {
+      "bytes": 27,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-frozen-sync.log",
+      "sha256": "c0cc5e991f107a64471ebd482260abde2f93c36e72363fa5a012b154447b9ffe"
+    },
+    {
+      "bytes": 19,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-lint.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 63,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-secret-scan.log",
+      "sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+    },
+    {
+      "bytes": 45,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/LOCAL-typing.log",
+      "sha256": "f3eae03b5d08ff9e522bf62f15991a536feec9b6c2c7e55d23f11b1a8a241de0"
+    },
+    {
       "bytes": 17399,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/MARKET-ASSESSMENT.JSON",
       "sha256": "5f37d05e6289bfe0be06b200c47c3281c72a00618764115d9381df7051313ec7"
+    },
+    {
+      "bytes": 24549,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/PERFORMANCE-ASSESSMENT.json",
+      "sha256": "52ade395742461404e19d6731a6be7f8e3542ef95c9bca7197f4995175dcd9dd"
+    },
+    {
+      "bytes": 6768,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/PERFORMANCE-ASSESSMENT.md",
+      "sha256": "683e88beaff49e27a6e910f872c9762bce64ccd1dcd10e5ac1851043ca353e06"
+    },
+    {
+      "bytes": 1537,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SUPERSEDED-LINT-GATE.json",
+      "sha256": "6e63d8600e4705537b72213b678a7a223043f419b0d8c12d7518f46b59383e1c"
     }
   ],
   "schema_version": "accel003-evidence-index-v1",

@@ -1,0 +1,121 @@
+{
+  "adversarial_receipt": {
+    "path": "cp4-independent-attacks.json",
+    "results": "Changed source bytes/newline, self-declared new owned hash, real-provider descriptor, training/production purpose, canonical-collision body and orphan-observation body all rejected at the public qualified feature gate. DTO/schema-only acceptance limits separately recorded below.",
+    "sha256": "45adb7a407b0cebc100360e9f5af3fd973e5980b99117398bb185a4ef7104c68"
+  },
+  "authorship": "Independent CP4 reviewer; did not author player_evidence implementation or its tests/docs.",
+  "file_bindings": [
+    {
+      "path": "src/dmf_pulse/player_evidence/__init__.py",
+      "sha256": "7baea649fd85a1532c080b41a9e1b8ec7d46aac65db59075017d4c32efce7e37"
+    },
+    {
+      "path": "src/dmf_pulse/player_evidence/contracts.py",
+      "sha256": "09ea247806a3c7e1429e54b6ffa21f9297fe23f70fdfbd95aa69df068b0bd870"
+    },
+    {
+      "path": "src/dmf_pulse/player_evidence/demo.py",
+      "sha256": "263ac6e8f4db4214a4c594e9f3ee365c5b9e6c51232a50e64bac6ab59e256bbe"
+    },
+    {
+      "path": "src/dmf_pulse/player_evidence/features.py",
+      "sha256": "141f11eb75a9c584ff2681ebfbf8e725028bbc8b465e645ff4608eb8237b8071"
+    },
+    {
+      "path": "src/dmf_pulse/player_evidence/qualification.py",
+      "sha256": "a477371db8658445ebca72e26a58b8475c47f95bf1c52121ed6316c039e4b796"
+    },
+    {
+      "path": "src/dmf_pulse/player_evidence/resources/__init__.py",
+      "sha256": "e462e88b017f2c613f4961f3a8c9ae550cb2dfa159026d2fafc40454d1a2a582"
+    },
+    {
+      "path": "src/dmf_pulse/player_evidence/resources/owned-participation-v1.json",
+      "sha256": "6369d05ed2c4616d4029bd11e658749ea7180696b9032dd20f36dd2e4a097d0c"
+    },
+    {
+      "path": "tests/unit/player_evidence/test_participation_features.py",
+      "sha256": "43288ed1445d8f115c253aa3373cde4f66efa43ac7f57ae6acc99611695750c4"
+    },
+    {
+      "path": "tests/integration/player_evidence/test_owned_pipeline.py",
+      "sha256": "d0da2e2c7b57ca609fb67115c246ddd7ebde89b7dcc2896165f0290ce72d727f"
+    },
+    {
+      "path": "src/dmf_pulse/cli/player_evidence.py",
+      "sha256": "c827036f12903b432715eca9f568c20586690bd6db468a308c20f7951d17cc22"
+    },
+    {
+      "path": "tickets/DMF-PULSE-ACCEL-003/PLAYER-EVIDENCE.md",
+      "sha256": "13e09c280c547b3f0a3e2a72390c7c8b33fab65286fa51b2a51ae796f898292e"
+    },
+    {
+      "path": "tickets/DMF-PULSE-ACCEL-003/HOLDOUT-PLAN.md",
+      "sha256": "9e9028e6dd349d7b9c68a13efa2d57046535a5374fede3e9d886cbbf2943f789"
+    }
+  ],
+  "findings": [],
+  "nonblocking_limits": [
+    {
+      "condition_before_expansion": "Any future external report importer must authenticate/recompute source custody and report lineage, not rely on DTO validation or a supplied semantic SHA.",
+      "locator": "src/dmf_pulse/player_evidence/contracts.py:EvidenceFeatureSet.exact_report_population",
+      "observation": "DTO validation alone accepts a changed provider/source descriptor while SYNTHETIC/purpose/qualification remain shaped correctly. Semantic SHA is a content identity, not source custody authentication. Current service/CLI builds only byte-authenticated owned outputs and no report-import/training/storage consumer exists, so this does not bypass the accepted gate.",
+      "severity": "P3"
+    },
+    {
+      "condition_before_expansion": "Before admitting a new source/version, qualify canonical mapping bijection and orphan-observation policy explicitly; retain rejects/exclusions in its acceptance fixtures.",
+      "locator": "src/dmf_pulse/player_evidence/contracts.py:ParticipationDataset.exact_relations_and_revisions",
+      "observation": "Schema-only decoder accepts two provider teams mapping to the same canonical team and observations with no roster key. It explicitly grants no rights/features; changed bodies fail the public byte gate. The fixed qualified owned body does not rely on these malformed variants.",
+      "severity": "P3"
+    },
+    {
+      "observation": "No provider data files, accounts, subscriptions, credentials or real current observations were acquired. Supplier account eligibility, field/season completeness and StatsBomb full licence remain unverified/closed as documented.",
+      "severity": "LIMIT"
+    }
+  ],
+  "outcome": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "primary_document_spot_checks": [
+    {
+      "retrieval_completed_utc": "2026-10-29T19:17:00Z",
+      "supports": "CC BY4.0 label; lineup/bench/substitution/hasFormation documentation. No data download.",
+      "url": "https://figshare.com/articles/dataset/Matches/7770422"
+    },
+    {
+      "retrieval_completed_utc": "2026-10-29T19:17:00Z",
+      "supports": "CC BY4.0 label, author/paper citation, documented player identifiers. No data download.",
+      "url": "https://figshare.com/articles/dataset/Players/7765196"
+    },
+    {
+      "retrieval_completed_utc": "2026-10-29T19:17:00Z",
+      "supports": "Project use discussed but competition/publication permissions not granted; caller must resolve relevant rights.",
+      "url": "https://www.api-football.com/terms"
+    },
+    {
+      "retrieval_completed_utc": "2026-10-29T19:17:00Z",
+      "supports": "Provider expressly disclaims holding official league/competition rights; source/partner provenance needs resolution.",
+      "url": "https://www.sportmonks.com/integrity-support/"
+    }
+  ],
+  "protected": "No tracked edits, provider/credential calls, source qualification, model activation or historical/P01/A02/A03/A04 changes performed by reviewer.",
+  "review_conclusions": [
+    "Public build_features authenticates exact source descriptor AND bytes AND shipped resource against an independently fixed digest before decoding; no arbitrary synthetic wrapper or owner string qualifies another source.",
+    "Season/provider fixture/player/team joins, temporal usable clocks, exact historical team membership and append-only predecessor/revision checks are explicit. Later corrections/mappings/fixtures cannot enter an earlier-cutoff report.",
+    "Known roles and known regulation-minute support use separate denominators; positive minutes do not infer START. Missing roster/role/minutes are typed exclusions, not fabricated zeros. Independent pinned fixture oracles and87 tests pass.",
+    "Status is SYNTHETIC/EVIDENCE_ONLY_NOT_MODEL_INPUT, activation false, and uncertainty is empirical support only. No model invocation, fitting, hidden source persistence or active rights/model policy changes are present in this slice.",
+    "The proposed chronology protocol predeclares later qualification/periods/models/metrics/paired support before holdout evaluation; it does not fit, select, approve or activate any candidate."
+  ],
+  "reviewed_at": "2026-10-29T19:18:09.387889+00:00",
+  "reviewed_sha": "98d68e3dffa4d9c057179b68e49b4b735a2aa3ec",
+  "reviewer": "/root/accel003_market_review",
+  "schema_version": "accel003-independent-review-v1",
+  "scope": "CP4 closed owned-source participation qualification, strict contracts, temporal joins/revisions, missingness, empirical denominators, CLI and inactive holdout proposal",
+  "tests": {
+    "command": "MARKET frozen Python3.13 environment with EVIDENCE/src first on sys.path; pytest tests/unit/player_evidence tests/integration/player_evidence -q --basetemp <owned review dir> -p no:cacheprovider --tb=short",
+    "exit_code": 0,
+    "log": "cp4-independent-tests.log",
+    "log_sha256": "919d3c501ed985f92bb32771cbce5038bc3c9d123cd29a1b5370389c175fa987",
+    "passed": 87,
+    "skipped": 0
+  }
+}

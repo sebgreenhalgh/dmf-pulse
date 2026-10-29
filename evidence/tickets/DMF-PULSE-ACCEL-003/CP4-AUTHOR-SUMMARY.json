@@ -1,0 +1,31 @@
+{
+  "classification": "OWNED_SYNTHETIC_EVIDENCE_ONLY",
+  "combined_statement_branch_coverage_percent": "99.28",
+  "early_feature_sha256": "58f8dfd51202a9b3b94f3dfb516903b5a5f5528f4da77e4b97e1a0c7e9a73dfa",
+  "files": {
+    "src/dmf_pulse/cli/player_evidence.py": "c827036f12903b432715eca9f568c20586690bd6db468a308c20f7951d17cc22",
+    "src/dmf_pulse/player_evidence/__init__.py": "7baea649fd85a1532c080b41a9e1b8ec7d46aac65db59075017d4c32efce7e37",
+    "src/dmf_pulse/player_evidence/contracts.py": "09ea247806a3c7e1429e54b6ffa21f9297fe23f70fdfbd95aa69df068b0bd870",
+    "src/dmf_pulse/player_evidence/demo.py": "263ac6e8f4db4214a4c594e9f3ee365c5b9e6c51232a50e64bac6ab59e256bbe",
+    "src/dmf_pulse/player_evidence/features.py": "141f11eb75a9c584ff2681ebfbf8e725028bbc8b465e645ff4608eb8237b8071",
+    "src/dmf_pulse/player_evidence/qualification.py": "a477371db8658445ebca72e26a58b8475c47f95bf1c52121ed6316c039e4b796",
+    "src/dmf_pulse/player_evidence/resources/__init__.py": "e462e88b017f2c613f4961f3a8c9ae550cb2dfa159026d2fafc40454d1a2a582",
+    "src/dmf_pulse/player_evidence/resources/owned-participation-v1.json": "6369d05ed2c4616d4029bd11e658749ea7180696b9032dd20f36dd2e4a097d0c",
+    "tests/integration/player_evidence/test_owned_pipeline.py": "d0da2e2c7b57ca609fb67115c246ddd7ebde89b7dcc2896165f0290ce72d727f",
+    "tests/unit/player_evidence/test_participation_features.py": "43288ed1445d8f115c253aa3373cde4f66efa43ac7f57ae6acc99611695750c4",
+    "tickets/DMF-PULSE-ACCEL-003/HOLDOUT-PLAN.md": "9e9028e6dd349d7b9c68a13efa2d57046535a5374fede3e9d886cbbf2943f789",
+    "tickets/DMF-PULSE-ACCEL-003/PLAYER-EVIDENCE.md": "13e09c280c547b3f0a3e2a72390c7c8b33fab65286fa51b2a51ae796f898292e"
+  },
+  "later_feature_sha256": "bec1fe84438e6978952e2426bfbfa6bd1f7548f5896536793575704c47ae9bca",
+  "mypy_files": 7,
+  "parent_sha": "9098ba8",
+  "production_activation": false,
+  "production_model_changed": false,
+  "provider_requests": 0,
+  "real_player_history_acquired": false,
+  "real_source_qualified": false,
+  "schema_version": "cp4-engineering-summary-v1",
+  "source_fixture_sha256": "6369d05ed2c4616d4029bd11e658749ea7180696b9032dd20f36dd2e4a097d0c",
+  "tests_passed": 87,
+  "tests_skipped": 0
+}

@@ -1,0 +1,50 @@
+{
+  "doctor": {
+    "capabilities": {
+      "canonical_refresh_control": true,
+      "controlled_supersession": true,
+      "gist_exclusion": true,
+      "immutable_point_observations": true,
+      "player_research_custody": true,
+      "tstzrange": true,
+      "uuidv7": true
+    },
+    "database": {
+      "host": "127.0.0.1",
+      "name": "dmf_pulse_control_test",
+      "port": 55433
+    },
+    "migration": {
+      "at_head": true,
+      "current": "20261029_0008",
+      "head": "20261029_0008"
+    },
+    "postgres": {
+      "major": 18,
+      "supported": true,
+      "version": "18.4"
+    },
+    "schema_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f",
+    "status": "HEALTHY"
+  },
+  "head_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f",
+  "offline_sql_bytes": 7593,
+  "offline_sql_sha256": "a81c036716295a428acdaea5d21423fbf72d696b23dc0a12256956c75f2da7e2",
+  "previous_sha256": "b29b0e3f3f3e2ff99ef62693c5bb9f4e6344805248a7e25807f29f4bcb5d2417",
+  "provider_requests": 0,
+  "real_data_or_credentials": false,
+  "recorded_at": "2026-10-29T19:30:48.025721+00:00",
+  "schema_version": "refresh-control-migration-roundtrip-v1",
+  "sequence": [
+    "0008 with owned control binding",
+    "downgrade0007",
+    "verify exact predecessor catalog",
+    "upgrade0008",
+    "verify exact head catalog",
+    "alembic.check",
+    "offline0007:head SQL",
+    "doctor HEALTHY"
+  ],
+  "status": "PASS",
+  "test_only_control_binding_removed_by_explicit_downgrade": true
+}

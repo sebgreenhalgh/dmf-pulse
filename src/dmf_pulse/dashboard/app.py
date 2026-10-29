@@ -17,6 +17,7 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, ConfigDict, StrictStr, field_validator
 from starlette.responses import JSONResponse, Response
 
+from dmf_pulse.dashboard.current import CurrentEligibility
 from dmf_pulse.dashboard.runtime import DeskRuntime
 from dmf_pulse.dashboard.views import PlayerComparison
 from dmf_pulse.private_v1.presentation import PresentationModel
@@ -54,8 +55,11 @@ class SessionInput(BaseModel):
 
 
 class SessionContext(PresentationModel):
-    schema_version: Literal["desk-session-v1"] = "desk-session-v1"
+    schema_version: Literal["desk-session-v2"] = "desk-session-v2"
     demo: bool
+    synthetic_sources: bool
+    execution_mode: Literal["DEMO", "PRIVATE_CURRENT"]
+    eligibility: CurrentEligibility | None
 
 
 def _error(code: str, status: int = 400) -> JSONResponse:
@@ -77,6 +81,14 @@ def create_app(
     session_started = 0.0
     login_attempts = 0
     paired = False
+
+    def context() -> SessionContext:
+        return SessionContext(
+            demo=runtime.demo,
+            synthetic_sources=runtime.synthetic_sources,
+            execution_mode="DEMO" if runtime.demo else "PRIVATE_CURRENT",
+            eligibility=runtime.eligibility(),
+        )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -154,6 +166,9 @@ def create_app(
                 return _error("REQUEST_TIMEOUT", 408)
             request._body = b"".join(chunks)
         if request.url.path.startswith("/api/") and request.url.path != "/api/session":
+            if session is not None and elapsed_clock() - session_started >= 3600:
+                runtime.cancel()
+                return _error("SESSION_REQUIRED", 401)
             cookie = request.cookies.get("dmf_session", "")
             if (
                 session is None
@@ -211,17 +226,24 @@ def create_app(
         pairing_code = ""
         session = token_urlsafe(32)
         session_started = elapsed_clock()
-        response = JSONResponse({"status": "PAIRED", "demo": runtime.demo}, headers=_HEADERS)
+        response = JSONResponse(
+            {"status": "PAIRED", **context().model_dump(mode="json")}, headers=_HEADERS
+        )
         response.set_cookie("dmf_session", session, httponly=True, samesite="strict", path="/")
         return response
 
     @app.get("/api/context")
     async def session_context() -> Response:
         return Response(
-            SessionContext(demo=runtime.demo).model_dump_json(),
+            context().model_dump_json(),
             media_type="application/json",
             headers=_HEADERS,
         )
+
+    @app.get("/api/eligibility")
+    async def eligibility() -> Response:
+        value = runtime.eligibility()
+        return JSONResponse(None if value is None else value.model_dump(mode="json"))
 
     @app.post("/api/refresh")
     async def refresh(value: RefreshInput) -> Response:
@@ -268,12 +290,17 @@ def create_app(
         result: dict[str, object] = {
             "real_cohort_status": "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT"
         }
-        if runtime.demo:
+        if runtime.synthetic_sources:
             from dmf_pulse.player_lab.demo import synthetic_evaluation
 
             evaluation = synthetic_evaluation()
             result["synthetic_report"] = evaluation.scorecard.model_dump(mode="json")
             result["synthetic_holdout"] = evaluation.holdout.model_dump(mode="json")
+            from dmf_pulse.player_lab.runner import operational_synthetic_evaluation
+
+            result["operational_report"] = operational_synthetic_evaluation().model_dump(
+                mode="json"
+            )
         return JSONResponse(result)
 
     @app.post("/api/cancel")

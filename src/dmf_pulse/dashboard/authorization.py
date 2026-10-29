@@ -24,7 +24,7 @@ Sha = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 Ref = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$")]
 Provider = Literal["FPL", "ODDS", "OPENFOOTBALL"]
 Classification = Literal["OWNED_SYNTHETIC", "PRIVATE_CURRENT"]
-State = Literal["RIGHTS_APPROVAL_REQUIRED", "BLOCKED", "EXPIRED"]
+State = Literal["RIGHTS_APPROVAL_REQUIRED", "SOURCE_NOT_AVAILABLE", "BLOCKED", "EXPIRED"]
 
 
 class AuthorizationError(ValueError):
@@ -144,6 +144,7 @@ class OperatorRefreshApproval(_Contract):
     quota_max_age_seconds: int = Field(ge=1, le=86400)
     max_acquisition_seconds: int = Field(ge=1, le=900)
     max_run_seconds: int = Field(ge=1, le=900)
+    qualified_deadline_at: datetime | None = None
     daily_request_limit: int = Field(ge=1)
     daily_credit_limit: int = Field(ge=2)
     monthly_request_limit: int = Field(ge=1)
@@ -300,6 +301,11 @@ def _approved_expiry(
             raise AuthorizationError("AUTHORIZATION_SCOPE_MISMATCH")
     if request.horizon not in approval.horizons:
         raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
+    if approval.classification == "PRIVATE_CURRENT" and (
+        approval.qualified_deadline_at is None
+        or request.deadline_at != approval.qualified_deadline_at
+    ):
+        raise AuthorizationError("AUTHORIZATION_DEADLINE_SCOPE_MISMATCH")
     if not issued_at <= request.information_cutoff < request.deadline_at:
         raise AuthorizationError("AUTHORIZATION_DEADLINE_INVALID", "EXPIRED")
     if request.information_cutoff > issued_at + timedelta(seconds=approval.max_acquisition_seconds):
