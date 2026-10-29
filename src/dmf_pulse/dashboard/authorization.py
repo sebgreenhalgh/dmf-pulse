@@ -9,13 +9,14 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable, Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime, timedelta
+from importlib.resources import files
 from pathlib import Path
 from secrets import token_hex
 from typing import Annotated, Any, Literal, Self, cast
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 
@@ -134,6 +135,7 @@ class OperatorRefreshApproval(_Contract):
     source_scopes: tuple[SourceScope, ...]
     plan_quota: QualifiedPlanQuota
     ledger_id: Sha
+    ledger_backend: Literal["OWNED_JSON", "POSTGRES"] = "OWNED_JSON"
     status: Literal["APPROVED_REVIEWED", "REVOKED"]
     usage: Literal["ONE_SHOT", "MANUAL_RECURRING"]
     approved_at: datetime
@@ -148,6 +150,20 @@ class OperatorRefreshApproval(_Contract):
     monthly_credit_limit: int = Field(ge=2)
     safety_reserve_credits: int = Field(ge=0)
     control_metadata_retention_approved: Literal[True]
+
+    @field_validator("control_metadata_retention_approved", mode="before")
+    @classmethod
+    def explicit_control_permission(cls, value: object) -> object:
+        if value is not True:
+            raise ValueError("control metadata permission must be explicit boolean true")
+        return value
+
+    @field_validator("horizons", mode="before")
+    @classmethod
+    def integer_horizons(cls, value: object) -> object:
+        if isinstance(value, tuple) and any(type(item) is not int for item in value):
+            raise ValueError("horizons require exact integers")
+        return value
 
     @model_validator(mode="after")
     def complete_scope(self) -> Self:
@@ -190,11 +206,19 @@ class RefreshRequest(_Contract):
     information_cutoff: datetime
     deadline_at: datetime
 
+    @field_validator("horizon", mode="before")
+    @classmethod
+    def integer_horizon(cls, value: object) -> object:
+        if type(value) is not int:
+            raise ValueError("horizon requires an exact integer")
+        return value
+
 
 class RefreshGrant(_Contract):
     schema_version: Literal["operator-refresh-grant-v1"] = "operator-refresh-grant-v1"
     reservation_id: Sha
     ledger_id: Sha
+    ledger_backend: Literal["OWNED_JSON", "POSTGRES"] = "OWNED_JSON"
     approval_sha256: Sha
     classification: Classification
     request: RefreshRequest
@@ -208,9 +232,43 @@ class RefreshGrant(_Contract):
         return canonical_sha256(self.model_dump(mode="json"))
 
 
-# Enrollment requires a separate reviewed implementation and owner approval.
-# Runtime documents, environment variables and browser requests cannot add rows.
-PRODUCTION_APPROVALS: tuple[OperatorRefreshApproval, ...] = ()
+def production_approvals() -> tuple[OperatorRefreshApproval, ...]:
+    """Load only trusted installed metadata on explicit invocation.
+
+    This exact resource is excluded from the executable content fingerprint to
+    avoid its own expected fingerprint being self-referential. Its byte digest
+    and the complete wheel/Git identities are bound by detached release review.
+    Installation is trusted as it is for executable code; no user path, runtime
+    document, browser value or environment setting can enroll approval rows.
+    """
+    try:
+        body = (
+            files("dmf_pulse.dashboard.resources")
+            .joinpath("production_refresh_enrollments.json")
+            .read_bytes()
+        )
+        if len(body) > 131072:
+            raise ValueError("enrollment resource exceeds bound")
+        value = json.loads(body, object_pairs_hook=_strict_object)
+        if (
+            not isinstance(value, dict)
+            or set(value) != {"schema_version", "approvals"}
+            or value["schema_version"] != "trusted-refresh-enrollments-v1"
+            or not isinstance(value["approvals"], list)
+            or len(value["approvals"]) > 32
+        ):
+            raise ValueError("enrollment resource schema differs")
+        approvals = tuple(
+            OperatorRefreshApproval.model_validate_json(json.dumps(row, allow_nan=False))
+            for row in value["approvals"]
+        )
+        if len({row.authorization_id for row in approvals}) != len(approvals) or any(
+            row.classification != "PRIVATE_CURRENT" for row in approvals
+        ):
+            raise ValueError("enrollment identities or classification differ")
+        return approvals
+    except (OSError, ValueError, TypeError, RecursionError):
+        raise AuthorizationError("TRUSTED_APPROVAL_REGISTRY_INVALID") from None
 
 
 def _now(clock: Callable[[], datetime]) -> datetime:
@@ -218,6 +276,47 @@ def _now(clock: Callable[[], datetime]) -> datetime:
     if value.tzinfo is None or value.utcoffset() is None:
         raise AuthorizationError("AUTHORIZATION_CLOCK_INVALID")
     return value.astimezone(UTC)
+
+
+def _approved_expiry(
+    approval: OperatorRefreshApproval, request: RefreshRequest, issued_at: datetime
+) -> datetime:
+    """One pure authority check shared by issuer, reservation and child worker."""
+    if approval.status != "APPROVED_REVIEWED":
+        raise AuthorizationError("AUTHORIZATION_REVOKED")
+    if not approval.not_before <= issued_at < approval.expires_at:
+        raise AuthorizationError("AUTHORIZATION_EXPIRED", "EXPIRED")
+    for name in (
+        "authorization_id",
+        "implementation_sha",
+        "review_sha256",
+        "operator_ref",
+        "purpose",
+        "season_code",
+        "mode",
+        "source_scopes",
+    ):
+        if getattr(request, name) != getattr(approval, name):
+            raise AuthorizationError("AUTHORIZATION_SCOPE_MISMATCH")
+    if request.horizon not in approval.horizons:
+        raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
+    if not issued_at <= request.information_cutoff < request.deadline_at:
+        raise AuthorizationError("AUTHORIZATION_DEADLINE_INVALID", "EXPIRED")
+    if request.information_cutoff > issued_at + timedelta(seconds=approval.max_acquisition_seconds):
+        raise AuthorizationError("ACQUISITION_WINDOW_EXCEEDED")
+    quota = approval.plan_quota
+    if (
+        not quota.period_started_at <= issued_at < quota.resets_at
+        or not quota.observed_at
+        <= issued_at
+        <= quota.observed_at + timedelta(seconds=approval.quota_max_age_seconds)
+    ):
+        raise AuthorizationError("QUALIFIED_QUOTA_EVIDENCE_STALE")
+    return min(
+        approval.expires_at,
+        request.deadline_at,
+        issued_at + timedelta(seconds=approval.max_run_seconds),
+    )
 
 
 def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
@@ -245,87 +344,31 @@ def _write_new(path: Path, value: dict[str, object]) -> None:
         os.fsync(stream.fileno())
 
 
-class DurableUsageLedger:
-    """Append-only local control records, bound to one enrolled ledger identity.
+class UsageLedger:
+    """Shared authorization policy over authenticated atomic storage hooks.
 
-    Every attempted refresh is reserved permanently, even before transport. A
-    crash leaves an exclusive lock or incomplete record and therefore blocks.
-    Operator/OS tampering with this trusted local control directory is outside
-    the browser threat boundary; hash chains are integrity evidence, not a
-    defence against a privileged operator replacing a complete disk history.
+    Backends authenticate identity, sequence/hash chain and complete event rows
+    before yielding a transaction. Append must be create-only/atomic, preserve
+    the same transaction lock, and durably record the supplied event payload.
+    A storage backend cannot expand approval scope or replace these policies.
     """
 
-    def __init__(self, path: Path, ledger_id: str) -> None:
-        self.path = path.absolute()
+    def __init__(
+        self,
+        ledger_id: str,
+        *,
+        backend: Literal["OWNED_JSON", "POSTGRES"],
+        transaction: Callable[[], AbstractContextManager[list[dict[str, Any]]]],
+        append: Callable[[list[dict[str, Any]], dict[str, object]], None],
+    ) -> None:
+        if len(ledger_id) != 64 or any(ch not in "0123456789abcdef" for ch in ledger_id):
+            raise AuthorizationError("USAGE_LEDGER_IDENTITY_INVALID")
+        if backend not in {"OWNED_JSON", "POSTGRES"}:
+            raise AuthorizationError("USAGE_LEDGER_BACKEND_INVALID")
         self.ledger_id = ledger_id
-
-    @classmethod
-    def create(cls, path: Path) -> DurableUsageLedger:
-        """Explicit setup; never implicitly recreate a missing history."""
-        identity = token_hex(32)
-        try:
-            path.mkdir(parents=False, exist_ok=False)
-            _write_new(
-                path / "identity.json",
-                {"schema_version": "refresh-usage-v1", "ledger_id": identity},
-            )
-        except OSError:
-            raise AuthorizationError("USAGE_LEDGER_INITIALIZATION_FAILED") from None
-        return cls(path, identity)
-
-    @contextmanager
-    def _transaction(self) -> Iterator[list[dict[str, Any]]]:
-        lock = self.path / "lock"
-        acquired = False
-        try:
-            if self.path.is_symlink() or not self.path.is_dir():
-                raise AuthorizationError("USAGE_LEDGER_INVALID")
-            lock.mkdir()
-            acquired = True
-            identity = _read_object(self.path / "identity.json")
-            if identity != {"schema_version": "refresh-usage-v1", "ledger_id": self.ledger_id}:
-                raise AuthorizationError("USAGE_LEDGER_IDENTITY_MISMATCH")
-            entries = sorted(self.path.iterdir(), key=lambda path: path.name)
-            if len(entries) > 100002:
-                raise AuthorizationError("USAGE_LEDGER_CAPACITY_REACHED")
-            records: list[dict[str, Any]] = []
-            previous = "0" * 64
-            for entry in entries:
-                if entry.name in {"identity.json", "lock"}:
-                    continue
-                if entry.name != f"{len(records):010d}.json":
-                    raise AuthorizationError("USAGE_LEDGER_INVALID")
-                record = _read_object(entry)
-                digest = record.pop("sha256", None)
-                if (
-                    record.get("sequence") != len(records)
-                    or record.get("previous_sha256") != previous
-                    or record.get("ledger_id") != self.ledger_id
-                    or canonical_sha256(record) != digest
-                ):
-                    raise AuthorizationError("USAGE_LEDGER_INVALID")
-                record["sha256"] = digest
-                records.append(record)
-                previous = cast(str, digest)
-            yield records
-        except AuthorizationError:
-            raise
-        except (OSError, ValueError, TypeError, KeyError):
-            raise AuthorizationError("USAGE_LEDGER_UNAVAILABLE") from None
-        finally:
-            if acquired:
-                lock.rmdir()
-
-    def _append(self, records: list[dict[str, Any]], payload: dict[str, object]) -> None:
-        record = {
-            **payload,
-            "ledger_id": self.ledger_id,
-            "sequence": len(records),
-            "previous_sha256": records[-1]["sha256"] if records else "0" * 64,
-        }
-        _write_new(
-            self.path / f"{len(records):010d}.json", {**record, "sha256": canonical_sha256(record)}
-        )
+        self.backend_discriminator = backend
+        self._transaction = transaction
+        self._append = append
 
     @staticmethod
     def _clock(records: list[dict[str, Any]], now: datetime) -> None:
@@ -334,15 +377,23 @@ class DurableUsageLedger:
 
     def reserve(self, approval: OperatorRefreshApproval, grant: RefreshGrant) -> None:
         if (
+            approval.classification == "PRIVATE_CURRENT"
+            and self.backend_discriminator != "POSTGRES"
+        ):
+            raise AuthorizationError("PRODUCTION_CONTROL_STORE_NOT_ACCEPTED")
+        expected_expiry = _approved_expiry(approval, grant.request, grant.issued_at)
+        if (
             grant.approval_sha256 != canonical_sha256(approval.model_dump(mode="json"))
             or grant.classification != approval.classification
             or grant.ledger_id != approval.ledger_id
             or grant.ledger_id != self.ledger_id
+            or approval.ledger_backend != self.backend_discriminator
+            or grant.ledger_backend != self.backend_discriminator
             or grant.request.source_scopes != approval.source_scopes
-            or grant.expires_at > approval.expires_at
+            or grant.expires_at != expected_expiry
         ):
             raise AuthorizationError("REFRESH_GRANT_INVALID")
-        if approval.classification == "PRIVATE_CURRENT" and approval not in PRODUCTION_APPROVALS:
+        if approval.classification == "PRIVATE_CURRENT" and approval not in production_approvals():
             raise AuthorizationError("PRODUCTION_APPROVAL_NOT_ENROLLED", "RIGHTS_APPROVAL_REQUIRED")
         with self._transaction() as records:
             self._clock(records, grant.issued_at)
@@ -494,38 +545,30 @@ class DurableUsageLedger:
             raise AuthorizationError("AUTHORIZATION_CLOCK_INVALID")
         if (
             grant.ledger_id != self.ledger_id
+            or grant.ledger_backend != self.backend_discriminator
             or len(worker_id) != 64
             or any(ch not in "0123456789abcdef" for ch in worker_id)
         ):
             raise AuthorizationError("REFRESH_GRANT_INVALID")
+        if grant.classification == "PRIVATE_CURRENT" and self.backend_discriminator != "POSTGRES":
+            raise AuthorizationError("PRODUCTION_CONTROL_STORE_NOT_ACCEPTED")
         if grant.classification == "PRIVATE_CURRENT":
             # Child workers prove code enrollment independently of a parent's
             # launch document or the ability to construct a library object.
             enrolled = [
                 row
-                for row in PRODUCTION_APPROVALS
+                for row in production_approvals()
                 if canonical_sha256(row.model_dump(mode="json")) == grant.approval_sha256
             ]
             if (
                 len(enrolled) != 1
                 or enrolled[0].status != "APPROVED_REVIEWED"
                 or enrolled[0].ledger_id != self.ledger_id
+                or enrolled[0].ledger_backend != self.backend_discriminator
                 or not enrolled[0].not_before <= now < enrolled[0].expires_at
-                or enrolled[0].source_scopes != grant.request.source_scopes
-                or any(
-                    getattr(enrolled[0], name) != getattr(grant.request, name)
-                    for name in (
-                        "authorization_id",
-                        "implementation_sha",
-                        "review_sha256",
-                        "operator_ref",
-                        "purpose",
-                        "season_code",
-                        "mode",
-                    )
-                )
-                or grant.request.horizon not in enrolled[0].horizons
             ):
+                raise AuthorizationError("REFRESH_GRANT_INVALID")
+            if grant.expires_at != _approved_expiry(enrolled[0], grant.request, grant.issued_at):
                 raise AuthorizationError("REFRESH_GRANT_INVALID")
         if not grant.issued_at <= now < grant.expires_at or now >= grant.request.deadline_at:
             raise AuthorizationError("REFRESH_GRANT_EXPIRED", "EXPIRED")
@@ -541,24 +584,112 @@ class DurableUsageLedger:
             raise AuthorizationError("REFRESH_GRANT_NOT_CLAIMED")
 
 
+class DurableUsageLedger(UsageLedger):
+    """Append-only local control records, bound to one enrolled ledger identity.
+
+    Every attempted refresh is reserved permanently, even before transport. A
+    crash leaves an exclusive lock or incomplete record and therefore blocks.
+    Operator/OS tampering with this trusted local control directory is outside
+    the browser threat boundary; hash chains are integrity evidence, not a
+    defence against a privileged operator replacing a complete disk history.
+    """
+
+    def __init__(self, path: Path, ledger_id: str) -> None:
+        self.path = path.absolute()
+        super().__init__(
+            ledger_id,
+            backend="OWNED_JSON",
+            transaction=self._file_transaction,
+            append=self._file_append,
+        )
+
+    @classmethod
+    def create(cls, path: Path) -> DurableUsageLedger:
+        """Explicit setup; never implicitly recreate a missing history."""
+        identity = token_hex(32)
+        try:
+            path.mkdir(parents=False, exist_ok=False)
+            _write_new(
+                path / "identity.json",
+                {"schema_version": "refresh-usage-v1", "ledger_id": identity},
+            )
+        except OSError:
+            raise AuthorizationError("USAGE_LEDGER_INITIALIZATION_FAILED") from None
+        return cls(path, identity)
+
+    @contextmanager
+    def _file_transaction(self) -> Iterator[list[dict[str, Any]]]:
+        lock = self.path / "lock"
+        acquired = False
+        try:
+            if self.path.is_symlink() or not self.path.is_dir():
+                raise AuthorizationError("USAGE_LEDGER_INVALID")
+            lock.mkdir()
+            acquired = True
+            identity = _read_object(self.path / "identity.json")
+            if identity != {"schema_version": "refresh-usage-v1", "ledger_id": self.ledger_id}:
+                raise AuthorizationError("USAGE_LEDGER_IDENTITY_MISMATCH")
+            entries = sorted(self.path.iterdir(), key=lambda path: path.name)
+            if len(entries) > 100002:
+                raise AuthorizationError("USAGE_LEDGER_CAPACITY_REACHED")
+            records: list[dict[str, Any]] = []
+            previous = "0" * 64
+            for entry in entries:
+                if entry.name in {"identity.json", "lock"}:
+                    continue
+                if entry.name != f"{len(records):010d}.json":
+                    raise AuthorizationError("USAGE_LEDGER_INVALID")
+                record = _read_object(entry)
+                digest = record.pop("sha256", None)
+                if (
+                    record.get("sequence") != len(records)
+                    or record.get("previous_sha256") != previous
+                    or record.get("ledger_id") != self.ledger_id
+                    or canonical_sha256(record) != digest
+                ):
+                    raise AuthorizationError("USAGE_LEDGER_INVALID")
+                record["sha256"] = digest
+                records.append(record)
+                previous = cast(str, digest)
+            yield records
+        except AuthorizationError:
+            raise
+        except (OSError, ValueError, TypeError, KeyError, RecursionError):
+            raise AuthorizationError("USAGE_LEDGER_UNAVAILABLE") from None
+        finally:
+            if acquired:
+                lock.rmdir()
+
+    def _file_append(self, records: list[dict[str, Any]], payload: dict[str, object]) -> None:
+        record = {
+            **payload,
+            "ledger_id": self.ledger_id,
+            "sequence": len(records),
+            "previous_sha256": records[-1]["sha256"] if records else "0" * 64,
+        }
+        _write_new(
+            self.path / f"{len(records):010d}.json", {**record, "sha256": canonical_sha256(record)}
+        )
+
+
 class RefreshAuthorizer:
     """Resolve trusted code enrollment, then reserve before worker creation."""
 
     def __init__(
         self,
-        ledger: DurableUsageLedger | None = None,
+        ledger: UsageLedger | None = None,
         *,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._ledger = ledger
         self._clock = clock
-        self._approvals = PRODUCTION_APPROVALS
+        self._approvals: tuple[OperatorRefreshApproval, ...] | None = None
 
     @classmethod
     def for_owned_sources(
         cls,
         approval: OperatorRefreshApproval,
-        ledger: DurableUsageLedger,
+        ledger: UsageLedger,
         *,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> RefreshAuthorizer:
@@ -569,58 +700,30 @@ class RefreshAuthorizer:
         return value
 
     def authorize(self, request: RefreshRequest) -> RefreshGrant:
-        approvals = [
-            row for row in self._approvals if row.authorization_id == request.authorization_id
-        ]
+        registry = self._approvals if self._approvals is not None else production_approvals()
+        approvals = [row for row in registry if row.authorization_id == request.authorization_id]
         if len(approvals) != 1:
             raise AuthorizationError(
                 "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED", "RIGHTS_APPROVAL_REQUIRED"
             )
         approval = approvals[0]
         now = _now(self._clock)
-        if approval.status != "APPROVED_REVIEWED":
-            raise AuthorizationError("AUTHORIZATION_REVOKED")
-        if not approval.not_before <= now < approval.expires_at:
-            raise AuthorizationError("AUTHORIZATION_EXPIRED", "EXPIRED")
-        for name in (
-            "implementation_sha",
-            "review_sha256",
-            "operator_ref",
-            "purpose",
-            "season_code",
-            "mode",
-            "source_scopes",
-        ):
-            if getattr(request, name) != getattr(approval, name):
-                raise AuthorizationError("AUTHORIZATION_SCOPE_MISMATCH")
-        if request.horizon not in approval.horizons:
-            raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
-        if not now <= request.information_cutoff < request.deadline_at:
-            raise AuthorizationError("AUTHORIZATION_DEADLINE_INVALID", "EXPIRED")
-        if request.information_cutoff > now + timedelta(seconds=approval.max_acquisition_seconds):
-            raise AuthorizationError("ACQUISITION_WINDOW_EXCEEDED")
-        quota = approval.plan_quota
+        expires_at = _approved_expiry(approval, request, now)
         if (
-            not quota.period_started_at <= now < quota.resets_at
-            or not quota.observed_at
-            <= now
-            <= quota.observed_at + timedelta(seconds=approval.quota_max_age_seconds)
+            self._ledger is None
+            or approval.ledger_id != self._ledger.ledger_id
+            or approval.ledger_backend != self._ledger.backend_discriminator
         ):
-            raise AuthorizationError("QUALIFIED_QUOTA_EVIDENCE_STALE")
-        if self._ledger is None or approval.ledger_id != self._ledger.ledger_id:
             raise AuthorizationError("USAGE_LEDGER_REQUIRED")
         grant = RefreshGrant(
             reservation_id=token_hex(32),
             ledger_id=self._ledger.ledger_id,
+            ledger_backend=self._ledger.backend_discriminator,
             approval_sha256=canonical_sha256(approval.model_dump(mode="json")),
             classification=approval.classification,
             request=request,
             issued_at=now,
-            expires_at=min(
-                approval.expires_at,
-                request.deadline_at,
-                now + timedelta(seconds=approval.max_run_seconds),
-            ),
+            expires_at=expires_at,
         )
         self._ledger.reserve(approval, grant)
         return grant

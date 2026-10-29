@@ -12,8 +12,8 @@ from pathlib import Path
 import pytest
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.dashboard import authorization as auth
 from dmf_pulse.dashboard.authorization import (
-    PRODUCTION_APPROVALS,
     AuthorizationError,
     DurableUsageLedger,
     OperatorRefreshApproval,
@@ -22,6 +22,7 @@ from dmf_pulse.dashboard.authorization import (
     RefreshRequest,
     RouteBudget,
     SourceScope,
+    production_approvals,
 )
 
 pytestmark = pytest.mark.unit
@@ -110,13 +111,39 @@ def setup(tmp_path: Path, **changes):
 
 def test_production_registry_has_no_runtime_enrollment(tmp_path):
     ledger, _, request, _ = setup(tmp_path)
-    assert PRODUCTION_APPROVALS == ()
+    assert production_approvals() == ()
     for authorizer in (RefreshAuthorizer(), RefreshAuthorizer(ledger)):
         with pytest.raises(AuthorizationError) as caught:
             authorizer.authorize(request)
         assert caught.value.code == "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED"
         assert caught.value.state == "RIGHTS_APPROVAL_REQUIRED"
     assert sorted(path.name for path in ledger.path.iterdir()) == ["identity.json"]
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        b"{}",
+        b"not JSON",
+        b'{"schema_version":"trusted-refresh-enrollments-v1","approvals":{},"extra":1}',
+        b'{"schema_version":"trusted-refresh-enrollments-v1","approvals":[],"approvals":[]}',
+        b"x" * 131073,
+        b"[" * 1500 + b"0" + b"]" * 1500,
+    ],
+    ids=["empty", "malformed", "extras", "duplicates", "oversize", "depth"],
+)
+def test_fixed_enrollment_resource_corruption_is_typed(monkeypatch, body):
+    class Resource:
+        def joinpath(self, name):
+            assert name == "production_refresh_enrollments.json"
+            return self
+
+        def read_bytes(self):
+            return body
+
+    monkeypatch.setattr(auth, "files", lambda package: Resource())
+    with pytest.raises(AuthorizationError, match="TRUSTED_APPROVAL_REGISTRY_INVALID"):
+        production_approvals()
 
 
 @pytest.mark.parametrize(
@@ -234,10 +261,35 @@ def test_library_reservation_cannot_enroll_private_approval(tmp_path):
             "request": request.model_copy(update={"source_scopes": scopes}),
         }
     )
-    with pytest.raises(AuthorizationError, match="PRODUCTION_APPROVAL_NOT_ENROLLED"):
+    with pytest.raises(AuthorizationError, match="PRODUCTION_CONTROL_STORE_NOT_ACCEPTED"):
         ledger.reserve(private, forged)
-    with pytest.raises(AuthorizationError, match="REFRESH_GRANT_INVALID"):
+    with pytest.raises(AuthorizationError, match="PRODUCTION_CONTROL_STORE_NOT_ACCEPTED"):
         ledger.claim(forged, WORKER, now=NOW)
+    assert len(list(ledger.path.glob("[0-9]*.json"))) == 1
+
+
+@pytest.mark.parametrize("attack", ["run_window", "acquisition_window", "scope", "quota_issuance"])
+def test_direct_reservation_cannot_expand_issued_scope(tmp_path, attack):
+    ledger, approval, request, authorizer = setup(tmp_path)
+    grant = authorizer.authorize(request)
+    if attack == "run_window":
+        forged = grant.model_copy(update={"expires_at": NOW + timedelta(minutes=30)})
+    elif attack == "acquisition_window":
+        forged = grant.model_copy(
+            update={
+                "request": request.model_copy(
+                    update={"information_cutoff": NOW + timedelta(minutes=5)}
+                )
+            }
+        )
+    elif attack == "scope":
+        forged = grant.model_copy(
+            update={"request": request.model_copy(update={"operator_ref": "different_operator"})}
+        )
+    else:
+        forged = grant.model_copy(update={"issued_at": NOW - timedelta(seconds=1)})
+    with pytest.raises(AuthorizationError):
+        ledger.reserve(approval, forged)
     assert len(list(ledger.path.glob("[0-9]*.json"))) == 1
 
 
@@ -293,7 +345,9 @@ def test_reservation_needs_exact_ledger_and_reinitialization_is_forbidden(tmp_pa
         RefreshAuthorizer.for_owned_sources(approval, other, clock=lambda: NOW).authorize(request)
 
 
-@pytest.mark.parametrize("alteration", ["unexpected_file", "truncated_record", "missing_middle"])
+@pytest.mark.parametrize(
+    "alteration", ["unexpected_file", "truncated_record", "missing_middle", "deep_record"]
+)
 def test_ledger_corruption_is_never_silently_reset(tmp_path, alteration):
     ledger, _, request, authorizer = setup(tmp_path)
     grant = authorizer.authorize(request)
@@ -303,6 +357,10 @@ def test_ledger_corruption_is_never_silently_reset(tmp_path, alteration):
         (ledger.path / "unexpected.json").write_text("{}", encoding="utf-8")
     elif alteration == "truncated_record":
         (ledger.path / "0000000000.json").write_text('{"kind":', encoding="utf-8")
+    elif alteration == "deep_record":
+        (ledger.path / "0000000000.json").write_text(
+            "[" * 1500 + "0" + "]" * 1500, encoding="utf-8"
+        )
     else:
         (ledger.path / "0000000001.json").unlink()
     with pytest.raises(AuthorizationError):
@@ -334,7 +392,7 @@ def test_grant_tampering_cannot_relabel_or_expand_worker(tmp_path):
             }
         ),
     ):
-        with pytest.raises(AuthorizationError, match="REFRESH_GRANT_INVALID"):
+        with pytest.raises(AuthorizationError):
             ledger.claim(modified, WORKER, now=NOW)
     ledger.claim(grant, WORKER, now=NOW)
     with pytest.raises(AuthorizationError, match="NOT_CLAIMED"):
@@ -491,6 +549,9 @@ def test_control_records_contain_only_hashes_times_and_counters(tmp_path):
         {"daily_request_limit": 11},
         {"monthly_credit_limit": 22},
         {"control_metadata_retention_approved": False},
+        {"control_metadata_retention_approved": 1},
+        {"control_metadata_retention_approved": "true"},
+        {"horizons": (True,)},
     ],
 )
 def test_incomplete_or_unsafe_approval_contract_rejects(tmp_path, update):

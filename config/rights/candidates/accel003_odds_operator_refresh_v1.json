@@ -50,6 +50,7 @@
   "human_approval_evidence_sha256": null,
   "source_profile_bindings": null,
   "durable_control_ledger_identity": null,
+  "required_canonical_control_backend": "POSTGRES",
   "control_metadata_retention_approval": null,
   "capabilities": {
     "user_initiated_transient_private_recommendation": "PROPOSED_ONLY",

@@ -1,11 +1,24 @@
 # ACCEL-003 market authorization candidate
 
-The production approval registry is empty. This programme enrolls no account,
+The fixed packaged production approval registry is empty. This programme enrolls no account,
 approves no recurring acquisition and authorizes no live pilot. The new proposed
 JSON is deliberately incompatible with an approved runtime contract: unresolved
 account, plan, budget, identity and approval fields are null and its status is
 `PROPOSED_INACTIVE`. Runtime JSON, environment variables and browser payloads
-cannot enroll production approvals.
+cannot enroll production approvals. `production_approvals()` reads only
+`dashboard/resources/production_refresh_enrollments.json` on explicit invocation;
+it exposes no path or environment override. Its schema, size, unique identities,
+strict approval contracts and private classification are checked fail closed.
+
+The executable content fingerprint excludes only that exact enrollment metadata
+resource, preserving all authorization code and all other resources. Otherwise an
+enrollment row containing its expected implementation identity would hash itself.
+Trusted installation authenticates packaged metadata as it does packaged code;
+this assumes the installed wheel/package has passed release review. Detached
+release/pilot evidence must bind the final Git SHA, complete wheel SHA,
+implementation content fingerprint and enrollment-resource byte digest together.
+The wheel and Git hashes cannot be embedded inside their own bytes. The grant
+independently binds the exact canonical enrollment row and source-profile hashes.
 
 The public [terms](https://the-odds-api.com/terms-and-conditions.html), updated
 31 August 2026, support this vendor-level use case. The account, plan, project
@@ -48,7 +61,16 @@ source is `REPOSITORY_OWNED_SYNTHETIC`. Such a grant is never real execution
 authority: the worker must require injected owned transports and forbid default
 real transports for that classification.
 
-`DurableUsageLedger.create(path)` is explicit first-time setup and generates a
+`UsageLedger` holds the shared scope, issuance, grant, consumption and budget
+policies. Its transaction/append hooks require atomic durable storage and fully
+authenticated event rows. The canonical production backend is PostgreSQL under
+accepted ADR-DATA-002. Approval and grant both bind their exact `ledger_backend`
+and ledger identity. A storage adapter cannot broaden the shared policy.
+
+`DurableUsageLedger` is an **owned-synthetic JSON engineering backend** and
+unconditionally refuses `PRIVATE_CURRENT`; a source/owner approval cannot make
+it canonical production control state. `DurableUsageLedger.create(path)` is
+explicit first-time setup and generates a
 new identity; it never recreates an existing or missing history automatically.
 An enrolled approval is bound to that identity. Reservations use exclusive
 locking, create-only hash-chained records and file flush/fsync. Cross-process
@@ -77,7 +99,9 @@ corruption and grant modification, but do not defend against a privileged
 operator deliberately replacing an entire disk history. Recovery requires a
 separate reviewed reconciliation and owner action, never a reset button.
 
-Before a real profile can be enrolled, the owner checklist must resolve all
+Before a real profile can be enrolled, a qualified canonical PostgreSQL control
+backend and the independently reviewed full worker path must be in place. The
+owner checklist must resolve all
 null proposal fields, verify exact plan allocation and other account use, set
 explicit daily/monthly caps and quota freshness, approve the control ledger and
 its custody/recovery, bind final reviewed code and source profiles, set expiry,
