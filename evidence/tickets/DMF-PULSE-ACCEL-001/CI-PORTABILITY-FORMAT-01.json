@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "-m",
+    "ruff",
+    "format",
+    "--check",
+    "."
+  ],
+  "started_at": "2026-10-29T00:38:05.589382+00:00",
+  "elapsed_seconds": 0.52809120004531,
+  "exit_code": 0,
+  "output_file": "CI-PORTABILITY-FORMAT-01.log",
+  "output_byte_sha256": "746fb9e725ed31e3a1e1719a7ce6a56df95c9cfa1f948b6120ee8a12deea1ea6"
+}

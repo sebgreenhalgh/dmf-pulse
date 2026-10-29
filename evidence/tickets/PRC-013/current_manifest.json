@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 203197,
+      "bytes": 203668,
       "path": "PLANS.md",
-      "sha256": "f2550c1ba8036ee0828233e2005d02f14f4e40bb508dfe1a867d824bcbb8dd42"
+      "sha256": "5743e45121577dca3c33b2ca3a36feae60e17b71469d6b28dadb10a5d8372521"
     },
     {
       "bytes": 2761,
@@ -6496,9 +6496,9 @@
       "sha256": "8961d969f4cff9f3289e35a66400a9ac1da2a009e262156374cb545fc091b7bd"
     },
     {
-      "bytes": 33036,
+      "bytes": 33298,
       "path": "tests/unit/ingestion/test_fpl_current_input.py",
-      "sha256": "36f864a1dadb28923273ad18b38aec7dfe9642cd23ace5b37db6b941daab3ca2"
+      "sha256": "4a88c483e895841269694a1e2ca1832abf21b8d6a74ac8a3c016e3a8cc171759"
     },
     {
       "bytes": 11428,
@@ -7701,9 +7701,9 @@
       "sha256": "b79d7eb388a942f427478a6859b748468394978be5d8a00fc6019fc4678104c4"
     },
     {
-      "bytes": 3462,
+      "bytes": 3989,
       "path": "tickets/DMF-PULSE-ACCEL-001/CONTRACT.md",
-      "sha256": "c0a00b82244177dfc87797652021ff6e6116b3c404b70e4c480a330ad37a8a59"
+      "sha256": "a4ac861489214bd384792f32c264d4dffa5e7d521b8efc707e174a034d5b30a3"
     },
     {
       "bytes": 5637,

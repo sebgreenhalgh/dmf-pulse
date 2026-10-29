@@ -46,6 +46,14 @@ Every checkpoint records parent/child hashes, changed paths, commands and review
 Ordinary fast-forward publication only. Final exact SHA must pass all unchanged
 twenty CI jobs and coverage gates; human acceptance stays separate.
 
+Release portability addendum: inherited current-input hard-link identity testing
+must create the source copy and its real hard link within the same temporary
+filesystem. Hosted CI can mount the checkout and temporary directory on separate
+devices. This permits a focused fixture correction in
+tests/unit/ingestion/test_fpl_current_input.py, preserving real inode alias checks,
+all source-admission assertions and the unchanged zero-skips CI gate. No runtime
+FPL ingestion, rights, provider or acquisition behavior may change.
+
 CP0 independent review addendum: G06 is also a valid publication P1. C includes
 the legacy live-transient service/CLI with injected clock and the same typed receipt;
 pure synthetic run/replay remains clock-free. G07 reporting parity will be delivered

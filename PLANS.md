@@ -2823,3 +2823,10 @@ A02/A03 remain consumed; the A03 metadata gate says nothing about final-result a
 - [ ] Release full unchanged gates, protected evidence audit, exact-SHA CI, publication and capped handoff.
 
 No provider access, actual P01 score, A04 authority, promotion or activation. New worktrees preserve dirty Availability work.
+
+Standalone AB CI 40788607213 passed all 686 tests in its final shard but its
+hard-link fixture skipped on a cross-device checkout/tmp layout. The required
+zero-skips gate rejected it. Both isolated branches now create the source copy
+and real hard link on one temporary filesystem, preserving inode identity and
+every admission assertion. Each branch passes all 66 current-input tests with
+zero network attempts; independent portability review and fresh full CI follow.

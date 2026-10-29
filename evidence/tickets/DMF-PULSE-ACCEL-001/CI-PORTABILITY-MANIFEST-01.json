@@ -1,0 +1,11 @@
+{
+  "command": [
+    ".venv/Scripts/python.exe",
+    "evidence/tickets/DMF-PULSE-ACCEL-001/verify_index_manifest.py"
+  ],
+  "started_at": "2026-10-29T00:39:09.547763+00:00",
+  "elapsed_seconds": 0.7595303999260068,
+  "exit_code": 0,
+  "output_file": "CI-PORTABILITY-MANIFEST-01.log",
+  "output_byte_sha256": "8a37b6bd45291d6bdadad3bf23e846522d8d0101d6cfc723a99f26c4d7dc3d0a"
+}
