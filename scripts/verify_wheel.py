@@ -68,6 +68,108 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _archive_accel003_parity(
+    controls: Path,
+    wheel_sha256: str,
+    *,
+    repository_root: Path,
+    acceptance: dict[str, object] | None = None,
+) -> list[dict[str, object]]:
+    """Preserve bounded raw comparisons even when the installed child fails."""
+    if re.fullmatch(r"[0-9a-f]{64}", wheel_sha256) is None:
+        raise VerificationError("installed ACCEL003 archive wheel identity is invalid")
+    limit = 2 * 1024 * 1024
+    directory = repository_root / "review_pack" / f"accel003-installed-parity-{wheel_sha256[:16]}"
+    artifacts: list[dict[str, object]] = []
+    bodies: dict[int, bytes] = {}
+    try:
+        for horizon in (1, 3):
+            source = controls / f"parity-{horizon}.json"
+            if not source.exists():
+                # A forced process timeout can prevent the probe's own finally
+                # from moving its completed comparisons out of the owned run.
+                candidates = []
+                for run in controls.glob("owned-runs-*"):
+                    nested = run / source.name
+                    if nested.exists():
+                        candidates.append(nested)
+                        if len(candidates) > 1:
+                            raise VerificationError("installed ACCEL003 parity source is ambiguous")
+                if not candidates:
+                    continue
+                source = candidates[0]
+            if (
+                source.is_symlink()
+                or not source.is_file()
+                or not source.resolve().is_relative_to(controls.resolve())
+            ):
+                raise VerificationError("installed ACCEL003 parity source is not a regular file")
+            with source.open("rb") as handle:
+                body = handle.read(limit + 1)
+            if not body or len(body) > limit:
+                raise VerificationError(
+                    "installed ACCEL003 parity inventory exceeds its size bound"
+                )
+            digest = hashlib.sha256(body).hexdigest()
+            directory.mkdir(parents=True, exist_ok=True)
+            if not directory.resolve().is_relative_to(repository_root.resolve()):
+                raise VerificationError("installed ACCEL003 parity archive escaped repository")
+            destination = directory / f"parity-{horizon}-{digest}.json"
+            try:
+                with destination.open("xb") as handle:
+                    handle.write(body)
+            except FileExistsError:
+                if destination.is_symlink() or not destination.is_file():
+                    raise VerificationError(
+                        "installed ACCEL003 parity archive is not a regular file"
+                    ) from None
+                with destination.open("rb") as handle:
+                    retained = handle.read(limit + 1)
+                if retained != body:
+                    raise VerificationError(
+                        "installed ACCEL003 immutable parity archive conflicts"
+                    ) from None
+            artifacts.append(
+                {
+                    "horizon": horizon,
+                    "path": destination.relative_to(repository_root).as_posix(),
+                    "bytes": len(body),
+                    "sha256": digest,
+                    "wheel_sha256": wheel_sha256,
+                }
+            )
+            bodies[horizon] = body
+        if acceptance is not None:
+            if set(bodies) != {1, 3}:
+                raise VerificationError("installed ACCEL003 successful parity inventory is missing")
+            cases = acceptance["cases"]
+            if not isinstance(cases, list):
+                raise VerificationError("installed ACCEL003 parity case inventory is invalid")
+            for case in cases:
+                inventory = json.loads(bodies[case["horizon"]])
+                if (
+                    not isinstance(inventory, dict)
+                    or set(inventory)
+                    != {"checked_fields", "numeric_fields", "excluded", "mismatches"}
+                    or inventory["mismatches"] != []
+                    or not isinstance(inventory["excluded"], list)
+                    or type(inventory["checked_fields"]) is not int
+                    or type(inventory["numeric_fields"]) is not int
+                    or not 0 < inventory["numeric_fields"] <= inventory["checked_fields"]
+                    or inventory["checked_fields"] != case["checked_fields"]
+                    or inventory["numeric_fields"] != case["numeric_fields"]
+                    or len(inventory["excluded"]) != case["custody_exclusion_count"]
+                    or hashlib.sha256(bodies[case["horizon"]]).hexdigest()
+                    != case["custody_inventory_sha256"]
+                ):
+                    raise VerificationError(
+                        "installed ACCEL003 retained parity inventory is inconsistent"
+                    )
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError, RecursionError) as exc:
+        raise VerificationError("installed ACCEL003 parity archival failed") from exc
+    return artifacts
+
+
 def _require_accel003_acceptance(value: object) -> dict[str, object]:
     """Reject partial or synthetic-unit-only claims from the installed process probe."""
     if not isinstance(value, dict) or any(
@@ -686,23 +788,32 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
 
         current_probe = temporary_path / "accel003_wheel_probe.py"
         shutil.copyfile(REPOSITORY_ROOT / "scripts/accel003_wheel_probe.py", current_probe)
-        current_result = _run(
-            [
-                str(environment_python),
-                "-I",
-                str(current_probe),
-                "--control-root",
-                str(temporary_path / "accel003-owned-controls"),
-            ],
-            cwd=temporary_path,
-            step="installed ACCEL003 paired ASGI current process, numerical parity and operational CLI",
-            timeout_seconds=900,
-            environment=clean_environment,
-        )
+        current_controls = temporary_path / "accel003-owned-controls"
+        current_acceptance = None
         try:
+            current_result = _run(
+                [
+                    str(environment_python),
+                    "-I",
+                    str(current_probe),
+                    "--control-root",
+                    str(current_controls),
+                ],
+                cwd=temporary_path,
+                step="installed ACCEL003 paired ASGI current process, numerical parity and operational CLI",
+                timeout_seconds=900,
+                environment=clean_environment,
+            )
             current_acceptance = _require_accel003_acceptance(json.loads(current_result.stdout))
         except json.JSONDecodeError as exc:
             raise VerificationError("installed ACCEL003 probe did not emit safe JSON") from exc
+        finally:
+            current_parity_artifacts = _archive_accel003_parity(
+                current_controls,
+                _sha256(wheel),
+                repository_root=REPOSITORY_ROOT,
+                acceptance=current_acceptance,
+            )
 
         distributions_result = _run(
             [
@@ -752,6 +863,7 @@ def verify_wheel(*, report_path: Path = DEFAULT_REPORT) -> dict[str, object]:
             "installed_zoneinfo_fallback": True,
             "installed_sebs_desk": desk_acceptance,
             "installed_accel003_current_mode": current_acceptance,
+            "installed_accel003_parity_artifacts": current_parity_artifacts,
             "installed_dashboard_option_parser": desk_parser,
             "platform": {
                 "architecture": platform.machine(),

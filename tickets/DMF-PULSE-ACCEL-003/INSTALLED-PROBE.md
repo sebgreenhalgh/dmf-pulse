@@ -64,3 +64,16 @@ Full per-pointer parity inventories, including both custody values, are retained
 beside that receipt. This wheel predates the final parent current-result envelope
 binding change. Final acceptance is determined by the literal installed-wheel
 gate on the integrated product source, not this development receipt.
+
+The final verifier archives only raw `parity-1.json`/`parity-3.json`, capped at
+2 MiB each, before temporary cleanup, including failed runs. A forced timeout can
+recover a completed comparison from exactly one interrupted `owned-runs-*`
+directory. Ambiguity fails closed. Artifacts use exclusive creation and full
+content SHA256 filenames under ignored
+`review_pack/accel003-installed-parity-<wheel-SHA-prefix>/`; existing conflicting
+bytes cannot be overwritten. Successful reports bind both raw artifact digests,
+sizes, paths, numerical counts and exclusion counts to the worker receipt and
+require zero retained mismatches. Failure receipts may retain malformed or
+partial raw comparisons without asserting successful parity. The first archive
+test attempt hit pytest/Windows setup limits because a 2 MiB parameter received
+an automatic test ID; explicit short IDs resolved that test-harness failure.
