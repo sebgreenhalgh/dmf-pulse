@@ -16,7 +16,7 @@ value is read, copied, decoded, stored or used.
   separate new-purpose approval preparation; fresh FPL v2 blind setup.
 - [x] CP2 implement private reviewed enrollment/wheel assembly/install and
   canonical control workflow using the existing registry/authorizer/worker.
-- [ ] CP3 implement the narrow nongenerative canonical P01 controller, proposed
+- [x] CP3 implement the narrow nongenerative canonical P01 controller, proposed
   owner code-binding decision and cold literal-oracle compatibility proof.
 - [ ] CP4 implement approved locator onboarding and qualified player custody,
   point-only/full-distribution adapters, protocol/coverage/holdout integration.

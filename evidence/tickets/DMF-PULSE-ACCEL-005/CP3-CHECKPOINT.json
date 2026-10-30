@@ -1,0 +1,22 @@
+{
+  "actual_p01_hypothetical_labels_used": false,
+  "actual_p01_metric_values_computed": 0,
+  "exact_literal_oracle_values": 147,
+  "final_whole_package_proposal": "REGENERATE_AFTER_FINAL_PACKAGE_EDITS",
+  "fit_draw_refreeze_calls": 0,
+  "full_release_acceptance": "CP6_PENDING",
+  "implementation_state": "NONGENERATIVE_CONTROLLER_COMPLETE_SCOPED_REVIEW_CLEAR",
+  "independent_cli_cases": 3,
+  "independent_owned_cases": 51,
+  "normal_targeted_tests": 22,
+  "normal_vault_reads": 0,
+  "original_authentication_only": true,
+  "original_forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "original_forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "owner_code_binding": "PROPOSED_UNACCEPTED",
+  "parent": "69b1d5871fdc5c3ad6366b2a0b95fed678a1f717",
+  "provider_requests": 0,
+  "qualified_outcomes_installed": 0,
+  "schema_version": "accel005-cp3-checkpoint-v1",
+  "sealed_at": "2026-10-30T18:36:49.723535+00:00"
+}

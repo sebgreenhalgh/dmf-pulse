@@ -1,0 +1,129 @@
+................FFF...                                                   [100%]
+================================== FAILURES ===================================
+_________ test_writer_reauthenticates_before_creating_artifact[hash] __________
+
+tmp_path = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/pytest-of-unknown/pytest-22/test_writer_reauthenticates_be0')
+attack = 'hash'
+
+    @pytest.mark.parametrize("attack", ["hash", "state", "empty_closure"])
+    def test_writer_reauthenticates_before_creating_artifact(tmp_path, attack):
+        proposal = c.propose_canonical_binding()
+        if attack == "hash":
+>           proposal = proposal.model_copy(update={"semantic_sha256": "0" * 64})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\unit\evaluation\test_p01_canonical.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = CanonicalCodeBinding(semantic_sha256='ea657be7f7292790860d6a788c30bec11d336c64b47d6870686445334f0c5f32', schema_versio...on='DESCRIPTIVE_TEN_FIXTURES_NO_TUNING_NO_PROMOTION', acquisition_authorized=False, fallback_attempts_authorized=False)
+update = {'semantic_sha256': '0000000000000000000000000000000000000000000000000000000000000000'}
+
+    def model_copy(
+        self,
+        *,
+        update: Mapping[str, Any] | None = None,
+        deep: bool = False,
+    ) -> Self:
+        del deep
+        payload = self.model_dump(mode="python")
+        payload.update(update or {})
+>       return type(self).model_validate(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for CanonicalCodeBinding
+E         Value error, evidence semantic hash mismatch [type=value_error, input_value={'semantic_sha256': '0000...mpts_authorized': False}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/value_error
+
+src\dmf_pulse\ingestion\openfootball\team_strength_data.py:77: ValidationError
+_________ test_writer_reauthenticates_before_creating_artifact[state] _________
+
+tmp_path = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/pytest-of-unknown/pytest-22/test_writer_reauthenticates_be1')
+attack = 'state'
+
+    @pytest.mark.parametrize("attack", ["hash", "state", "empty_closure"])
+    def test_writer_reauthenticates_before_creating_artifact(tmp_path, attack):
+        proposal = c.propose_canonical_binding()
+        if attack == "hash":
+            proposal = proposal.model_copy(update={"semantic_sha256": "0" * 64})
+        elif attack == "state":
+>           proposal = proposal.model_copy(update={"state": "ACCEPTED"})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\unit\evaluation\test_p01_canonical.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = CanonicalCodeBinding(semantic_sha256='ea657be7f7292790860d6a788c30bec11d336c64b47d6870686445334f0c5f32', schema_versio...on='DESCRIPTIVE_TEN_FIXTURES_NO_TUNING_NO_PROMOTION', acquisition_authorized=False, fallback_attempts_authorized=False)
+update = {'state': 'ACCEPTED'}
+
+    def model_copy(
+        self,
+        *,
+        update: Mapping[str, Any] | None = None,
+        deep: bool = False,
+    ) -> Self:
+        del deep
+        payload = self.model_dump(mode="python")
+        payload.update(update or {})
+>       return type(self).model_validate(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for CanonicalCodeBinding
+E       state
+E         Input should be 'PROPOSED_UNACCEPTED' [type=literal_error, input_value='ACCEPTED', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/literal_error
+
+src\dmf_pulse\ingestion\openfootball\team_strength_data.py:77: ValidationError
+_____ test_writer_reauthenticates_before_creating_artifact[empty_closure] _____
+
+tmp_path = WindowsPath('C:/Users/sebgr/AppData/Local/Temp/pytest-of-unknown/pytest-22/test_writer_reauthenticates_be2')
+attack = 'empty_closure'
+
+    @pytest.mark.parametrize("attack", ["hash", "state", "empty_closure"])
+    def test_writer_reauthenticates_before_creating_artifact(tmp_path, attack):
+        proposal = c.propose_canonical_binding()
+        if attack == "hash":
+            proposal = proposal.model_copy(update={"semantic_sha256": "0" * 64})
+        elif attack == "state":
+            proposal = proposal.model_copy(update={"state": "ACCEPTED"})
+        else:
+>           proposal = proposal.model_copy(update={"components": ()})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\unit\evaluation\test_p01_canonical.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = CanonicalCodeBinding(semantic_sha256='ea657be7f7292790860d6a788c30bec11d336c64b47d6870686445334f0c5f32', schema_versio...on='DESCRIPTIVE_TEN_FIXTURES_NO_TUNING_NO_PROMOTION', acquisition_authorized=False, fallback_attempts_authorized=False)
+update = {'components': ()}
+
+    def model_copy(
+        self,
+        *,
+        update: Mapping[str, Any] | None = None,
+        deep: bool = False,
+    ) -> Self:
+        del deep
+        payload = self.model_dump(mode="python")
+        payload.update(update or {})
+>       return type(self).model_validate(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for CanonicalCodeBinding
+E       components
+E         Tuple should have at least 6 items after validation, not 0 [type=too_short, input_value=(), input_type=tuple]
+E           For further information visit https://errors.pydantic.dev/2.13/v/too_short
+
+src\dmf_pulse\ingestion\openfootball\team_strength_data.py:77: ValidationError
+============================== warnings summary ===============================
+tests/unit/evaluation/test_p01_canonical.py: 14 warnings
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-005\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `SourceResource` - serialized value may not be as expected [field_name='resource', input_value={'repository': 'openfootb...e6c5408593a6ae2af39673'}, input_type=dict])
+    return self.__pydantic_serializer__.to_python(
+
+tests/unit/evaluation/test_p01_canonical.py::test_all_ten_owned_admission_fails_closed[string]
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-005\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `int` - serialized value may not be as expected [field_name='home_goals', input_value='2', input_type=str])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/unit/evaluation/test_p01_canonical.py::test_writer_reauthenticates_before_creating_artifact[hash]
+FAILED tests/unit/evaluation/test_p01_canonical.py::test_writer_reauthenticates_before_creating_artifact[state]
+FAILED tests/unit/evaluation/test_p01_canonical.py::test_writer_reauthenticates_before_creating_artifact[empty_closure]
+3 failed, 19 passed, 15 warnings in 37.12s

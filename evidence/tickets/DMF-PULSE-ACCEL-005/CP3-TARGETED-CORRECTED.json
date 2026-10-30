@@ -1,0 +1,20 @@
+{
+  "actual_provider_calls": 0,
+  "actual_vault_calls": 0,
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/unit/evaluation/test_p01_canonical.py",
+    "-q",
+    "--tb=short"
+  ],
+  "completed_at": "2026-10-30T17:59:21.875829+00:00",
+  "cwd": "DEDICATED_WAVE005_WORKTREE",
+  "environment": "CLOSED_NONSECRET_TEST_WHITELIST",
+  "exit_code": 0,
+  "helper_sha256": "c19b572ff52a21924ca192c270e9b6e77030a07be6b63efc58cc1f933f4f74f7",
+  "log_sha256": "47cf8bf1264b3bbfb61e32740cc2f405e92454bf6470c315ac9e8e44e261bf50",
+  "schema_version": "accel005-owned-command-v1",
+  "started_at": "2026-10-30T17:58:43.870987+00:00"
+}

@@ -173,7 +173,7 @@
     {
       "bytes": 218724,
       "path": "PLANS.md",
-      "sha256": "380f5a5ff02f702752e25b25b234c67a3ecaad43afd4a99b8786fd8b02a0238c"
+      "sha256": "4e03089212f38b8fc8d37f26305b7ac28d232326c55ffdd067cf84f059e9f300"
     },
     {
       "bytes": 2761,
@@ -3371,9 +3371,9 @@
       "sha256": "1714d42b0072c15afa63ae1db4f2b898db6f90a0c3b819af8b35b6e476de6bdd"
     },
     {
-      "bytes": 1177,
+      "bytes": 3523,
       "path": "src/dmf_pulse/cli/recovery.py",
-      "sha256": "e1caa033c38ede706ef28181749b5c75b930b210757a431b841798218092232c"
+      "sha256": "e12e2be880f2c8ecbabf2ee667575a950117989e69d8eb861654b7cec458dcb1"
     },
     {
       "bytes": 1660,
@@ -3786,6 +3786,11 @@
       "sha256": "89af6a582a080613859275f57fcca5c8674d9ce19a687679f9d4e5cb8e183347"
     },
     {
+      "bytes": 27601,
+      "path": "src/dmf_pulse/evaluation/p01_canonical.py",
+      "sha256": "84fa2008b0a93ada1cba82156d92e42b9e35a969fa7a0916d42b3b2a7a21a07c"
+    },
+    {
       "bytes": 12483,
       "path": "src/dmf_pulse/evaluation/p01_fallback.py",
       "sha256": "9bd304ffe2531e9cbdc7473b5efd3d090ad938fbcc37acd8778316fbf7ca002b"
@@ -3839,6 +3844,16 @@
       "bytes": 885,
       "path": "src/dmf_pulse/evaluation/resources/default.yaml",
       "sha256": "a1207826b9bffeb598ee9b398839fa05266faacc67800a551e812a8b71af17b9"
+    },
+    {
+      "bytes": 102,
+      "path": "src/dmf_pulse/evaluation/resources/p01_canonical_acceptances.json",
+      "sha256": "0b692b9178782aec698d28f90a37d42c93a8d5b4878f83a8b25a4f2072389171"
+    },
+    {
+      "bytes": 4728,
+      "path": "src/dmf_pulse/evaluation/resources/p01_original_identity.json",
+      "sha256": "e4035f285d8dd574808fa2084420b51936e3e1e27f43f8dbb5f7e275dbd60cb4"
     },
     {
       "bytes": 20964,
@@ -6681,6 +6696,11 @@
       "sha256": "16e6de64a12a0482e33acb6b1ead2cbd840a5d780690c1f92a07a5462097f558"
     },
     {
+      "bytes": 2905,
+      "path": "tests/unit/evaluation/p01_canonical_support.py",
+      "sha256": "b4aba8b521442431b26dca910f374ebc7e607c3730dc949a8eeafb06e528a443"
+    },
+    {
       "bytes": 1138,
       "path": "tests/unit/evaluation/p01_d1_test_support.py",
       "sha256": "9379c2a3aa0a1a99238e089ffc73575ce38454004d6e08c46976efb79286a179"
@@ -6724,6 +6744,11 @@
       "bytes": 19752,
       "path": "tests/unit/evaluation/test_model_validation.py",
       "sha256": "b1d20cc160cbd668cc1bae57be675b6f1918ea73d5768b89bf558e169c297a71"
+    },
+    {
+      "bytes": 5835,
+      "path": "tests/unit/evaluation/test_p01_canonical.py",
+      "sha256": "00edb59c2f38e4945a5f4255bbd0ba396c50c9ccb4891eb2b85cd7ec31f6d10b"
     },
     {
       "bytes": 36998,
@@ -8629,6 +8654,11 @@
       "bytes": 2825,
       "path": "tickets/DMF-PULSE-ACCEL-005/CP2.md",
       "sha256": "dfb83417cf62ea5fd7f94de0483716aaa74415dc8858d36640b3c6ac3d773944"
+    },
+    {
+      "bytes": 2437,
+      "path": "tickets/DMF-PULSE-ACCEL-005/CP3.md",
+      "sha256": "016c24193dea48ce5e80e86227a9db699131f15008f400c89de1b1bbe6dc16b5"
     },
     {
       "bytes": 19514,

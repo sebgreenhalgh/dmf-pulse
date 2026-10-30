@@ -1,0 +1,50 @@
+{
+  "actual_p01_labels_or_scores_used": false,
+  "checked_at": "2026-10-30T18:38:12.134639+00:00",
+  "command_comparisons": {
+    "p01_canonical_proposal": {
+      "ast_identical": true,
+      "decorated_function_lf_bytes": 1000,
+      "decorated_function_lf_sha256": "cf2f0700e1480706b734f4f414c5b44369a18ddc534bbcd3c8f0ccf57281dfc9",
+      "text_identical_after_crlf_normalization": true
+    },
+    "p01_canonical_score": {
+      "ast_identical": true,
+      "decorated_function_lf_bytes": 1307,
+      "decorated_function_lf_sha256": "0b25621f0e18e35e6c8b8e908dca81ef2d693b7ed83ba9121863cdc12449b920",
+      "text_identical_after_crlf_normalization": true
+    }
+  },
+  "findings": [],
+  "index_identity_rechecked": true,
+  "limits": [
+    "This addendum binds the deliberately partial checkpoint CLI. It preserves the earlier full working-file review and proves both CP3 decorated command bodies are byte-identical after CRLF normalization, including their signatures and decorators.",
+    "Final whole-package installed-wheel and source binding must be refreshed after remaining milestone code is included. Owner acceptance and qualified labels remain pending."
+  ],
+  "operational_authority_granted": false,
+  "original_review_rewritten": false,
+  "other_staged_ast_differences": 0,
+  "parent_cli_sha256": "e1caa033c38ede706ef28181749b5c75b930b210757a431b841798218092232c",
+  "prior_review": {
+    "bytes": 7866,
+    "path": "review_pack/accel005-independent-cp3-final-3b0ebeb55fdfc71d6a7f9555ba776307eadbc61ee6e460a085d99a1cb570c759.json",
+    "sha256": "3b0ebeb55fdfc71d6a7f9555ba776307eadbc61ee6e460a085d99a1cb570c759"
+  },
+  "probe_sha256": "4cf12c023565dae94df0e4aec15bf47fb981e39e75c2cc84831a3d987da1555b",
+  "provider_requests": 0,
+  "retained_parent_functions_text_and_ast_unchanged": [
+    "_fail",
+    "inventory",
+    "verify"
+  ],
+  "reviewed_working_cli_sha256": "808c4bd49de882fa58587f63f4b7191e832050b5b3eddbdbc0085eb7bfabf06f",
+  "schema_version": "accel005-independent-cp3-index-cli-addendum-v1",
+  "source_or_index_edits": 0,
+  "staged_cli_bytes": 3523,
+  "staged_cli_git_blob_sha1": "0082b20fe3799d70a27aa65527fcb2af5f7e2a54",
+  "staged_cli_sha256": "e12e2be880f2c8ecbabf2ee667575a950117989e69d8eb861654b7cec458dcb1",
+  "staged_controller_sha256": "84fa2008b0a93ada1cba82156d92e42b9e35a969fa7a0916d42b3b2a7a21a07c",
+  "staged_module_equals_reviewed_working_module_except_omitted_function": "add_locator",
+  "status": "PASS_SCOPED_CP3_INDEX_CLI_EQUIVALENT",
+  "vault_access": false
+}

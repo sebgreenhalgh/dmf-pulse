@@ -1,0 +1,33 @@
+{
+  "canonical_outcome_body_parses": 0,
+  "checked_at": "2026-10-30T17:22:22.554330+00:00",
+  "cleared_caches": [
+    "dmf_pulse.football_events.team_strength_adapter._forecast_clubs",
+    "dmf_pulse.football_events.team_strength_adapter._validated_artifact_json",
+    "dmf_pulse.football_events.team_strength_parameter_draws._validated_draw_json",
+    "dmf_pulse.ingestion.openfootball.team_strength_data._approval_timestamp",
+    "dmf_pulse.markets.consensus.code_identity",
+    "dmf_pulse.markets.normalisation.code_identity"
+  ],
+  "cold_draw_cache_hits": 0,
+  "cold_draw_cache_misses": 0,
+  "dataset_mode": "LIVE_OBSERVED",
+  "fixture_count": 10,
+  "fixture_registry_sha256": "de447eb368a807d4edf701a75c094a8b3f4925aa3e87cbff9b9f4fadd63eba18",
+  "forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "forecast_bytes": 38208223,
+  "forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "full_generative_forecast_model_loads": 0,
+  "generation_or_scoring_tripwire_calls": 0,
+  "metric_values_computed": 0,
+  "operational_code_approval": false,
+  "original_bytes_mtime_unchanged": true,
+  "original_identity_sha256": "e4035f285d8dd574808fa2084420b51936e3e1e27f43f8dbb5f7e275dbd60cb4",
+  "probe_sha256": "204fc3c8f5d48b9b65143eeb756b71e3dc0e6f97d0d47530351d28c9ab4768e0",
+  "provider_requests": 0,
+  "schema_version": "accel005-independent-original-p01-authentication-v1",
+  "source_sha256": "84fa2008b0a93ada1cba82156d92e42b9e35a969fa7a0916d42b3b2a7a21a07c",
+  "status": "PASS_READ_ONLY_ORIGINAL_AUTHENTICATION_NOT_SCORING_AUTHORITY",
+  "target_outcomes_supplied_or_read": false,
+  "vault_calls": 0
+}

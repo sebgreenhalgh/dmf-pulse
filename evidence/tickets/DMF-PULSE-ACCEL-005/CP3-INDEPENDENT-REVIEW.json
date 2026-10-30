@@ -1,0 +1,113 @@
+{
+  "actual_p01_hypothetical_labels_used": false,
+  "actual_p01_scores_computed": 0,
+  "checked_at": "2026-10-30T17:24:58.286921+00:00",
+  "cli_checks": [
+    "cli_proposal_persists_only_unaccepted_metadata",
+    "cli_existing_proposal_not_overwritten",
+    "cli_score_denies_before_input_read_and_output_creation"
+  ],
+  "cold_original_authentication_only": true,
+  "conditions_for_real_score": [
+    "A separately accepted exact nongenerative code binding and independent review must be installed through trusted release custody.",
+    "The exact immutable canonical provider bytes, lineage, acquisition evidence and parsed snapshot must have a separately accepted source qualification for the P01 descriptive purpose.",
+    "All ten oriented frozen fixtures must pass finality, actual-played date, receipt/usability, D+2 and strict-goal gates before any metric.",
+    "Original literal forecast, code binding and installed acceptance registry are rechecked before returning a score."
+  ],
+  "findings": [],
+  "fit_draw_freeze_calls": 0,
+  "historical_restrictions": {
+    "a02_a03_consumption_preserved": true,
+    "a04_authorized": false,
+    "conditional_canonical_acquisition_authorized_here": false,
+    "original_code_authority_automatically_transferred": false
+  },
+  "limits": [
+    "This review approves the scoped engineering implementation only; it grants no owner acceptance, source rights, acquisition or real scoring authority.",
+    "No real-positive scoring path is executed; owned admission and literal one-fixture numerical compatibility are separate proofs.",
+    "The whole-Python proposal digest must be regenerated after all milestone package edits; the files reviewed here and thirteen protected dependencies are explicitly bound.",
+    "Final installed-wheel, native, complete CI and publication acceptance remain milestone gates outside this scoped review."
+  ],
+  "literal_oracle_decimal_spelling_exact": true,
+  "literal_oracle_metric_rows_sha256": "35fa2f565ca809b32f7535938a79c69357b0b472778d76de2af0ed1fbfa54ce7",
+  "literal_oracle_metrics_exact": 147,
+  "operational_scoring_authorized": false,
+  "original_fixture_registry_sha256": "de447eb368a807d4edf701a75c094a8b3f4925aa3e87cbff9b9f4fadd63eba18",
+  "original_forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "original_forecast_bytes": 38208223,
+  "original_forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "owned_admission_boundary_writer_checks": 51,
+  "owner_binding_status": "PROPOSED_UNACCEPTED",
+  "prior_findings_resolved": [
+    "Typed exact accepted-code and qualification identities",
+    "Complete code and critical resource closure with disclosed original/post-origin history",
+    "Exact ten original fixture IDs, scheduling, finality, strict goals and all-thirty product rows",
+    "Source/raw/qualification/owner evidence and chronology retained",
+    "Raw parsing and source-body exception frames detached",
+    "Authenticated exact-type immutable artifact writer"
+  ],
+  "probe_sha256": "fd6be42f77311035f0fb77b338c3f19175af78eb80baf7d023e129eca6e73f26",
+  "proof_receipts": {
+    "admission": {
+      "bytes": 5046,
+      "path": "review_pack/accel005-independent-owned-admission-40f3cfc5a24c07913faf506e9e337f5a34dc6fbe1d820a1acb0624de15fbf960.json",
+      "sha256": "40f3cfc5a24c07913faf506e9e337f5a34dc6fbe1d820a1acb0624de15fbf960"
+    },
+    "boundaries": {
+      "bytes": 1777,
+      "path": "review_pack/accel005-independent-controller-boundary-67ac403d1301cb4c5c6c3872730b08cc7f72b5cceeb9c1b5b2792209e3a461f5.json",
+      "sha256": "67ac403d1301cb4c5c6c3872730b08cc7f72b5cceeb9c1b5b2792209e3a461f5"
+    },
+    "cold_oracle": {
+      "bytes": 7083,
+      "path": "review_pack/accel005-independent-p01-oracle-ac94652a454f4e03c2cdd535c211ce3e81c36dff1994136826014b9ef525f8d3.json",
+      "sha256": "ac94652a454f4e03c2cdd535c211ce3e81c36dff1994136826014b9ef525f8d3"
+    },
+    "original_authentication": {
+      "bytes": 1677,
+      "path": "review_pack/accel005-independent-original-authentication-f695c01cb7cad74adaf304c1b70575e96f6948fa95b57247a63e51b0b842dfeb.json",
+      "sha256": "f695c01cb7cad74adaf304c1b70575e96f6948fa95b57247a63e51b0b842dfeb"
+    },
+    "writer": {
+      "bytes": 1729,
+      "path": "review_pack/accel005-independent-writer-372808ee2d8cb85f2f6d809a497bc7053bee15619e26f50db570f2d7a0b633ff.json",
+      "sha256": "372808ee2d8cb85f2f6d809a497bc7053bee15619e26f50db570f2d7a0b633ff"
+    }
+  },
+  "provider_requests": 0,
+  "qualified_label_state": "NONE_INSTALLED_AVAILABILITY_NOT_ESTABLISHED",
+  "real_credential_or_vault_access": false,
+  "reproduce": [
+    ".venv/Scripts/python.exe review_pack/probe_cp3_owned_admission.py",
+    ".venv/Scripts/python.exe review_pack/probe_cp3_boundary.py",
+    ".venv/Scripts/python.exe review_pack/probe_cp3_writer.py",
+    ".venv/Scripts/python.exe review_pack/probe_p01_literal_oracle.py",
+    ".venv/Scripts/python.exe review_pack/probe_cp3_original_authentication.py",
+    ".venv/Scripts/python.exe review_pack/probe_cp3_cold_import.py"
+  ],
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/cli/recovery.py": "808c4bd49de882fa58587f63f4b7191e832050b5b3eddbdbc0085eb7bfabf06f",
+    "src/dmf_pulse/evaluation/p01_canonical.py": "84fa2008b0a93ada1cba82156d92e42b9e35a969fa7a0916d42b3b2a7a21a07c",
+    "src/dmf_pulse/evaluation/resources/p01_canonical_acceptances.json": "0b692b9178782aec698d28f90a37d42c93a8d5b4878f83a8b25a4f2072389171",
+    "src/dmf_pulse/evaluation/resources/p01_original_identity.json": "e4035f285d8dd574808fa2084420b51936e3e1e27f43f8dbb5f7e275dbd60cb4"
+  },
+  "schema_version": "accel005-independent-cp3-review-v1",
+  "scientific_interpretation": "The original prospective forecast remains immutable. This post-origin code admission amendment preserves the unchanged metric kernel and does not authorize outcome-dependent selection, tuning or promotion. Ten fixture outcomes and thirty product rows carry no assumption of statistical independence.",
+  "status": "PASS_SCOPED_CP3_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "trusted_acceptance_resource_empty": true,
+  "unchanged_numerical_and_validator_dependencies_sha256": {
+    "src/dmf_pulse/assurance/canonical.py": "687d4632f9bf4265a3b7ebfc95f61311e45cffb53b50d31645a48d08491381d2",
+    "src/dmf_pulse/evaluation/p01_frozen_view.py": "ee756a31cb9cde20b02f5a4f967623c25334b2629a86153990dd8c5b29f21a11",
+    "src/dmf_pulse/evaluation/team_strength_mixture_analysis.py": "83f726012a04cc1b5129db988654c32bc42143667ce371bdcca2482b703d2ed4",
+    "src/dmf_pulse/evaluation/team_strength_prospective.py": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5",
+    "src/dmf_pulse/evaluation/team_strength_replay.py": "520f3537c99a482ea1a58f5cdcde52e94db35497b44af57e6047c29e3645822d",
+    "src/dmf_pulse/football_events/poisson.py": "a96de8afe0b05d05eb1cfa6d68ba0791e540e50cc862a308f7fd4229873e0dac",
+    "src/dmf_pulse/football_events/team_strength_adapter.py": "0833d4d21ebdd1b16b506ae614253d0671f8b95fced43769e6cfcf7d1ba6bc06",
+    "src/dmf_pulse/football_events/team_strength_mixture.py": "5a492d3fdc7aaee74e935af17cd45d316342231f2ee8505782e5a0af6472e095",
+    "src/dmf_pulse/football_events/team_strength_model.py": "406339d0519eeaffee0fb305c52f2732c356f079d0e1af8f7ef5f8355623f164",
+    "src/dmf_pulse/football_events/team_strength_numerics.py": "cc82edc6c501802207edcf4545a14b704bc54848edf400b67523be0997ad7d36",
+    "src/dmf_pulse/football_events/team_strength_parameter_draws.py": "0bfbe387ebe292c5167ce170a1271011c7ec7904c8fdae0be08a85a6e92421d0",
+    "src/dmf_pulse/ingestion/openfootball/team_strength_data.py": "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0",
+    "src/dmf_pulse/ingestion/openfootball/team_strength_governance.py": "781720eb60e15573ba4f806350cb5a25c8647b08a3d6dab49144ee1ec7c7bc38"
+  }
+}

@@ -1,0 +1,9 @@
+......................                                                   [100%]
+============================== warnings summary ===============================
+tests/unit/evaluation/test_p01_canonical.py::test_all_ten_owned_admission_fails_closed[string]
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\ACCEL-005\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `int` - serialized value may not be as expected [field_name='home_goals', input_value='2', input_type=str])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+22 passed, 1 warning in 36.97s
