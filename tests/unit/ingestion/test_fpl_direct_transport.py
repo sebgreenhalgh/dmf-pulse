@@ -30,6 +30,14 @@ _CREDENTIAL_MARKER = "synthetic-credential-never-disclose"
 _READ_FAILURE = "synthetic-read-failure-never-disclose"
 
 
+@pytest.fixture(autouse=True)
+def owned_supplier_permission(monkeypatch):
+    """Transport-lifecycle tests use owned openers, never a real supplier route."""
+    from dmf_pulse.operation import enrollment
+
+    monkeypatch.setattr(enrollment, "require_fpl_route", lambda *args, **kwargs: None)
+
+
 class _Headers(Message):
     def __init__(
         self, content_type: str = "application/json", *, content_length: int | str | None = None

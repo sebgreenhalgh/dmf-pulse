@@ -13,7 +13,6 @@ from dmf_pulse.credentials.providers import (
     AutomaticFplCredentialProvider,
     AutomaticOddsCredentialProvider,
 )
-from dmf_pulse.dashboard.synthetic import demo_inputs
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct import (
     DirectFplClient,
@@ -38,7 +37,7 @@ from dmf_pulse.ingestion.odds.credentials import (
     EnvironmentOddsCredentialProvider,
 )
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput
-from dmf_pulse.ingestion.odds.models import QuotaState
+from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaState
 from dmf_pulse.ingestion.odds.transient import CurrentOddsTransientService
 from dmf_pulse.ingestion.openfootball.client import (
     HttpClientOpenFootballTransport,
@@ -93,6 +92,13 @@ class GuardedFplTransport:
     ) -> None:
         self._guard, self._delegate = guard, delegate
         self._check_expiry = check_expiry
+
+    @property
+    def requires_supplier_permission(self) -> bool:
+        return (
+            isinstance(self._delegate, DirectUrllibTransport)
+            or getattr(self._delegate, "requires_supplier_permission", False) is True
+        )
 
     def send(self, request: DirectHttpRequest) -> DirectHttpResponse:
         self._guard.before_send("FPL", request.method, request.host, request.path)
@@ -153,6 +159,8 @@ class OwnedFplTransport:
 
 def owned_odds_body() -> bytes:
     """Re-encode exact owned market values into the existing provider parser schema."""
+    from dmf_pulse.dashboard.synthetic import demo_inputs
+
     source = OddsProviderCurrentInput.model_validate_json(demo_inputs()["odds.json"])
     events = []
     for event in source.events:
@@ -267,12 +275,17 @@ class CurrentSourceFactories:
         owned: bool,
         fpl_profile: RightsProfile,
         odds_profile: RightsProfile,
-        quota: QuotaState,
+        quota: QuotaState | QualifiedOperatorQuota,
         clock: Callable[[], datetime],
     ) -> None:
         self._guard, self._owned, self._clock = guard, owned, clock
         self._fpl_profile, self._odds_profile, self._quota = fpl_profile, odds_profile, quota
-        self._inputs = demo_inputs() if owned else {}
+        if owned:
+            from dmf_pulse.dashboard.synthetic import demo_inputs
+
+            self._inputs = demo_inputs()
+        else:
+            self._inputs = {}
 
     def direct(self, attestation: DirectFplRunAttestation) -> DirectFplClient:
         delegate: DirectTransport
@@ -281,7 +294,7 @@ class CurrentSourceFactories:
             credentials = DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": "placeholder"})
         else:
             delegate = DirectUrllibTransport()
-            credentials = AutomaticFplCredentialProvider(clock=self._clock)
+            credentials = AutomaticFplCredentialProvider(clock=self._clock, vault_only=True)
         return DirectFplClient(
             attestation,
             profile=self._fpl_profile,

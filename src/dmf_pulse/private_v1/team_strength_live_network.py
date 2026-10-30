@@ -102,6 +102,15 @@ class GuardedFplTransport:
     gate: OneShotNetworkGate
     delegate: DirectTransport
 
+    @property
+    def requires_supplier_permission(self) -> bool:
+        from dmf_pulse.ingestion.fpl.direct import DirectUrllibTransport
+
+        return (
+            isinstance(self.delegate, DirectUrllibTransport)
+            or getattr(self.delegate, "requires_supplier_permission", False) is True
+        )
+
     def send(self, request: DirectHttpRequest) -> DirectHttpResponse:
         endpoint = fpl_endpoint(request.path)
         self.gate.attempt("FPL", endpoint)

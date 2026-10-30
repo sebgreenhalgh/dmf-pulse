@@ -1,0 +1,74 @@
+{
+  "base_checkpoint": "b67dee8bf069961a959e7d041a114329e3957689",
+  "cold_import_checks": {
+    "credential_service_windows_providers_cli_direct_modules": "PASS_FULL_COLD_TRIPWIRES_AND_LAZY_CONSTRUCTORS",
+    "current_sources_full_cold": "BLOCKED_INHERITED_SQLALCHEMY_WINDOWS_PLATFORM_SUBPROCESS",
+    "current_sources_platform_prewarmed": "PASS_ALL_SIX_MODULES_UNDER_TRIPWIRES_AFTER_EXPLICIT_STANDARDLIB_PLATFORM_FACTS_PREWARM",
+    "dependency_control": "Ordinary fresh import sqlalchemy with passive audit recording and no environment wrapper independently emits subprocess.Popen on this Windows host.",
+    "forbidden_secret_config_reads": 0,
+    "limitation": "The prewarmed check is not represented as a complete cold-import pass. The inherited dependency behavior requires separate milestone hardening or an explicit applicable authority decision.",
+    "native_credential_calls": 0,
+    "network_or_product_file_writes": 0
+  },
+  "failed_final_cases": 0,
+  "independent_cases_passed": 39,
+  "initial_probe_receipt_sha256": "14e1715a1a16984844fd8d455a6b1ea423eddd3b815e7addbe67b700edc50c86",
+  "no_unresolved_material_findings_in_changed_credential_slice": true,
+  "old_exposed_credential_read_or_compared": false,
+  "original_dirty_and_wave004_files_written_by_reviewer": 0,
+  "private_owner_information_copied_to_evidence": false,
+  "production_vault_reads": 0,
+  "production_vault_writes": 0,
+  "provider_requests": 0,
+  "real_credentials_inspected": false,
+  "remaining_boundaries": [
+    "Global FPL supplier policy gate is not part of this first slice and was reported by the implementer as not yet implemented.",
+    "No claim that the private pilot is eligible, enrolled, approved or executed. No live operation or source permission follows from credential registration.",
+    "Full milestone regression, packaging, independent integration, exact-SHA CI and the inherited cold-import boundary remain outside this scoped receipt."
+  ],
+  "resolved_findings": [
+    {
+      "correction": "Sample actual clock and enforce future expiry inside the existing lock, record registration then; post-native expiry removes only the new target and returns an expired failure.",
+      "id": "FPL_REGISTRATION_CLOCK_AFTER_CONTROL_WAIT",
+      "initial_behavior": "Owned lock wait advanced past expiry; setup wrote expired token and pre-lock registration time while returning success.",
+      "severity": "P2",
+      "status": "RESOLVED",
+      "verified": "No pre-read; no write when lock wait crosses expiry; actual registration time after wait; post-write expiry cleanup and cleanup-failure resolution refusal."
+    },
+    {
+      "correction": "Secret-bearing setup scope returns only a fixed code; public exit occurs after that frame unwinds.",
+      "id": "CLI_EXIT_SECRET_FRAME_REACHABLE",
+      "initial_behavior": "Own prompt canary remained in SecretStr local reachable through CLI exit cause/context traceback on setup failure.",
+      "severity": "P2",
+      "status": "RESOLVED",
+      "verified": "Typed and unknown backend failures preserve fixed output and leave no own canary string or SecretStr in reachable product frames."
+    }
+  ],
+  "retained_cli_and_transport_boundary_cases_passed": 24,
+  "retained_run_log_sha256": "891faa64e8642a0a4d364bf75d8fd2ad75aa33c6a1e4be4854a8b07c46168f64",
+  "retained_service_and_fresh_cases_passed": 46,
+  "reviewed_at": "2026-10-30T16:27:30.211621+00:00",
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/cli/credentials.py": "cb3b10aee1997aef9b2528eb08e8afab3ce6b3e002996ae4d1ee01294c0e39e1",
+    "src/dmf_pulse/credentials/providers.py": "35cf9def692c2a354823f53974b8401bdbea35a27b880389cc6e1df9987a1d06",
+    "src/dmf_pulse/credentials/service.py": "d6bc692ff88442d821ad97d7da5595a74f94b79a3c67cad210f5655bc26fce19",
+    "src/dmf_pulse/credentials/windows.py": "97f2a3a59c7bcca6b5e2571cad5e4088a19186b19cc06d93e02689ddc0e85bae",
+    "src/dmf_pulse/dashboard/current_sources.py": "a2bb2f59f79e16080e1fbd17c2beb5b8522940dcc392be96e96f0b0c109f5556",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "06a4807456b1dace48a41fbb9dcb6befab7e73c7b2490757ced11d700adf625f"
+  },
+  "reviewed_worktree_changes_not_yet_committed": true,
+  "schema_version": "accel005-independent-fresh-fpl-credential-slice-v1",
+  "scope_checks": [
+    "Exact production FPLv2 target and username/schema; Odds v1 unchanged; fake native calls never access legacy FPLv1.",
+    "Fresh setup and replacement are blind writes under the existing mutation lock, with literal fresh attestation and aware future expiry.",
+    "Malformed, legacy, duplicate, unknown or incoherent metadata refuses resolution before token validation; expired status reports metadata without decoding the value.",
+    "Private current-source provider pins vault_only and ignores every ambient credential selector/token; nonWindows fails before factory/environment access.",
+    "Post-lookup expiry uses metadata only with no second vault read; constructors are lazy.",
+    "Explicit status makes no provider-authentication or entitlement claim; freshness is operator attestation, not cryptographic verification of provider issuance."
+  ],
+  "status": "PASS_SCOPED_CREDENTIAL_DELTA_WITH_EXPLICIT_REMAINING_BOUNDARIES",
+  "test_script_sha256": "2d923005f2b1b5d24508947f900fae2b484f38b74313282128d83e26fcf521e9",
+  "total_unique_targeted_cases_passed": 109,
+  "tracked_files_edited_by_reviewer": 0,
+  "whole_milestone_clearance": false
+}

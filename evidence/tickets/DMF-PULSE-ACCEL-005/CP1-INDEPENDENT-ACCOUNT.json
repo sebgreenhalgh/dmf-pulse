@@ -1,0 +1,238 @@
+{
+  "actual_account_facts_verified": false,
+  "author_suite": {
+    "command": ".venv/Scripts/python.exe review_pack/run_owned.py -m pytest tests/unit/operation/test_account_evidence.py -q -p no:cacheprovider",
+    "passed": 25,
+    "seconds": 1.14
+  },
+  "case_count": 50,
+  "cases": [
+    {
+      "name": "complete_input_is_review_only_no_authority",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_evidence_ref",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_redacted_evidence_sha256",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_plan_name",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_plan_ref",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_covered_sports",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_covered_regions",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_covered_markets",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_operator_country",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_permitted_countries",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_permitted_purposes",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_plan_credit_allowance",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_remaining_credits",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_observed_at",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_period_started_at",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_resets_at",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_reset_period",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_other_usage",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_safety_reserve_credits",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_proposed_quota_max_age_seconds",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_terms_version",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_terms_reviewed_at",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing_fact_terms_evidence_sha256",
+      "outcome": "PASS"
+    },
+    {
+      "name": "zero_balance_preserved",
+      "outcome": "PASS"
+    },
+    {
+      "name": "stale_by_microsecond",
+      "outcome": "PASS"
+    },
+    {
+      "name": "other_usage_missing",
+      "outcome": "PASS"
+    },
+    {
+      "name": "other_usage_reserved",
+      "outcome": "PASS"
+    },
+    {
+      "name": "terms_review_in_future",
+      "outcome": "PASS"
+    },
+    {
+      "name": "naive_review_clock",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "strict_fact_remaining_credits",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "strict_fact_plan_credit_allowance",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "strict_fact_safety_reserve_credits",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_entitlement_verified",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_project_rights_approved",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_owner_budget_accepted",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_runtime_authority",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_state",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_blockers",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "forged_review_required_review",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "editable_does_not_pass_sealed_reader",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "sealed_envelope_not_editable_model",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "no_output_overwrite",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "safe_read_error_duplicate",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "safe_read_error_unknown_field",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "safe_read_error_invalid_utf8",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "safe_read_error_oversized",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "safe_read_error_deep_json",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "name": "cli_draft_no_external_access",
+      "outcome": "PASS"
+    },
+    {
+      "name": "cli_review_no_external_access",
+      "outcome": "PASS"
+    },
+    {
+      "name": "trusted_production_registry_remains_empty",
+      "outcome": "PASS"
+    }
+  ],
+  "control_database_accessed": false,
+  "cp2_trusted_enrollment_and_supplier_policy": "NOT_IMPLEMENTED_NOT_CLEARED_BY_THIS_REVIEW",
+  "findings": [],
+  "git_head": "b67dee8bf069961a959e7d041a114329e3957689",
+  "inherited_metadata_cli_regressions": {
+    "command": ".venv/Scripts/python.exe review_pack/run_owned.py -m pytest tests/unit/operation/test_operator_metadata.py tests/unit/operation/test_console_and_cli.py -q -p no:cacheprovider",
+    "passed": 58,
+    "seconds": 1.51
+  },
+  "provider_requests": 0,
+  "real_credentials_or_vault_accessed": false,
+  "review_harness_sha256": "a397436ae6454e48e730aedad45654ed4067f582de4acee66ac38c4ebf07d6e8",
+  "reviewed_at": "2026-10-30T16:35:33.101525+00:00",
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/operation/account.py": "c096bbda5cf71a9989d70b9170147de523041eefcfea18491b7de95e17bed006",
+    "src/dmf_pulse/operation/cli.py": "7e34ac7e6439545b653051b81c51a7d2e30eb2257f7d38d45f40d0d0efa034ac",
+    "src/dmf_pulse/operation/control.py": "3fe67f742878a4b5522330da3ef74f143c15590ed8f7ac89b599dc1d19f35ded",
+    "src/dmf_pulse/operation/models.py": "e475538cde6b9331997a3de4172484953c56682aded511bc830bdbd73cce9d53",
+    "src/dmf_pulse/operation/packages.py": "6dbb14bfadfd471869d5460809c0703672ccf40ee7d0af142d2bf209231f8641",
+    "tests/unit/operation/test_account_evidence.py": "9e6f00ae2ffb35eb07172e5371893b72797fd2177669774f19f75fba15eedfbb"
+  },
+  "schema_version": "accel005-independent-cp1-account-review-v1",
+  "scope": "Nonexecuting owner-reported account completeness workflow only",
+  "source_binding": "Exact component hashes, including uncommitted CP1 changes; no full-commit review implied",
+  "source_edited": false,
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2_WITHIN_NONEXECUTING_SCOPE",
+  "supplier_permission_or_owner_approval_granted": false
+}

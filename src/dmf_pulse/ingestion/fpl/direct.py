@@ -97,8 +97,10 @@ class DirectFplCredential(FrozenModel):
     source: Literal["ENVIRONMENT", "HIDDEN_PROMPT", "OS_VAULT"]
     bearer_token: SecretStr
     expires_at: datetime | None = None
+    registered_at: datetime | None = None
+    credential_generation: Literal["FPL_FRESH_V2"] | None = None
 
-    @field_validator("expires_at")
+    @field_validator("expires_at", "registered_at")
     @classmethod
     def expiry_is_aware(cls, value: datetime | None) -> datetime | None:
         if value is None:
@@ -111,6 +113,13 @@ class DirectFplCredential(FrozenModel):
     def token_is_bounded(self) -> Self:
         if self.source == "OS_VAULT" and self.expires_at is None:
             raise ValueError("stored FPL bearer token requires explicit expiry")
+        if self.credential_generation is not None and (
+            self.source != "OS_VAULT"
+            or self.registered_at is None
+            or self.expires_at is None
+            or self.registered_at >= self.expires_at
+        ):
+            raise ValueError("fresh vault credential requires coherent registration metadata")
         value = self.bearer_token.get_secret_value()
         if not value or value != value.strip() or len(value) > 16_384 or "\x00" in value:
             raise ValueError("FPL bearer token is invalid")
@@ -145,6 +154,7 @@ class DirectHttpRequest:
     connect_timeout_seconds: float
     read_timeout_seconds: float
     total_timeout_seconds: float
+    supplier_profile_sha256: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -290,6 +300,13 @@ class DirectUrllibTransport:
             or parsed.fragment
         ):
             raise IngestionError("INTERNAL_INVARIANT", "direct FPL URL is not allowlisted")
+        _require_supplier_route(
+            request.method,
+            request.host,
+            request.path,
+            datetime.now(UTC),
+            request.supplier_profile_sha256,
+        )
         started_at = self._monotonic()
         opener = urllib.request.build_opener(_NoRedirect())
         outbound = urllib.request.Request(url, headers=dict(request.headers), method="GET")
@@ -379,6 +396,40 @@ def _profile_is_exact(profile: RightsProfile) -> bool:
     )
 
 
+def _require_supplier_route(
+    method: str, host: str, path: str, now: datetime, profile_sha256: str | None = None
+) -> None:
+    from dmf_pulse.operation.enrollment import require_fpl_route
+    from dmf_pulse.operation.models import OperationError
+
+    try:
+        require_fpl_route(method, host, path, now=now, profile_sha256=profile_sha256)
+    except OperationError:
+        raise IngestionError(
+            "FPL_SUPPLIER_PERMISSION_REQUIRED",
+            "Supplier permission for this exact FPL route is required.",
+        ) from None
+
+
+def _supplier_profile_fingerprint(profile: RightsProfile) -> str:
+    from dmf_pulse.operation.enrollment import rights_fingerprint
+
+    return rights_fingerprint(profile)
+
+
+def _installed_profile_is_exact(profile: RightsProfile) -> bool:
+    from dmf_pulse.operation.enrollment import installed_enrollment
+    from dmf_pulse.operation.models import OperationError
+
+    try:
+        return any(
+            row.scope.provider == "FPL" and row.profile == profile
+            for row in installed_enrollment().qualifications
+        )
+    except OperationError:
+        return False
+
+
 class DirectFplClient:
     """One sequential session with a finite request and retry budget."""
 
@@ -400,6 +451,13 @@ class DirectFplClient:
         self._attestation = attestation
         self._profile = profile or load_rights_profiles()[DIRECT_FPL_PROFILE_ID]
         self._transport = transport or DirectUrllibTransport()
+        # Wrapped native transports forward this marker; injected owned transports
+        # are a test seam, never a claim of real supplier permission.
+        self._real_transport = (
+            transport is None
+            or isinstance(transport, DirectUrllibTransport)
+            or getattr(transport, "requires_supplier_permission", False) is True
+        )
         self._credential_provider = credential_provider or DirectFplCredentialProvider()
         self._sleeper = sleeper
         if maximum_requests < 1 or maximum_requests > 24 or maximum_attempts not in {1, 2, 3}:
@@ -414,7 +472,7 @@ class DirectFplClient:
         self._clock = clock
         self._request_count = 0
         self._endpoint_classes: list[DirectFplResource] = []
-        if not _profile_is_exact(self._profile):
+        if not _profile_is_exact(self._profile) and not _installed_profile_is_exact(self._profile):
             raise IngestionError("RIGHTS_BLOCKED", "direct FPL rights profile is not exact")
         for capability in (
             RightsCapability.AUTOMATED_ACCESS,
@@ -449,6 +507,9 @@ class DirectFplClient:
             connect_timeout_seconds=float(config.timeouts_seconds.connect),
             read_timeout_seconds=float(config.timeouts_seconds.read),
             total_timeout_seconds=float(config.timeouts_seconds.total),
+            supplier_profile_sha256=_supplier_profile_fingerprint(self._profile)
+            if self._real_transport
+            else None,
         )
 
     @staticmethod
@@ -488,12 +549,28 @@ class DirectFplClient:
         gameweek: int | None = None,
     ) -> bytes:
         path = direct_path(resource, entry_id=entry_id, gameweek=gameweek)
+        if self._real_transport:
+            _require_supplier_route(
+                "GET",
+                DIRECT_FPL_HOST,
+                path,
+                self._clock(),
+                _supplier_profile_fingerprint(self._profile),
+            )
         if self._before_request is not None:
             self._before_request()
         if self._request_count >= self._maximum_requests:
             raise IngestionError("REQUEST_BUDGET_EXHAUSTED", "FPL request budget exhausted")
         if resource is DirectFplResource.MY_TEAM and self._before_credential is not None:
             self._before_credential("GET", DIRECT_FPL_HOST, path)
+        if self._real_transport:
+            _require_supplier_route(
+                "GET",
+                DIRECT_FPL_HOST,
+                path,
+                self._clock(),
+                _supplier_profile_fingerprint(self._profile),
+            )
         credential = (
             self._credential_provider.get() if resource is DirectFplResource.MY_TEAM else None
         )
@@ -556,6 +633,7 @@ class _DirectFetchOutcome:
 
 
 _PUBLIC_FAILURES = {
+    "FPL_SUPPLIER_PERMISSION_REQUIRED": "Supplier permission for this exact FPL route is required.",
     "CREDENTIAL_MISSING": "DMF_FPL_BEARER_TOKEN is missing.",
     "CREDENTIAL_INVALID": "FPL bearer token is invalid.",
     "CREDENTIAL_NOT_CONFIGURED": "FPL credential is not configured. Use secure credentials setup.",

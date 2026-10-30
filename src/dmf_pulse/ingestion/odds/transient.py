@@ -14,7 +14,7 @@ from dmf_pulse.ingestion.odds.client import OddsClient
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from dmf_pulse.ingestion.odds.credentials import CredentialProvider
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
-from dmf_pulse.ingestion.odds.models import QuotaState
+from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
 from dmf_pulse.ingestion.rights import require_rights
 
@@ -31,7 +31,7 @@ class CurrentOddsTransientService:
         client_factory: Callable[..., OddsClient] = OddsClient,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         rights_profile: RightsProfile | None = None,
-        quota: QuotaState | None = None,
+        quota: QuotaState | QualifiedOperatorQuota | None = None,
         maximum_attempts: Literal[1] | None = None,
         require_known_quota: bool = False,
     ) -> None:

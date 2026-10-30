@@ -45,7 +45,7 @@ def _native() -> _WinCred:
 
 
 class WindowsCredentialBackend:
-    """Only this application's two exact targets; no credential enumeration."""
+    """Exact Odds v1 and fresh FPL v2 targets; never inspect legacy FPL v1."""
 
     def __init__(self, *, namespace: str = "dmf-pulse/credentials/v1") -> None:
         if not re.fullmatch(r"[A-Za-z0-9._/-]{1,160}", namespace) or ".." in namespace:
@@ -58,7 +58,11 @@ class WindowsCredentialBackend:
     def _target(self, provider: Provider) -> str:
         if provider not in {"odds", "fpl"}:
             raise CredentialError("CREDENTIAL_INVALID")
-        return f"{self._namespace}/{provider}"
+        if provider == "fpl":
+            if self._namespace == "dmf-pulse/credentials/v1":
+                return "dmf-pulse/credentials/v2/fpl"
+            return f"{self._namespace}/fresh-v2/fpl"
+        return f"{self._namespace}/odds"
 
     def read(self, provider: Provider) -> VaultRecord | None:
         try:
@@ -88,7 +92,7 @@ class WindowsCredentialBackend:
                 # v0.2.3 converts a Python str to a UTF-16LE Windows blob.
                 "CredentialBlob": value,
                 "Persist": 2,
-                "UserName": f"dmf-pulse.{provider}.v1",
+                "UserName": f"dmf-pulse.{provider}.v{2 if provider == 'fpl' else 1}",
                 "Comment": comment,
             }
         )

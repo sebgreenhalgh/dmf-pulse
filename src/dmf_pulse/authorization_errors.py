@@ -26,6 +26,10 @@ class AuthorizationError(ValueError):
 # Unknown codes must never be copied from a credential-bearing exception graph.
 _ACQUISITION_CODES = frozenset(
     {
+        "FPL_SUPPLIER_PERMISSION_REQUIRED",
+        "NEW_ODDS_PURPOSE_QUALIFICATION_REQUIRED",
+        "OPENFOOTBALL_SCOPE_QUALIFICATION_REQUIRED",
+        "TRUSTED_APPROVAL_REGISTRY_INVALID",
         "ACQUISITION_CLOSED",
         "ACQUISITION_CUTOFF_PASSED",
         "AUTHORIZATION_CLOCK_INVALID",

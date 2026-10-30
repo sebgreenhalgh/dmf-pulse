@@ -35,8 +35,13 @@ def _failure(error: CredentialError) -> None:
     raise typer.Exit(4)
 
 
-def _set(provider: Provider, replace: bool, expires_at: str | None) -> None:
+def _set_scope(
+    provider: Provider, replace: bool, expires_at: str | None, *, fresh_issued: bool = False
+) -> str | None:
+    """Unwind all prompt/secret-bearing frames before an outer public CLI exit."""
     try:
+        if provider == "fpl" and not fresh_issued:
+            raise CredentialError("CREDENTIAL_FRESH_ISSUANCE_REQUIRED")
         expiry = None
         if expires_at is not None:
             try:
@@ -48,18 +53,36 @@ def _set(provider: Provider, replace: bool, expires_at: str | None) -> None:
             with warnings.catch_warnings():
                 warnings.simplefilter("error", getpass.GetPassWarning)
                 text = typer.prompt(
-                    "Odds API key" if provider == "odds" else "Short-lived FPL bearer token",
+                    "Odds API key" if provider == "odds" else "Freshly issued FPL replacement",
                     hide_input=True,
                 )
         except getpass.GetPassWarning:
             raise CredentialError("CREDENTIAL_SECURE_INPUT_REQUIRED") from None
         value = SecretStr(text)
         del text
-        _service().set(provider, value, replace=replace, expires_at=expiry)
+        _service().set(
+            provider,
+            value,
+            replace=replace,
+            expires_at=expiry,
+            fresh_issuance_attested=fresh_issued,
+        )
         del value
-        typer.echo(json.dumps({"status": "CONFIGURED", "provider": provider}, sort_keys=True))
     except CredentialError as exc:
-        _failure(exc)
+        return exc.code
+    except Exception:
+        return "CREDENTIAL_BACKEND_UNAVAILABLE"
+    return None
+
+
+def _set(
+    provider: Provider, replace: bool, expires_at: str | None, *, fresh_issued: bool = False
+) -> None:
+    code = _set_scope(provider, replace, expires_at, fresh_issued=fresh_issued)
+    del replace, expires_at, fresh_issued
+    if code is not None:
+        _failure(CredentialError(code))
+    typer.echo(json.dumps({"status": "CONFIGURED", "provider": provider}, sort_keys=True))
 
 
 @credentials_app.command("set-odds-key", cls=CredentialCommand)
@@ -80,9 +103,42 @@ def set_fpl_token(
     replace: Annotated[
         bool, typer.Option("--replace", help="Explicitly replace the short-lived token.")
     ] = False,
+    fresh_issued: Annotated[
+        bool,
+        typer.Option(
+            "--fresh-issued",
+            help="Attest this is a newly issued replacement, not the exposed token.",
+        ),
+    ] = False,
 ) -> None:
-    """Store a separate token with explicit expiry; no renewal or session extraction."""
-    _set("fpl", replace, expires_at)
+    """Blind-write the fresh v2 slot; never read or migrate a legacy FPL slot."""
+    _set("fpl", replace, expires_at, fresh_issued=fresh_issued)
+
+
+@credentials_app.command("fpl-status", cls=CredentialCommand)
+def fpl_status() -> None:
+    """Inspect only the fresh v2 slot's presence, expiry and registration metadata."""
+    try:
+        result = _service().status("fpl")
+        typer.echo(
+            json.dumps(
+                {
+                    "configured": result.configured,
+                    "state": result.state,
+                    "generation": "FPL_FRESH_V2",
+                    "expires_at": None
+                    if result.expires_at is None
+                    else result.expires_at.isoformat(),
+                    "registered_at": None
+                    if result.registered_at is None
+                    else result.registered_at.isoformat(),
+                    "provider_authentication_verified": False,
+                },
+                sort_keys=True,
+            )
+        )
+    except CredentialError as exc:
+        _failure(exc)
 
 
 @credentials_app.command("status", cls=CredentialCommand)

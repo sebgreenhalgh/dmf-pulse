@@ -1,0 +1,20 @@
+{
+  "actual_provider_calls": 0,
+  "actual_vault_calls": 0,
+  "command": [
+    "python",
+    "-m",
+    "mypy",
+    "--platform",
+    "linux",
+    "src/dmf_pulse"
+  ],
+  "completed_at": "2026-10-30T16:50:51.429999+00:00",
+  "cwd": "DEDICATED_WAVE005_WORKTREE",
+  "environment": "CLOSED_NONSECRET_TEST_WHITELIST",
+  "exit_code": 0,
+  "helper_sha256": "c19b572ff52a21924ca192c270e9b6e77030a07be6b63efc58cc1f933f4f74f7",
+  "log_sha256": "5d70ead6e7b5d375222ec2896b9e4b631c3103b9179dde0deeba173c48763e0d",
+  "schema_version": "accel005-owned-command-v1",
+  "started_at": "2026-10-30T16:50:50.558724+00:00"
+}

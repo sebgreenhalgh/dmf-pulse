@@ -66,6 +66,12 @@ class Metadata(BaseModel):
         return canonical_sha256(self.model_dump(mode="json"))
 
 
+class MetadataTime(Metadata):
+    """Pure UTC clock validation shared by draft and control operations."""
+
+    checked_at: datetime
+
+
 class StageCheck(Metadata):
     stage: Stage
     state: Literal["NOT_CHECKED", "VERIFIED", "BLOCKED", "EXPIRED"] = "NOT_CHECKED"

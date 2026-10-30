@@ -104,12 +104,14 @@ class AutomaticFplCredentialProvider(DirectFplCredentialProvider):
         platform: str | None = None,
         environment: Mapping[str, str] | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        vault_only: bool = False,
     ) -> None:
         self._factory = service_factory or (lambda: CredentialService(clock=clock))
         self._platform = platform
         self._environment = environment
         self._clock = clock
         self._expires_at: datetime | None = None
+        self._vault_only = vault_only
 
     def __repr__(self) -> str:
         return "AutomaticFplCredentialProvider(<lazy-short-lived-source>)"
@@ -120,11 +122,18 @@ class AutomaticFplCredentialProvider(DirectFplCredentialProvider):
             code, message = outcome.code, outcome.message
             del self, outcome
             raise IngestionError(code, message) from None
+        if self._vault_only and outcome.registered_at is None:
+            del self, outcome
+            raise IngestionError(
+                "CREDENTIAL_CORRUPT", "Fresh FPL v2 registration metadata is required."
+            ) from None
         self._expires_at = outcome.expires_at
         return DirectFplCredential(
             source="OS_VAULT" if outcome.expires_at is not None else "ENVIRONMENT",
             bearer_token=SecretStr(outcome.value.get_secret_value()),
             expires_at=outcome.expires_at,
+            registered_at=outcome.registered_at,
+            credential_generation="FPL_FRESH_V2" if outcome.registered_at is not None else None,
         )
 
     def check_expiry(self) -> None:
@@ -142,9 +151,14 @@ class AutomaticFplCredentialProvider(DirectFplCredentialProvider):
 
 def _fpl_scope(provider: AutomaticFplCredentialProvider) -> ResolvedCredential | CredentialError:
     try:
+        platform = os.name if provider._platform is None else provider._platform
+        if provider._vault_only:
+            if platform != "nt":
+                return CredentialError("CREDENTIAL_BACKEND_UNSUPPORTED")
+            # No environment selector or legacy token value is consulted.
+            return provider._factory().resolve("fpl")
         environment = os.environ if provider._environment is None else provider._environment
         selection = environment.get(FPL_SOURCE_VARIABLE, "auto").casefold()
-        platform = os.name if provider._platform is None else provider._platform
         if selection == "auto" and platform == "nt":
             return provider._factory().resolve("fpl")
         if selection != "environment":

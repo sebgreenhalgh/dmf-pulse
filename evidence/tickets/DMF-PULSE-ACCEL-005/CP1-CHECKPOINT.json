@@ -1,0 +1,54 @@
+{
+  "account_blockers": [
+    "ACCOUNT_EVIDENCE_REF_REQUIRED",
+    "ACCOUNT_REDACTED_EVIDENCE_SHA256_REQUIRED",
+    "ACCOUNT_PLAN_NAME_REQUIRED",
+    "ACCOUNT_PLAN_REF_REQUIRED",
+    "ACCOUNT_COVERED_SPORTS_REQUIRED",
+    "ACCOUNT_COVERED_REGIONS_REQUIRED",
+    "ACCOUNT_COVERED_MARKETS_REQUIRED",
+    "ACCOUNT_OPERATOR_COUNTRY_REQUIRED",
+    "ACCOUNT_PERMITTED_COUNTRIES_REQUIRED",
+    "ACCOUNT_PERMITTED_PURPOSES_REQUIRED",
+    "ACCOUNT_PLAN_CREDIT_ALLOWANCE_REQUIRED",
+    "ACCOUNT_REMAINING_CREDITS_REQUIRED",
+    "ACCOUNT_OBSERVED_AT_REQUIRED",
+    "ACCOUNT_PERIOD_STARTED_AT_REQUIRED",
+    "ACCOUNT_RESETS_AT_REQUIRED",
+    "ACCOUNT_RESET_PERIOD_REQUIRED",
+    "ACCOUNT_OTHER_USAGE_REQUIRED",
+    "ACCOUNT_SAFETY_RESERVE_CREDITS_REQUIRED",
+    "ACCOUNT_PROPOSED_QUOTA_MAX_AGE_SECONDS_REQUIRED",
+    "ACCOUNT_TERMS_VERSION_REQUIRED",
+    "ACCOUNT_TERMS_REVIEWED_AT_REQUIRED",
+    "ACCOUNT_TERMS_EVIDENCE_SHA256_REQUIRED"
+  ],
+  "account_entitlement_verified": false,
+  "actual_account_state": "INCOMPLETE",
+  "actual_provider_requests": 0,
+  "final_release_acceptance": "CP6_PENDING",
+  "fpl": "EXPOSED_LEGACY_SLOT_NEVER_READ_FRESH_V2_SETUP_REQUIRED",
+  "implementation_state": "COMPLETE_NONEXECUTING_ACCOUNT_AND_FRESH_CREDENTIAL_SLICE",
+  "independent_scoped_receipts": [
+    {
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP1-INDEPENDENT-FRESH-FPL.json",
+      "sha256": "8439edd7c257b55e6c367becec31d40e402462fa70386608bde1a2e3ade0657e"
+    },
+    {
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP1-INDEPENDENT-ACCOUNT.json",
+      "sha256": "4541c477f7f87c634a6dc3ce8948ac0e8b810a931e63930f81b14c15fe9d3329"
+    }
+  ],
+  "live_pilot_authorized": false,
+  "live_pilot_executed": false,
+  "normal_odds_slot": "OWNER_REPORTED_CONFIGURED_NOT_READ",
+  "normal_vault_reads": 0,
+  "parent": "b67dee8bf069961a959e7d041a114329e3957689",
+  "production_active": false,
+  "project_rights_approved": false,
+  "protected_numerical_sources_unchanged": 157,
+  "schema_version": "accel005-cp1-checkpoint-v1",
+  "sealed_at": "2026-10-30T16:51:43.055508+00:00",
+  "source_gate_tests": 144,
+  "targeted_tests": 166
+}

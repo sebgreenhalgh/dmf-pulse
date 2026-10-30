@@ -1,4 +1,7 @@
 {
-  "schema_version": "trusted-refresh-enrollments-v1",
-  "approvals": []
+  "schema_version": "trusted-refresh-enrollments-v2",
+  "approvals": [],
+  "qualifications": [],
+  "release_permits": [],
+  "default_authorization_id": null
 }

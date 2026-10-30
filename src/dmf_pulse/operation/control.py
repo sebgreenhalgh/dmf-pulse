@@ -13,7 +13,7 @@ from dmf_pulse.dashboard.postgres_authorization import (
     DatabaseRef,
     PostgresUsageLedger,
 )
-from dmf_pulse.operation.models import Metadata, OperationError, Ref, Sha
+from dmf_pulse.operation.models import Metadata, MetadataTime, OperationError, Ref, Sha
 
 
 class _ControlRequest(Metadata):
@@ -112,7 +112,3 @@ def recover_control(
         checked_at=receipt_time.checked_at,
         audit=audit,
     )
-
-
-class MetadataTime(Metadata):
-    checked_at: datetime

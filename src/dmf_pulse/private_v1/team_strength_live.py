@@ -440,6 +440,12 @@ class TeamStrengthL1ObservationService:
             if assessment.freshness == "STALE_BLOCKED":
                 return self._blocked(stage, L1Reason.SOURCE_STALE)
             # Check runtime credentials without ever emitting or storing values.
+            if self._fpl_transport is None:
+                from dmf_pulse.ingestion.fpl.direct import _require_supplier_route
+
+                _require_supplier_route(
+                    "GET", "fantasy.premierleague.com", f"/api/my-team/{request.entry_id}/", started
+                )
             reason = L1Reason.CREDENTIAL_UNAVAILABLE
             self._fpl_credentials.get()
             self._odds_credentials.get_credential()

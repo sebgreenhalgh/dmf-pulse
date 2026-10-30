@@ -38,7 +38,9 @@ class MemoryVault:
     def write(self, provider, value, comment):
         self.events.append(("write", provider))
         self.rows[provider] = VaultRecord(
-            value.encode("utf-16-le"), f"dmf-pulse.{provider}.v1", comment
+            value.encode("utf-16-le"),
+            f"dmf-pulse.{provider}.v{2 if provider == 'fpl' else 1}",
+            comment,
         )
 
     def delete(self, provider):
@@ -152,7 +154,7 @@ def test_fpl_separate_expiry_and_size_limit(setup_service):
     backend, service = setup_service
     expiry = NOW + timedelta(minutes=5)
     service.set("odds", SecretStr(KEY))
-    service.set("fpl", SecretStr(KEY), expires_at=expiry)
+    service.set("fpl", SecretStr(KEY), expires_at=expiry, fresh_issuance_attested=True)
     later = CredentialService(lambda: backend, clock=lambda: expiry)
     assert later.status("fpl").state == "EXPIRED"
     with pytest.raises(CredentialError) as error:
@@ -269,7 +271,7 @@ def test_cli_hidden_setup_status_rotation_and_delete(setup_service, monkeypatch)
 def test_auto_fpl_expiry_is_separate(setup_service):
     _, service = setup_service
     expiry = NOW + timedelta(seconds=1)
-    service.set("fpl", SecretStr(KEY), expires_at=expiry)
+    service.set("fpl", SecretStr(KEY), expires_at=expiry, fresh_issuance_attested=True)
     provider = AutomaticFplCredentialProvider(
         service_factory=lambda: service, platform="nt", environment={}, clock=lambda: expiry
     )

@@ -25,6 +25,7 @@ _MESSAGES = {
     "CREDENTIAL_TOO_LARGE": "The token exceeds the Windows vault limit. Use the approved session-only or hidden-prompt mechanism; it was not truncated.",
     "CREDENTIAL_LOCK_TIMEOUT": "Another credential mutation is in progress. Retry the explicit setup operation later.",
     "CREDENTIAL_SECURE_INPUT_REQUIRED": "Secure terminal input is unavailable. Run this setup command in an interactive PowerShell terminal.",
+    "CREDENTIAL_FRESH_ISSUANCE_REQUIRED": "A freshly issued FPL replacement is required. Use --fresh-issued with its actual expiry; never reuse the exposed token.",
 }
 
 
@@ -58,12 +59,15 @@ class VaultBackend(Protocol):
 class CredentialStatus:
     configured: bool
     state: Literal["CONFIGURED", "MISSING", "EXPIRED", "UNAVAILABLE", "CORRUPT"]
+    expires_at: datetime | None = None
+    registered_at: datetime | None = None
 
 
 @dataclass(frozen=True, slots=True, repr=False)
 class ResolvedCredential:
     value: SecretStr
     expires_at: datetime | None
+    registered_at: datetime | None = None
 
 
 @dataclass(frozen=True, slots=True, repr=False)
@@ -89,15 +93,21 @@ def _unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
     return result
 
 
-def _metadata(record: VaultRecord, provider: Provider, now: datetime) -> datetime | None:
-    if record.username != f"dmf-pulse.{provider}.v1" or len(record.comment) > 256:
+def _metadata(
+    record: VaultRecord, provider: Provider, now: datetime, *, allow_expired: bool
+) -> tuple[datetime | None, datetime | None]:
+    generation = 2 if provider == "fpl" else 1
+    if record.username != f"dmf-pulse.{provider}.v{generation}" or len(record.comment) > 256:
         raise CredentialError("CREDENTIAL_CORRUPT")
     try:
         data = json.loads(record.comment, object_pairs_hook=_unique)
+        expected = {"schema_version", "provider", "expires_at"}
+        if provider == "fpl":
+            expected |= {"registered_at", "fresh_issuance_attested"}
         if (
             not isinstance(data, dict)
-            or set(data) != {"schema_version", "provider", "expires_at"}
-            or data["schema_version"] != "credential-metadata-v1"
+            or set(data) != expected
+            or data["schema_version"] != f"credential-metadata-v{generation}"
             or data["provider"] != provider
         ):
             raise ValueError("invalid metadata")
@@ -105,18 +115,27 @@ def _metadata(record: VaultRecord, provider: Provider, now: datetime) -> datetim
         if provider == "odds":
             if expiry is not None:
                 raise ValueError("unexpected expiry")
-            return None
+            return None, None
         if not isinstance(expiry, str):
             raise ValueError("missing expiry")
         expires_at = datetime.fromisoformat(expiry)
         if expires_at.tzinfo is None or expires_at.utcoffset() is None:
             raise ValueError("naive expiry")
+        registered = data["registered_at"]
+        if not isinstance(registered, str) or data["fresh_issuance_attested"] is not True:
+            raise ValueError("fresh issuance attestation missing")
+        registered_at = datetime.fromisoformat(registered)
+        if registered_at.tzinfo is None or registered_at.utcoffset() is None:
+            raise ValueError("naive registration")
+        registered_at = registered_at.astimezone(UTC)
+        if registered_at > now or registered_at >= expires_at:
+            raise ValueError("invalid registration chronology")
     except (TypeError, ValueError, KeyError):
         raise CredentialError("CREDENTIAL_CORRUPT") from None
     expires_at = expires_at.astimezone(UTC)
-    if expires_at <= now:
+    if expires_at <= now and not allow_expired:
         raise CredentialError("CREDENTIAL_EXPIRED")
-    return expires_at
+    return expires_at, registered_at
 
 
 def _validate(value: str, provider: Provider) -> None:
@@ -148,7 +167,7 @@ def _read_scope(
             return _Outcome(
                 status=CredentialStatus(False, "MISSING"), code="CREDENTIAL_NOT_CONFIGURED"
             )
-        expires_at = _metadata(record, provider, now)
+        expires_at, registered_at = _metadata(record, provider, now, allow_expired=not decode)
         lower, upper = (32, 1024) if provider == "odds" else (2, 2560)
         if (
             not isinstance(record.blob, bytes)
@@ -158,10 +177,15 @@ def _read_scope(
             return _Outcome(code="CREDENTIAL_CORRUPT")
         if not decode:
             # CredRead copies the blob internally; status does not decode it.
-            return _Outcome(status=CredentialStatus(True, "CONFIGURED"))
+            expired = expires_at is not None and expires_at <= now
+            return _Outcome(
+                status=CredentialStatus(
+                    not expired, "EXPIRED" if expired else "CONFIGURED", expires_at, registered_at
+                )
+            )
         value = record.blob.decode("utf-16-le", errors="strict")
         _validate(value, provider)
-        return _Outcome(resolved=ResolvedCredential(SecretStr(value), expires_at))
+        return _Outcome(resolved=ResolvedCredential(SecretStr(value), expires_at, registered_at))
     except CredentialError as exc:
         code = (
             "CREDENTIAL_CORRUPT"
@@ -180,29 +204,41 @@ def _write_scope(
     provider: Provider,
     value: str,
     expires_at: datetime | None,
-    now: datetime,
+    clock: Callable[[], datetime],
     replace: bool,
+    fresh_issuance_attested: bool,
 ) -> _Outcome:
     try:
         _validate(value, provider)
+        now = _utc(clock())
         if provider == "fpl":
             if expires_at is None or _utc(expires_at) <= now:
                 return _Outcome(code="CREDENTIAL_EXPIRY_REQUIRED")
             expires_at = _utc(expires_at)
+            if fresh_issuance_attested is not True:
+                return _Outcome(code="CREDENTIAL_FRESH_ISSUANCE_REQUIRED")
         elif expires_at is not None:
             return _Outcome(code="CREDENTIAL_INVALID")
-        comment = json.dumps(
-            {
-                "schema_version": "credential-metadata-v1",
+        with backend.mutation_lock():
+            now = _utc(clock())
+            if expires_at is not None and expires_at <= now:
+                return _Outcome(code="CREDENTIAL_EXPIRY_REQUIRED")
+            metadata: dict[str, object] = {
+                "schema_version": f"credential-metadata-v{2 if provider == 'fpl' else 1}",
                 "provider": provider,
                 "expires_at": None if expires_at is None else expires_at.isoformat(),
-            },
-            separators=(",", ":"),
-        )
-        with backend.mutation_lock():
-            if backend.read(provider) is not None and not replace:
+            }
+            if provider == "fpl":
+                metadata.update(registered_at=now.isoformat(), fresh_issuance_attested=True)
+            comment = json.dumps(metadata, separators=(",", ":"))
+            # A fresh FPL registration is an explicit replacement operation.
+            # Never copy the old blob, including under --replace.
+            if provider == "odds" and not replace and backend.read(provider) is not None:
                 return _Outcome(code="CREDENTIAL_ALREADY_CONFIGURED")
             backend.write(provider, value, comment)
+            if expires_at is not None and expires_at <= _utc(clock()):
+                backend.delete(provider)
+                return _Outcome(code="CREDENTIAL_EXPIRED")
         return _Outcome()
     except CredentialError as exc:
         code = exc.code
@@ -273,14 +309,27 @@ class CredentialService:
         *,
         replace: bool = False,
         expires_at: datetime | None = None,
+        fresh_issuance_attested: bool = False,
     ) -> None:
-        outcome = self._set(provider, secret, replace=replace, expires_at=expires_at)
+        outcome = self._set(
+            provider,
+            secret,
+            replace=replace,
+            expires_at=expires_at,
+            fresh_issuance_attested=fresh_issuance_attested,
+        )
         del self, secret
         if outcome.code is not None:
             raise CredentialError(outcome.code) from None
 
     def _set(
-        self, provider: Provider, secret: SecretStr, *, replace: bool, expires_at: datetime | None
+        self,
+        provider: Provider,
+        secret: SecretStr,
+        *,
+        replace: bool,
+        expires_at: datetime | None,
+        fresh_issuance_attested: bool,
     ) -> _Outcome:
         try:
             return _write_scope(
@@ -288,8 +337,9 @@ class CredentialService:
                 provider,
                 secret.get_secret_value(),
                 expires_at,
-                _utc(self._clock()),
+                self._clock,
                 replace,
+                fresh_issuance_attested,
             )
         except CredentialError as exc:
             code = exc.code

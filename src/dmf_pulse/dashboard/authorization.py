@@ -12,12 +12,11 @@ from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime, timedelta
-from importlib.resources import files
 from pathlib import Path
 from secrets import token_hex
 from typing import Annotated, Any, Literal, Self, cast
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.authorization_errors import AuthorizationError as AuthorizationError
@@ -155,9 +154,11 @@ class OperatorRefreshApproval(_Contract):
 
     @field_validator("horizons", mode="before")
     @classmethod
-    def integer_horizons(cls, value: object) -> object:
+    def integer_horizons(cls, value: object, info: ValidationInfo) -> object:
         if isinstance(value, (tuple, list)) and any(type(item) is not int for item in value):
             raise ValueError("horizons require exact integers")
+        if info.mode == "json" and isinstance(value, list):
+            return tuple(value)
         return value
 
     @model_validator(mode="after")
@@ -236,33 +237,12 @@ def production_approvals() -> tuple[OperatorRefreshApproval, ...]:
     Installation is trusted as it is for executable code; no user path, runtime
     document, browser value or environment setting can enroll approval rows.
     """
+    from dmf_pulse.operation.enrollment import installed_enrollment
+    from dmf_pulse.operation.models import OperationError
+
     try:
-        body = (
-            files("dmf_pulse.dashboard.resources")
-            .joinpath("production_refresh_enrollments.json")
-            .read_bytes()
-        )
-        if len(body) > 131072:
-            raise ValueError("enrollment resource exceeds bound")
-        value = json.loads(body, object_pairs_hook=_strict_object)
-        if (
-            not isinstance(value, dict)
-            or set(value) != {"schema_version", "approvals"}
-            or value["schema_version"] != "trusted-refresh-enrollments-v1"
-            or not isinstance(value["approvals"], list)
-            or len(value["approvals"]) > 32
-        ):
-            raise ValueError("enrollment resource schema differs")
-        approvals = tuple(
-            OperatorRefreshApproval.model_validate_json(json.dumps(row, allow_nan=False))
-            for row in value["approvals"]
-        )
-        if len({row.authorization_id for row in approvals}) != len(approvals) or any(
-            row.classification != "PRIVATE_CURRENT" for row in approvals
-        ):
-            raise ValueError("enrollment identities or classification differ")
-        return approvals
-    except (OSError, ValueError, TypeError, RecursionError):
+        return installed_enrollment().approvals
+    except OperationError:
         raise AuthorizationError("TRUSTED_APPROVAL_REGISTRY_INVALID") from None
 
 
@@ -277,8 +257,19 @@ def _approved_expiry(
     approval: OperatorRefreshApproval, request: RefreshRequest, issued_at: datetime
 ) -> datetime:
     """One pure authority check shared by issuer, reservation and child worker."""
+    source_expiry = approval.expires_at
     if approval.status != "APPROVED_REVIEWED":
         raise AuthorizationError("AUTHORIZATION_REVOKED")
+    if approval.classification == "PRIVATE_CURRENT":
+        from dmf_pulse.operation.enrollment import require_source_closure
+        from dmf_pulse.operation.models import OperationError
+
+        if approval not in production_approvals():
+            raise AuthorizationError("PRODUCTION_APPROVAL_NOT_ENROLLED")
+        try:
+            source_expiry = require_source_closure(approval.source_scopes, now=issued_at)
+        except OperationError as error:
+            raise AuthorizationError(error.code, "RIGHTS_APPROVAL_REQUIRED") from None
     if not approval.not_before <= issued_at < approval.expires_at:
         raise AuthorizationError("AUTHORIZATION_EXPIRED", "EXPIRED")
     for name in (
@@ -313,6 +304,7 @@ def _approved_expiry(
     ):
         raise AuthorizationError("QUALIFIED_QUOTA_EVIDENCE_STALE")
     return min(
+        source_expiry,
         approval.expires_at,
         request.deadline_at,
         issued_at + timedelta(seconds=approval.max_run_seconds),
@@ -741,6 +733,13 @@ class UsageLedger:
                 raise AuthorizationError("REFRESH_GRANT_INVALID")
             if grant.expires_at != _approved_expiry(enrolled[0], grant.request, grant.issued_at):
                 raise AuthorizationError("REFRESH_GRANT_INVALID")
+            from dmf_pulse.operation.enrollment import require_source_closure
+            from dmf_pulse.operation.models import OperationError
+
+            try:
+                require_source_closure(enrolled[0].source_scopes, now=now)
+            except OperationError as error:
+                raise AuthorizationError(error.code, "RIGHTS_APPROVAL_REQUIRED") from None
         if not grant.issued_at <= now < grant.expires_at or now >= grant.request.deadline_at:
             raise AuthorizationError("REFRESH_GRANT_EXPIRED", "EXPIRED")
 

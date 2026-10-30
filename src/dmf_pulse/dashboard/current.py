@@ -39,7 +39,7 @@ from dmf_pulse.dashboard.current_sources import CurrentSourceFactories, Provider
 from dmf_pulse.dashboard.synthetic import DEMO_TIME, demo_inputs
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsProfile
-from dmf_pulse.ingestion.odds.models import QuotaSource, QuotaState
+from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaSource, QuotaState
 from dmf_pulse.private_v1.actionability import checked_report
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import PrivateV1Decision
@@ -114,6 +114,15 @@ def resolved_profiles(
         else {row.provider: row.profile_id for row in scopes}
     )
     try:
+        if scopes is not None and any(
+            row.source_kind == "RIGHTS_QUALIFIED_PRIVATE" for row in scopes
+        ):
+            from dmf_pulse.operation.enrollment import installed_enrollment
+
+            for qualification in installed_enrollment().qualifications:
+                registries[qualification.scope.provider][
+                    qualification.profile.rights_profile_id
+                ] = qualification.profile
         return {
             provider: registries[provider][identity] for provider, identity in identities.items()
         }
@@ -169,7 +178,7 @@ class CurrentLaunch:
     grant: RefreshGrant
     ledger_path: Path | None
     entry_id: int
-    quota: QuotaState
+    quota: QuotaState | QualifiedOperatorQuota
     worker_id: str = field(repr=False)
     control_account_ref: str
     database_ref: DatabaseReference = "OPERATOR_CONTROL_DATABASE"
@@ -559,9 +568,13 @@ class CurrentRefreshSession:
                 used=0,
                 last_cost=0,
                 observed_at=approval.plan_quota.observed_at,
-                source=QuotaSource.SYNTHETIC_FIXTURE
-                if self.owned_sources
-                else QuotaSource.RESPONSE_HEADERS,
+                source=QuotaSource.SYNTHETIC_FIXTURE,
+            )
+            if self.owned_sources
+            else QualifiedOperatorQuota(
+                remaining=approval.plan_quota.remaining_credits,
+                observed_at=approval.plan_quota.observed_at,
+                evidence_sha256=approval.plan_quota.evidence_sha256,
             ),
         )
         _launch_is_bound(launch)

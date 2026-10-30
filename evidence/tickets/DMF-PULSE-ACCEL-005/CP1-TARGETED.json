@@ -1,0 +1,23 @@
+{
+  "actual_provider_calls": 0,
+  "actual_vault_calls": 0,
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/unit/credentials",
+    "tests/unit/operation/test_account_evidence.py",
+    "tests/unit/operation/test_operator_metadata.py",
+    "tests/unit/operation/test_console_and_cli.py",
+    "tests/unit/operation/test_authorization_preview.py",
+    "-q"
+  ],
+  "completed_at": "2026-10-30T16:44:53.502105+00:00",
+  "cwd": "DEDICATED_WAVE005_WORKTREE",
+  "environment": "CLOSED_NONSECRET_TEST_WHITELIST",
+  "exit_code": 0,
+  "helper_sha256": "c19b572ff52a21924ca192c270e9b6e77030a07be6b63efc58cc1f933f4f74f7",
+  "log_sha256": "fb7b78d7d809f74cd745a846176acae8b9b1b6bdd239b0dbce8920ed9fae074d",
+  "schema_version": "accel005-owned-command-v1",
+  "started_at": "2026-10-30T16:44:48.567999+00:00"
+}

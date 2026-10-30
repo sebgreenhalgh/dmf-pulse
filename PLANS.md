@@ -12,7 +12,7 @@ value is read, copied, decoded, stored or used.
 
 - [x] CP0 fetch main/parent, isolate worktree, authenticate authority, P01 and
   protected identities, preserve original dirty files, retain private inputs.
-- [ ] CP1 complete nonsecret existing-account evidence, quotas/provenance and
+- [x] CP1 complete nonsecret existing-account evidence, quotas/provenance and
   separate new-purpose approval preparation; fresh FPL v2 blind setup.
 - [ ] CP2 implement private reviewed enrollment/wheel assembly/install and
   canonical control workflow using the existing registry/authorizer/worker.
@@ -31,6 +31,15 @@ remain unresolved, not disproved. Original P01/fallback consumption/authority
 history and all157 numerical sources remain pinned. The old consumed Odds
 purpose cannot authorize this new pilot. A caller-resealed JSON decision,
 completed draft, environment assertion or browser input cannot enroll a grant.
+
+CP1 implementation and owned checks are complete; actual account facts remain
+missing, with each required field reported separately. Source closure now gates
+reservation, credential resolution and native FPL transport, including actual
+permission expiry and exact profile identity. The old risk acceptance and
+consumed Odds purpose do not qualify. Fresh FPL v2 setup blindly writes a new
+slot and cannot read/migrate the exposed legacy slot. CP2 wheel assembly and
+reviewed default launch, CP3 canonical scoring and CP4 locator/player work are
+in progress; their drafts are not approved operations.
 
 ## DMF-PULSE-ACCEL-004 — existing forecasts and secure operation
 

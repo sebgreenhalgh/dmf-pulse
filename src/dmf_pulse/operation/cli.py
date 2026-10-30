@@ -11,16 +11,72 @@ import typer
 from pydantic import ValidationError
 
 from dmf_pulse.dashboard.authorization import AuthorizationError
-from dmf_pulse.operation.control import (
-    ControlRecoveryRequest,
-    ControlSetupRequest,
-    init_control,
-    recover_control,
-)
 from dmf_pulse.operation.models import CredentialObservation, Metadata, OperationError, readiness
 from dmf_pulse.operation.packages import PilotProposal, prepare_pilot, read_metadata, write_metadata
 
 operation_app = typer.Typer(help="Prepare owner review and recover canonical control metadata.")
+
+
+@operation_app.command("account-draft")
+def account_draft_command(
+    account_ref: Annotated[
+        str, typer.Option(help="Opaque odds-account- reference; never an email or key.")
+    ],
+    output: Annotated[
+        Path, typer.Option(help="New private, editable nonsecret account evidence input.")
+    ],
+) -> None:
+    """Create an input template; missing facts remain null and no request is made."""
+    from dmf_pulse.operation.account import OddsAccountEvidence
+    from dmf_pulse.operation.packages import write_nonexecuting_input
+
+    try:
+        digest = write_nonexecuting_input(output, OddsAccountEvidence(account_ref=account_ref))
+    except (OperationError, ValidationError) as error:
+        _fail(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "status": "EDITABLE_NONEXECUTING_DRAFT",
+                "artifact_sha256": digest,
+                "runtime_authority": "NOT_GRANTED",
+            },
+            sort_keys=True,
+        )
+    )
+
+
+@operation_app.command("review-account")
+def account_review_command(
+    input_path: Annotated[
+        Path, typer.Option("--input", help="Locally completed, nonsecret account evidence draft.")
+    ],
+    output: Annotated[Path, typer.Option(help="New immutable account-review package.")],
+) -> None:
+    """Validate dated account facts for review; completeness never verifies entitlement."""
+    from dmf_pulse.operation.account import OddsAccountEvidence, prepare_account_review
+    from dmf_pulse.operation.packages import read_nonexecuting_input
+
+    try:
+        evidence = read_nonexecuting_input(input_path, OddsAccountEvidence)
+        result = prepare_account_review(evidence, now=datetime.now(UTC))
+        digest = write_metadata(output, result)
+    except (OperationError, ValidationError) as error:
+        _fail(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "state": result.state,
+                "blockers": result.blockers,
+                "artifact_sha256": digest,
+                "entitlement_verified": False,
+                "runtime_authority": "NOT_GRANTED",
+            },
+            sort_keys=True,
+        )
+    )
 
 
 def _show(value: Metadata) -> None:
@@ -80,7 +136,7 @@ def prepare_pilot_command(
     authorization_id: Annotated[
         str,
         typer.Option(
-            help="Fresh ACCEL004-PILOT- identifier; historical consumed approvals are prohibited."
+            help="Fresh ACCEL005-PILOT- identifier; historical consumed approvals are prohibited."
         ),
     ],
     output: Annotated[Path, typer.Option(help="New immutable metadata-only owner package.")],
@@ -128,6 +184,8 @@ def init_control_command(
     output: Annotated[Path, typer.Option(help="New immutable control receipt.")],
 ) -> None:
     """Explicitly initialize/reopen the canonical account ledger; no grant is issued."""
+    from dmf_pulse.operation.control import ControlSetupRequest, init_control
+
     try:
         from dmf_pulse.dashboard.current import _control_connection
 
@@ -167,6 +225,8 @@ def prepare_control_command(
     ] = False,
 ) -> None:
     """Prepare control-only administration; it grants no provider authority."""
+    from dmf_pulse.operation.control import ControlRecoveryRequest, ControlSetupRequest
+
     values = {
         "classification": "OWNED_SYNTHETIC" if owned_synthetic else "PRIVATE_CURRENT",
         "account_ref": account_ref,
@@ -210,6 +270,8 @@ def recover_control_command(
     output: Annotated[Path, typer.Option(help="New immutable read-only recovery receipt.")],
 ) -> None:
     """Reconnect and authenticate existing history without initializing or resetting it."""
+    from dmf_pulse.operation.control import ControlRecoveryRequest, recover_control
+
     try:
         from dmf_pulse.dashboard.current import _control_connection
 

@@ -35,6 +35,18 @@ from dmf_pulse.ingestion.fpl.direct import (
 )
 
 
+@pytest.fixture(autouse=True)
+def owned_supplier_closure(monkeypatch):
+    """These credential/ledger tests own their native-send replacement.
+
+    Missing real supplier permission is tested without this seam in
+    test_supplier_enrollment; no source eligibility is inferred here.
+    """
+    from dmf_pulse.operation import enrollment
+
+    monkeypatch.setattr(enrollment, "require_fpl_route", lambda *args, **kwargs: None)
+
+
 def sources(tmp_path):
     launch = CurrentRefreshSession.owned(tmp_path / "usage").prepare(1)
     time = [DEMO_TIME]

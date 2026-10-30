@@ -4,11 +4,14 @@ These constants disclose reasons; they grant no authority and change no budgets.
 """
 
 CURRENT_FAILURE_ACTIONS = {
+    "FPL_SUPPLIER_PERMISSION_REQUIRED": "Qualify supplier permission or an applicable exception for the exact FPL routes; owner risk acceptance is insufficient.",
+    "NEW_ODDS_PURPOSE_QUALIFICATION_REQUIRED": "Review current account evidence and approve the new Odds purpose; the consumed historical profile cannot authorize this pilot.",
+    "OPENFOOTBALL_SCOPE_QUALIFICATION_REQUIRED": "Qualify the exact pinned OpenFootball source scope in the reviewed enrollment.",
     "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED": "Enroll a reviewed refresh approval; run dmf operation status.",
     "PRODUCTION_APPROVAL_NOT_ENROLLED": "Install the reviewed enrollment wheel; run dmf operation status.",
     "CREDENTIAL_UNAVAILABLE": "Configure the required credentials with dmf credentials; check dmf credentials status.",
     "CREDENTIAL_NOT_CONFIGURED": "Configure the required credentials with dmf credentials; check dmf credentials status.",
-    "CREDENTIAL_EXPIRED": "Replace the expired FPL token with dmf credentials set-fpl-token --replace --expires-at <actual-expiry>.",
+    "CREDENTIAL_EXPIRED": "Supply a freshly issued replacement locally with dmf credentials set-fpl-token --replace --fresh-issued --expires-at <actual-expiry>.",
     "CREDENTIAL_CORRUPT": "Explicitly replace the invalid entry through dmf credentials.",
     "CREDENTIAL_BACKEND_UNAVAILABLE": "Use the correct Windows user session and check Windows Credential Manager.",
     "FPL_AUTH_REQUIRED": "Obtain an authorized current FPL token and replace it through dmf credentials.",

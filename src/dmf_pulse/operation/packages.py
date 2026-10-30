@@ -14,13 +14,12 @@ from pydantic import Field, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.dashboard.authorization import QualifiedPlanQuota, SourceScope
-from dmf_pulse.operation.control import MetadataTime
-from dmf_pulse.operation.models import Metadata, OperationError, Ref, Sha
+from dmf_pulse.operation.models import Metadata, MetadataTime, OperationError, Ref, Sha
 
 
 class PilotProposal(Metadata):
     schema_version: Literal["operator-pilot-proposal-v1"] = "operator-pilot-proposal-v1"
-    authorization_id: Annotated[str, Field(pattern=r"^ACCEL004-PILOT-[A-Za-z0-9_.:-]{1,80}$")]
+    authorization_id: Annotated[str, Field(pattern=r"^ACCEL00[45]-PILOT-[A-Za-z0-9_.:-]{1,80}$")]
     classification: Literal["PRIVATE_CURRENT"] = "PRIVATE_CURRENT"
     operator_ref: Ref | None = None
     entry_id: Annotated[int, Field(ge=1)] | None = None
@@ -131,6 +130,15 @@ def write_metadata(path: Path, value: Metadata) -> str:
     """Create one immutable authenticated metadata artifact, never overwrite."""
     envelope = {"payload": value.model_dump(mode="json"), "semantic_sha256": value.semantic_sha256}
     body = canonical_json_bytes(envelope) + b"\n"
+    return _write_body(path, body)
+
+
+def write_nonexecuting_input(path: Path, value: Metadata) -> str:
+    """Create an editable evidence draft, with no approval or integrity claim."""
+    return _write_body(path, canonical_json_bytes(value.model_dump(mode="json")) + b"\n")
+
+
+def _write_body(path: Path, body: bytes) -> str:
     if len(body) > 131072 or path.is_symlink():
         raise OperationError("OPERATOR_ARTIFACT_INVALID")
     try:
@@ -143,7 +151,9 @@ def write_metadata(path: Path, value: Metadata) -> str:
     return hashlib.sha256(body).hexdigest()
 
 
-def _read_metadata_scope[T: Metadata](path: Path, contract: type[T]) -> T | None:
+def _read_metadata_scope[T: Metadata](
+    path: Path, contract: type[T], *, sealed: bool = True
+) -> T | None:
     """Discard invalid bytes and parser exception frames before a public error exists."""
 
     def unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
@@ -175,6 +185,8 @@ def _read_metadata_scope[T: Metadata](path: Path, contract: type[T]) -> T | None
         if len(body) > 131072:
             raise ValueError("metadata file exceeds bound")
         value = json.loads(body, object_pairs_hook=unique)
+        if not sealed:
+            return contract.model_validate_json(json.dumps(value, allow_nan=False))
         if not isinstance(value, dict) or set(value) != {"payload", "semantic_sha256"}:
             raise ValueError("metadata envelope differs")
         result = contract.model_validate_json(json.dumps(value["payload"], allow_nan=False))
@@ -188,6 +200,14 @@ def _read_metadata_scope[T: Metadata](path: Path, contract: type[T]) -> T | None
 def read_metadata[T: Metadata](path: Path, contract: type[T]) -> T:
     """Authenticate bounded metadata; failed parser payloads cannot escape as context."""
     result = _read_metadata_scope(path, contract)
+    if result is None:
+        raise OperationError("OPERATOR_ARTIFACT_INVALID")
+    return result
+
+
+def read_nonexecuting_input[T: Metadata](path: Path, contract: type[T]) -> T:
+    """Read an editable local evidence draft; integrity or approval is not inferred."""
+    result = _read_metadata_scope(path, contract, sealed=False)
     if result is None:
         raise OperationError("OPERATOR_ARTIFACT_INVALID")
     return result

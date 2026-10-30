@@ -43,6 +43,17 @@ class QuotaState(_FrozenModel):
         return self
 
 
+class QualifiedOperatorQuota(_FrozenModel):
+    """Accepted account observation; never misrepresented as response headers."""
+
+    remaining: int = Field(ge=0)
+    observed_at: datetime
+    evidence_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source: Literal["QUALIFIED_OPERATOR_ACCOUNT_EVIDENCE"] = "QUALIFIED_OPERATOR_ACCOUNT_EVIDENCE"
+    used: None = None
+    last_cost: None = None
+
+
 class ProviderFailureCode(StrEnum):
     RIGHTS_BLOCKED = "RIGHTS_BLOCKED"
     CREDENTIAL_UNAVAILABLE = "CREDENTIAL_UNAVAILABLE"

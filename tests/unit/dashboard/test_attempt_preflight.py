@@ -145,6 +145,13 @@ def test_new_route_lookup_does_not_reuse_another_routes_spent_attempt(tmp_path):
 
 
 def test_revoked_installed_scope_denies_before_transaction_or_lookup(tmp_path, monkeypatch):
+    from dmf_pulse.operation import enrollment
+
+    # This owned revocation-policy test supplies its independent supplier-closure
+    # seam explicitly. Default and real transport denials are tested separately.
+    monkeypatch.setattr(
+        enrollment, "require_source_closure", lambda scopes, *, now: NOW + timedelta(hours=1)
+    )
     file_ledger, approval, request, _ = setup(tmp_path)
     # Hypothetical installed approval and PG-discriminated hooks are injected
     # over an OWNED file history solely to exercise shared revocation policy.

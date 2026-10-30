@@ -12,7 +12,6 @@ from pathlib import Path
 import pytest
 
 from dmf_pulse.assurance.canonical import canonical_sha256
-from dmf_pulse.dashboard import authorization as auth
 from dmf_pulse.dashboard.authorization import (
     AuthorizationError,
     DurableUsageLedger,
@@ -141,7 +140,9 @@ def test_fixed_enrollment_resource_corruption_is_typed(monkeypatch, body):
         def read_bytes(self):
             return body
 
-    monkeypatch.setattr(auth, "files", lambda package: Resource())
+    from dmf_pulse.operation import enrollment
+
+    monkeypatch.setattr(enrollment, "files", lambda package: Resource())
     with pytest.raises(AuthorizationError, match="TRUSTED_APPROVAL_REGISTRY_INVALID"):
         production_approvals()
 

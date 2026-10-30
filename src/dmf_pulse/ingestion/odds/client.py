@@ -27,7 +27,12 @@ from dmf_pulse.ingestion.odds.credentials import (
     UnavailableCredentialProvider,
     validate_runtime_credential,
 )
-from dmf_pulse.ingestion.odds.models import ProviderFailureCode, QuotaSource, QuotaState
+from dmf_pulse.ingestion.odds.models import (
+    ProviderFailureCode,
+    QualifiedOperatorQuota,
+    QuotaSource,
+    QuotaState,
+)
 from dmf_pulse.ingestion.rights import require_rights
 
 __all__ = [
@@ -1304,7 +1309,7 @@ class OddsClient:
     def fetch(
         self,
         *,
-        quota: QuotaState | None = None,
+        quota: QuotaState | QualifiedOperatorQuota | None = None,
         commence_from: datetime | None = None,
         commence_to: datetime | None = None,
     ) -> OddsFetchResult:
@@ -1334,7 +1339,7 @@ class OddsClient:
     def _unsafe_fetch(
         self,
         *,
-        quota: QuotaState | None = None,
+        quota: QuotaState | QualifiedOperatorQuota | None = None,
         commence_from: datetime | None = None,
         commence_to: datetime | None = None,
     ) -> OddsFetchResult:
@@ -1619,7 +1624,7 @@ class OddsClient:
 def _fetch_without_traceback_escape(
     client: OddsClient,
     *,
-    quota: QuotaState | None,
+    quota: QuotaState | QualifiedOperatorQuota | None,
     commence_from: datetime | None,
     commence_to: datetime | None,
 ) -> _FetchOutcome:

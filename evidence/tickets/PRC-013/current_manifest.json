@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 217917,
+      "bytes": 218517,
       "path": "PLANS.md",
-      "sha256": "e4734300caf3a6b58bea07b5e86a6820bf4cff64e27d103839d59c618cec809d"
+      "sha256": "623ca2f9a80186d551a9133628351648e00fef1dd550f04bdc12faa6469cb136"
     },
     {
       "bytes": 2761,
@@ -2991,9 +2991,9 @@
       "sha256": "285319e4f06ea90ac52fbba2600116f979a8a3ee3d4312dc6e574981d6cb8e31"
     },
     {
-      "bytes": 2441,
+      "bytes": 2634,
       "path": "src/dmf_pulse/authorization_errors.py",
-      "sha256": "c893c56ed518a3845e9d7069ae82210ebd14a9cdd755fd35488ac6bb8777bc73"
+      "sha256": "f0e093d7ece2ac5be282514f8c97916fea994f2b7e0de0ed9c2397c9db248ebf"
     },
     {
       "bytes": 1469,
@@ -3251,9 +3251,9 @@
       "sha256": "8060678b5a376a52b3db99448cba6027a4e57914b391a9d09b117b420247b9b5"
     },
     {
-      "bytes": 4075,
+      "bytes": 5983,
       "path": "src/dmf_pulse/cli/credentials.py",
-      "sha256": "f8626096f763ac6162d39b021cb18edb91b66e25ba2b6db5b61a2a9b0fc1f83d"
+      "sha256": "cb3b10aee1997aef9b2528eb08e8afab3ce6b3e002996ae4d1ee01294c0e39e1"
     },
     {
       "bytes": 3398,
@@ -3426,24 +3426,24 @@
       "sha256": "ad208335d17c81f876090fd1f11bc95b45f7f8f88ed43e6536d3d3c8e4fd0980"
     },
     {
-      "bytes": 6823,
+      "bytes": 7547,
       "path": "src/dmf_pulse/credentials/providers.py",
-      "sha256": "993c08146a29b7581f757f99972a58a07ae366a54785f42d4788a5f7da19bf3f"
+      "sha256": "35cf9def692c2a354823f53974b8401bdbea35a27b880389cc6e1df9987a1d06"
     },
     {
-      "bytes": 11825,
+      "bytes": 14389,
       "path": "src/dmf_pulse/credentials/service.py",
-      "sha256": "0a15382fd7301ce64fcf8f022aded021f15418e539b0f5f188f0226b58b43cb9"
+      "sha256": "d6bc692ff88442d821ad97d7da5595a74f94b79a3c67cad210f5655bc26fce19"
     },
     {
-      "bytes": 5567,
+      "bytes": 5789,
       "path": "src/dmf_pulse/credentials/windows.py",
-      "sha256": "c24a93645780062a0ba90271678199c7f65531dc77a9a9100b34f69750af064d"
+      "sha256": "97f2a3a59c7bcca6b5e2571cad5e4088a19186b19cc06d93e02689ddc0e85bae"
     },
     {
-      "bytes": 9059,
+      "bytes": 9559,
       "path": "src/dmf_pulse/current_failures.py",
-      "sha256": "d4cbf75fd17df14477ebbcd23893d2901c0572d5875d0fa63063bc61c47c0597"
+      "sha256": "d8993af12c91f6b3856b4040c8f588d0be02f3cf91d4af7fe7955132cab61853"
     },
     {
       "bytes": 78,
@@ -3456,19 +3456,19 @@
       "sha256": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab"
     },
     {
-      "bytes": 37944,
+      "bytes": 38017,
       "path": "src/dmf_pulse/dashboard/authorization.py",
-      "sha256": "5c68e86eea96c8a59070f636454c86c4dec6f287fdcf7654a6ecaebef39c8116"
+      "sha256": "59b62407e7ccf1a1f9858d0d65b8459620aed640fb5bf0a5a5b7792f6b0ce979"
     },
     {
-      "bytes": 30700,
+      "bytes": 31380,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "8cad4feee6746e463f18aa9f7df213aeb72c3575a230a29c7e292d8252e7d02e"
+      "sha256": "a78b9e6594a343b9bb47de7aae778ac2b0ab7b2e6c4dd59e987c51c3b3a29f17"
     },
     {
-      "bytes": 13413,
+      "bytes": 13842,
       "path": "src/dmf_pulse/dashboard/current_sources.py",
-      "sha256": "b7339695e01fb9f296d6ac37cee3c75ff4245a2c3705f1bb1ac5b1a4d40743e5"
+      "sha256": "b5cdf03705d2cca4fb8da5eac77c0f691f68a26437f80946636b3eab9f9f329b"
     },
     {
       "bytes": 12739,
@@ -3571,9 +3571,9 @@
       "sha256": "b42d86a640fa96b8187816cc321ba329b3537137101bc2fc2b3fefbace2a19b6"
     },
     {
-      "bytes": 76,
+      "bytes": 161,
       "path": "src/dmf_pulse/dashboard/resources/production_refresh_enrollments.json",
-      "sha256": "f55100d3e4f538af4c08ae32ede4bc16eaf54092c4c8d9c73723adbe956b5d26"
+      "sha256": "c3843f5d9f9ad774e1e7f521a0104d9f043a6bc2b0aa75ca26793607573bd6a6"
     },
     {
       "bytes": 16851,
@@ -4171,9 +4171,9 @@
       "sha256": "20fea68f46cb67d4fef68af8ff1512536ed824e59cf5e587d72e18668daea8fd"
     },
     {
-      "bytes": 26834,
+      "bytes": 29837,
       "path": "src/dmf_pulse/ingestion/fpl/direct.py",
-      "sha256": "d5ef2705ec6bc9e695e1a09c8a6ee3f62f80534b02715c64739fd10a95d8cda1"
+      "sha256": "3909f1e38aba3511732b6a1adcd771a7cc365762d0dc304988dd7864c4062302"
     },
     {
       "bytes": 31073,
@@ -4221,9 +4221,9 @@
       "sha256": "e45e09e5c6aef2b4b7693a132a26571a5fe38d47b6fc9ff65b55d4187b13d182"
     },
     {
-      "bytes": 63982,
+      "bytes": 64102,
       "path": "src/dmf_pulse/ingestion/odds/client.py",
-      "sha256": "a9b483aacd5e3c12a5dbdd049ad5c3dd51f0917a5d867ad1d4237b3c031d1c64"
+      "sha256": "996f134785a8f70a369688aa977cae764cadc632131f1750a4b222130efca803"
     },
     {
       "bytes": 7070,
@@ -4256,9 +4256,9 @@
       "sha256": "a7201d5b518297c3c60654bfc941d22979e093b3e6de6e8d371d0ae56ab82f0e"
     },
     {
-      "bytes": 6730,
+      "bytes": 7126,
       "path": "src/dmf_pulse/ingestion/odds/models.py",
-      "sha256": "42ee8f5a6c30e484d3ba2193c83deb1ec9f8d6a0ee43312e64ff8c677e0f91ff"
+      "sha256": "3c1919ff24118c4fce5b974466d1227ae5e8a84647fc0cef50ebfc7ea29175fb"
     },
     {
       "bytes": 23732,
@@ -4276,9 +4276,9 @@
       "sha256": "6377565a1a679c4cad9f63542d9eae88bf05d05166d783af114659ef5d83bac0"
     },
     {
-      "bytes": 5576,
+      "bytes": 5625,
       "path": "src/dmf_pulse/ingestion/odds/transient.py",
-      "sha256": "3faeb93796f3989a92ea58a63da64269161d64d4e490ca2d08f1a8e3aa472a81"
+      "sha256": "e73d0b95d9f11ec47ec81e2ee05448002db2c2a276a21b1a7a2e369a04347086"
     },
     {
       "bytes": 617,
@@ -4456,9 +4456,14 @@
       "sha256": "6a8bd2c4de15965eaed1edd45d95ce8dd90620e0efb907062362867c2a15517b"
     },
     {
-      "bytes": 8745,
+      "bytes": 10727,
+      "path": "src/dmf_pulse/operation/account.py",
+      "sha256": "c096bbda5cf71a9989d70b9170147de523041eefcfea18491b7de95e17bed006"
+    },
+    {
+      "bytes": 11051,
       "path": "src/dmf_pulse/operation/cli.py",
-      "sha256": "65e18fe1bfc6a5ec895e6985cd6e7682b602e08020549dc26606cbc931ff4ef1"
+      "sha256": "48e3a85ff8d7e650601a4343c0ca25b2d6841c06d7cc1f85c9b0742f216e808f"
     },
     {
       "bytes": 4622,
@@ -4466,19 +4471,24 @@
       "sha256": "a78e8b1e0f0dd07f8d9612773be7a297ef803d64da6769f41e7371eb75d5985f"
     },
     {
-      "bytes": 3832,
+      "bytes": 3789,
       "path": "src/dmf_pulse/operation/control.py",
-      "sha256": "e88f19c5e7409708f9b8e42e56ca832bdbe6aded77e3f98145eb4b84e32ae72b"
+      "sha256": "3fe67f742878a4b5522330da3ef74f143c15590ed8f7ac89b599dc1d19f35ded"
     },
     {
-      "bytes": 6029,
+      "bytes": 8569,
+      "path": "src/dmf_pulse/operation/enrollment.py",
+      "sha256": "72f76c76eaaf51e8810d4fc5803258f21836eed6f15858bdff7d1a713880bfb8"
+    },
+    {
+      "bytes": 6163,
       "path": "src/dmf_pulse/operation/models.py",
-      "sha256": "7ffced84b3f8ee068ea27f0782533b817c9fde7cb489a1ae03868ee8adf4ebbf"
+      "sha256": "e475538cde6b9331997a3de4172484953c56682aded511bc830bdbd73cce9d53"
     },
     {
-      "bytes": 8573,
+      "bytes": 9331,
       "path": "src/dmf_pulse/operation/packages.py",
-      "sha256": "44852df6c70f5439e7504c24a4312858d01ee1aaaab62199dcbd9f41a26d028d"
+      "sha256": "ad9f98591dba622290aa7a68b0e25d0abda5acaf818aa44510550069140fbccf"
     },
     {
       "bytes": 2578,
@@ -5036,9 +5046,9 @@
       "sha256": "0ad1f21d9a30537f2d30d28ec5f3f2afed89ade27767c3498a305b24624641bf"
     },
     {
-      "bytes": 26826,
+      "bytes": 27114,
       "path": "src/dmf_pulse/private_v1/team_strength_live.py",
-      "sha256": "28933a05edb963842de40346a5eb0a39adc1ab99685b5ee72a8c17417853370c"
+      "sha256": "008c44b31aeb6d27b07ab3653ed25571e673f20a1841b6146226519fb3c0d82e"
     },
     {
       "bytes": 3795,
@@ -5046,9 +5056,9 @@
       "sha256": "11e86817d24a4bf64b528255c43f2e30fa5738b923dbcbf35a840cc281cc7c6a"
     },
     {
-      "bytes": 4257,
+      "bytes": 4571,
       "path": "src/dmf_pulse/private_v1/team_strength_live_network.py",
-      "sha256": "7676a5c00eef585a8dbf3ffb54906ebd3f74bf95860ef64f8565d2a2ae3659a7"
+      "sha256": "e58d19b0720b93ecff192524fc8e2fea238868751d76e6e2b69dc7d6c0313f31"
     },
     {
       "bytes": 3984,
@@ -6591,14 +6601,19 @@
       "sha256": "b9db44bbd2d395a3166d225d8bde875b551e16256558a301882c97424584c998"
     },
     {
-      "bytes": 10196,
-      "path": "tests/unit/credentials/test_service.py",
-      "sha256": "d13bdbc3a2593e12e73ae285762519a40c440c68d059365bfef6ec77ccbf2a89"
+      "bytes": 9523,
+      "path": "tests/unit/credentials/test_fresh_fpl.py",
+      "sha256": "5bfd6d0a9563a2b5bd345b4a8d4cfe4874e418bcd818628908be5bb731637d09"
     },
     {
-      "bytes": 9661,
+      "bytes": 10311,
+      "path": "tests/unit/credentials/test_service.py",
+      "sha256": "f6f9ca43eaa2c75a31bd7719ef632d5261d123da9e50edaa0c8ce685a41c8e8a"
+    },
+    {
+      "bytes": 9997,
       "path": "tests/unit/dashboard/test_attempt_preflight.py",
-      "sha256": "9701ba58846e9ac0fba7d63d9cad1de3b35a50f4e2e1516fcc5231afb00fcea7"
+      "sha256": "1c030bbd3956e01192175d06118f6960eb26f296b3bc47e1bda272ef95ff6cbe"
     },
     {
       "bytes": 3865,
@@ -6606,9 +6621,9 @@
       "sha256": "647e8eb01a6d122fa538f1b000f3f281c429f55fc0c496ba35e6afdb4214152f"
     },
     {
-      "bytes": 8041,
+      "bytes": 8468,
       "path": "tests/unit/dashboard/test_current_credential_ordering.py",
-      "sha256": "6d833cce5867392931b115b4793a53057c8ff1f2883e5fbf12aa7c40f283e410"
+      "sha256": "840d965cd44232cc2c34b070a699c8dee03a13b8d16220c9a617eb218804982f"
     },
     {
       "bytes": 4815,
@@ -6628,7 +6643,7 @@
     {
       "bytes": 22746,
       "path": "tests/unit/dashboard/test_live_authorization.py",
-      "sha256": "a2a814567f10418b150e306e7599782e8e797ec0ea38ba013ae6f462d9987192"
+      "sha256": "753cfb59f9c9b54b797c21bd6619d65f62f821a996ca4df0803a93174a17c482"
     },
     {
       "bytes": 4399,
@@ -7136,9 +7151,9 @@
       "sha256": "3880b09aa32a6cbdee6a849113ba7ed85258fdc2e111a1de655668ea21e53f55"
     },
     {
-      "bytes": 13340,
+      "bytes": 13635,
       "path": "tests/unit/ingestion/test_fpl_direct_transport.py",
-      "sha256": "51c5dbdbd9b5893fa32ef4db012de910a4c8122a8f43d4b709d11c1b5942a0d8"
+      "sha256": "cd8f9805741fad5a002a65e637a769fe6bef1cff380e482a66d132994c639b70"
     },
     {
       "bytes": 4268,
@@ -7311,6 +7326,11 @@
       "sha256": "b40c5114b8cfa427b77ef02ad395eb4edc8521b9da716fc5437277236a03ff5c"
     },
     {
+      "bytes": 6989,
+      "path": "tests/unit/operation/test_account_evidence.py",
+      "sha256": "cdc4b3763cb20463fa576e19075c61fa210a8b2270b8cd7b963e4b265bac9e28"
+    },
+    {
       "bytes": 9849,
       "path": "tests/unit/operation/test_authorization_preview.py",
       "sha256": "ffe9678af281b6afac3ac2f61fbb75cdf4450791f1df6edf5840c0ba7a7f6ab9"
@@ -7324,6 +7344,11 @@
       "bytes": 13370,
       "path": "tests/unit/operation/test_operator_metadata.py",
       "sha256": "1425470dbbcce0122cc8246e070a1e6a8309ac8fbfb84f94901780926b9c1444"
+    },
+    {
+      "bytes": 8319,
+      "path": "tests/unit/operation/test_supplier_enrollment.py",
+      "sha256": "2c1c2b457a7a0c09531616b30cab163824ca34b6f65108255047dea906f81ded"
     },
     {
       "bytes": 18938,
@@ -8574,6 +8599,11 @@
       "bytes": 10388,
       "path": "tickets/DMF-PULSE-ACCEL-005/CONTRACT.md",
       "sha256": "e17d9a0364ddac52430b6058dded372584519f1079b179532954dcea6ad8415d"
+    },
+    {
+      "bytes": 1625,
+      "path": "tickets/DMF-PULSE-ACCEL-005/CP1.md",
+      "sha256": "469ebbd9bd98477c6a13c794a7dab38ed681a43e50871905d5f6241e39273858"
     },
     {
       "bytes": 19514,
