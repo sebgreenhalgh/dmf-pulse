@@ -1,0 +1,45 @@
+{
+  "artifact_fixtures": "All3new packaged JSON files are repository-authored fictional acceptance data, not provider payloads.",
+  "clock_limit": "Tool invocation timestamps were not exposed individually; window binds the public research session without fabricating exact fetch seconds.",
+  "current_season_coverage": "NOT_ESTABLISHED",
+  "data_files_archives_provider_JSON_accounts_credentials_accessed": false,
+  "real_qualification": "CLOSED_NOT_ACQUIRED",
+  "recorded_at": "2026-10-30T03:44:34.717004+00:00",
+  "retrieval_window_utc": {
+    "from": "2026-10-30T03:26:23Z",
+    "until": "2026-10-30T03:40:52Z"
+  },
+  "schema_version": "accel004-player-source-public-doc-receipts-v1",
+  "sources": [
+    {
+      "identity": "Matches, Luca Pappalardo and Emanuele Massucco, item7770422,2019-02-26T12:15",
+      "licence_label": "CC BY4.0",
+      "result": "PUBLIC_DOCUMENT_PARSED",
+      "scope": "Documentary native role fields, not data-file completeness or acquisition",
+      "url": "https://figshare.com/articles/dataset/Matches/7770422"
+    },
+    {
+      "identity": "Pappalardo et al., Scientific Data6,236(2019), DOI10.1038/s41597-019-0247-7",
+      "result": "PRIMARY_DOMAIN_INDEXED_FULL_TEXT; direct fetch identity redirect inaccessible",
+      "scope": "Historical2017/18 English first division; author full-season coverage claim; nested formation documentation",
+      "url": "https://www.nature.com/articles/s41597-019-0247-7"
+    },
+    {
+      "identity": "Same primary article PDF,Table1",
+      "result": "PRIMARY_DOMAIN_INDEXED_TABLE; direct fetch identity redirect inaccessible",
+      "scope": "Author reports380 English fixtures; release files were not inspected",
+      "url": "https://www.nature.com/articles/s41597-019-0247-7.pdf"
+    },
+    {
+      "identity": "Creative Commons Attribution4.0 International deed",
+      "result": "PUBLIC_DOCUMENT_PARSED",
+      "scope": "Reuse/transformation, attribution/change/link obligations and other-rights/warranty caveats; separate project approval still required",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "identity": "University of Pisa author repository PDF",
+      "result": "403; not used as observed payload evidence",
+      "url": "https://arpi.unipi.it/retrieve/e0d6c92d-e6c2-fcf8-e053-d805fe0aa794/Public%20data%20soccer%20%28camera%20ready%29.pdf"
+    }
+  ]
+}

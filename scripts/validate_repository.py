@@ -690,6 +690,7 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
         "typer",
         "fastapi",
         "uvicorn",
+        "pywin32-ctypes",
     }
     if runtime_names != expected_runtime:
         errors.append(f"pyproject.toml: unexpected runtime dependencies: {sorted(runtime_names)}")
@@ -700,10 +701,11 @@ def _validate_package_contract(root: Path, errors: list[str]) -> None:
             "psycopg[binary]==3.3.4",
             "fastapi==0.162.0",
             "uvicorn==0.54.0",
+            "pywin32-ctypes==0.2.3; sys_platform == 'win32'",
         }
         if not required_exact.issubset(set(dependencies)):
             errors.append(
-                "pyproject.toml: DAT-003 database dependencies must use exact approved pins"
+                "pyproject.toml: database/UI/native credential dependencies must use exact reviewed pins and markers"
             )
     dependency_groups = pyproject.get("dependency-groups", {})
     dev_dependencies = (

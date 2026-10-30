@@ -1,0 +1,84 @@
+{
+  "actual_vault_provider_DB_calls": 0,
+  "changed_paths_from_prior_review": [
+    "src/dmf_pulse/dashboard/authorization.py",
+    "src/dmf_pulse/dashboard/current.py",
+    "src/dmf_pulse/dashboard/current_sources.py",
+    "src/dmf_pulse/ingestion/fpl/direct.py"
+  ],
+  "elapsed_seconds": 25.442,
+  "final_CI_and_installed_model_parity_pending": true,
+  "independence_boundary": "Reviewer assesses only root-owned callback/credential/error wiring. Reviewer-authored check_transport_window and preflight_attempt policy require C independent review.",
+  "independent_probe_sha256": "b02553137690ea18b4b00eeba8be0671a1ae834e6b03079c9364dd769bce90da",
+  "limits": [
+    "Explicit sourcehashpins are decisive; later bytes require review.",
+    "A softwarecheck cannot eliminate arbitrary instantaneous time/state races; the demonstrated blockingcontrolwait is rechecked."
+  ],
+  "native_final_execution_pending": true,
+  "no_unresolved_material_CP1_finding": true,
+  "prior_review_retained": true,
+  "prior_review_sha256": "4bf927325b624ad0fe39f168ca0ca229970eb33a5b409f51ff8cf858c322df15",
+  "production_activation": false,
+  "recorded_at": "2026-10-30T04:15:51.940419+00:00",
+  "resolved_control_wait_findings": [
+    {
+      "fix": "GuardedFplTransport invokes AutomaticFplCredentialProvider.check_expiry after control/window checks and before MY_TEAM delegate; no second native lookup.",
+      "independent_case": "Injected actual AutomaticFpl provider, clockadvanced by controlwait, exactly1lookup,0delegate sends; CREDENTIAL_EXPIRED detached context.",
+      "issue": "FPL native token could expire during blocking control after the earlier expiry sample."
+    },
+    {
+      "fix": "All3 guarded source transports invoke pure CurrentAcquisitionGuard.before_transport afterdurablebefore_send and beforedelegate.",
+      "independent_case": "Actualownedgrant/claim/attempt acrossFPL,Odds,OpenFootball; committedattemptadvancesclockpastcutoff;0delegates;one spentattemptretained.",
+      "issue": "Blocking control could cross grant/acquisition window even with a long-lived credential."
+    }
+  ],
+  "root_head_at_record": "31f5d97cb11b805ea1981c69bbd765d9f36165a0",
+  "schema_version": "accel004-independent-cp1-control-wait-delta-v1",
+  "services_started": 0,
+  "source_drift_paths": [],
+  "source_sha256": {
+    "pyproject.toml": "bf159abb2bd3b5b1c58364de20fe334684b882b54fcb71f8827f38346ac6000f",
+    "scripts/accel004_vault_probe.py": "18668da495f9c35f24f25e8deb967eef6301b16b6b77031fb7727c6ee919689b",
+    "scripts/verify_accel001_private_wheel.py": "7ec2205b1c462638b5fd1fa02f3194e1fa967c4d251cac80d3d577fee3b47500",
+    "src/dmf_pulse/authorization_errors.py": "c893c56ed518a3845e9d7069ae82210ebd14a9cdd755fd35488ac6bb8777bc73",
+    "src/dmf_pulse/cli/app.py": "64a455295eab50fe7412ef15f3e85538e887dcca4aa80c2e1c02eae8ecde48d0",
+    "src/dmf_pulse/cli/credential_errors.py": "8060678b5a376a52b3db99448cba6027a4e57914b391a9d09b117b420247b9b5",
+    "src/dmf_pulse/cli/credentials.py": "f8626096f763ac6162d39b021cb18edb91b66e25ba2b6db5b61a2a9b0fc1f83d",
+    "src/dmf_pulse/cli/pulse.py": "d9a77e0a2b2ce6afe4fc643abea8bc738cc1988b1cb1fd2b033eeb990e5a09b0",
+    "src/dmf_pulse/credentials/__init__.py": "ad208335d17c81f876090fd1f11bc95b45f7f8f88ed43e6536d3d3c8e4fd0980",
+    "src/dmf_pulse/credentials/providers.py": "993c08146a29b7581f757f99972a58a07ae366a54785f42d4788a5f7da19bf3f",
+    "src/dmf_pulse/credentials/service.py": "0a15382fd7301ce64fcf8f022aded021f15418e539b0f5f188f0226b58b43cb9",
+    "src/dmf_pulse/credentials/windows.py": "b5c64fe22e447f41773a1a3f91473e2dfb5ff8fcaeba00f220c9629b23edee7a",
+    "src/dmf_pulse/current_failures.py": "d4cbf75fd17df14477ebbcd23893d2901c0572d5875d0fa63063bc61c47c0597",
+    "src/dmf_pulse/dashboard/authorization.py": "5c68e86eea96c8a59070f636454c86c4dec6f287fdcf7654a6ecaebef39c8116",
+    "src/dmf_pulse/dashboard/current.py": "8cad4feee6746e463f18aa9f7df213aeb72c3575a230a29c7e292d8252e7d02e",
+    "src/dmf_pulse/dashboard/current_sources.py": "b7339695e01fb9f296d6ac37cee3c75ff4245a2c3705f1bb1ac5b1a4d40743e5",
+    "src/dmf_pulse/dashboard/runtime.py": "b3c96c296e461cd4b6643dcac0df323af662172437e4b3dba99b5ef300c0c24f",
+    "src/dmf_pulse/ingestion/errors.py": "7da88fb73307ed74c162d1b18dce71a38584cfaa609409fe44fcd85fc0e6b7ca",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "3c7ef45f78b6f6ef2ba9d8cdd95ba0bb1452602417b676e7501ed299182b9d12",
+    "src/dmf_pulse/ingestion/odds/client.py": "a9b483aacd5e3c12a5dbdd049ad5c3dd51f0917a5d867ad1d4237b3c031d1c64",
+    "src/dmf_pulse/ingestion/odds/credentials.py": "3f1beb0b6a22395d9e4f76eb89ce32fd5b1555fec580e48009e881ce5e05952c",
+    "src/dmf_pulse/ingestion/odds/service.py": "6377565a1a679c4cad9f63542d9eae88bf05d05166d783af114659ef5d83bac0",
+    "src/dmf_pulse/ingestion/odds/transient.py": "3faeb93796f3989a92ea58a63da64269161d64d4e490ca2d08f1a8e3aa472a81",
+    "uv.lock": "f546cf5551363697579f3b927f5c36bc2e9dfb04ea7ef1a6e523da00e59c41cb"
+  },
+  "source_stable_during_tests": true,
+  "status": "PASS_FINAL_CP1_CALLBACK_DELTA",
+  "test_command": [
+    "-m",
+    "pytest",
+    "review_pack/independent_cp1_final_checks.py",
+    "tests/unit/credentials/test_boundaries.py",
+    "tests/unit/dashboard/test_current_credential_ordering.py",
+    "tests/unit/dashboard/test_current_diagnostics.py",
+    "-q",
+    "--tb=short",
+    "--basetemp",
+    "review_pack/pytest-independent-cp1-delta",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "test_exit_code": 0,
+  "test_log_sha256": "df07a8c5d7671dfa25ae8687e3aa83b044295cb3ff838c127562bfdda6e508e0",
+  "test_summary": "76 passed in 23.94s"
+}

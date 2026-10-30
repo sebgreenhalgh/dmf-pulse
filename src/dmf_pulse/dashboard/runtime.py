@@ -13,6 +13,13 @@ from threading import RLock
 from time import monotonic
 from typing import Literal, Protocol
 
+from pydantic import computed_field
+
+from dmf_pulse.current_failures import (
+    CURRENT_FAILURE_ACTIONS,
+    CURRENT_FAILURE_CODES,
+    EXPIRED_FAILURE_CODES,
+)
 from dmf_pulse.dashboard.authorization import AuthorizationError
 from dmf_pulse.dashboard.current import (
     CurrentEligibility,
@@ -35,6 +42,11 @@ class JobState(PresentationModel):
     job_id: str | None = None
     stages: tuple[str, ...] = ()
     error_code: str | None = None
+
+    @computed_field
+    def error_action(self) -> str | None:
+        """Fixed operator guidance only; no provider or credential observation."""
+        return CURRENT_FAILURE_ACTIONS.get(self.error_code) if self.error_code is not None else None
 
 
 class Worker(Protocol):
@@ -299,32 +311,8 @@ class DeskRuntime:
                 ):
                     self._accept(value.result, envelope=value)
                     break
-                elif kind == "error" and value in {
-                    "CREDENTIAL_UNAVAILABLE",
-                    "QUOTA_EXHAUSTED",
-                    "MANAGER_OR_FIXTURE_MAPPING_INVALID",
-                    "DECISION_DEADLINE_PASSED",
-                    "AUTHORIZATION_EXPIRED",
-                    "ACQUISITION_CUTOFF_PASSED",
-                    "SOURCE_REQUEST_BUDGET_EXHAUSTED",
-                    "SOURCE_ROUTE_NOT_AUTHORIZED",
-                    "CURRENT_SOURCE_OR_RUN_BLOCKED",
-                    "SOURCE_NOT_AVAILABLE",
-                    "SOURCE_AUTHENTICATION_REJECTED",
-                    "SOURCE_AUTHENTICATION_OR_REQUEST_REJECTED",
-                    "SOURCE_RESPONSE_INVALID",
-                }:
-                    self._discard(
-                        "EXPIRED"
-                        if value
-                        in {
-                            "DECISION_DEADLINE_PASSED",
-                            "AUTHORIZATION_EXPIRED",
-                            "ACQUISITION_CUTOFF_PASSED",
-                        }
-                        else "BLOCKED",
-                        str(value),
-                    )
+                elif kind == "error" and type(value) is str and value in CURRENT_FAILURE_CODES:
+                    self._discard("EXPIRED" if value in EXPIRED_FAILURE_CODES else "BLOCKED", value)
                     if value == "SOURCE_NOT_AVAILABLE" and self._current is not None:
                         self._current.record_failure(
                             AuthorizationError(value, "SOURCE_NOT_AVAILABLE")

@@ -14,6 +14,7 @@ from dmf_pulse.credentials.providers import (
     AutomaticOddsCredentialProvider,
 )
 from dmf_pulse.dashboard.synthetic import demo_inputs
+from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct import (
     DirectFplClient,
     DirectFplCredentialProvider,
@@ -31,7 +32,11 @@ from dmf_pulse.ingestion.odds.client import (
     OddsHttpResponse,
     OddsTransport,
 )
-from dmf_pulse.ingestion.odds.credentials import EnvironmentOddsCredentialProvider
+from dmf_pulse.ingestion.odds.config import load_provider_config as odds_provider_config
+from dmf_pulse.ingestion.odds.credentials import (
+    CredentialProvider,
+    EnvironmentOddsCredentialProvider,
+)
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput
 from dmf_pulse.ingestion.odds.models import QuotaState
 from dmf_pulse.ingestion.odds.transient import CurrentOddsTransientService
@@ -55,16 +60,47 @@ Provider = Literal["FPL", "ODDS", "OPENFOOTBALL"]
 
 
 class AcquisitionGuard(Protocol):
+    def credential_failed(self, code: object) -> None: ...
+    def before_transport(self) -> None: ...
+    def preflight_send(self, provider: Provider, method: str, host: str, path: str) -> None: ...
     def before_send(self, provider: Provider, method: str, host: str, path: str) -> None: ...
     def finish_acquisition(self) -> None: ...
 
 
-class GuardedFplTransport:
-    def __init__(self, guard: AcquisitionGuard, delegate: DirectTransport) -> None:
+class _GuardedOddsCredentialProvider:
+    """Read exact live route permission immediately before accepted key resolution."""
+
+    def __init__(self, guard: AcquisitionGuard, delegate: CredentialProvider) -> None:
         self._guard, self._delegate = guard, delegate
+
+    def get_credential(self) -> str | None:
+        config = odds_provider_config()
+        self._guard.preflight_send("ODDS", "GET", config.host, config.path)
+        try:
+            return self._delegate.get_credential()
+        except IngestionError as error:
+            self._guard.credential_failed(error.code)
+            raise
+
+
+class GuardedFplTransport:
+    def __init__(
+        self,
+        guard: AcquisitionGuard,
+        delegate: DirectTransport,
+        *,
+        check_expiry: Callable[[], None] | None = None,
+    ) -> None:
+        self._guard, self._delegate = guard, delegate
+        self._check_expiry = check_expiry
 
     def send(self, request: DirectHttpRequest) -> DirectHttpResponse:
         self._guard.before_send("FPL", request.method, request.host, request.path)
+        self._guard.before_transport()
+        if self._check_expiry is not None and request.path.startswith("/api/my-team/"):
+            # The control transaction can wait. Recheck metadata after it, with
+            # no second credential read, immediately before authenticated I/O.
+            self._check_expiry()
         return self._delegate.send(request)
 
 
@@ -76,6 +112,7 @@ class GuardedOddsTransport:
 
     def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
         self._guard.before_send("ODDS", request.method, request.host, request.path)
+        self._guard.before_transport()
         return self._delegate.send(request, credential)
 
 
@@ -87,6 +124,7 @@ class GuardedScoreTransport:
 
     def send(self, request: OpenFootballHttpRequest) -> OpenFootballHttpResponse:
         self._guard.before_send("OPENFOOTBALL", request.method, request.host, request.path)
+        self._guard.before_transport()
         return self._delegate.send(request)
 
 
@@ -247,8 +285,17 @@ class CurrentSourceFactories:
         return DirectFplClient(
             attestation,
             profile=self._fpl_profile,
-            transport=GuardedFplTransport(self._guard, delegate),
+            transport=GuardedFplTransport(
+                self._guard,
+                delegate,
+                check_expiry=credentials.check_expiry
+                if isinstance(credentials, AutomaticFplCredentialProvider)
+                else None,
+            ),
             credential_provider=credentials,
+            before_credential=lambda method, host, path: self._guard.preflight_send(
+                "FPL", method, host, path
+            ),
             clock=self._clock,
             maximum_attempts=1,
             sleeper=(lambda _: None) if self._owned else time.sleep,
@@ -256,13 +303,14 @@ class CurrentSourceFactories:
         )
 
     def odds(self, clock: Callable[[], datetime]) -> CurrentOddsTransientService:
-        credentials = (
+        delegate_credentials = (
             EnvironmentOddsCredentialProvider(
                 environment={"THE_ODDS_API_KEY": "placeholder" + "-placeholder"}
             )
             if self._owned
             else AutomaticOddsCredentialProvider()
         )
+        credentials = _GuardedOddsCredentialProvider(self._guard, delegate_credentials)
 
         def client(profile: RightsProfile, **kwargs: object) -> OddsClient:
             del kwargs

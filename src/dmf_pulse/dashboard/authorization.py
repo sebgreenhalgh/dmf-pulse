@@ -598,11 +598,13 @@ class UsageLedger:
             raise AuthorizationError("ACQUISITION_CUTOFF_PASSED", "EXPIRED")
 
     def check_transport_window(self, grant: RefreshGrant, worker_id: str, *, now: datetime) -> None:
-        """Recheck the same grant/window after a blocking durable attempt.
+        """Recheck the same grant/window after a blocking control observation/write.
 
         This pure check opens no control transaction and grants no route or
-        claim. The caller must already have recorded its exact attempt. A late
-        refusal keeps that spent record; it does not refund or reset anything.
+        claim. After preflight it precedes key lookup; after the exact durable
+        attempt it precedes transport. Full claim/route/count checks and the
+        atomic attempt remain required. A late refusal keeps any spent record;
+        it does not refund or reset anything.
         """
         self._attempt_ready(grant, worker_id, now)
 

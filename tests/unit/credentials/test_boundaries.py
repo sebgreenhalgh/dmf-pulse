@@ -17,6 +17,7 @@ from dmf_pulse.cli import credentials as credential_cli
 from dmf_pulse.cli.app import app
 from dmf_pulse.credentials import windows
 from dmf_pulse.credentials.service import CredentialError
+from dmf_pulse.dashboard.current_sources import GuardedFplTransport
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct import (
     DirectFplClient,
@@ -152,6 +153,38 @@ def test_exhausted_request_budget_refuses_before_credential_lookup():
 def test_vault_token_cannot_omit_actual_expiry():
     with pytest.raises(ValidationError):
         DirectFplCredential(source="OS_VAULT", bearer_token=SecretStr(KEY))
+
+
+def test_expiry_during_control_transaction_refuses_before_delegate_without_relookup():
+    now = [NOW]
+    sent = []
+    lookups = []
+
+    class Provider(CredentialProvider):
+        def get(self):
+            lookups.append(True)
+            return super().get()
+
+        def check_expiry(self):
+            if now[0] >= NOW + timedelta(seconds=1):
+                raise IngestionError("CREDENTIAL_EXPIRED", "fixed expired message")
+
+    provider = Provider()
+    guard = SimpleNamespace(
+        before_send=lambda *args: now.__setitem__(0, NOW + timedelta(seconds=1)),
+        before_transport=lambda: None,
+    )
+    transport = GuardedFplTransport(
+        guard,
+        SimpleNamespace(send=lambda request: sent.append(True)),
+        check_expiry=provider.check_expiry,
+    )
+    value = client(transport)
+    value._credential_provider = provider
+    value._clock = lambda: now[0]
+    with pytest.raises(IngestionError) as error:
+        value.fetch(DirectFplResource.MY_TEAM, entry_id=42)
+    assert error.value.code == "CREDENTIAL_EXPIRED" and not sent and lookups == [True]
 
 
 def test_native_facade_uses_exact_targets_generic_user_scope_and_utf16(monkeypatch):

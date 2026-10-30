@@ -1,0 +1,70 @@
+{
+  "author_commit": "a3dc78a3c6d1488411dc10a1bc911647af2c2234",
+  "checked_at": "2026-10-30T03:58:11.398332+00:00",
+  "credential_reads": 0,
+  "database_connections": 0,
+  "findings": [],
+  "focused_tests": {
+    "failed": 0,
+    "limit": "Two later owned growth and alternate stream tests were added by the author; this count records this reviewer's actual thirty seven case run, not the author's later thirty nine case result.",
+    "log_sha256": "27ab98ff56150a14d43437a6bcdc58e0f16bae5ed3ebea5e411086bfb260ecd7",
+    "passed": 37,
+    "seconds": 2.59
+  },
+  "independent_tests": {
+    "failed": 0,
+    "log_sha256": "74764f657ecdc9180e1ce57d6f90c7048413552bc47737c270fd5a86d895e5d8",
+    "passed": 11,
+    "seconds": 1.18,
+    "test_sha256": "523c41fb9424a7674b7228d5a16af859ed1b3905203de37cfc4e12893fc81952"
+  },
+  "normalization": [
+    {
+      "change": "CRLF_TO_LF_ONLY_FULL_PREIMAGE_HASH_VERIFIED",
+      "final_sha256": "06f395ffffe7be408e48fc8a5ac63429adc5a16fc63b995415bc4cec663ab8f4",
+      "path": "src/dmf_pulse/player_lab/recovery.py",
+      "prior_sha256": "3fa644594988732fce0e1cfc3f7e8661eb6e84e66e9a23bd228fd45a0de44e90"
+    }
+  ],
+  "prior_review_sha256": "245db744305c1a0ccb6da60980f479b230b9ee2ede3cca2617cf378f7819c4d0",
+  "provider_requests": 0,
+  "real_scores_computed": 0,
+  "release_limit": "This clears the bounded recovery implementation slice, not final root integration, newly qualified labels, P01 scoring, global absence of further forecasts or final wave release.",
+  "resolved_findings": [
+    {
+      "id": "CP2-C01",
+      "issue": "Recovery hashing and catalogue parser failures initially retained raw payload or read frames in exception context.",
+      "priority": "MATERIAL_P2",
+      "resolution": "Private helpers now return bounded outcomes; fixed public RecoveryError is raised only after raw frames return. Independent parser and digest canary graph checks pass."
+    },
+    {
+      "id": "CP2-C02",
+      "issue": "Inventory observation time preceded later authority reviews included by the catalogue.",
+      "priority": "PROVENANCE_PRECISION",
+      "resolution": "Model description and browser explicitly label this as inventory observation time and identify later authority and review receipts; no catalogue seal time is backdated."
+    }
+  ],
+  "schema_version": "independent-forecast-recovery-review-v1",
+  "scope": "Read-only final author source review before root integration",
+  "source_sha256": {
+    "src/dmf_pulse/cli/recovery.py": "e1caa033c38ede706ef28181749b5c75b930b210757a431b841798218092232c",
+    "src/dmf_pulse/dashboard/app.py": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab",
+    "src/dmf_pulse/dashboard/resources/desk.js": "98fa490adf718b7e8b26e7ff1d2cf4524d2c54164ea52847d6d4b66e6d780868",
+    "src/dmf_pulse/player_lab/recovery.py": "06f395ffffe7be408e48fc8a5ac63429adc5a16fc63b995415bc4cec663ab8f4",
+    "src/dmf_pulse/player_lab/recovery_models.py": "98f2bc50d2b6ddc38b2c7eda2c27102db14f13dc6cde5994fa3e017b984285d2",
+    "src/dmf_pulse/player_lab/resources/recovered_forecasts_v1.json": "3dde6cd2322e72cf9e7a4232c8f98a679b5bd6c687c19af5adbce0ac2bafb4f3",
+    "tickets/DMF-PULSE-ACCEL-004/FORECAST-RECOVERY.md": "65a91bacecd2662c7cb83d169f9f499cb6ddb0ff35851f2488b41b202eb112f2"
+  },
+  "status": "PASS_RECOVERY_SLICE_NO_UNRESOLVED_MATERIAL_FINDING",
+  "verified": [
+    "The trust root is a fixed packaged resource byte hash plus semantic seal, with explicit original P01 byte and semantic identities. Caller JSON statuses or a freshly resealed catalogue cannot replace it.",
+    "Actual authorized original public P01 bytes were verified by the hash-only API. It identifies a real pre-outcome MATCH forecast and never authorizes scoring. No model, forecast parser or draw generator was invoked.",
+    "Ten fixture outcomes remain the target denominator. Thirty rows are the three forecast products per fixture; no assumption of fixture independence is added.",
+    "The last local October14 label snapshot has zero final and ten missing or nonfinal fixtures. Current source availability remains NOT_QUERIED; missing labels never become zero scores or accuracy metrics.",
+    "Historical synthetic, reconstructed and unverified families remain separate from genuine P01 custody. Private operation hashes alone cannot establish retained player forecasts or dependency rights. Additional owner reported freezes remain unresolved, not disproved.",
+    "Unknown JSON, deep malformed bytes, empty files and pickle shaped bytes are hashed without deserialization and remain unverified custody with no scoring permission.",
+    "The verifier is one explicit bounded local regular file operation. It rejects secret-like names, network paths, links and reparse points, nonregular files, alternate streams, unstable identity and growth. It is not a recursive scanner or source acquisition boundary.",
+    "The paired performance endpoint reads shipped metadata only. P01 MATCH evidence and player cohort eligibility are separate, and synthetic diagnostics remain visibly labelled. No route exposes the local file verifier or creates credentials, source calls, enrollment or metrics.",
+    "Original canonical resumption remains BLOCKED_EXACT_CODE_NO_REGENERATION and binds the independent authority review. No A02 or A03 retry, new source policy or production activation is created."
+  ]
+}

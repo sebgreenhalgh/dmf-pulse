@@ -13,13 +13,13 @@ live pilot, retention, model promotion or production activation.
   designed before that inventory.
 - [x] CP1 implement native current-user Windows credential setup/status/rotation/
   deletion and automatic authorized Odds lookup; review FPL expiry separately.
-- [ ] CP2 recover and classify existing real, synthetic, reconstructed and
+- [x] CP2 recover and classify existing real, synthetic, reconstructed and
   unverified freezes before proposing another cohort; retain metadata only.
-- [ ] CP3 integrate eligible existing forecasts/labels and classified performance
+- [x] CP3 integrate eligible existing forecasts/labels and classified performance
   views using accepted scoring kernels; score only genuinely qualified cohorts.
-- [ ] CP4 complete existing account/plan/budget/control/enrollment operator tools
+- [x] CP4 complete existing account/plan/budget/control/enrollment operator tools
   and a concrete single-pilot authorization package; no second account or bypass.
-- [ ] CP5 advance typed player evidence and current-mode operator reliability,
+- [x] CP5 advance typed player evidence and current-mode operator reliability,
   with complete owned-injection acceptance and exact numerical parity.
 - [ ] CP6 independent adversarial review, native Windows installed-wheel vault
   persistence test, unchanged full gates, capped review and exact-SHA 20/20 CI.
@@ -41,6 +41,13 @@ worker/ledger, with fixed typed operator remedies. Independent credential findin
 are resolved; final integration, numerical, packaging and exact-SHA CI remain CP6.
 CP4 setup/recovery/preflight and CP5 owned formation adapter are implemented;
 the existing account plan/quota/rights and owner pilot decision remain distinct.
+Recovery records ten families and explicit bounded-search gaps; P01 remains real
+match evidence with no locally admitted final ten-result cohort. Canonical
+resumption needs an exact nongenerative code-policy decision, not an A02/A03
+retry or implicit A04. Current source wrappers now check route authority before
+lookup and recheck the same window after blocking control; safe reasons cross
+worker/runtime/CLI/browser. Final source parity, installed acceptance and full
+twenty-job CI remain required; no live pilot or model activation is inferred.
 
 ## DMF-PULSE-ACCEL-003 — current-mode execution and prospective evidence
 

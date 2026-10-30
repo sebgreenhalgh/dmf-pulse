@@ -46,6 +46,7 @@ DIRECT_FPL_PROFILE_ID: Literal["fpl_official_private_operator_initiated_read_v1"
 DIRECT_FPL_HOST: Literal["fantasy.premierleague.com"] = "fantasy.premierleague.com"
 DIRECT_FPL_TOKEN_ENV: Literal["DMF_FPL_BEARER_TOKEN"] = "DMF_FPL_BEARER_TOKEN"
 DIRECT_FPL_USER_AGENT = "dmf-pulse-private-operator-read/0.2.0"
+type RouteGate = Callable[[str, str, str], None]
 
 _PATH_PATTERN = re.compile(
     r"^(?:"
@@ -393,6 +394,7 @@ class DirectFplClient:
         maximum_attempts: int = 3,
         pace_seconds: float = 0.25,
         before_request: Callable[[], None] | None = None,
+        before_credential: RouteGate | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._attestation = attestation
@@ -408,6 +410,7 @@ class DirectFplClient:
         self._maximum_attempts = maximum_attempts
         self._pace_seconds = pace_seconds
         self._before_request = before_request
+        self._before_credential = before_credential
         self._clock = clock
         self._request_count = 0
         self._endpoint_classes: list[DirectFplResource] = []
@@ -489,6 +492,8 @@ class DirectFplClient:
             self._before_request()
         if self._request_count >= self._maximum_requests:
             raise IngestionError("REQUEST_BUDGET_EXHAUSTED", "FPL request budget exhausted")
+        if resource is DirectFplResource.MY_TEAM and self._before_credential is not None:
+            self._before_credential("GET", DIRECT_FPL_HOST, path)
         credential = (
             self._credential_provider.get() if resource is DirectFplResource.MY_TEAM else None
         )

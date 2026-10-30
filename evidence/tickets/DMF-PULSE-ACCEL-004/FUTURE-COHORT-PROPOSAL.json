@@ -1,0 +1,23 @@
+{
+  "assessed_at": "2026-10-30T04:15:31.928496Z",
+  "candidate_deadline_at": "2026-10-31T11:00:00Z",
+  "candidate_gameweek": 9,
+  "direct_open_status": "ACCESS_ERROR",
+  "evidence_kind": "OFFICIAL_PUBLIC_HTML_SEARCH_INDEX",
+  "execution_authorized": false,
+  "freeze_attempted": false,
+  "published_date": "2026-10-29",
+  "real_cohort_size": 0,
+  "required_before_freeze": [
+    "Separately approved exact source/account/routes/request budget/purpose/code identity.",
+    "All retained dependencies and final labels independently source-qualified.",
+    "Authenticated current complete catalogue, fixture identities and future deadline.",
+    "Preregistered population, rules/models, benchmarks and holdout policy before outcomes.",
+    "Original append-only trusted-clock forecast custody before deadline."
+  ],
+  "schema_version": "future-player-cohort-candidate-v1",
+  "season": "2026/27",
+  "semantic_sha256": "b4826acbf29ba4ae69e17224203d75a984f0327823f12518d5c052bb0b3c377b",
+  "source_url": "https://www.premierleague.com/es/news/4750452/everything-you-need-for-gameweek-9-of-fpl-with-the-latest-tips-and-advice",
+  "status": "FUTURE_CANDIDATE_REQUIRES_APPROVAL"
+}

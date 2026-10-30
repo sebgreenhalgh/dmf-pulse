@@ -29,6 +29,7 @@ from dmf_pulse.cli.prices import prices_app
 from dmf_pulse.cli.private_v1 import private_v1_app
 from dmf_pulse.cli.pulse import pulse_command
 from dmf_pulse.cli.rank import rank_app
+from dmf_pulse.cli.recovery import recovery_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
 from dmf_pulse.cli.specs_cmd import specs_app
@@ -62,6 +63,7 @@ app.add_typer(player_lab_app, name="player-lab")
 app.add_typer(prices_app, name="prices")
 app.add_typer(private_v1_app, name="private-v1")
 app.add_typer(rank_app, name="rank")
+app.add_typer(recovery_app, name="forecasts")
 app.add_typer(specs_app, name="specs")
 app.command("pulse")(pulse_command)
 app.command("dashboard")(dashboard_command)

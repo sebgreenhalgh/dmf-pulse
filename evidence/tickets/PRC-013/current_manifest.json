@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 214482,
+      "bytes": 215030,
       "path": "PLANS.md",
-      "sha256": "0227c6644e1db919ca5d20f730e65e5858a5e621b2a29b6c763a8b38b54932cd"
+      "sha256": "b5b2b3405894336f9f34dc6198564efcf9d5201320272df05e99fb81d9088484"
     },
     {
       "bytes": 2761,
@@ -2156,9 +2156,9 @@
       "sha256": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539"
     },
     {
-      "bytes": 2913,
+      "bytes": 3503,
       "path": "scripts/accel004_vault_probe.py",
-      "sha256": "8ae5cba541fa008c4fe0a99a5e3dbb4d8305eb6269f7f3e2ffab6d515e44df24"
+      "sha256": "18668da495f9c35f24f25e8deb967eef6301b16b6b77031fb7727c6ee919689b"
     },
     {
       "bytes": 2059,
@@ -2626,9 +2626,9 @@
       "sha256": "dd362da8a9a81be532f0e6901045b6dfca7998d113b5c070a9448e01070d8998"
     },
     {
-      "bytes": 75031,
+      "bytes": 75144,
       "path": "scripts/validate_repository.py",
-      "sha256": "07e381fa121715c6c7c977273cef89417be8bf367f63864e5c1c8ca7edfbb0a7"
+      "sha256": "59621da2d6b450aa7024baf9f823502439f494337c8f370d24924508cce65c4d"
     },
     {
       "bytes": 8785,
@@ -3226,9 +3226,9 @@
       "sha256": "730f905d12f5fcefb162931d287cc6b6faab716c8538da88791c385f9ced8802"
     },
     {
-      "bytes": 4697,
+      "bytes": 4791,
       "path": "src/dmf_pulse/cli/app.py",
-      "sha256": "8c249b96ca5127df0d921a9dbf11305faebe6d7a5c941371dec3d32ce0133230"
+      "sha256": "64a455295eab50fe7412ef15f3e85538e887dcca4aa80c2e1c02eae8ecde48d0"
     },
     {
       "bytes": 17176,
@@ -3356,14 +3356,19 @@
       "sha256": "53f6a3e6ee7ec5a395c56b4b3ec4084584de3034b3117192a088cb92f1dfa9af"
     },
     {
-      "bytes": 8402,
+      "bytes": 2340,
       "path": "src/dmf_pulse/cli/pulse.py",
-      "sha256": "5dfb52e439bf3b0917f93ed7566befb3d8e1a4f2718825a7621ac46533edbcc4"
+      "sha256": "d9a77e0a2b2ce6afe4fc643abea8bc738cc1988b1cb1fd2b033eeb990e5a09b0"
     },
     {
       "bytes": 11903,
       "path": "src/dmf_pulse/cli/rank.py",
       "sha256": "1714d42b0072c15afa63ae1db4f2b898db6f90a0c3b819af8b35b6e476de6bdd"
+    },
+    {
+      "bytes": 1177,
+      "path": "src/dmf_pulse/cli/recovery.py",
+      "sha256": "e1caa033c38ede706ef28181749b5c75b930b210757a431b841798218092232c"
     },
     {
       "bytes": 1660,
@@ -3436,29 +3441,34 @@
       "sha256": "b5c64fe22e447f41773a1a3f91473e2dfb5ff8fcaeba00f220c9629b23edee7a"
     },
     {
+      "bytes": 9059,
+      "path": "src/dmf_pulse/current_failures.py",
+      "sha256": "d4cbf75fd17df14477ebbcd23893d2901c0572d5875d0fa63063bc61c47c0597"
+    },
+    {
       "bytes": 78,
       "path": "src/dmf_pulse/dashboard/__init__.py",
       "sha256": "04f2751be30f81b11218d5b4d0fa0b5d1745a91f07727253098a0bf395473b32"
     },
     {
-      "bytes": 12204,
+      "bytes": 12574,
       "path": "src/dmf_pulse/dashboard/app.py",
-      "sha256": "c8c8e82537b7f1a7b3ce497bd6b484382e9fada4cb3dc474d56d6b36e503098d"
+      "sha256": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab"
     },
     {
-      "bytes": 35806,
+      "bytes": 37944,
       "path": "src/dmf_pulse/dashboard/authorization.py",
-      "sha256": "2143afe53fa3a20eeb1103d65b5959f88cd5bce33b06f026de6dc0013d09424a"
+      "sha256": "5c68e86eea96c8a59070f636454c86c4dec6f287fdcf7654a6ecaebef39c8116"
     },
     {
-      "bytes": 28766,
+      "bytes": 30700,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "eb34322edcbed59355eea562af52f0cd12eaff535b39305851450cf7cea440ef"
+      "sha256": "8cad4feee6746e463f18aa9f7df213aeb72c3575a230a29c7e292d8252e7d02e"
     },
     {
-      "bytes": 11452,
+      "bytes": 13413,
       "path": "src/dmf_pulse/dashboard/current_sources.py",
-      "sha256": "acf06625df36a465bdc81620aee18a7377186a36e5b6573bb7f675cebe690a33"
+      "sha256": "b7339695e01fb9f296d6ac37cee3c75ff4245a2c3705f1bb1ac5b1a4d40743e5"
     },
     {
       "bytes": 12739,
@@ -3551,9 +3561,9 @@
       "sha256": "36ecd7e7df58dcf92351e61014df3a30360685dd8d5eeed225be47eb32669328"
     },
     {
-      "bytes": 26769,
+      "bytes": 28870,
       "path": "src/dmf_pulse/dashboard/resources/desk.js",
-      "sha256": "ce25bdf53fbf0796da27d55e63044c4d6bcae989edbcd267a8b13f35bab5207c"
+      "sha256": "a7698dc6792ca25bb6e45a3f2b65335e533cdc5156c6ff7b0284be8e68446546"
     },
     {
       "bytes": 1983,
@@ -3566,9 +3576,9 @@
       "sha256": "f55100d3e4f538af4c08ae32ede4bc16eaf54092c4c8d9c73723adbe956b5d26"
     },
     {
-      "bytes": 17390,
+      "bytes": 16851,
       "path": "src/dmf_pulse/dashboard/runtime.py",
-      "sha256": "040381fc458009ea3c8bba6f2e6e8f4391b702a5b3a2e1631688c36c1cbff644"
+      "sha256": "b3c96c296e461cd4b6643dcac0df323af662172437e4b3dba99b5ef300c0c24f"
     },
     {
       "bytes": 5548,
@@ -4161,9 +4171,9 @@
       "sha256": "20fea68f46cb67d4fef68af8ff1512536ed824e59cf5e587d72e18668daea8fd"
     },
     {
-      "bytes": 26464,
+      "bytes": 26773,
       "path": "src/dmf_pulse/ingestion/fpl/direct.py",
-      "sha256": "bc31c22c28445ade61d6668cd6569a1cf319c8bb0b15b2bd5a3899ddeeaf4d02"
+      "sha256": "3c7ef45f78b6f6ef2ba9d8cdd95ba0bb1452602417b676e7501ed299182b9d12"
     },
     {
       "bytes": 31073,
@@ -4686,6 +4696,16 @@
       "sha256": "bbd411c57e1e506284464f0a5a949f1deda3d3f265c1345fc5db823e9e5e2c8e"
     },
     {
+      "bytes": 6165,
+      "path": "src/dmf_pulse/player_lab/recovery.py",
+      "sha256": "06f395ffffe7be408e48fc8a5ac63429adc5a16fc63b995415bc4cec663ab8f4"
+    },
+    {
+      "bytes": 6581,
+      "path": "src/dmf_pulse/player_lab/recovery_models.py",
+      "sha256": "98f2bc50d2b6ddc38b2c7eda2c27102db14f13dc6cde5994fa3e017b984285d2"
+    },
+    {
       "bytes": 89,
       "path": "src/dmf_pulse/player_lab/resources/__init__.py",
       "sha256": "71e0a91334990bce7f1bed09ae7d6f6e39edcf5bc7f9bbde82442592ec2564d8"
@@ -4724,6 +4744,11 @@
       "bytes": 216,
       "path": "src/dmf_pulse/player_lab/resources/forecast-inputs.json",
       "sha256": "7091eba0b5e60aca1f4513c27474009e729bfcaf653245d46222f24a904d64f6"
+    },
+    {
+      "bytes": 18802,
+      "path": "src/dmf_pulse/player_lab/resources/recovered_forecasts_v1.json",
+      "sha256": "3dde6cd2322e72cf9e7a4232c8f98a679b5bd6c687c19af5adbce0ac2bafb4f3"
     },
     {
       "bytes": 3990,
@@ -5404,6 +5429,11 @@
       "bytes": 4446,
       "path": "tests/contract/player_lab/test_cli.py",
       "sha256": "e3864e5b629171d0c6764fb167e88e4546818245a7f49f1b538207cbb37ca838"
+    },
+    {
+      "bytes": 2037,
+      "path": "tests/contract/player_lab/test_recovery_cli.py",
+      "sha256": "8b7343b77ad638b6349d166ccf927ae733e81e2f4ba158e03f2c736571b41c4d"
     },
     {
       "bytes": 1461,
@@ -6556,9 +6586,9 @@
       "sha256": "5e9005b01d9eb09031cd9a6b94d1ba4e7312f250a18a0474c76cb86eba898e71"
     },
     {
-      "bytes": 7945,
+      "bytes": 9101,
       "path": "tests/unit/credentials/test_boundaries.py",
-      "sha256": "fc45978b8d524ffcdf87f2f6672fca523d48e81e4fb38a6946cc28d47067d40d"
+      "sha256": "b9db44bbd2d395a3166d225d8bde875b551e16256558a301882c97424584c998"
     },
     {
       "bytes": 10196,
@@ -6566,9 +6596,24 @@
       "sha256": "d13bdbc3a2593e12e73ae285762519a40c440c68d059365bfef6ec77ccbf2a89"
     },
     {
+      "bytes": 9661,
+      "path": "tests/unit/dashboard/test_attempt_preflight.py",
+      "sha256": "9701ba58846e9ac0fba7d63d9cad1de3b35a50f4e2e1516fcc5231afb00fcea7"
+    },
+    {
       "bytes": 3865,
       "path": "tests/unit/dashboard/test_current_cli.py",
       "sha256": "647e8eb01a6d122fa538f1b000f3f281c429f55fc0c496ba35e6afdb4214152f"
+    },
+    {
+      "bytes": 8041,
+      "path": "tests/unit/dashboard/test_current_credential_ordering.py",
+      "sha256": "6d833cce5867392931b115b4793a53057c8ff1f2883e5fbf12aa7c40f283e410"
+    },
+    {
+      "bytes": 4815,
+      "path": "tests/unit/dashboard/test_current_diagnostics.py",
+      "sha256": "0814de54965990615f0a267223357a28732d8d3f57280a5b1a564595704ee4a6"
     },
     {
       "bytes": 25055,
@@ -6589,6 +6634,11 @@
       "bytes": 4399,
       "path": "tests/unit/dashboard/test_postgres_control_contract.py",
       "sha256": "afff38894f83388d93ea77b950b1783e0bc6a300025de314778786d68965379f"
+    },
+    {
+      "bytes": 2874,
+      "path": "tests/unit/dashboard/test_recovery_performance.py",
+      "sha256": "aa2cda640ec749dedecc07cc5b6b76720121bb4551046437077dfd6e6e2dc829"
     },
     {
       "bytes": 14770,
@@ -7394,6 +7444,11 @@
       "bytes": 19584,
       "path": "tests/unit/player_lab/test_player_lab.py",
       "sha256": "ec768c76e9a054a6dea033847c929dfda191eeac571f053eff297f1081bc17d0"
+    },
+    {
+      "bytes": 11955,
+      "path": "tests/unit/player_lab/test_recovery.py",
+      "sha256": "d090fc13a26a9c417fbd75fdfa0f0f207ee7aca5b7cc064af8839cb46cc9f9a6"
     },
     {
       "bytes": 5323,
@@ -8474,6 +8529,16 @@
       "bytes": 4227,
       "path": "tickets/DMF-PULSE-ACCEL-004/CREDENTIALS.md",
       "sha256": "976de4eae60f2732a326b11aa6d03d09a716da1afeec57139a790dd0bd9c7f81"
+    },
+    {
+      "bytes": 4553,
+      "path": "tickets/DMF-PULSE-ACCEL-004/EVALUATION-READINESS.md",
+      "sha256": "f06c601f9a4c84e709359301819497ecd77ae6b7d5697b67ee9cc8caa66aeddf"
+    },
+    {
+      "bytes": 6007,
+      "path": "tickets/DMF-PULSE-ACCEL-004/FORECAST-RECOVERY.md",
+      "sha256": "65a91bacecd2662c7cb83d169f9f499cb6ddb0ff35851f2488b41b202eb112f2"
     },
     {
       "bytes": 7521,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import os
 import re
@@ -13,7 +14,11 @@ from pathlib import Path
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("create", "resolve", "delete", "absent"), required=True)
+    parser.add_argument(
+        "--phase",
+        choices=("create", "resolve", "rotate", "resolve-rotated", "delete", "absent"),
+        required=True,
+    )
     parser.add_argument("--namespace", required=True)
     args = parser.parse_args()
     if os.name != "nt" or not re.fullmatch(
@@ -35,8 +40,9 @@ def main() -> None:
         raise SystemExit("clean installed wheel required")
     backend = WindowsCredentialBackend(namespace=args.namespace)
     service = CredentialService(lambda: backend)
+    suffix = ":rotated" if args.phase in {"rotate", "resolve-rotated"} else ""
     value = hashlib.sha256(
-        ("owned-ACCEL004-native-acceptance:" + args.namespace).encode()
+        ("owned-ACCEL004-native-acceptance:" + args.namespace + suffix).encode()
     ).hexdigest()
     cli._service = lambda: service
     if args.phase == "create":
@@ -44,7 +50,12 @@ def main() -> None:
         result = CliRunner().invoke(app, ["credentials", "set-odds-key"], input=value + "\n")
         assert result.exit_code == 0 and value not in result.output
         assert service.status("odds").configured
-    elif args.phase == "resolve":
+    elif args.phase == "rotate":
+        result = CliRunner().invoke(
+            app, ["credentials", "set-odds-key", "--replace"], input=value + "\n"
+        )
+        assert result.exit_code == 0 and value not in result.output
+    elif args.phase in {"resolve", "resolve-rotated"}:
         provider = AutomaticOddsCredentialProvider(
             service_factory=lambda: CredentialService(lambda: backend), environment={}
         )
@@ -56,6 +67,8 @@ def main() -> None:
     else:
         assert not service.status("odds").configured
     del value
+    from win32ctypes import core
+
     print(
         json.dumps(
             {
@@ -67,6 +80,8 @@ def main() -> None:
                 "provider_requests": 0,
                 "production_targets_read": 0,
                 "secret_values_recorded": False,
+                "binding_version": importlib.metadata.version("pywin32-ctypes"),
+                "binding_backend": core._backend,
                 "input_boundary": "TYPER_HIDDEN_PROMPT_WITH_OWNED_IN_MEMORY_INPUT_SHIM",
             },
             sort_keys=True,

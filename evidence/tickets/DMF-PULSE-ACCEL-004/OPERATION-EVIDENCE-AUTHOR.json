@@ -1,0 +1,150 @@
+{
+  "author_head_sha": "3e3a5021a3ec2f521870d798dee535b0a1e5c3fc",
+  "base_sha": "9f8a97d4d80868ab4f52152ad481fdc1557fb3fa",
+  "checks": [
+    {
+      "elapsed_seconds": 1.18,
+      "result": "PASS",
+      "scope": "initial shared authorization + PG constructor contracts",
+      "tests": 72
+    },
+    {
+      "elapsed_seconds": 55.09,
+      "limit": "Pre-final local run; later narrow metadata safety/test additions followed.",
+      "result": "PASS",
+      "scope": "pre-final operation unit + retained auth/PG unit + actual owned one-GW worker console",
+      "tests": 137
+    },
+    {
+      "elapsed_seconds": 145.94,
+      "limit": "Session started before safe-error scope follow-up; not claimed as exact-final coverage gate.",
+      "result": "PASS",
+      "scope": "covered operation unit + retained auth/PG unit + actual owned one-GW worker console",
+      "tests": 143
+    },
+    {
+      "elapsed_seconds": 2.29,
+      "result": "PASS",
+      "scope": "final operation units including detached-error canary",
+      "tests": 71
+    },
+    {
+      "additional_tests": 47,
+      "elapsed_seconds": 1.36,
+      "result": "PASS",
+      "retained_tests": 87,
+      "scope": "player evidence old+new unit/integration",
+      "tests": 134
+    },
+    {
+      "elapsed_seconds": 2.16,
+      "result": "PASS",
+      "scope": "covered player evidence old+new unit/integration",
+      "tests": 134
+    },
+    {
+      "elapsed_seconds": 3.09,
+      "result": "PASS",
+      "scope": "final operation unit + player evidence unit/integration",
+      "tests": 205
+    },
+    {
+      "check": "Ruff",
+      "result": "PASS",
+      "scope": "all owned operation/evidence source and tests"
+    },
+    {
+      "check": "strict mypy",
+      "result": "PASS",
+      "scope": "operation + shared authorization/PG source; player evidence + CLI"
+    }
+  ],
+  "cleanup": {
+    "new_DB_or_loopback_services_started": false,
+    "owned_runtime_test_worker_closed": true,
+    "real_vault_entries_touched": false
+  },
+  "commits": {
+    "operation": "440829bcc2cc0e50d06ea66e701512fb63d7b58c",
+    "owned_adapter": "287d2ee703a7fbca17b1bcd1b6a38d9636a5bb0f",
+    "safe_error": "26f712089d2e8f03d9d4e828c3c48e29c3ed026d",
+    "shared_preflight": "0304bb4684431a908d5fffae9fd66ce134bf1a2f",
+    "synthetic_test_normalization": "3e3a5021a3ec2f521870d798dee535b0a1e5c3fc"
+  },
+  "control_or_provider_operations_performed": false,
+  "coverage_limit": "Focused report is diagnostic, not the whole-package 90% acceptance gate; project thresholds/workflows unchanged.",
+  "independent_review": {
+    "adapter": "Requested, pending separate independent review",
+    "operation": "C reports20 injected offline attacks PASS3.63s, detached receipt parent-owned; exact source freeze26f7120 plus source-preserving3e3a502 test delta"
+  },
+  "live_pilot_executed": false,
+  "numerical_models_or_active_source_profiles_changed": false,
+  "owned_committed_file_sha256": {
+    "src/dmf_pulse/cli/player_evidence.py": "fd4bb777009b6ed943b1fb26f37496f3af920792cffb4c86e93c721971e3d0f3",
+    "src/dmf_pulse/dashboard/authorization.py": "3b732b6d02c2a9d0dffe5f2b32382b7710669bf6a09470a4c18ca0ea410ba5ac",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "3ec2d42571fa2efba20fed52f1681532221d6728622203e763b07821975dc7bb",
+    "src/dmf_pulse/operation/__init__.py": "6a8bd2c4de15965eaed1edd45d95ce8dd90620e0efb907062362867c2a15517b",
+    "src/dmf_pulse/operation/cli.py": "65e18fe1bfc6a5ec895e6985cd6e7682b602e08020549dc26606cbc931ff4ef1",
+    "src/dmf_pulse/operation/console.py": "a78e8b1e0f0dd07f8d9612773be7a297ef803d64da6769f41e7371eb75d5985f",
+    "src/dmf_pulse/operation/control.py": "e88f19c5e7409708f9b8e42e56ca832bdbe6aded77e3f98145eb4b84e32ae72b",
+    "src/dmf_pulse/operation/models.py": "7ffced84b3f8ee068ea27f0782533b817c9fde7cb489a1ae03868ee8adf4ebbf",
+    "src/dmf_pulse/operation/packages.py": "44852df6c70f5439e7504c24a4312858d01ee1aaaab62199dcbd9f41a26d028d",
+    "src/dmf_pulse/operation/validation.py": "e2bda543858af30fc77399f4b2d7bd02b71908916d779e36af8e922781b821d9",
+    "src/dmf_pulse/player_evidence/qualification.py": "fbf952e94e9c26aa8cf0d5e2b2e30dba9bda337b807687f08f2aad21c76304d1",
+    "src/dmf_pulse/player_evidence/resources/owned-wyscout-bindings-v1.json": "1f074333f89ce1b326db33491eca4a363aa13939c9745ff20491a8b58599ad61",
+    "src/dmf_pulse/player_evidence/resources/owned-wyscout-native-v1.json": "566c3631f423c792e657ab5e38db858b611855ca8deead3332a2053789451aed",
+    "src/dmf_pulse/player_evidence/resources/owned-wyscout-participation-v1.json": "cdb1ec3a066e25e38cd6d66d34ea76c3b065217d16b2e59a384dd279d6b56dc3",
+    "src/dmf_pulse/player_evidence/wyscout.py": "5a160e5404ae2ff265e014d019e63e9e13db193388f993910a986a9552639fcd",
+    "tests/integration/operation/test_owned_console.py": "239cc42f02ad420a5aa7631803d2afcc48cad90345ec55eb94aa74ffa9c057fc",
+    "tests/integration/player_evidence/test_owned_wyscout.py": "6cb6322755ac9eb4e80a99f401e7a213228a681fe93896b0507301a61de9ab4f",
+    "tests/unit/operation/test_authorization_preview.py": "ffe9678af281b6afac3ac2f61fbb75cdf4450791f1df6edf5840c0ba7a7f6ab9",
+    "tests/unit/operation/test_console_and_cli.py": "d8cf4b8a9e5c6cf04c9d22fd0495a29dc5df6d14701b529f5b522abdc610cf23",
+    "tests/unit/operation/test_operator_metadata.py": "1425470dbbcce0122cc8246e070a1e6a8309ac8fbfb84f94901780926b9c1444",
+    "tests/unit/player_evidence/test_wyscout_adapter.py": "cd57296966e8008cc430e62a94d7afd9bfa98d789793d6605e821fbc26f166e9",
+    "tickets/DMF-PULSE-ACCEL-004/OPERATION.md": "1d9c3302e7f17265105e06e9b623267138435550d63e9644d08bef0031f6dace",
+    "tickets/DMF-PULSE-ACCEL-004/PLAYER-ADAPTER.md": "32c221bb77e5fc73a53be6451819decbf62f5be801b30f7a1434c332a35ab0df"
+  },
+  "production_activation": false,
+  "production_enrollment_count": 0,
+  "production_enrollment_resource_sha256": "f55100d3e4f538af4c08ae32ede4bc16eaf54092c4c8d9c73723adbe956b5d26",
+  "real_data_acquired_or_scored": false,
+  "recorded_at": "2026-10-30T03:44:34.474070+00:00",
+  "remaining_parent_integration_gates": [
+    "Root CLI/pulse/current and credential integration",
+    "root-owned scanner expression normalization and full scan",
+    "independent E review",
+    "fresh installed final wheel commands",
+    "all literal final acceptance and20 exact-SHA CI jobs"
+  ],
+  "retained_failures": [
+    "Initial preview clock-regression test used an out-of-window cutoff, reached the correct earlier ACQUISITION_WINDOW_EXCEEDED denial; fixture cutoff corrected.",
+    "Two initial metadata tests used enormous autogenerated node IDs, causing Windows temp-path setup errors; bounded explicit IDs added.",
+    "Initial strict typing/lint issues (literal narrowing, native common-base annotation, imports and statement formatting) corrected before commits.",
+    "Full scanner first returned 2 findings: owned rejected-field test value and a root-owned copied credential provider dotted expression; own test normalized to recognized example. Second scan has only the root-owned expression (parent notified)."
+  ],
+  "root_owned_copies_for_local_integration_only_not_committed": {
+    "src/dmf_pulse/credentials/__init__.py": "ad208335d17c81f876090fd1f11bc95b45f7f8f88ed43e6536d3d3c8e4fd0980",
+    "src/dmf_pulse/credentials/providers.py": "a10536c178b766c0e01cfd50047fa160811e2706ce47625498662cb0f3360dcf",
+    "src/dmf_pulse/credentials/service.py": "4209fcd639ddf8b381fd160507f6b5d7df78125ff7790fb0a4f6030921258cfb",
+    "src/dmf_pulse/credentials/windows.py": "b5c64fe22e447f41773a1a3f91473e2dfb5ff8fcaeba00f220c9629b23edee7a",
+    "src/dmf_pulse/dashboard/current.py": "fac2a859fafa86aa6d592060ef6890b829e0648b572d70b08d57126d5a5edaf9"
+  },
+  "schema_version": "accel004-operation-evidence-author-v1",
+  "scoped_player_evidence_coverage": {
+    "covered_branches": 207,
+    "covered_lines": 648,
+    "excluded_lines": 0,
+    "missing_branches": 7,
+    "missing_lines": 12,
+    "num_branches": 214,
+    "num_partial_branches": 7,
+    "num_statements": 660,
+    "percent_branches_covered": 96.72897196261682,
+    "percent_branches_covered_display": "97",
+    "percent_covered": 97.82608695652173,
+    "percent_covered_display": "98",
+    "percent_statements_covered": 98.18181818181819,
+    "percent_statements_covered_display": "98"
+  },
+  "vault_operations_performed": false
+}

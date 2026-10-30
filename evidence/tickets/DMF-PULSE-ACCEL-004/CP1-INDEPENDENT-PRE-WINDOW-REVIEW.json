@@ -1,0 +1,117 @@
+{
+  "active_source_rights_or_production_enrollment_changed": false,
+  "dependency_metadata_review": {
+    "declared_runtime_transitives": 0,
+    "license": "BSD-3-Clause",
+    "locked_wheel_sha256": "8a1513379d709975552d202d942d9837758905c8d01eb82b8bcc30918929e7b8",
+    "name": "pywin32-ctypes",
+    "platform_marker": "sys_platform==win32",
+    "python313_support": "nativecheckpointbehaviorobservedbyroot;notupstreamcertification",
+    "upstream_classifiers_stop_at": "3.11",
+    "version": "0.2.3"
+  },
+  "independent_probe_sha256": "0c716044aad0dd5c814e2c2a132506bd49584f843fa8db773e7abd2f58f1cab4",
+  "initial_material_findings": [
+    {
+      "id": "CP1-D-01",
+      "issue": "Actionable credential/revocation/control failure reasons were collapsed before console remediation.",
+      "locator": "140bebb current.py current_worker categories + runtime.py fixed errors + pulse.py ACTIONS",
+      "resolution": "Root current_failures shared known-code mapping used by worker/runtime/console; independent injected worker checks and retained diagnostic pipeline tests pass.",
+      "severity": "materialP2",
+      "status": "RESOLVED_IN_REVIEWED_SOURCE"
+    },
+    {
+      "id": "CP1-D-02",
+      "issue": "Expired/spent/corrupt route could be refused at send after native credential lookup.",
+      "locator": "140bebb current_sources.py direct/odds factory and Guarded transports",
+      "resolution": "Shared read-only route preflight plus root before_credential/GuardedOddsCredentialProvider and safe guard sidecar; independent actualfactory expired/spent/wrongroute/corrupt tests verify0 credential calls.",
+      "severity": "materialP2",
+      "status": "RESOLVED_IN_REVIEWED_SOURCE;reviewer-authored-ledger-fix-requires-separate-C-review"
+    }
+  ],
+  "limits": [
+    "Read-only root-source review plus owned/injected tests; no real account entitlement/livepilot asserted.",
+    "Root final installed wheel/frozen checks/fullcoverage and20exactSHA CI remain separate pending gates.",
+    "This receipt authenticates listed working bytes; later changed bytes require delta review."
+  ],
+  "native_final_gate_note": "Fresh final-source wheel proof must include replacement and explicit ctypes/dependency version; updated helper reviewed statically, not executed by this reviewer.",
+  "native_first_checkpoint_authentication": {
+    "checkpoint_wheel_matches_receipt": true,
+    "checkpoint_wheel_sha256": "fe205ef4e2dea72c81c8b587ba8a6404a127aa9064db3db24e39c23d483ab684",
+    "final_new_source_wheel_repetition_required": true,
+    "original_probe_bytes_sha256": "866fd3458bd1c752819c9774a1cc66137334703937891eafdde6424946fa8c06",
+    "original_probe_matches_receipt": true,
+    "receipt_declares_human_input": false,
+    "receipt_declares_input_shim": true,
+    "separate_powershell_processes": 5
+  },
+  "original_availability": {
+    "head": "4eda6fe9ba0db917ac09bf9a877b1a31c6c3f9fb",
+    "limit": "Status/HEAD proof does not individually authenticate dirty file bytes.",
+    "status_stdout_sha256": "f4b88b6a4cf32618a9c192b7addace05e2520802b6f696d0cfb94a292bb84abd"
+  },
+  "p01_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "p01_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "previous_independent_test_result": "107PASS20.09s,22 independently authored probes+85 retained tests; this receipt repeats with before/after source hashes",
+  "production_activation": false,
+  "real_credential_vault_provider_or_DB_operations": 0,
+  "recorded_at": "2026-10-30T04:02:54.728446+00:00",
+  "reviewer_independence": "Reviewed root-owned CP1 credential/CLI/transport/current wiring. Reviewer authored operation/E and0975f1a shared route preflight; those author changes are not counted as independent review and require C review.",
+  "root_head_at_record": "14212b158540738a33ca19a04faff241e5ea62a8",
+  "schema_version": "accel004-independent-cp1-final-review-v1",
+  "services_started": 0,
+  "source_drift_paths": [],
+  "source_sha256": {
+    "pyproject.toml": "bf159abb2bd3b5b1c58364de20fe334684b882b54fcb71f8827f38346ac6000f",
+    "scripts/verify_accel001_private_wheel.py": "7ec2205b1c462638b5fd1fa02f3194e1fa967c4d251cac80d3d577fee3b47500",
+    "src/dmf_pulse/authorization_errors.py": "c893c56ed518a3845e9d7069ae82210ebd14a9cdd755fd35488ac6bb8777bc73",
+    "src/dmf_pulse/cli/app.py": "64a455295eab50fe7412ef15f3e85538e887dcca4aa80c2e1c02eae8ecde48d0",
+    "src/dmf_pulse/cli/credential_errors.py": "8060678b5a376a52b3db99448cba6027a4e57914b391a9d09b117b420247b9b5",
+    "src/dmf_pulse/cli/credentials.py": "f8626096f763ac6162d39b021cb18edb91b66e25ba2b6db5b61a2a9b0fc1f83d",
+    "src/dmf_pulse/cli/pulse.py": "d9a77e0a2b2ce6afe4fc643abea8bc738cc1988b1cb1fd2b033eeb990e5a09b0",
+    "src/dmf_pulse/credentials/__init__.py": "ad208335d17c81f876090fd1f11bc95b45f7f8f88ed43e6536d3d3c8e4fd0980",
+    "src/dmf_pulse/credentials/providers.py": "993c08146a29b7581f757f99972a58a07ae366a54785f42d4788a5f7da19bf3f",
+    "src/dmf_pulse/credentials/service.py": "0a15382fd7301ce64fcf8f022aded021f15418e539b0f5f188f0226b58b43cb9",
+    "src/dmf_pulse/credentials/windows.py": "b5c64fe22e447f41773a1a3f91473e2dfb5ff8fcaeba00f220c9629b23edee7a",
+    "src/dmf_pulse/current_failures.py": "d4cbf75fd17df14477ebbcd23893d2901c0572d5875d0fa63063bc61c47c0597",
+    "src/dmf_pulse/dashboard/authorization.py": "a1b6039be8091dbc8611ffac4897f4a652b99286b18946861e597f8c55c21ceb",
+    "src/dmf_pulse/dashboard/current.py": "1a481bd3a0cf215506ac9744e7ff0bc7143605f5327f90df52a05445ca4c2375",
+    "src/dmf_pulse/dashboard/current_sources.py": "ba2c4897403cbb100ffc6a793acb62026f08b1ef02d08f8237bbc17169d2d4cf",
+    "src/dmf_pulse/dashboard/runtime.py": "b3c96c296e461cd4b6643dcac0df323af662172437e4b3dba99b5ef300c0c24f",
+    "src/dmf_pulse/ingestion/errors.py": "7da88fb73307ed74c162d1b18dce71a38584cfaa609409fe44fcd85fc0e6b7ca",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "0bc85a6dc7f7a3b35275d8c0e5354bc70d4d6dd61a323298bdda9640ff148290",
+    "src/dmf_pulse/ingestion/odds/client.py": "a9b483aacd5e3c12a5dbdd049ad5c3dd51f0917a5d867ad1d4237b3c031d1c64",
+    "src/dmf_pulse/ingestion/odds/credentials.py": "3f1beb0b6a22395d9e4f76eb89ce32fd5b1555fec580e48009e881ce5e05952c",
+    "src/dmf_pulse/ingestion/odds/service.py": "6377565a1a679c4cad9f63542d9eae88bf05d05166d783af114659ef5d83bac0",
+    "src/dmf_pulse/ingestion/odds/transient.py": "3faeb93796f3989a92ea58a63da64269161d64d4e490ca2d08f1a8e3aa472a81",
+    "uv.lock": "f546cf5551363697579f3b927f5c36bc2e9dfb04ea7ef1a6e523da00e59c41cb"
+  },
+  "source_snapshot_stable_during_test": true,
+  "status": "PASS_INJECTED_CP1_SOURCE_REVIEW",
+  "test_command": [
+    "-m",
+    "pytest",
+    "review_pack/independent_cp1_final_checks.py",
+    "tests/unit/credentials",
+    "tests/unit/cli/test_pulse.py",
+    "tests/unit/dashboard/test_current_diagnostics.py",
+    "-q",
+    "--tb=short",
+    "--basetemp",
+    "review_pack/pytest-independent-cp1-sealed",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "test_elapsed_seconds": 23.676,
+  "test_exit_code": 0,
+  "test_log_sha256": "9c901d8b189a00dbbbb3c132c7de0541c6cb6651194174664f2c1cc9719c4baa",
+  "test_summary": "108 passed in 21.78s",
+  "unchanged_numeric_files": {
+    "changes": [],
+    "count": 157
+  },
+  "unchanged_protected_paths": {
+    "changes": [],
+    "count": 11
+  }
+}

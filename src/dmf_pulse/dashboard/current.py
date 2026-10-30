@@ -19,6 +19,8 @@ from typing import Literal
 from sqlalchemy import Connection as SqlConnection
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.authorization_errors import AuthorizationState, safe_authorization_fields
+from dmf_pulse.current_failures import CREDENTIAL_FAILURE_CODES, safe_current_failure_code
 from dmf_pulse.dashboard.authorization import (
     AuthorizationError,
     AuthorizationPreview,
@@ -249,6 +251,12 @@ def validate_current_result(envelope: CurrentWorkerResult, launch: CurrentLaunch
         raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
 
 
+@dataclass(frozen=True, slots=True)
+class _GuardFailure:
+    code: str
+    state: AuthorizationState
+
+
 class CurrentAcquisitionGuard:
     def __init__(self, launch: CurrentLaunch, clock: Callable[[], datetime]) -> None:
         self._launch, self._clock = launch, clock
@@ -268,26 +276,99 @@ class CurrentAcquisitionGuard:
                 launch.grant.ledger_id, launch.control_account_ref, launch.database_ref
             )
         self._closed = False
+        self.failure: _GuardFailure | None = None
         self._ledger.claim(launch.grant, launch.worker_id, now=clock())
 
     def check(self) -> None:
-        self._ledger.check(self._launch.grant, self._launch.worker_id, now=self._clock())
+        try:
+            self._ledger.check(self._launch.grant, self._launch.worker_id, now=self._clock())
+        except AuthorizationError as error:
+            if self.failure is None:
+                self.failure = _GuardFailure(*safe_authorization_fields(error))
+            raise
+
+    def credential_failed(self, code: object) -> None:
+        """Keep only a known fixed credential reason across the accepted Odds client."""
+        safe = (
+            code
+            if type(code) is str and code in CREDENTIAL_FAILURE_CODES
+            else "CREDENTIAL_UNAVAILABLE"
+        )
+        if self.failure is None:
+            self.failure = _GuardFailure(safe, "BLOCKED")
+
+    def before_transport(self) -> None:
+        """Recheck the same grant window after a potentially blocking ledger write."""
+        try:
+            if self._closed:
+                raise AuthorizationError("ACQUISITION_CLOSED")
+            self._ledger.check_transport_window(
+                self._launch.grant, self._launch.worker_id, now=self._clock()
+            )
+        except AuthorizationError as error:
+            if self.failure is None:
+                self.failure = _GuardFailure(*safe_authorization_fields(error))
+            raise
 
     def before_send(self, provider: Provider, method: str, host: str, path: str) -> None:
-        if self._closed:
-            raise AuthorizationError("ACQUISITION_CLOSED")
-        self._ledger.attempt(
-            self._launch.grant,
-            self._launch.worker_id,
-            provider=provider,
-            method=method,
-            host=host,
-            path=path,
-            now=self._clock(),
-        )
+        try:
+            if self._closed:
+                raise AuthorizationError("ACQUISITION_CLOSED")
+            self._ledger.attempt(
+                self._launch.grant,
+                self._launch.worker_id,
+                provider=provider,
+                method=method,
+                host=host,
+                path=path,
+                now=self._clock(),
+            )
+        except AuthorizationError as error:
+            if self.failure is None:
+                self.failure = _GuardFailure(*safe_authorization_fields(error))
+            raise
+
+    def preflight_send(self, provider: Provider, method: str, host: str, path: str) -> None:
+        try:
+            if self._closed:
+                raise AuthorizationError("ACQUISITION_CLOSED")
+            self._ledger.preflight_attempt(
+                self._launch.grant,
+                self._launch.worker_id,
+                provider=provider,
+                method=method,
+                host=host,
+                path=path,
+                now=self._clock(),
+            )
+            # The read-only transaction can wait too. Do not resolve a key if
+            # that wait crossed the same grant/cutoff boundary.
+            self.before_transport()
+        except AuthorizationError as error:
+            if self.failure is None:
+                self.failure = _GuardFailure(*safe_authorization_fields(error))
+            raise
 
     def finish_acquisition(self) -> None:
         self._closed = True
+
+
+def _current_service_scope(
+    service: PrivateV1OneCommandService, request: OneCommandRequest, guard: CurrentAcquisitionGuard
+) -> OneCommandResult | _GuardFailure:
+    """Preserve a safe boundary refusal across accepted clients' generic wrappers.
+
+    Only the first bounded guard sidecar crosses this scope. Raw source/client
+    exceptions and credential-bearing frames are discarded before public raise.
+    No parser, model, retry policy or scoring implementation is changed.
+    """
+    try:
+        result = service.run(request)
+    except Exception:
+        if guard.failure is None:
+            raise
+        return guard.failure
+    return guard.failure if guard.failure is not None else result
 
 
 def _launch_is_bound(launch: CurrentLaunch) -> None:
@@ -336,15 +417,16 @@ def run_current_recommendation(
         clock=active_clock,
     )
     try:
-        result = PrivateV1OneCommandService(
-            direct_client_factory=sources.direct,
-            odds_service_factory=sources.odds,
-            score_service_factory=sources.score,
-            _provider_request_guard=guard.check,
-            progress=progress,
-            collect_presentation=True,
-            clock=active_clock,
-        ).run(
+        result = _current_service_scope(
+            PrivateV1OneCommandService(
+                direct_client_factory=sources.direct,
+                odds_service_factory=sources.odds,
+                score_service_factory=sources.score,
+                _provider_request_guard=guard.check,
+                progress=progress,
+                collect_presentation=True,
+                clock=active_clock,
+            ),
             OneCommandRequest(
                 entry_id=launch.entry_id,
                 code_sha=launch.grant.request.implementation_sha,
@@ -358,8 +440,11 @@ def run_current_recommendation(
                 if owned
                 else 256,
                 root_seed=42 if launch.grant.request.horizon == 1 else 43,
-            )
+            ),
+            guard,
         )
+        if isinstance(result, _GuardFailure):
+            raise AuthorizationError(result.code, result.state) from None
         guard.check()
         if result.actionability.deadline_at != launch.grant.request.deadline_at:
             raise AuthorizationError("OFFICIAL_DEADLINE_SCOPE_MISMATCH")
@@ -389,33 +474,7 @@ def current_worker(pipe: Connection, horizon: Literal[1, 3], launch: CurrentLaun
         validate_current_result(envelope, launch)
         pipe.send(("current_result", envelope))
     except (AuthorizationError, IngestionError, PrivateV1Error) as error:
-        categories = {
-            "CREDENTIAL_MISSING": "CREDENTIAL_UNAVAILABLE",
-            "CREDENTIAL_UNAVAILABLE": "CREDENTIAL_UNAVAILABLE",
-            "QUOTA_EXHAUSTED": "QUOTA_EXHAUSTED",
-            "HTTP_429": "QUOTA_EXHAUSTED",
-            "MAPPING_CONFLICT": "MANAGER_OR_FIXTURE_MAPPING_INVALID",
-            "DECISION_DEADLINE_PASSED": "DECISION_DEADLINE_PASSED",
-            "AUTHORIZATION_EXPIRED": "AUTHORIZATION_EXPIRED",
-            "REFRESH_GRANT_EXPIRED": "AUTHORIZATION_EXPIRED",
-            "ACQUISITION_CUTOFF_PASSED": "ACQUISITION_CUTOFF_PASSED",
-            "SOURCE_REQUEST_BUDGET_EXHAUSTED": "SOURCE_REQUEST_BUDGET_EXHAUSTED",
-            "SOURCE_ROUTE_NOT_AUTHORIZED": "SOURCE_ROUTE_NOT_AUTHORIZED",
-            "SOURCE_UNAVAILABLE": "SOURCE_NOT_AVAILABLE",
-            "SOURCE_PROFILE_NOT_AVAILABLE": "SOURCE_NOT_AVAILABLE",
-            "HTTP_5XX": "SOURCE_NOT_AVAILABLE",
-            "CONNECT_TIMEOUT": "SOURCE_NOT_AVAILABLE",
-            "READ_TIMEOUT": "SOURCE_NOT_AVAILABLE",
-            "TOTAL_TIMEOUT": "SOURCE_NOT_AVAILABLE",
-            "FPL_AUTH_REQUIRED": "SOURCE_AUTHENTICATION_REJECTED",
-            "HTTP_4XX": "SOURCE_AUTHENTICATION_OR_REQUEST_REJECTED",
-            "CREDENTIAL_INVALID": "SOURCE_AUTHENTICATION_REJECTED",
-            "CONTENT_TYPE_INVALID": "SOURCE_RESPONSE_INVALID",
-            "SCHEMA_INVALID": "SOURCE_RESPONSE_INVALID",
-            "PAYLOAD_TOO_LARGE": "SOURCE_RESPONSE_INVALID",
-            "POST_CUTOFF": "ACQUISITION_CUTOFF_PASSED",
-        }
-        pipe.send(("error", categories.get(error.code, "CURRENT_SOURCE_OR_RUN_BLOCKED")))
+        pipe.send(("error", safe_current_failure_code(error.code)))
     except Exception:
         pipe.send(("error", "CURRENT_SOURCE_OR_RUN_BLOCKED"))
     finally:

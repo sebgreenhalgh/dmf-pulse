@@ -209,7 +209,7 @@ async function poll(){
     providerEligibility=await api('/api/eligibility');
     $('stages').replaceChildren(...state.stages.map(s=>text('li',s)));
     const reason=state.error_code || providerEligibility?.error_code;
-    if(state.status!=='COMPLETE'||!view)$('notice').textContent=({'RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED':'Live refresh requires a separately eligible source approval. No provider acquisition occurred.','RUN_TIMEOUT':'Refresh timed out and the worker was cleared.','WORKER_CLEANUP_FAILED':'Worker cleanup failed. This runtime is closed; restart the application.','PRESENTATION_LIFETIME_ENDED':'Presentation expired and was cleared.','DECISION_DEADLINE_PASSED':'The official deadline has passed. This recommendation is withheld.','AUTHORIZATION_REVOKED':'Refresh authorization was revoked. The recommendation was cleared.'})[reason] || reason || state.status;
+    if(state.status!=='COMPLETE'||!view)$('notice').textContent=({'RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED':'Live refresh requires a separately eligible source approval. No provider acquisition occurred.','RUN_TIMEOUT':'Refresh timed out and the worker was cleared.','WORKER_CLEANUP_FAILED':'Worker cleanup failed. This runtime is closed; restart the application.','PRESENTATION_LIFETIME_ENDED':'Presentation expired and was cleared.','DECISION_DEADLINE_PASSED':'The official deadline has passed. This recommendation is withheld.','AUTHORIZATION_REVOKED':'Refresh authorization was revoked. The recommendation was cleared.'})[reason] || state.error_action || reason || state.status;
     $('refresh').disabled=state.status==='RUNNING';
     if(state.status==='COMPLETE'){
       if(!view||view.job_id!==state.job_id)await current(state.job_id);

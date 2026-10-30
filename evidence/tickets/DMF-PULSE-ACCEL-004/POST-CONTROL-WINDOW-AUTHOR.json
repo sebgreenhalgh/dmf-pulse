@@ -1,0 +1,32 @@
+{
+  "actual_provider_vault_DB_calls": 0,
+  "checks": [
+    {
+      "check": "Ruff/check+format",
+      "result": "PASS"
+    },
+    {
+      "check": "strict mypy authorization.py",
+      "result": "PASS"
+    },
+    {
+      "check": "same retained/shared-preview/attempt suite plus7new post-control cases",
+      "elapsed_seconds": 1.54,
+      "new_attempt_tests_total": 22,
+      "result": "PASS",
+      "tests": 107
+    }
+  ],
+  "commit_sha": "8b5d0fe2d4267ef02604551823af3c59b6b07538",
+  "independent_review": "Required from C; author does not count its own code as independent clearance.",
+  "new_services_started": 0,
+  "owned_file_sha256": {
+    "src/dmf_pulse/dashboard/authorization.py": "c9a20e374e5e4a77fbfe8ac7258dddd3bbb074704d7a673bcfda35d521f7778a",
+    "tests/unit/dashboard/test_attempt_preflight.py": "9701ba58846e9ac0fba7d63d9cad1de3b35a50f4e2e1516fcc5231afb00fcea7"
+  },
+  "parent_sha": "0975f1a90542cc6b03e036c1144c09f757be88cf",
+  "production_activation": false,
+  "recorded_at": "2026-10-30T04:14:18.673315+00:00",
+  "schema_version": "accel004-post-control-window-author-v1",
+  "scope": "check_transport_window delegates the existing _attempt_ready pure grant/cutoff check. No second control transaction, append, route authorization, refund or model/rights change."
+}

@@ -1,0 +1,37 @@
+{
+  "actual_provider_vault_DB_calls": 0,
+  "base_sha": "140bebb4630bda8794b826de8ecc0da024725576",
+  "checks": [
+    {
+      "command": "ruff check and format --check two owned files",
+      "result": "PASS"
+    },
+    {
+      "command": "mypy src/dmf_pulse/dashboard/authorization.py",
+      "result": "PASS"
+    },
+    {
+      "command": "pytest tests/unit/dashboard/test_attempt_preflight.py tests/unit/dashboard/test_live_authorization.py tests/unit/dashboard/test_postgres_control_contract.py tests/unit/operation/test_authorization_preview.py -q --tb=short --basetemp review_pack/pytest-lookup-preflight -p no:cacheprovider",
+      "elapsed_seconds": 3.03,
+      "new_tests": 15,
+      "passed": 100,
+      "result": "PASS"
+    }
+  ],
+  "commit_sha": "0975f1a90542cc6b03e036c1144c09f757be88cf",
+  "independent_review_required": "C review of0975f1a; author does not count its own CP1 security finding fix as independent clearance.",
+  "owned_file_sha256": {
+    "src/dmf_pulse/dashboard/authorization.py": "a1b6039be8091dbc8611ffac4897f4a652b99286b18946861e597f8c55c21ceb",
+    "tests/unit/dashboard/test_attempt_preflight.py": "2690a59e9d8af8001180e7337d890121182c45cb02513ee73cd15d1e159e9e4b"
+  },
+  "production_activation": false,
+  "recorded_at": "2026-10-30T04:05:49.104213+00:00",
+  "retained_initial_failures": [
+    "Initial fresh worktree lacked the ignored review_pack parent directory:100fixture setup errors before any test body; harness mkdir corrected.",
+    "One initial Ruff unused fixture variable corrected."
+  ],
+  "root_integrated_commit": "d4aab1221f2f9e7aec93a25487437c8550810748",
+  "schema_version": "accel004-lookup-preflight-author-v1",
+  "scope": "Shared read-only exact claimed-route preflight, same factored validation as attempt; event payload/SQL/quota policy unchanged.",
+  "services_started": 0
+}
