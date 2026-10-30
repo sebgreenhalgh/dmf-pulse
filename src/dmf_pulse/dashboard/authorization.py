@@ -592,6 +592,81 @@ class UsageLedger:
                 {"kind": "CHECK", "at": now.isoformat(), "reservation_id": grant.reservation_id},
             )
 
+    def _attempt_ready(self, grant: RefreshGrant, worker_id: str, now: datetime) -> None:
+        self._valid_grant(grant, worker_id, now)
+        if now > grant.request.information_cutoff:
+            raise AuthorizationError("ACQUISITION_CUTOFF_PASSED", "EXPIRED")
+
+    def _available_attempt_route(
+        self,
+        records: list[dict[str, Any]],
+        grant: RefreshGrant,
+        worker_id: str,
+        *,
+        provider: Provider,
+        method: str,
+        host: str,
+        path: str,
+    ) -> str:
+        self._claimed(records, grant, worker_id)
+        source = next(
+            (row for row in grant.request.source_scopes if row.provider == provider), None
+        )
+        route = (
+            next(
+                (
+                    row
+                    for row in source.routes
+                    if (row.method, row.host, row.path) == (method, host, path)
+                ),
+                None,
+            )
+            if source
+            else None
+        )
+        if route is None:
+            raise AuthorizationError("SOURCE_ROUTE_NOT_AUTHORIZED")
+        route_hash = canonical_sha256([provider, method, host, path])
+        attempts = sum(
+            row.get("kind") == "ATTEMPT"
+            and row.get("reservation_id") == grant.reservation_id
+            and row.get("route_sha256") == route_hash
+            for row in records
+        )
+        if attempts >= route.maximum_calls:
+            raise AuthorizationError("SOURCE_REQUEST_BUDGET_EXHAUSTED")
+        return route_hash
+
+    def preflight_attempt(
+        self,
+        grant: RefreshGrant,
+        worker_id: str,
+        *,
+        provider: Provider,
+        method: str,
+        host: str,
+        path: str,
+        now: datetime,
+    ) -> None:
+        """Check the exact pending route before credentials, without consuming it.
+
+        This is no grant or reservation. The eventual transport must still call
+        attempt(), which repeats this same policy under its authenticated lock
+        and appends exactly once. No usage can be refunded by this observation.
+        """
+        self._attempt_ready(grant, worker_id, now)
+        with self._transaction() as records:
+            self._clock(records, now)
+            self._available_attempt_route(
+                records,
+                grant,
+                worker_id,
+                provider=provider,
+                method=method,
+                host=host,
+                path=path,
+            )
+
     def attempt(
         self,
         grant: RefreshGrant,
@@ -603,38 +678,18 @@ class UsageLedger:
         path: str,
         now: datetime,
     ) -> None:
-        self._valid_grant(grant, worker_id, now)
-        if now > grant.request.information_cutoff:
-            raise AuthorizationError("ACQUISITION_CUTOFF_PASSED", "EXPIRED")
+        self._attempt_ready(grant, worker_id, now)
         with self._transaction() as records:
             self._clock(records, now)
-            self._claimed(records, grant, worker_id)
-            source = next(
-                (row for row in grant.request.source_scopes if row.provider == provider), None
+            route_hash = self._available_attempt_route(
+                records,
+                grant,
+                worker_id,
+                provider=provider,
+                method=method,
+                host=host,
+                path=path,
             )
-            route = (
-                next(
-                    (
-                        row
-                        for row in source.routes
-                        if (row.method, row.host, row.path) == (method, host, path)
-                    ),
-                    None,
-                )
-                if source
-                else None
-            )
-            if route is None:
-                raise AuthorizationError("SOURCE_ROUTE_NOT_AUTHORIZED")
-            route_hash = canonical_sha256([provider, method, host, path])
-            attempts = sum(
-                row.get("kind") == "ATTEMPT"
-                and row.get("reservation_id") == grant.reservation_id
-                and row.get("route_sha256") == route_hash
-                for row in records
-            )
-            if attempts >= route.maximum_calls:
-                raise AuthorizationError("SOURCE_REQUEST_BUDGET_EXHAUSTED")
             self._append(
                 records,
                 {
