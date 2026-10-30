@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime
 from threading import Barrier, Event
@@ -130,6 +131,20 @@ def _insert_external(session: Session, ids: dict[str, UUID], external_id: str) -
     )
 
 
+def _commit_overlap_write(session: Session, insert: Callable[[], object]) -> str:
+    """Retry one rolled-back deadlock, then require the original constraint result."""
+    for attempt in range(2):
+        try:
+            insert()
+            commit_session(session)
+            return "COMMITTED"
+        except DataModelError as exc:
+            session.rollback()
+            if exc.code != "DATABASE_RETRYABLE" or attempt == 1:
+                return exc.code
+    raise AssertionError("bounded overlap transaction did not return")
+
+
 def test_two_overlap_races_commit_exactly_one_row(
     postgres_session_factory: sessionmaker[Session],
 ) -> None:
@@ -141,8 +156,9 @@ def test_two_overlap_races_commit_exactly_one_row(
     def membership_worker(team: UUID) -> str:
         with postgres_session_factory() as session:
             membership_barrier.wait(timeout=10)
-            try:
-                PlayerMembershipRepository(session).add_version(
+            return _commit_overlap_write(
+                session,
+                lambda: PlayerMembershipRepository(session).add_version(
                     player_id=ids["player"],
                     team_id=team,
                     season_id=ids["season"],
@@ -150,12 +166,8 @@ def test_two_overlap_races_commit_exactly_one_row(
                     squad_status=SquadStatus.REGISTERED,
                     valid_range=valid,
                     known_at=known,
-                )
-                commit_session(session)
-                return "COMMITTED"
-            except DataModelError as exc:
-                session.rollback()
-                return exc.code
+                ),
+            )
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         membership_results = list(executor.map(membership_worker, (ids["north"], ids["south"])))
@@ -166,8 +178,9 @@ def test_two_overlap_races_commit_exactly_one_row(
     def revision_worker(number: int) -> str:
         with postgres_session_factory() as session:
             revision_barrier.wait(timeout=10)
-            try:
-                FixtureRepository(session).add_revision(
+            return _commit_overlap_write(
+                session,
+                lambda: FixtureRepository(session).add_revision(
                     fixture_id=ids["fixture"],
                     revision_number=number,
                     kickoff_at=datetime(2026, 8, 21, 19 + number, tzinfo=UTC),
@@ -176,12 +189,8 @@ def test_two_overlap_races_commit_exactly_one_row(
                     known_at=known,
                     observed_at=known,
                     source_snapshot_id=ids["snapshot_one"],
-                )
-                commit_session(session)
-                return "COMMITTED"
-            except DataModelError as exc:
-                session.rollback()
-                return exc.code
+                ),
+            )
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         revision_results = list(executor.map(revision_worker, (1, 2)))
@@ -204,13 +213,9 @@ def test_overlapping_current_accepted_external_mapping_writers_are_serialized(
     def worker() -> str:
         with postgres_session_factory() as session:
             barrier.wait(timeout=10)
-            try:
-                _insert_external(session, ids, "player-001")
-                commit_session(session)
-                return "COMMITTED"
-            except DataModelError as exc:
-                session.rollback()
-                return exc.code
+            return _commit_overlap_write(
+                session, lambda: _insert_external(session, ids, "player-001")
+            )
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         results = list(executor.map(lambda _: worker(), range(2)))

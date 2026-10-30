@@ -1,0 +1,175 @@
+{
+  "actual_p01_scores": 0,
+  "actual_player_comparisons": 0,
+  "actual_provider_requests": 0,
+  "corrected_default_schema_sha256": "897bad1218f7b9417a67667116b5a04efbd728293317455ba3d8f790c1dc3599",
+  "corrected_postgres_tests": 129,
+  "evidence": [
+    {
+      "bytes": 6783,
+      "original_path": "review_pack/accel005-independent-concurrency-test-remediation-e3826efeaa1708aad6ce868436763ccd9560f25d5deb823d3f619821040040bd.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-INDEPENDENT-CONCURRENCY.json",
+      "sha256": "e3826efeaa1708aad6ce868436763ccd9560f25d5deb823d3f619821040040bd"
+    },
+    {
+      "bytes": 14018,
+      "original_path": "review_pack/accel005-independent-locale-correction-010c0e8cc56cebe68f5fe82c8e65732eb051b7736d0569788fe2d9e6012520b3.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-INDEPENDENT-LOCALE.json",
+      "sha256": "010c0e8cc56cebe68f5fe82c8e65732eb051b7736d0569788fe2d9e6012520b3"
+    },
+    {
+      "bytes": 5366,
+      "original_path": "review_pack/accel005-independent-installed-native-review-8085db6ebe18c579b37696b1db4c95baaabe4e5794d33abebfc18f433f196494.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INDEPENDENT-INSTALLED.json",
+      "sha256": "8085db6ebe18c579b37696b1db4c95baaabe4e5794d33abebfc18f433f196494"
+    },
+    {
+      "bytes": 7038,
+      "original_path": "review_pack/accel005-independent-browser-parity-review-49a1803b79d20068ef23db89f6a29089f1fd046996e49bc607862a733fb44585.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INDEPENDENT-BROWSER-PARITY.json",
+      "sha256": "49a1803b79d20068ef23db89f6a29089f1fd046996e49bc607862a733fb44585"
+    },
+    {
+      "bytes": 6172,
+      "original_path": "review_pack/accel005-independent-final-installed-p01-13bce0446d829a00b973cdbd043580131aa5e604a0e8269f393b5672df657d54.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INDEPENDENT-P01.json",
+      "sha256": "13bce0446d829a00b973cdbd043580131aa5e604a0e8269f393b5672df657d54"
+    },
+    {
+      "bytes": 61558,
+      "original_path": "review_pack/release005/CP6-INSTALLED-WHEEL.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INSTALLED-WHEEL.json",
+      "sha256": "1cd31d85a766593ba6ca6f83ff5502f2f51ddfab99694346a46b7c9340a21e16"
+    },
+    {
+      "bytes": 1481,
+      "original_path": "review_pack/release005/CP6-INSTALLED-native.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INSTALLED-native.json",
+      "sha256": "902d51cc1110b012361d663190e5fc3ce83e7d5f5ce80f2877f6901498130468"
+    },
+    {
+      "bytes": 746,
+      "original_path": "review_pack/release005/CP6-INSTALLED-native.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INSTALLED-native.LOG",
+      "sha256": "f5b4aaff78bb04398cf7a90039a1525ebd65c98ea27e2e517d9c911e86c064f6"
+    },
+    {
+      "bytes": 7004,
+      "original_path": "review_pack/release005/CP6-INSTALLED-parity.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INSTALLED-parity.json",
+      "sha256": "cb54b3583c899da3c74351b5ec7f0e75da2182b2be3e08f0cfcabf8976b69e01"
+    },
+    {
+      "bytes": 5151,
+      "original_path": "review_pack/release005/CP6-INSTALLED-parity.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-INSTALLED-parity.LOG",
+      "sha256": "7c4dfa6b061c8e4f48cd8aa3a506e0a0ed69c4dceaaba5714a9ca7c095bd790a"
+    },
+    {
+      "bytes": 664,
+      "original_path": "review_pack/release005/CP6-BROWSER-NATIVE-CLEANUP.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-BROWSER-NATIVE-CLEANUP.json",
+      "sha256": "93e593f71c955ca01410b4929fb83c35f8158537a587a3e7579beff590917d9f"
+    },
+    {
+      "bytes": 94,
+      "original_path": "review_pack/release005/CP6-ACTUAL-BROWSER.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-ACTUAL-BROWSER.LOG",
+      "sha256": "21e17aef689b4aed99c319ecf1402dbea37a538552cdcfcf9b72b8b3c30315cb"
+    },
+    {
+      "bytes": 3103,
+      "original_path": "review_pack/release005/CP6-ALL-INSTALLED-VERIFIERS.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-ALL-INSTALLED-VERIFIERS.json",
+      "sha256": "dd9b6650131279062c8e0730c6143a66118715133d3ff6bbc23fd86c8b41af61"
+    },
+    {
+      "bytes": 265,
+      "original_path": "review_pack/release005/CP6-verify_gcs008_wheel.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-verify_gcs008_wheel.json",
+      "sha256": "6c5e9b632aec6abe4f56f4a9bbb3243271da168df7a5cb98bf3f361481761dad"
+    },
+    {
+      "bytes": 180,
+      "original_path": "review_pack/release005/CP6-verify_gcs008_wheel.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-verify_gcs008_wheel.LOG",
+      "sha256": "e2cd6e5a4570ea5792bf223117872d193768092c066fded088d1bb997a20adde"
+    },
+    {
+      "bytes": 374,
+      "original_path": "review_pack/release005/CP6-verify_gcs008_wheel-RECHECK.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-verify_gcs008_wheel-RECHECK.json",
+      "sha256": "8a98823cb7eb3453659c27f8393fa5d92c381746f42bdb3ee3ef656939fd6bc1"
+    },
+    {
+      "bytes": 689,
+      "original_path": "review_pack/release005/CP6-verify_gcs008_wheel-RECHECK.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-verify_gcs008_wheel-RECHECK.LOG",
+      "sha256": "8d4f1035e1979108509e99df5efddfcde274ae7e47b4d73dcbde29f1177fe259"
+    },
+    {
+      "bytes": 1324,
+      "original_path": "review_pack/release005/CP6-WINDOWS-FULL.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-WINDOWS-FULL.json",
+      "sha256": "546d9bec8e01f322eea3791e0d5e2f04abe94e92a2c731cb87a2777439b868a0"
+    },
+    {
+      "bytes": 653,
+      "original_path": "review_pack/release005/CP6-WINDOWS-FULL.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-WINDOWS-FULL.LOG",
+      "sha256": "401101a25e561e9a6c54be28f5b3b4a527490c2db667db250ccd37f6a3765eaa"
+    },
+    {
+      "bytes": 1110,
+      "original_path": "review_pack/release005/CP6-SUPERSEDED-WINDOWS-STOP.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-SUPERSEDED-WINDOWS-STOP.json",
+      "sha256": "c453d83b76fae1d76e87c661373e498cab7ced22fce9a7d6904bd2997d09c5bf"
+    },
+    {
+      "bytes": 1045,
+      "original_path": "review_pack/release005/CP6-CONCURRENCY-DIAGNOSTIC.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-CONCURRENCY-DIAGNOSTIC.json",
+      "sha256": "4d29d33431be89e48a4a2e5a24b9460753becd4ab6fb53a09c54fbb4344d97a5"
+    },
+    {
+      "bytes": 100,
+      "original_path": "review_pack/release005/CP6-CONCURRENCY-DIAGNOSTIC.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-CONCURRENCY-DIAGNOSTIC.LOG",
+      "sha256": "2b556ba87b4582bcb2c08ff54e56b0694720181a19eed3be3fdd5e2e9b8c8718"
+    },
+    {
+      "bytes": 1039,
+      "original_path": "review_pack/release005/CP6-CONCURRENCY-RECHECK.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-CONCURRENCY-RECHECK.json",
+      "sha256": "c697de9444a19490bae29b0dfd26304ecfcc08b219ba2e5d997d07db9feacb45"
+    },
+    {
+      "bytes": 100,
+      "original_path": "review_pack/release005/CP6-CONCURRENCY-RECHECK.LOG",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-CONCURRENCY-RECHECK.LOG",
+      "sha256": "da462256cd6a0f44380ff27d161b0ba6d89c4ba7d18ff917b0143316ef406ec5"
+    },
+    {
+      "bytes": 3727,
+      "original_path": "review_pack/release005/browser/receipt.json",
+      "public_path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-CANDIDATE1-BROWSER-RAW-RECEIPT.json",
+      "sha256": "103a50d211c09b4b18ab67347054731adc11118925dc61d5c9a0f4a7728e2cf6"
+    }
+  ],
+  "final_complete_regression": "FRESH_SOURCE_BOUND_RUN_REQUIRED",
+  "final_installed_acceptance": "REBUILD_AND_FRESH_BINDING_REQUIRED",
+  "final_twenty_job_ci": "EXACT_FINAL_COMMIT_REQUIRED",
+  "independent_full_shape_attacks": 78,
+  "independent_retry_controls": 23,
+  "independent_two_locale_retained_cases": 24,
+  "initial_candidate_status": "SUPERSEDED_BY_REVIEWED_MIGRATION_CORRECTION; not final wheel evidence",
+  "initial_candidate_wheel_sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65",
+  "normal_vault_reads": 0,
+  "owner_source_pilot_code_acceptance": "NOT_GRANTED",
+  "predecessor_commit": "270f64cafc1437dd464ddc0c4a38ffd881a5f46e",
+  "production_active": false,
+  "production_change": "SIX_EXPLICIT_C_COLLATIONS_IN_NEW_REAL_CUSTODY_MIGRATION_ONLY",
+  "schema_version": "accel005-cp6-reviewed-corrections-v1",
+  "sealed_at": "2026-10-30T20:33:30.117523+00:00",
+  "test_only_concurrency_retry": "ONE_TYPED_RETRY_AFTER_ROLLBACK"
+}

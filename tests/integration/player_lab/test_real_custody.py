@@ -27,7 +27,7 @@ from tests.unit.player_lab.real_support import owned_case, owned_full, reseal
 pytestmark = [pytest.mark.integration, pytest.mark.postgres]
 
 
-@pytest.fixture(scope="module", params=("POINT_ADAPTER", "FULL_LEGACY"))
+@pytest.fixture(scope="module", params=("POINT_ADAPTER", "FULL_LEGACY", "FULL_LEGACY_SHIFTED"))
 def owned(postgres_url, request):
     now = datetime.now(UTC)
     protocol, populations, forecasts, labels, registry = owned_case(now)
@@ -46,7 +46,7 @@ def owned(postgres_url, request):
     patch = pytest.MonkeyPatch()
     for module in (real_rights, real_store, real_integrity):
         patch.setattr(module, "real_source_registry", lambda: registry)
-    if request.param == "FULL_LEGACY":
+    if request.param.startswith("FULL_LEGACY"):
         from dmf_pulse.player_lab.real import adapt_qualified_full_forecast
 
         forecasts = tuple(
@@ -123,10 +123,26 @@ def owned(postgres_url, request):
         make_url(postgres_url).set(database="postgres"), isolation_level="AUTOCOMMIT"
     )
     with admin.connect() as con:
-        con.execute(text(f'CREATE DATABASE "{name}"'))
+        locale = (
+            " TEMPLATE template0 LOCALE_PROVIDER icu ICU_LOCALE 'en-u-ka-shifted-ks-level3'"
+            " LC_COLLATE 'C' LC_CTYPE 'C' ENCODING 'UTF8'"
+            if request.param == "FULL_LEGACY_SHIFTED"
+            else ""
+        )
+        con.execute(text(f'CREATE DATABASE "{name}"{locale}'))
     url = make_url(postgres_url).set(database=name).render_as_string(hide_password=False)
     engine = create_engine(url, hide_parameters=True)
     try:
+        if request.param == "FULL_LEGACY_SHIFTED":
+            with engine.connect() as con:
+                order = con.execute(
+                    text(
+                        'SELECT array_agg(k ORDER BY k),array_agg(k ORDER BY k COLLATE "C") '
+                        "FROM unnest(ARRAY['source_summary_sha256','sources']) k"
+                    )
+                ).one()
+                assert order[0] == ["sources", "source_summary_sha256"]
+                assert order[1] == ["source_summary_sha256", "sources"]
         upgrade_database(url)
         ledger = PostgresResearchLedger(lambda: engine)
         stored_protocol = ledger.register_real_protocol(protocol)

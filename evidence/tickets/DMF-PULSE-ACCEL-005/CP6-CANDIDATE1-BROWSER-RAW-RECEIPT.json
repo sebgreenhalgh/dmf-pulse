@@ -1,0 +1,115 @@
+{
+  "schema_version": "accel005-installed-real-browser-v1",
+  "classification": "OWNED_SYNTHETIC_RECOMMENDATION_AND_PUBLIC_PROJECT_METADATA_ONLY",
+  "status": "FAIL",
+  "provider_calls": 0,
+  "real_key_lookups": 0,
+  "port": 8771,
+  "playwright_module": "NOT_LOCATED_IN_BOUNDED_PRIOR_TOOL_PATHS",
+  "browser_driver": "ACTUAL_CHROMIUM_CDP_NODE_NATIVE_WEBSOCKET",
+  "started_at": "2026-10-30T19:57:38.630Z",
+  "source_freeze_sha": "59c1b155470c315ec9b714126d9c5846d51f8d3f",
+  "installed_wheel_sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65",
+  "fingerprint_context": "ACTUAL_INSTALLED_RUNTIME_GUARD; nativeWindowsPath ordering andforceincludedconfiguration differ fromsource/string-sortedproofs",
+  "browser_version": "HeadlessChrome/149.0.7827.55",
+  "current_mode": {
+    "mode": "SYNTHETIC_CURRENT_MODE",
+    "catalogue": 121,
+    "projected": 120,
+    "blocked": 1,
+    "xi": 11,
+    "squad": 15,
+    "job_sha256": "7639d31c59dea655bba073e51808d747a75f0bcbdd9330f4fd1b40d6ed073520"
+  },
+  "screenshots": [
+    {
+      "file": "owned-team.png",
+      "bytes": 97561,
+      "sha256": "e4286caedeac5d50ccb29cd6d6d1a57a60ca89c989bcd54e859887ce785248bd"
+    },
+    {
+      "file": "performance-recovery-top.png",
+      "bytes": 100225,
+      "sha256": "abd1536244188fb92cccb4ac1460528a02caa8fc6103bfd0050736c0f12017f2"
+    },
+    {
+      "file": "performance-p01-distinction.png",
+      "bytes": 104435,
+      "sha256": "caae5cd001ff9bb8e94c1956e6dd8ca8f65742a1e089bafb47e11ea44a49fb67"
+    },
+    {
+      "file": "owned-mobile-health.png",
+      "bytes": 31445,
+      "sha256": "11598e97825972ee798f7b094f4dad830127549d8c1d052a9597280226d79b8e"
+    }
+  ],
+  "authenticated_reload_same_job": true,
+  "player_detail_rendered_distribution": true,
+  "player_comparison_rendered": true,
+  "performance": {
+    "real_player_cohort": 0,
+    "recovered_match_fixtures": 10,
+    "products_per_match": 3,
+    "product_rows": 30,
+    "final_fixture_labels": 0,
+    "missing_fixture_labels": 10,
+    "synthetic_and_real_separate": true
+  },
+  "mobile_viewport": true,
+  "logout_cleared": true,
+  "control_counts": {
+    "RESERVATION": 1,
+    "CLAIM": 1,
+    "CHECK": 4,
+    "ATTEMPT": 13
+  },
+  "responses": {
+    "/:200": 2,
+    "/assets/desk.css:200": 2,
+    "/assets/desk.js:200": 2,
+    "/api/context:401": 1,
+    "/api/session:200": 1,
+    "/api/refresh:200": 1,
+    "/api/status:200": 91,
+    "/api/eligibility:200": 90,
+    "/api/desk:200": 4,
+    "/api/context:200": 1,
+    "/api/players/50041:200": 1,
+    "/api/compare/188/193:200": 1,
+    "/api/performance:200": 2,
+    "/api/logout:200": 1,
+    "/api/desk:401": 1
+  },
+  "taskkill_exit_codes": [
+    128,
+    0
+  ],
+  "browser_errors": 0,
+  "external_page_requests": 0,
+  "server_port_closed": true,
+  "debugger_port_closed": true,
+  "runtime_guards": [
+    {
+      "external_network_attempts": 0,
+      "guard": "LOOPBACK_ONLY_BEFORE_PACKAGE_IMPORT",
+      "implementation_fingerprint": "26982c345de90a86eb9dae7ba5d4c4517b126631",
+      "installed_distribution": "0.2.0",
+      "pid": 23556,
+      "secret_lookup_attempts": 0
+    },
+    {
+      "external_network_attempts": 0,
+      "guard": "LOOPBACK_ONLY_BEFORE_PACKAGE_IMPORT",
+      "implementation_fingerprint": "26982c345de90a86eb9dae7ba5d4c4517b126631",
+      "installed_distribution": "0.2.0",
+      "pid": 45104,
+      "secret_lookup_attempts": 0
+    }
+  ],
+  "helper_sha256": "4c0ecb6f0b2dfbabe97353ecb63344c1c423478da270da30fffe93f6b341bbf7",
+  "runtime_wrapper_sha256": "e6845b1e57da178a9e5927c87de6877b889cdae25da279e36fc8600dc9303b82",
+  "elapsed_ms": 68734,
+  "cleanup_failure_code": "OWNED_TEMP_CLEANUP_FAILED",
+  "cleanup_os_code": "EPERM",
+  "external_owned_temp_removed": false
+}

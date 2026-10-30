@@ -1,0 +1,162 @@
+{
+  "all_1519_exclusion_rows_have_exact_permitted_pointer_value_types_and_semantics": true,
+  "browser_combined_interpretation": "PASS_FUNCTIONAL_AND_SEPARATELY_VERIFIED_CLEANUP",
+  "browser_functional_checks": {
+    "exact_catalogue_projected_blocked": [
+      121,
+      120,
+      1
+    ],
+    "external_requests_and_real_secret_lookups": 0,
+    "mobile_health_and_logout_401": true,
+    "one_reservation_one_claim_thirteen_owned_attempts": true,
+    "owned_actual_chromium_cdp": true,
+    "p01_final_missing_labels": [
+      0,
+      10
+    ],
+    "p01_match_fixtures_products_rows": [
+      10,
+      3,
+      30
+    ],
+    "player_detail_distribution_and_comparison": true,
+    "real_player_cohort": 0,
+    "runtime_guards_two_pids_exact_installed_fingerprint": true,
+    "same_job_authenticated_reload": true
+  },
+  "browser_original_failure": "OWNED_TEMP_CLEANUP_FAILED_EPERM_ONLY",
+  "browser_original_raw_receipt": {
+    "bytes": 3727,
+    "path": "review_pack/release005/browser/receipt.json",
+    "sha256": "103a50d211c09b4b18ab67347054731adc11118925dc61d5c9a0f4a7728e2cf6"
+  },
+  "browser_original_status_preserved": "FAIL",
+  "cancellation_lifecycle_phases": [
+    "acquisition",
+    "modelling"
+  ],
+  "checked_at": "2026-10-30T20:11:32.255077+00:00",
+  "checked_fields": 333502,
+  "findings": [],
+  "fresh_passive_cleanup_check": {
+    "exact_owned_temp_absent": true,
+    "mutations_performed": false,
+    "observed_at": "2026-10-30T20:11:31.9576725Z",
+    "recorded_processes": [
+      {
+        "absent": true,
+        "original_python_not_running": true,
+        "pid": 23556
+      },
+      {
+        "absent": true,
+        "original_python_not_running": true,
+        "pid": 45104
+      }
+    ],
+    "server8771_closed": true
+  },
+  "installed_windows_implementation_fingerprint": "26982c345de90a86eb9dae7ba5d4c4517b126631",
+  "limits": [
+    "The original browser raw FAIL is immutable. The separate direct PowerShell cleanup has an actual result receipt but no preserved standalone command/helper body; no independent historical command custody is invented. This review freshly and passively checks exact directory absence, original Python identities not running and server8771 closed without process or filesystem mutation.",
+    "The browser screenshots intentionally show an owned synthetic clock and SYNTHETIC_CURRENT_MODE, not live data, current manager state or provider freshness. The public P01 metadata and synthetic player results remain distinct.",
+    "Actual production/browser/model work was not rerun. The unchanged accepted installed probe's complete comparison and captured counts are authenticated; every retained raw exclusion is independently validated. Equal-valued full model bodies are not retained for a second independent recomputation.",
+    "Two explicit98-versus100 quota-header differences are control metadata, not numerical projection/decision differences. Source/run hashes and single screening SHA tokens may differ; full semantic-hash parity is not claimed.",
+    "Final Windows suite, literal wheel verifiers, exact complete20-job final-SHA CI and owner/source acceptance remain separate gates."
+  ],
+  "native_cleanup_receipt": {
+    "bytes": 664,
+    "path": "review_pack/release005/CP6-BROWSER-NATIVE-CLEANUP.json",
+    "sha256": "93e593f71c955ca01410b4929fb83c35f8158537a587a3e7579beff590917d9f"
+  },
+  "numeric_fields": 268159,
+  "numeric_projection_decision_mismatches": 0,
+  "operational_cli_real_cohort": 0,
+  "operational_cli_scored_owned_targets": 8,
+  "parity_log": {
+    "bytes": 5151,
+    "path": "review_pack/release005/CP6-INSTALLED-parity.LOG",
+    "sha256": "7c4dfa6b061c8e4f48cd8aa3a506e0a0ed69c4dceaaba5714a9ca7c095bd790a"
+  },
+  "parity_receipt": {
+    "bytes": 7004,
+    "path": "review_pack/release005/CP6-INSTALLED-parity.json",
+    "sha256": "cb54b3583c899da3c74351b5ec7f0e75da2182b2be3e08f0cfcabf8976b69e01"
+  },
+  "provider_or_vault_or_database_access_by_reviewer": 0,
+  "raw_parity_inventories": [
+    {
+      "binding": {
+        "bytes": 419110,
+        "path": "review_pack/accel005-independent-installed-parity-f2edc22fec8c7b51/parity-1.json",
+        "sha256": "730bad40b2b6f32e778c5eaa4a47cd7f0a44e41d87df4b22cb9a4dd7a5296526"
+      },
+      "checked_fields": 84053,
+      "excluded": 512,
+      "exclusion_classification": {
+        "explicit_owned_quota_control_metadata_difference": 1,
+        "source_or_run_custody_hash_identity": 511
+      },
+      "horizon": 1,
+      "mismatches": 0,
+      "numeric_fields": 67750
+    },
+    {
+      "binding": {
+        "bytes": 841051,
+        "path": "review_pack/accel005-independent-installed-parity-f2edc22fec8c7b51/parity-3.json",
+        "sha256": "d0ce51e7c4323d8ee7a0013bb3fb67ab863571631fc4526fc3f1f16f5731c1d5"
+      },
+      "checked_fields": 249449,
+      "excluded": 1007,
+      "exclusion_classification": {
+        "explicit_owned_quota_control_metadata_difference": 1,
+        "single_screen_sha_in_identical_disclosure": 2,
+        "source_or_run_custody_hash_identity": 1004
+      },
+      "horizon": 3,
+      "mismatches": 0,
+      "numeric_fields": 200409
+    }
+  ],
+  "reviewed_helpers_sha256": {
+    "review_pack/accel005_browser_installed.cjs": "4c0ecb6f0b2dfbabe97353ecb63344c1c423478da270da30fffe93f6b341bbf7",
+    "review_pack/accel005_browser_runtime.py": "e6845b1e57da178a9e5927c87de6877b889cdae25da279e36fc8600dc9303b82",
+    "review_pack/run_browser005.py": "a7ecbf38e0a1ba7c9bed3c24c834494aeb23539c4c30633d41a50dc29f034ebc",
+    "review_pack/run_installed005.py": "6ddc67147e0bca87ca106fbaa456bd8fc75439bd0118736b68324daa3c0122fc",
+    "scripts/accel003_wheel_probe.py": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539"
+  },
+  "schema_version": "accel005-independent-browser-parity-review-v1",
+  "screenshots_hashed_and_visually_reviewed": [
+    {
+      "bytes": 97561,
+      "path": "review_pack/release005/browser/owned-team.png",
+      "sha256": "e4286caedeac5d50ccb29cd6d6d1a57a60ca89c989bcd54e859887ce785248bd"
+    },
+    {
+      "bytes": 100225,
+      "path": "review_pack/release005/browser/performance-recovery-top.png",
+      "sha256": "abd1536244188fb92cccb4ac1460528a02caa8fc6103bfd0050736c0f12017f2"
+    },
+    {
+      "bytes": 104435,
+      "path": "review_pack/release005/browser/performance-p01-distinction.png",
+      "sha256": "caae5cd001ff9bb8e94c1956e6dd8ca8f65742a1e089bafb47e11ea44a49fb67"
+    },
+    {
+      "bytes": 31445,
+      "path": "review_pack/release005/browser/owned-mobile-health.png",
+      "sha256": "11598e97825972ee798f7b094f4dad830127549d8c1d052a9597280226d79b8e"
+    }
+  ],
+  "seven_distinct_network_guard_processes": true,
+  "source_or_tracked_edits_by_reviewer": false,
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "total_exclusion_classes": {
+    "explicit_owned_quota_control_metadata_difference": 2,
+    "single_screen_sha_in_identical_disclosure": 2,
+    "source_or_run_custody_hash_identity": 1515
+  },
+  "wheel_sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65"
+}

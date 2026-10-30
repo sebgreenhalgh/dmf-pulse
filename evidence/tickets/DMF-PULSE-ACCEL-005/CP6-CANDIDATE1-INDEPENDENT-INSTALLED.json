@@ -1,0 +1,73 @@
+{
+  "actual_owner_or_supplier_acceptance_inferred": false,
+  "checked_at": "2026-10-30T20:04:20.739984+00:00",
+  "credential_store_queries_by_reviewer": 0,
+  "findings": [],
+  "installed_custody_receipt": {
+    "bytes": 61558,
+    "path": "review_pack/release005/CP6-INSTALLED-WHEEL.json",
+    "sha256": "1cd31d85a766593ba6ca6f83ff5502f2f51ddfab99694346a46b7c9340a21e16"
+  },
+  "installed_observed_windows_implementation_fingerprint": "26982c345de90a86eb9dae7ba5d4c4517b126631",
+  "installed_outside_source_and_isolated_from_source_paths": true,
+  "installed_project_version": "0.2.0",
+  "installed_python": "3.13.5",
+  "installed_registry_empty_no_actual_qualification": true,
+  "installed_runtime_exact_locked_packages": 31,
+  "limits": [
+    "The reviewer rehashed actual installed files and ran only isolated package/distribution metadata and content-fingerprint inspection; the owned native credential lifecycle is authenticated from its exact executed helper, installed copy, captured result and log and was not rerun",
+    "The native capture does not record process IDs or a separate OS witness. The source invokes a distinct isolated child process and the result confirms its assertions; no stronger PID-level witness is claimed",
+    "The native launcher itself has no historical self-hash in this receipt; its current exact bytes were inspected and bound here, while the native child emits its executed helper hash",
+    "Browser, exact1/3GW numerical parity, the five wheel verifiers, final complete20-job CI and owner acceptance remain separate gates",
+    "Windows and POSIX content fingerprints intentionally use their native Path ordering; the complete portable wheel SHA is the primary package identity"
+  ],
+  "member_inventory": {
+    "bytes": 146279,
+    "path": "review_pack/accel005-independent-installed-member-custody-152ac5d1f08f5124cf4d09440bf9cb9b4928388de6127c94b98e0210c2f42372.json",
+    "sha256": "152ac5d1f08f5124cf4d09440bf9cb9b4928388de6127c94b98e0210c2f42372"
+  },
+  "native_log": {
+    "bytes": 746,
+    "path": "review_pack/release005/CP6-INSTALLED-native.LOG",
+    "sha256": "f5b4aaff78bb04398cf7a90039a1525ebd65c98ea27e2e517d9c911e86c064f6"
+  },
+  "native_result": {
+    "bytes": 1481,
+    "path": "review_pack/release005/CP6-INSTALLED-native.json",
+    "sha256": "902d51cc1110b012361d663190e5fc3ce83e7d5f5ce80f2877f6901498130468"
+  },
+  "native_scope_checks": [
+    "All native WinCred operations pass an exact owned-target facade; normal target and legacy-read attempts remain zero",
+    "Fresh FPL set has equal read counts before and after, proving blind setup within the owned namespace",
+    "A separate isolated Python process verifies persisted Odds and fresh FPL values against transient hashes and requires FPL_FRESH_V2 registration",
+    "FPL metadata expiry and expired resolution are checked without token decoding or provider authentication",
+    "Parent finally deletes fresh FPL, Odds and owned legacy entries; successful deletes and fresh/odds absence are required",
+    "Normal slots and ambient FPL credential environment are not consulted; logs contain counts and fixed metadata rather than credential values"
+  ],
+  "package_members_checked_against_git_recipe_wheel_and_actual_install": 514,
+  "provider_or_operator_database_calls_by_reviewer": 0,
+  "review_harness_initial_failures": [
+    "The first closed reviewer launcher omitted the nonsecret Windows architecture variables, so packaging's platform_machine marker selected30 packages and omitted greenlet. The corrected closed launcher retains the actual OS architecture markers (AMD64, independently observed as X64 by RuntimeInformation), after which the unchanged exact31-package locked expectation matches.",
+    "The restricted token could not launch the existing disposable installed interpreter. The authorized metadata-only retry used local elevated permissions, with no credential/provider/database query.",
+    "The first installed-child socket audit also denied local socket.gethostname used by platform.machine during SQLAlchemy import. The final audit permits that local OS hostname lookup only; all other socket audit events, including DNS and connections, remain denied."
+  ],
+  "reviewed_helpers": {
+    "review_pack/install_release005.py": "7883e9f29b42750c987fd905fe0c7feef58e54d2f3ab6344ba958116af50005b",
+    "review_pack/native_installed005.py": "4122f2f626f4efeaa5665c30d01569c7b7e61ad30a976734a66637a0f357a30a",
+    "review_pack/run_installed005.py": "6ddc67147e0bca87ca106fbaa456bd8fc75439bd0118736b68324daa3c0122fc"
+  },
+  "schema_version": "accel005-independent-installed-native-package-review-v1",
+  "source_association_checkpoint": "270f64cafc1437dd464ddc0c4a38ffd881a5f46e",
+  "source_build_checkpoint": "59c1b155470c315ec9b714126d9c5846d51f8d3f",
+  "source_or_tracked_edits_by_reviewer": false,
+  "source_package_config_pyproject_lock_unchanged_between_checkpoints": true,
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "wheel": {
+    "bytes": 1812946,
+    "path": "review_pack/release005/base-wheel/dmf_pulse-0.2.0-py3-none-any.whl",
+    "sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65"
+  },
+  "wheel_derived_posix_implementation_fingerprint": "f4e4652b65e178ab03c560a942a0d0f618148223",
+  "wheel_record_and_crc_and_path_identity_pass": true,
+  "wheel_total_members": 519
+}

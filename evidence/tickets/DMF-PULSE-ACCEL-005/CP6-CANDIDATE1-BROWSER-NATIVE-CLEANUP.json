@@ -1,0 +1,17 @@
+{
+    "schema_version":  "accel005-owned-browser-cleanup-v1",
+    "status":  "PASS",
+    "checked_at":  "2026-10-30T20:03:23.9549630Z",
+    "owned_temp_removed":  true,
+    "recorded_python_identities_not_running":  true,
+    "recorded_pid_absent":  [
+                                23556
+                            ],
+    "recorded_pid_reused_by_unrelated_nonpython":  [
+                                                       45104
+                                                   ],
+    "unrelated_processes_touched":  false,
+    "server8771_closed":  true,
+    "target_was_verified_inside_temp":  true,
+    "target_was_nonreparse":  true
+}

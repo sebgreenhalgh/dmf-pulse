@@ -1,0 +1,24 @@
+{
+  "schema_version": "accel005-ci-retained-failure-v1",
+  "source_commit": "270f64cafc1437dd464ddc0c4a38ffd881a5f46e",
+  "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/41118461834",
+  "job_id": 124279441985,
+  "classification": "RETAINED_FAILED_PREDECESSOR_NOT_FINAL_ACCEPTANCE",
+  "tool_log_extract": [
+    "2026-10-30T20:08:30.9281551Z ERROR tests/integration/player_lab/test_real_custody.py::test_native_clock_positive_and_nine_resealed_sql_substitutions[FULL_LEGACY] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9282961Z ERROR tests/integration/player_lab/test_real_custody.py::test_owned_descriptive_import_scores_exact_complete_vintage[FULL_LEGACY] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9284502Z ERROR tests/integration/player_lab/test_real_custody.py::test_owned_missing_label_and_wrong_historical_bytes_denied[FULL_LEGACY] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9285900Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_direct_sql_missing_fields_rejected[FULL_LEGACY-custody-remove] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9287923Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_direct_sql_missing_fields_rejected[FULL_LEGACY-forecast-remove] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9290172Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_direct_sql_missing_fields_rejected[FULL_LEGACY-population_registration_sha256-null] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9292296Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_direct_sql_missing_fields_rejected[FULL_LEGACY-recorded_at-null] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9294742Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_direct_sql_missing_fields_rejected[FULL_LEGACY-recorded_at-remove] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9297327Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_direct_sql_missing_fields_rejected[FULL_LEGACY-semantic_sha256-null] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9300231Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_rows_are_append_only_and_downgrade_never_discards[FULL_LEGACY] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9302831Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_runtime_rejects_disabled_guard_before_write[FULL_LEGACY] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9305295Z ERROR tests/integration/player_lab/test_real_custody.py::test_real_runtime_rejects_same_name_guard_when_false[FULL_LEGACY] - dmf_pulse.operation.models.OperationError: REAL_PLAYER_LEDGER_REJECTED",
+    "2026-10-30T20:08:30.9307400Z ================== 311 passed, 12 errors in 982.78s (0:16:22) ==================",
+    "2026-10-30T20:08:32.7494761Z  2026-10-30 19:56:28.360 UTC [1156] ERROR:  REAL_PLAYER_FULL_FORECAST_ADAPTER_INVALID"
+  ],
+  "diagnostic": "New full-forecast field-set ordering depended on the database locale; exact keys must use C collation. Windows default C passed; glibc en_US.UTF-8 diagnostic reproduces the reversed two-key order. Independent locale-controlled PostgreSQL guard proof is separately required."
+}

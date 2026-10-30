@@ -1,0 +1,16 @@
+{
+  "actual_provider_calls": 0,
+  "actual_vault_calls": 0,
+  "command": [
+    "python",
+    "review_pack/run_glibc005.py"
+  ],
+  "completed_at": "2026-10-30T20:28:10.820025+00:00",
+  "cwd": "DEDICATED_WAVE005_WORKTREE",
+  "environment": "CLOSED_NONSECRET_TEST_WHITELIST",
+  "exit_code": 0,
+  "helper_sha256": "3e1db583f9c57f757225068be1976519f38d6cb90404c7434454e20a33be1d3c",
+  "log_sha256": "14e753d651b4ecfc2b1dbf8b99280ab03c32290b0515330495928d4533d83d5c",
+  "schema_version": "accel005-owned-command-v1",
+  "started_at": "2026-10-30T20:28:04.588355+00:00"
+}

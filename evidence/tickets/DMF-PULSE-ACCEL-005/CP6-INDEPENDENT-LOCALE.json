@@ -1,0 +1,526 @@
+{
+  "actual_football_inputs_or_labels": 0,
+  "checked_at": "2026-10-30T20:31:02.597331+00:00",
+  "fieldset_count": 6,
+  "findings": [],
+  "full_run_database_accessed": false,
+  "literal_fieldsets_and_value_guards_unchanged": true,
+  "new_migration_sha256": "ba51965e9958d7c28915507fbb7f8ffa5a876dd8de8088fad9ec60a1bb4fd6cb",
+  "new_wheel_and_installed_acceptance_required": true,
+  "old_fixture_git_source_sha256": "49a500e26e685a1fad29b9db416e9f36ca5e3999b3be76111a994754bd15aac8",
+  "old_migration_sha256": "b76026268fa50679421969ca5106bf7637f4c8573a918166a5f150d2249a78ca",
+  "owned_databases_created_and_dropped": 2,
+  "p01_owner_binding_accepted": false,
+  "phases": [
+    {
+      "database_default_locale": null,
+      "database_default_provider": "c",
+      "exact_guard_integrity_restored": true,
+      "fixed_guard_valid_full": {
+        "accepted": true,
+        "code": null
+      },
+      "full_and_component_missing_extra_attacks": [
+        {
+          "key": "key",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "pmf",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "mean",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "sources",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "code_sha",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "model_id",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "position",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "retention",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "components",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "deadline_at",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "dataset_mode",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "generated_at",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "input_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "ruleset_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "schema_version",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "semantic_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "training_cutoff",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "expected_minutes",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "horizon_gameweeks",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "model_version_ids",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "information_cutoff",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "label_finality_cutoff",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "pmf_conversion_policy",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "source_summary_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "bonus",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "goals",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "saves",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "assists",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "own_goals",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "red_cards",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "appearance",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "clean_sheet",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "yellow_cards",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "penalty_saves",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "goals_conceded",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "penalty_misses",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "defensive_contributions",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "owned_unexpected",
+          "kind": "full_extra",
+          "rejected": true
+        },
+        {
+          "key": "owned_unexpected",
+          "kind": "component_extra",
+          "rejected": true
+        }
+      ],
+      "old_guard_valid_full": {
+        "accepted": true,
+        "code": null
+      },
+      "phase": "C",
+      "retained_original_test_calls": 12,
+      "retained_test_inventory_sha256": "7c0ba086d41a202755601b9c7da0e60912a4ea42653baef8341acb617dbb06ce",
+      "sort_checks": [
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "NEW.payload"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "prediction"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "prediction->'stage12'"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "prediction->'stage12'->'lineage'"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "body"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "body->'components'"
+        }
+      ]
+    },
+    {
+      "database_default_locale": "en-u-ka-shifted-ks-level3",
+      "database_default_provider": "i",
+      "exact_guard_integrity_restored": true,
+      "fixed_guard_valid_full": {
+        "accepted": true,
+        "code": null
+      },
+      "full_and_component_missing_extra_attacks": [
+        {
+          "key": "key",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "pmf",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "mean",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "sources",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "code_sha",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "model_id",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "position",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "retention",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "components",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "deadline_at",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "dataset_mode",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "generated_at",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "input_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "ruleset_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "schema_version",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "semantic_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "training_cutoff",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "expected_minutes",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "horizon_gameweeks",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "model_version_ids",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "information_cutoff",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "label_finality_cutoff",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "pmf_conversion_policy",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "source_summary_sha256",
+          "kind": "full_missing",
+          "rejected": true
+        },
+        {
+          "key": "bonus",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "goals",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "saves",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "assists",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "own_goals",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "red_cards",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "appearance",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "clean_sheet",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "yellow_cards",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "penalty_saves",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "goals_conceded",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "penalty_misses",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "defensive_contributions",
+          "kind": "component_missing",
+          "rejected": true
+        },
+        {
+          "key": "owned_unexpected",
+          "kind": "full_extra",
+          "rejected": true
+        },
+        {
+          "key": "owned_unexpected",
+          "kind": "component_extra",
+          "rejected": true
+        }
+      ],
+      "old_guard_valid_full": {
+        "accepted": false,
+        "code": "REAL_PLAYER_FULL_FORECAST_ADAPTER_INVALID"
+      },
+      "phase": "ICU_SHIFTED",
+      "retained_original_test_calls": 12,
+      "retained_test_inventory_sha256": "7c0ba086d41a202755601b9c7da0e60912a4ea42653baef8341acb617dbb06ce",
+      "sort_checks": [
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "NEW.payload"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "prediction"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "prediction->'stage12'"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "prediction->'stage12'->'lineage'"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": false,
+          "expression": "body"
+        },
+        {
+          "c_matches_literal": true,
+          "default_matches_literal": true,
+          "expression": "body->'components'"
+        }
+      ]
+    }
+  ],
+  "primary_docs": [
+    "https://www.postgresql.org/docs/18/collation.html",
+    "https://www.postgresql.org/docs/18/sql-createdatabase.html"
+  ],
+  "prior_installed_wheel_review_superseded_by_one_migration_file": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65",
+  "probe_sha256": "5b459aeb2dd42f7d2467ec4533484b4f8bb46ac57e9cb3de02432e8a890165fb",
+  "product_source_edits_by_reviewer": 0,
+  "production_diff": "Exactly six bare fieldset ORDER BY expressions acquire COLLATE C; removing those six additions reproduces the original source bytes exactly.",
+  "provider_requests": 0,
+  "real_credentials_accessed": false,
+  "real_source_or_owner_registry_changed": false,
+  "remaining_gates": [
+    "Fresh corrected wheel and proposal closure",
+    "Necessary final native/installed checks",
+    "Exact final-SHA complete CI"
+  ],
+  "schema_revision_and_parent_unchanged": true,
+  "schema_version": "accel005-independent-real-guard-locale-correction-v1",
+  "scope": "Owned PostgreSQL18 Windows server with C and ICU punctuation-shifted database defaults. The old full guard's failure is causally reproduced; this is not a fresh observation of the remote CI server's glibc locale.",
+  "status": "PASS_EXACT_SIX_SITE_COLLATION_CORRECTION_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+}

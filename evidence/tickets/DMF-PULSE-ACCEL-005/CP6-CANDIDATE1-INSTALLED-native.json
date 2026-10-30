@@ -1,0 +1,45 @@
+{
+  "actual_provider_requests": 0,
+  "completed_at": "2026-10-30T19:52:48.400802+00:00",
+  "helper_sha256": "4122f2f626f4efeaa5665c30d01569c7b7e61ad30a976734a66637a0f357a30a",
+  "installed_wheel_sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65",
+  "log_sha256": "f5b4aaff78bb04398cf7a90039a1525ebd65c98ea27e2e517d9c911e86c064f6",
+  "mode": "native",
+  "normal_vault_reads": 0,
+  "outside_source": true,
+  "result": {
+    "actual_provider_requests": 0,
+    "ambient_fpl_environment_consulted": false,
+    "child": {
+      "counts": {
+        "deletes": 0,
+        "legacy_reads": 0,
+        "normal_target_attempts": 0,
+        "reads": 4,
+        "writes": 0
+      },
+      "provider_requests": 0,
+      "status": "PASS"
+    },
+    "classification": "OWNED_SYNTHETIC_TEST_NAMESPACES_ONLY",
+    "cross_process_persistence": true,
+    "executed_helper_sha256": "4122f2f626f4efeaa5665c30d01569c7b7e61ad30a976734a66637a0f357a30a",
+    "fresh_expiry_enforced": true,
+    "fresh_setup_blind": true,
+    "normal_slots_read": 0,
+    "owned_slots_deleted": true,
+    "parent_counts": {
+      "deletes": 3,
+      "legacy_reads": 0,
+      "normal_target_attempts": 0,
+      "reads": 8,
+      "writes": 3
+    },
+    "schema_version": "accel005-installed-native-credentials-v1",
+    "secret_values_recorded": false,
+    "status": "PASS"
+  },
+  "schema_version": "accel005-installed-command-v1",
+  "started_at": "2026-10-30T19:52:45.792794+00:00",
+  "status": "PASS"
+}

@@ -1,0 +1,48 @@
+{
+  "actual_corrected_schema_sha256": "897bad1218f7b9417a67667116b5a04efbd728293317455ba3d8f790c1dc3599",
+  "actual_football_inputs_or_labels": 0,
+  "actual_old_schema_sha256": "64d37a2f4fd8830515edec2d903e8c44ebd3917b4ad359bc1b79cada99506eea",
+  "all_existing_integration_test_bodies_unchanged": true,
+  "base_candidate_sha": "270f64cafc1437dd464ddc0c4a38ffd881a5f46e",
+  "checked_at": "2026-10-30T20:35:21.978756+00:00",
+  "core_independent_review": {
+    "bytes": 14018,
+    "path": "review_pack/accel005-independent-locale-correction-010c0e8cc56cebe68f5fe82c8e65732eb051b7736d0569788fe2d9e6012520b3.json",
+    "sha256": "010c0e8cc56cebe68f5fe82c8e65732eb051b7736d0569788fe2d9e6012520b3"
+  },
+  "findings": [],
+  "fixed_catalog_restored_before_cleanup": true,
+  "fixture_modes": [
+    "POINT_ADAPTER",
+    "FULL_LEGACY",
+    "FULL_LEGACY_SHIFTED"
+  ],
+  "full_run_database_accessed": false,
+  "new_fixture_diagnostic_order_asserted_and_no_skip": true,
+  "only_changed_catalog_object": "evaluation.guard_real_artifact() definition",
+  "only_changed_package_member": "dmf_pulse/database/migrations/versions/20261030_0009_real_player_custody.py",
+  "owned_empty_database_dropped": true,
+  "p01_owner_binding_accepted": false,
+  "package_members_compared_to_prior_wheel": 514,
+  "prior_harness_history": "The first main locale-review attempts stopped before database creation because the four-character Git abbreviation was ambiguous. The authenticated full270f64... commit ID replaced it. No production permission or assertion was relaxed.",
+  "prior_installed_candidate_is_historical": true,
+  "probe_sha256": "880e28169fef3c66a08048708e34913427d68ab32cb938d67f6dc0fb7c60ef2e",
+  "product_source_edits_by_reviewer": 0,
+  "provider_requests": 0,
+  "real_credentials_accessed": false,
+  "real_source_or_owner_registry_changed": false,
+  "remaining_gates": [
+    "New corrected wheel and proposal",
+    "Required final native and installed acceptance",
+    "Full exact final-SHA CI"
+  ],
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/database/migrations/versions/20261030_0009_real_player_custody.py": "ba51965e9958d7c28915507fbb7f8ffa5a876dd8de8088fad9ec60a1bb4fd6cb",
+    "tests/integration/migrations/test_migrations.py": "2b2b59551ec6b377e7895c8debe08a5c374aa71976ae7b7072c45c0cac67ed96",
+    "tests/integration/player_lab/test_real_custody.py": "08dff4e9de483616864a55bf8545e9c5f71ef87ebd04f8d439a60d30215016c2"
+  },
+  "schema_catalog_difference_count": 1,
+  "schema_pin_source_change_only_exact_expected_hash": true,
+  "schema_version": "accel005-independent-locale-binding-and-schema-addendum-v1",
+  "status": "PASS_SCOPED_LOCALE_CORRECTION_AND_SCHEMA_PIN"
+}

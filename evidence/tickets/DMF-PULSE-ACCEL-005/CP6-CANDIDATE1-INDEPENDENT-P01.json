@@ -1,0 +1,109 @@
+{
+  "access_history": "The initial restricted-token stat of the explicitly supplied Temp installation was denied before product execution. No missing-file conclusion was drawn; the authorized closed normal-user probe authenticated the exact known installation.",
+  "actual_p01_hypothetical_labels_used": false,
+  "actual_p01_scores": 0,
+  "all_wheel_package_files_equal_current_tracked_source_or_forced_config": true,
+  "checked_at": "2026-10-30T20:10:35.950584+00:00",
+  "critical_resources": 4,
+  "driver_sha256": "fc9b44f7dd7fb232864bdaa78e3d9ef92bddf96edf9fbd10c07abbd47bbf66f2",
+  "existing_installed_command": {
+    "log_sha256": "c65aaa37a290aba214e068dc53b1e74310e50121aab48ff32a1d543b98ae9591",
+    "receipt_sha256": "07797d0a81e7e4c80670133f0b1175685ed00ab2146cab0fe8df039d6c1e5317",
+    "result_matched_exact_actual_artifact": true
+  },
+  "findings": [],
+  "fit_draw_freeze_calls": 0,
+  "fresh_installed_cold_proofs": {
+    "authenticate": {
+      "bytes": 1677,
+      "captured_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "captured_stdout_sha256": "9d073cdcc21d88c3e62897f2e8b42fd8fc5e4517428e0a3dd98ea95e69af04ff",
+      "path": "review_pack/accel005-independent-original-authentication-d4f01dca8308561336e4c6eb3470cec12c8f56787f847dc32f8023e5e9f95604.json",
+      "process_origin_custody": {
+        "attempts": {
+          "generation_or_real_scoring": 0,
+          "native_vault_import": 0,
+          "provider_or_network": 0,
+          "secret_environment": 0,
+          "subprocess": 0
+        },
+        "installed_module_origins_verified": 79,
+        "installed_modules_match_wheel": true,
+        "installed_proof_mode": "authenticate",
+        "isolated": true,
+        "outside_source": true,
+        "pid": 38648,
+        "wrapper_sha256": "9bf6091983d384c5d6620d381afbef3f0875a7779450f34b4a338b6909fc484d"
+      },
+      "sha256": "d4f01dca8308561336e4c6eb3470cec12c8f56787f847dc32f8023e5e9f95604"
+    },
+    "oracle": {
+      "bytes": 7083,
+      "captured_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "captured_stdout_sha256": "9d249d29e919cc9d7e1f2149e3a38111417b8d93cedc5a886f1170ce14ec3cb2",
+      "path": "review_pack/accel005-independent-p01-oracle-af6d3d1929f9e10d78470471cfcffe3db97f471b0fb4099fbec44591ce6f88c8.json",
+      "process_origin_custody": {
+        "attempts": {
+          "generation_or_real_scoring": 0,
+          "native_vault_import": 0,
+          "provider_or_network": 0,
+          "secret_environment": 0,
+          "subprocess": 0
+        },
+        "installed_module_origins_verified": 78,
+        "installed_modules_match_wheel": true,
+        "installed_proof_mode": "oracle",
+        "isolated": true,
+        "outside_source": true,
+        "pid": 25304,
+        "wrapper_sha256": "9bf6091983d384c5d6620d381afbef3f0875a7779450f34b4a338b6909fc484d"
+      },
+      "sha256": "af6d3d1929f9e10d78470471cfcffe3db97f471b0fb4099fbec44591ce6f88c8"
+    }
+  },
+  "historical_policy": "Original protocol93b9 remains explicit; generic model governance is labelled accurately; A02 amendment is history only, A02 consumed marker remains sealed, and A03 one-shot authority is historical. This proposal grants no fallback or canonical acquisition.",
+  "installed_accepted_code_bindings": 0,
+  "installed_attestation": {
+    "bytes": 4482,
+    "path": "review_pack/accel005-installed-p01-attestation-cbfba81e6568db6c2a7854e3ceb8818203b1ba09b5ee50e26c26b5fa60f92295.json",
+    "sha256": "cbfba81e6568db6c2a7854e3ceb8818203b1ba09b5ee50e26c26b5fa60f92295"
+  },
+  "installed_probe_sha256": "9bf6091983d384c5d6620d381afbef3f0875a7779450f34b4a338b6909fc484d",
+  "installed_qualified_outcomes": 0,
+  "literal_oracle_metric_values_exact": 147,
+  "literal_oracle_rows_sha256": "35fa2f565ca809b32f7535938a79c69357b0b472778d76de2af0ed1fbfa54ce7",
+  "operational_scoring_authorized": false,
+  "original_code_authority": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "original_forecast_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+  "original_forecast_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+  "owner_acceptance_granted": false,
+  "prior_cp3_review": {
+    "accepted_dependencies_unchanged": 13,
+    "controller_sha256": "84fa2008b0a93ada1cba82156d92e42b9e35a969fa7a0916d42b3b2a7a21a07c",
+    "original_identity_sha256": "e4035f285d8dd574808fa2084420b51936e3e1e27f43f8dbb5f7e275dbd60cb4",
+    "sha256": "3b0ebeb55fdfc71d6a7f9555ba776307eadbc61ee6e460a085d99a1cb570c759"
+  },
+  "private_installation_paths_included": false,
+  "private_location_metadata_sha256": "c9007d013f8c88fc0395d724b619609f19c4c315260aa8a209e5dd56c51bcbbb",
+  "proposal_byte_sha256": "d0f2a7d730255072aa1d79e360029f622e155818e7da1adaf8ca812fb98ad6b9",
+  "proposal_bytes": 41771,
+  "proposal_component_count": 412,
+  "proposal_semantic_sha256": "31f743b3a95842bc9ec005c31fd91ae8b4ba7f51df2f8f5c5426df390558d782",
+  "proposal_state": "PROPOSED_UNACCEPTED",
+  "provider_requests": 0,
+  "real_credentials_or_vault_access": false,
+  "real_original_read_only_authentication": true,
+  "reproduce": ".venv/Scripts/python.exe review_pack/review_installed_p01_final.py",
+  "reviewed_source_head": "270f64cafc1437dd464ddc0c4a38ffd881a5f46e",
+  "schema_version": "accel005-independent-final-installed-p01-readiness-v1",
+  "scope_limits": [
+    "This confirms the final installed engineering proposal and unchanged scorer compatibility; the binding remains unaccepted and no outcome acquisition or real P01 scoring is authorized.",
+    "Complete qualified local canonical labels and a separately accepted exact owner code binding must be installed before operational scoring.",
+    "Final exact-SHA CI, whole-release acceptance and publication remain separate pending gates."
+  ],
+  "source_wheel_origin_inventory_sha256": "df0ff8e63a9bcf838a621fd907efd0cacc425f1cfe23362a79fa1e7eaea423e8",
+  "status": "PASS_SCOPED_FINAL_INSTALLED_P01_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "wheel_package_files": 514,
+  "wheel_sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65",
+  "whole_python_files": 408
+}

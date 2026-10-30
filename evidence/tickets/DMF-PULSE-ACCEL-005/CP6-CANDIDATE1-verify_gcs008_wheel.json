@@ -1,0 +1,8 @@
+{
+  "completed_at": "2026-10-30T20:03:32.474296+00:00",
+  "exit_code": 1,
+  "log_sha256": "e2cd6e5a4570ea5792bf223117872d193768092c066fded088d1bb997a20adde",
+  "phase": "verify_gcs008_wheel",
+  "seconds": 2.461,
+  "started_at": "2026-10-30T20:03:30.013176+00:00"
+}

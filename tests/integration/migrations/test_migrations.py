@@ -58,7 +58,7 @@ from dmf_pulse.ingestion.fpl.service import DATABASE_REF
 from dmf_pulse.ingestion.odds.service import DEFAULT_CUTOFF, OddsIngestionService, OddsReplayRequest
 
 pytestmark = pytest.mark.migration
-EXPECTED_SCHEMA_SHA256 = "64d37a2f4fd8830515edec2d903e8c44ebd3917b4ad359bc1b79cada99506eea"
+EXPECTED_SCHEMA_SHA256 = "897bad1218f7b9417a67667116b5a04efbd728293317455ba3d8f790c1dc3599"
 NORMALISATION_AS_OF = datetime(2026, 8, 20, 12, 5, tzinfo=UTC)
 NRM006_TABLES = {
     "betting.market_consensus_outcome",

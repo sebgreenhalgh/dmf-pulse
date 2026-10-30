@@ -1,0 +1,30 @@
+{
+  "actual_provider_requests": 0,
+  "command": [
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\.venv\\Scripts\\python.exe",
+    "-m",
+    "coverage",
+    "run",
+    "--data-file=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\release005\\.coverage-full-windows",
+    "-m",
+    "pytest",
+    "-q",
+    "--basetemp",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\t\\cp6-full-windows",
+    "-o",
+    "cache_dir=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\t\\cp6-full-cache",
+    "--junitxml",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\release005\\full-windows.xml"
+  ],
+  "completed_at": "2026-10-30T20:22:07.578816+00:00",
+  "environment": "CLOSED_NONSECRET_TEST_WHITELIST_AND_LITERAL_OWNED_LOOPBACK_DSN",
+  "executed_helper_sha256": "faf61988583404c42b0b31173f01c723b02cb3216f8ccd04494a550cd0c02dab",
+  "exit_code": 4294967295,
+  "log_sha256": "401101a25e561e9a6c54be28f5b3b4a527490c2db667db250ccd37f6a3765eaa",
+  "normal_vault_reads": 0,
+  "phase": "CP6-WINDOWS-FULL",
+  "schema_version": "accel005-release-command-v1",
+  "seconds": 2257.56,
+  "source_checkpoint": "59c1b155470c315ec9b714126d9c5846d51f8d3f",
+  "started_at": "2026-10-30T19:44:30.018939+00:00"
+}

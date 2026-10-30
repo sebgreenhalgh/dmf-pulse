@@ -1,0 +1,9 @@
+{
+  "completed_at": "2026-10-30T20:08:32.792142+00:00",
+  "exit_code": 0,
+  "log_sha256": "8d4f1035e1979108509e99df5efddfcde274ae7e47b4d73dcbde29f1177fe259",
+  "phase": "CP6-verify_gcs008_wheel-RECHECK",
+  "seconds": 20.673,
+  "started_at": "2026-10-30T20:08:12.118833+00:00",
+  "verifier_sha256": "e8f36ea6af6689beb7c3d33439ed57beccbf85c76e707932ed0f3acb5d53c808"
+}

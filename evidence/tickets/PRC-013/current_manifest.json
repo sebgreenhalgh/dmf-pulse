@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 219228,
+      "bytes": 219855,
       "path": "PLANS.md",
-      "sha256": "94d3a81ae6c88cc27c8689009cd29a2b796caeed215d650f95a5221a8b13c7de"
+      "sha256": "d5311cf0923c99a0a61108838dfb06acf9d0bd808ae16d3d8afe22d9541339fe"
     },
     {
       "bytes": 2761,
@@ -3701,9 +3701,9 @@
       "sha256": "fa796fbc7ef04f2f1ef8868e417a3d9d077c5ab07d0905d44656e6fe5e7ee45c"
     },
     {
-      "bytes": 28293,
+      "bytes": 28365,
       "path": "src/dmf_pulse/database/migrations/versions/20261030_0009_real_player_custody.py",
-      "sha256": "b76026268fa50679421969ca5106bf7637f4c8573a918166a5f150d2249a78ca"
+      "sha256": "ba51965e9958d7c28915507fbb7f8ffa5a876dd8de8088fad9ec60a1bb4fd6cb"
     },
     {
       "bytes": 41,
@@ -5831,9 +5831,9 @@
       "sha256": "bf81dd1c1c985a54567ec83169bcc155f1e99aab28c942dfc22b8514cb4d6dea"
     },
     {
-      "bytes": 13544,
+      "bytes": 13769,
       "path": "tests/integration/data_model/test_concurrency.py",
-      "sha256": "7dacaea099b26e89e17e8ddbfe8aef8d70694b1456ee21056d6f5d18fe386633"
+      "sha256": "2188a34edcb73055429a4762a15e654d926fd1844c71913d7069cfb64ed914e5"
     },
     {
       "bytes": 9881,
@@ -5953,7 +5953,7 @@
     {
       "bytes": 95446,
       "path": "tests/integration/migrations/test_migrations.py",
-      "sha256": "997a364279fd4c57a9ecc44f429bf369063b856949e3ba11a15c36600f1717ae"
+      "sha256": "2b2b59551ec6b377e7895c8debe08a5c374aa71976ae7b7072c45c0cac67ed96"
     },
     {
       "bytes": 2421,
@@ -5991,9 +5991,9 @@
       "sha256": "6cb6322755ac9eb4e80a99f401e7a213228a681fe93896b0507301a61de9ab4f"
     },
     {
-      "bytes": 17730,
+      "bytes": 18547,
       "path": "tests/integration/player_lab/test_real_custody.py",
-      "sha256": "49a500e26e685a1fad29b9db416e9f36ca5e3999b3be76111a994754bd15aac8"
+      "sha256": "08dff4e9de483616864a55bf8545e9c5f71ef87ebd04f8d439a60d30215016c2"
     },
     {
       "bytes": 10352,
@@ -8754,6 +8754,11 @@
       "bytes": 2005,
       "path": "tickets/DMF-PULSE-ACCEL-005/CP5.md",
       "sha256": "0f75e7ca9031d4cc17a6ba9c311680024ae44ad2570caacbc57956c1e1bf39d3"
+    },
+    {
+      "bytes": 3978,
+      "path": "tickets/DMF-PULSE-ACCEL-005/CP6.md",
+      "sha256": "bb32c5a72b281ca30116253e5046949755d66b95f30f578c6ee91d2f43e70326"
     },
     {
       "bytes": 1376,

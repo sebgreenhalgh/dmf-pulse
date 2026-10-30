@@ -1,0 +1,196 @@
+{
+  "actual_provider_requests": 0,
+  "completed_at": "2026-10-30T19:57:58.271510+00:00",
+  "helper_sha256": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539",
+  "installed_wheel_sha256": "f2edc22fec8c7b51fc9d789e63624ade1480d02f00ad16657592676538921d65",
+  "log_sha256": "7c4dfa6b061c8e4f48cd8aa3a506e0a0ed69c4dceaaba5714a9ca7c095bd790a",
+  "mode": "parity",
+  "normal_vault_reads": 0,
+  "outside_source": true,
+  "result": {
+    "all_numeric_projection_and_decision_fields_exact": true,
+    "cancellations": [
+      {
+        "actual_spawn_child_pid": 38580,
+        "owned_attempts_before_cancellation": 1,
+        "pause_marker_observed": true,
+        "phase": "acquisition",
+        "reservation_still_spent": true,
+        "result_withheld": true,
+        "seconds": 2.521012100041844,
+        "terminated_and_handle_closed": true
+      },
+      {
+        "actual_spawn_child_pid": 14464,
+        "owned_attempts_before_cancellation": 13,
+        "pause_marker_observed": true,
+        "phase": "modelling",
+        "reservation_still_spent": true,
+        "result_withheld": true,
+        "seconds": 38.931453700060956,
+        "terminated_and_handle_closed": true
+      }
+    ],
+    "cases": [
+      {
+        "actual_spawn_child_pid": 27812,
+        "all_numeric_projection_and_decision_fields_exact": true,
+        "blocked": 1,
+        "case_seconds": 64.06777239998337,
+        "catalogue": 121,
+        "checked_fields": 84053,
+        "cleanup": "CONFIRMED",
+        "custody_exclusion_count": 512,
+        "custody_inventory_sha256": "730bad40b2b6f32e778c5eaa4a47cd7f0a44e41d87df4b22cb9a4dd7a5296526",
+        "default_process_worker": true,
+        "external_provider_requests": 0,
+        "horizon": 1,
+        "numeric_fields": 67750,
+        "owned_transport_attempts": {
+          "FPL": 8,
+          "ODDS": 1,
+          "OPENFOOTBALL": 4
+        },
+        "player_gameweek_details_equal": 120,
+        "projected": 120,
+        "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+        "reference_spawn_child_pid": 31288,
+        "same_run_browser_decision_equal": true,
+        "worker_seconds": 63.92174809996504
+      },
+      {
+        "actual_spawn_child_pid": 6008,
+        "all_numeric_projection_and_decision_fields_exact": true,
+        "blocked": 1,
+        "case_seconds": 173.75864329992328,
+        "catalogue": 121,
+        "checked_fields": 249449,
+        "cleanup": "CONFIRMED",
+        "custody_exclusion_count": 1007,
+        "custody_inventory_sha256": "d0ce51e7c4323d8ee7a0013bb3fb67ab863571631fc4526fc3f1f16f5731c1d5",
+        "default_process_worker": true,
+        "external_provider_requests": 0,
+        "horizon": 3,
+        "numeric_fields": 200409,
+        "owned_transport_attempts": {
+          "FPL": 8,
+          "ODDS": 1,
+          "OPENFOOTBALL": 4
+        },
+        "player_gameweek_details_equal": 360,
+        "projected": 120,
+        "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+        "reference_spawn_child_pid": 38272,
+        "same_run_browser_decision_equal": true,
+        "worker_seconds": 173.30782769992948
+      }
+    ],
+    "classification": "OWNED_SYNTHETIC_ENGINEERING_ONLY",
+    "cleanup": "CONFIRMED",
+    "custody_patterns": [
+      "/decision/run_id",
+      "/decision/semantic_sha256",
+      "/decision/lineage/code_sha",
+      "/decision/lineage/current_state_sha256",
+      "/decision/lineage/current_manager_state_sha256",
+      "/decision/lineage/market_constraints_sha256",
+      "/decision/lineage/score_prior_sha256_by_fixture/*",
+      "/decision/lineage/stage8_result_sha256_by_fixture/*",
+      "/decision/lineage/stage9_result_sha256",
+      "/decision/lineage/private_rules_authority_sha256",
+      "/decision/lineage/execution_input_sha256",
+      "/decision/lineage/optimiser_request_sha256",
+      "/decision/lineage/optimiser_result_sha256",
+      "/decision/lineage/rolling_execution_input_sha256",
+      "/decision/lineage/current_execution_input_sha256",
+      "/decision/lineage/stage8_distribution_sha256_by_gameweek/*/*",
+      "/decision/lineage/fixture_projection_sha256_by_gameweek/*/*",
+      "/decision/lineage/gameweek_projection_sha256_by_gameweek/*",
+      "/decision/lineage/future_gameweek_input_sha256_by_gameweek/*",
+      "/decision/lineage/scenario_tree_sha256",
+      "/decision/lineage/one_gameweek_optimiser_result_sha256",
+      "/decision/transfer_frontier/semantic_sha256",
+      "/decision/transfer_frontier/optimiser_request_sha256",
+      "/decision/transfer_frontier/optimiser_result_sha256",
+      "/decision/transfer_frontier/stage9_projection_sha256",
+      "/decision/transfer_frontier/points/*/semantic_sha256",
+      "/decision/transfer_frontier/points/*/stage11_plan_sha256",
+      "/decision/do_now/tactical_plan_sha256",
+      "/decision/by_gameweek/*/tactical_plan_sha256",
+      "/decision/future_plan/*/tactical_plan_sha256",
+      "/presentation/fixtures/*/result_sha256",
+      "/presentation/fixtures/*/summaries/*/source_bundle_ids",
+      "/presentation/fixtures/*/summaries/*/upstream_stage8_sha256",
+      "/presentation/gameweeks/*/result_sha256",
+      "/presentation/gameweeks/*/summaries/*/source_bundle_ids",
+      "/presentation/gameweeks/*/summaries/*/upstream_stage8_sha256s",
+      "/presentation/source_vintages/*/identity_sha256"
+    ],
+    "disclosure_token_paths": [
+      "/decision/action_space_disclosure",
+      "/decision/transfer_frontier/action_space_disclosure"
+    ],
+    "external_provider_requests": 0,
+    "horizons": [
+      1,
+      3
+    ],
+    "installed_cli": {
+      "cohort_freeze_labels_score": "PASS",
+      "player_evidence_exact_service_equality": true,
+      "player_evidence_players": 6,
+      "real_cohort_size": 0,
+      "report_exact_service_equality": true,
+      "scored_targets": 8
+    },
+    "network_guards": [
+      {
+        "pid": 11868,
+        "role": "__main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 14464,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 27812,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 31288,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 38272,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 38580,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      },
+      {
+        "pid": 6008,
+        "role": "__mp_main__",
+        "self_test_denials": 1,
+        "unexpected_denials": 0
+      }
+    ],
+    "no_full_semantic_hash_parity_claim": true,
+    "status": "PASS"
+  },
+  "schema_version": "accel005-installed-command-v1",
+  "started_at": "2026-10-30T19:53:12.634316+00:00",
+  "status": "PASS"
+}

@@ -26,6 +26,15 @@ value is read, copied, decoded, stored or used.
   one-/three-GW parity, installed/native/database/provenance/coverage gates,
   actual capped packet, normal publication and final-SHA twenty-job CI.
 
+CP6 candidate hardening preserves the first installed-wheel reviews and failed
+predecessor CI. A six-site explicit C collation correction fixes a reproduced
+Linux/Windows JSON-field ordering difference; the complete full-forecast guard
+suite now also exercises a punctuation-ignoring database locale. A test-only
+bounded transaction retry preserves the inherited overlap-race assertions.
+129 migration/player-custody/concurrency tests pass. Fresh source-bound complete
+regression and final installed-wheel publication remain required; their actual
+completion is recorded in detached final receipts rather than predicted here.
+
 No real scoring is inferred from owned tests. Additional owner-reported freezes
 remain unresolved, not disproved. Original P01/fallback consumption/authority
 history and all157 numerical sources remain pinned. The old consumed Odds

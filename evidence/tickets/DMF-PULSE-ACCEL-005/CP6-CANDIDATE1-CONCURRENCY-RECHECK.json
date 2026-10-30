@@ -1,0 +1,25 @@
+{
+  "command": [
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\.venv\\Scripts\\python.exe",
+    "-m",
+    "coverage",
+    "run",
+    "--data-file=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\release005\\.coverage-concurrency-recheck",
+    "-m",
+    "pytest",
+    "tests/integration/data_model/test_concurrency.py",
+    "-q",
+    "--tb=short",
+    "--basetemp",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\t\\cp6-concurrency-recheck",
+    "-o",
+    "cache_dir=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\t\\cp6-concurrency-cache"
+  ],
+  "completed_at": "2026-10-30T20:14:55.700987+00:00",
+  "database": "SEPARATE_OWNED_TEST_DB",
+  "exit_code": 0,
+  "helper_sha256": "1ed1ae4bf976d999e626ee8d5be8307d63557c0f7efd5fa304682fdd24d47570",
+  "log_sha256": "da462256cd6a0f44380ff27d161b0ba6d89c4ba7d18ff917b0143316ef406ec5",
+  "started_at": "2026-10-30T20:14:45.954772+00:00",
+  "status": "PASS"
+}

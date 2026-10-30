@@ -1,0 +1,248 @@
+{
+  "changed_test": {
+    "bytes": 13769,
+    "path": "tests/integration/data_model/test_concurrency.py",
+    "sha256": "2188a34edcb73055429a4762a15e654d926fd1844c71913d7069cfb64ed914e5"
+  },
+  "checked_at": "2026-10-30T20:17:43.282186+00:00",
+  "deterministic_case_count": 23,
+  "deterministic_cases": [
+    {
+      "case": "immediate_success",
+      "events": [
+        "INSERT",
+        "COMMIT"
+      ],
+      "result": "COMMITTED"
+    },
+    {
+      "case": "insert_retryable_then_success",
+      "events": [
+        "INSERT",
+        "ROLLBACK",
+        "INSERT",
+        "COMMIT"
+      ],
+      "result": "COMMITTED"
+    },
+    {
+      "case": "commit_retryable_then_success",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK",
+        "INSERT",
+        "COMMIT"
+      ],
+      "result": "COMMITTED"
+    },
+    {
+      "case": "insert_retryable_then_temporal_overlap",
+      "events": [
+        "INSERT",
+        "ROLLBACK",
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "TEMPORAL_OVERLAP"
+    },
+    {
+      "case": "commit_retryable_then_temporal_overlap",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK",
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "TEMPORAL_OVERLAP"
+    },
+    {
+      "case": "insert_retryable_twice_remains_failure",
+      "events": [
+        "INSERT",
+        "ROLLBACK",
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "DATABASE_RETRYABLE"
+    },
+    {
+      "case": "commit_retryable_twice_remains_failure",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK",
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "DATABASE_RETRYABLE"
+    },
+    {
+      "case": "insert_nonretryable_TEMPORAL_OVERLAP",
+      "events": [
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "TEMPORAL_OVERLAP"
+    },
+    {
+      "case": "commit_nonretryable_TEMPORAL_OVERLAP",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "TEMPORAL_OVERLAP"
+    },
+    {
+      "case": "insert_nonretryable_DATABASE_UNAVAILABLE",
+      "events": [
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "DATABASE_UNAVAILABLE"
+    },
+    {
+      "case": "commit_nonretryable_DATABASE_UNAVAILABLE",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "DATABASE_UNAVAILABLE"
+    },
+    {
+      "case": "insert_nonretryable_DATABASE_CONSTRAINT_VIOLATION",
+      "events": [
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "DATABASE_CONSTRAINT_VIOLATION"
+    },
+    {
+      "case": "commit_nonretryable_DATABASE_CONSTRAINT_VIOLATION",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "DATABASE_CONSTRAINT_VIOLATION"
+    },
+    {
+      "case": "insert_nonretryable_TEMPORAL_SUPERSESSION_CONFLICT",
+      "events": [
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "TEMPORAL_SUPERSESSION_CONFLICT"
+    },
+    {
+      "case": "commit_nonretryable_TEMPORAL_SUPERSESSION_CONFLICT",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "TEMPORAL_SUPERSESSION_CONFLICT"
+    },
+    {
+      "case": "insert_nonretryable_database_retryable",
+      "events": [
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "database_retryable"
+    },
+    {
+      "case": "commit_nonretryable_database_retryable",
+      "events": [
+        "INSERT",
+        "COMMIT",
+        "ROLLBACK"
+      ],
+      "result": "database_retryable"
+    },
+    {
+      "case": "unexpected_insert_exception_propagates",
+      "events": [
+        "INSERT"
+      ],
+      "result": "RAISED_ValueError"
+    },
+    {
+      "case": "unexpected_commit_exception_propagates",
+      "events": [
+        "INSERT",
+        "COMMIT"
+      ],
+      "result": "RAISED_ValueError"
+    },
+    {
+      "case": "rollback_failure_propagates_before_retry",
+      "events": [
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "result": "RAISED_RuntimeError"
+    },
+    {
+      "case": "unchanged_production_sqlstate_mapping_40P01",
+      "result": "DATABASE_RETRYABLE"
+    },
+    {
+      "case": "unchanged_production_sqlstate_mapping_40001",
+      "result": "DATABASE_RETRYABLE"
+    },
+    {
+      "case": "unchanged_production_sqlstate_mapping_55P03",
+      "result": "DATABASE_RETRYABLE"
+    }
+  ],
+  "findings": [],
+  "limits": [
+    "The original ongoing Windows full coverage run loaded the earlier test implementation and its two reported failures remain historical evidence; this focused review does not convert that run into a pass",
+    "This is a test transaction harness only, not a new production retry or provider retry policy. Exact committed-versus-overlap and row-count requirements remain enforced after the bounded retry",
+    "A fresh complete full release test/coverage and exact20-job final CI remain required after the test-only remediation"
+  ],
+  "native_owned_postgres": {
+    "author_full_run_database_or_named_shared_database_touched": false,
+    "coverage_data": {
+      "bytes": 380928,
+      "path": "review_pack/t/b-overlap-dac6c660c7e4/.coverage",
+      "sha256": "a4a685204ea192497e78ef44a0659c4054960fa5617362184793d81f50666606"
+    },
+    "coverage_enabled": true,
+    "database_dropped_and_absence_verified": true,
+    "log": {
+      "bytes": 100,
+      "path": "review_pack/t/b-overlap-dac6c660c7e4/pytest-coverage.log",
+      "sha256": "533e62a5bc3dad0a97b36e990d1192a9ac8492a05adff4b8daf65718774a8e1f"
+    },
+    "tests_passed": 5,
+    "unique_review_database": "dmf_accel005_review_overlap_c924e256c409"
+  },
+  "original_barriers_exact_commit_overlap_outcomes_and_final_row_assertions_unchanged": true,
+  "parent": "270f64cafc1437dd464ddc0c4a38ffd881a5f46e",
+  "parent_ast_exact_after_restoring_only_three_overlap_worker_try_blocks": true,
+  "parent_test_sha256": "7dacaea099b26e89e17e8ddbfe8aef8d70694b1456ee21056d6f5d18fe386633",
+  "production_config_schema_model_workflow_and_dependency_bytes_unchanged": true,
+  "production_error_mapper": {
+    "bytes": 2950,
+    "path": "src/dmf_pulse/data_model/errors.py",
+    "sha256": "f12db50cca03f285516b297cb7d2eb2f4c2bf3c4912e36bbbb9100a7da2d4fc7"
+  },
+  "provider_or_vault_or_operator_database_access": 0,
+  "retry_bound": {
+    "maximum_transaction_attempts": 2,
+    "retry_code": "DATABASE_RETRYABLE",
+    "rollback_before_each_repeated_insert": true,
+    "second_retryable_is_returned_as_failure_not_masked": true,
+    "unrelated_errors_not_retried": true
+  },
+  "schema_version": "accel005-independent-concurrency-test-remediation-v1",
+  "source_or_tracked_edits_by_reviewer": false,
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+}

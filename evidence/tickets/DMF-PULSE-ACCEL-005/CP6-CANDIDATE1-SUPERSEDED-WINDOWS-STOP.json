@@ -1,0 +1,17 @@
+{
+  "actual_provider_requests": 0,
+  "checked_at": "2026-10-30T20:22:33.114927+00:00",
+  "exit_receipt_sha256": "546d9bec8e01f322eea3791e0d5e2f04abe94e92a2c731cb87a2777439b868a0",
+  "initial_overlap_failures": "Two retained; separately reproduced PostgreSQL exclusion deadlocks; bounded test-only retry independently reviewed",
+  "normal_vault_reads": 0,
+  "raw_log_sha256": "401101a25e561e9a6c54be28f5b3b4a527490c2db667db250ccd37f6a3765eaa",
+  "reasons": [
+    "New migration collation correction requires fresh source-bound acceptance",
+    "Initial harness included performance under coverage rather than canonical not-performance selector"
+  ],
+  "schema_version": "accel005-superseded-windows-run-v1",
+  "state": "ABORTED_SUPERSEDED_NOT_ACCEPTANCE",
+  "stop_helper_result": "Owned descendant was stopped; its launcher exited before the second stop, which safely raised process-not-running. Subsequent native inspection found no matching coverage process.",
+  "stop_helper_sha256": "d3ae6ae015a2c19ea0132606b43d6754c671108488c9b84d0e31ec8a78029d6d",
+  "unrelated_processes_touched": false
+}
