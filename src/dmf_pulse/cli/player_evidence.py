@@ -32,3 +32,26 @@ def demo_command(
     import json
 
     typer.echo(json.dumps(payload, sort_keys=True, indent=2))
+
+
+@player_evidence_app.command("wyscout-demo")
+def wyscout_demo_command(
+    before_release: Annotated[
+        bool, typer.Option(help="Use a synthetic cutoff before the retrospective source vintage.")
+    ] = False,
+) -> None:
+    """Describe owned native lineup/bench roles; real Wyscout data is not admitted."""
+    import json
+
+    from dmf_pulse.player_evidence.wyscout import owned_wyscout_demo
+
+    try:
+        result = owned_wyscout_demo(
+            cutoff=datetime(2018, 5, 1, tzinfo=UTC) if before_release else None
+        )
+    except EvidenceError as error:
+        typer.echo(str(error), err=True)
+        raise typer.Exit(2) from None
+    payload = result.model_dump(mode="json")
+    payload["semantic_sha256"] = result.semantic_sha256
+    typer.echo(json.dumps(payload, sort_keys=True, indent=2))

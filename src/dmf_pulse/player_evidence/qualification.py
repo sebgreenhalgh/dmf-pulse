@@ -17,6 +17,9 @@ from dmf_pulse.player_evidence.contracts import (
 
 OWNED_SOURCE_ID = "accel003-owned-fixture-participation-v1"
 OWNED_PAYLOAD_SHA256 = "6369d05ed2c4616d4029bd11e658749ea7180696b9032dd20f36dd2e4a097d0c"
+OWNED_WYSCOUT_NATIVE_SHA256 = "566c3631f423c792e657ab5e38db858b611855ca8deead3332a2053789451aed"
+OWNED_WYSCOUT_BINDINGS_SHA256 = "1f074333f89ce1b326db33491eca4a363aa13939c9745ff20491a8b58599ad61"
+OWNED_WYSCOUT_PAYLOAD_SHA256 = "cdb1ec3a066e25e38cd6d66d34ea76c3b065217d16b2e59a384dd279d6b56dc3"
 MAX_BODY_BYTES = 262_144
 
 
@@ -42,8 +45,74 @@ def owned_source() -> EvidenceSource:
     )
 
 
+def _resource(name: str) -> bytes:
+    return files("dmf_pulse.player_evidence.resources").joinpath(name).read_bytes()
+
+
+def owned_wyscout_native_body() -> bytes:
+    return _resource("owned-wyscout-native-v1.json")
+
+
+def owned_wyscout_bindings_body() -> bytes:
+    return _resource("owned-wyscout-bindings-v1.json")
+
+
+def owned_wyscout_body() -> bytes:
+    return _resource("owned-wyscout-participation-v1.json")
+
+
+def _wyscout_owned_source(source_id: str, digest: str) -> EvidenceSource:
+    return EvidenceSource(
+        source_id=source_id,
+        provider_id="dmf-owned-synthetic-wyscout-shape",
+        payload_sha256=digest,
+        licence_id="REPOSITORY_OWNED_SYNTHETIC_ONLY",
+        approval_id="DMF-PULSE-ACCEL-004#owned-native-shape-only",
+        purpose="DESCRIPTIVE_EVIDENCE",
+        mode="SYNTHETIC",
+        qualification="OWNED_QUALIFIED",
+    )
+
+
+def owned_wyscout_native_source() -> EvidenceSource:
+    return _wyscout_owned_source("accel004-owned-wyscout-native-v1", OWNED_WYSCOUT_NATIVE_SHA256)
+
+
+def owned_wyscout_source() -> EvidenceSource:
+    return _wyscout_owned_source(
+        "accel004-owned-wyscout-participation-v1", OWNED_WYSCOUT_PAYLOAD_SHA256
+    )
+
+
+def _authenticate_exact(body: bytes, expected: str, packaged: bytes) -> None:
+    if not isinstance(body, bytes) or len(body) > MAX_BODY_BYTES:
+        raise EvidenceError("EVIDENCE_BODY_BOUND_EXCEEDED")
+    if hashlib.sha256(body).hexdigest() != expected:
+        raise EvidenceError("SOURCE_BYTES_NOT_AUTHENTICATED")
+    if len(packaged) > MAX_BODY_BYTES or hashlib.sha256(packaged).hexdigest() != expected:
+        raise EvidenceError("PACKAGED_SOURCE_IDENTITY_CHANGED")
+
+
+def authenticate_wyscout_native(body: bytes, source: EvidenceSource) -> None:
+    """Only the exact fictional native fixture is admitted; real releases stay closed."""
+    if source != owned_wyscout_native_source():
+        raise EvidenceError("SOURCE_NOT_QUALIFIED_FOR_NATIVE_ADAPTER")
+    _authenticate_exact(body, OWNED_WYSCOUT_NATIVE_SHA256, owned_wyscout_native_body())
+
+
 def authenticate_source(body: bytes, source: EvidenceSource) -> None:
     """Reject unsupported source/purpose/bytes before parsing or feature construction."""
+    if source == owned_wyscout_source():
+        _authenticate_exact(body, OWNED_WYSCOUT_PAYLOAD_SHA256, owned_wyscout_body())
+        _authenticate_exact(
+            owned_wyscout_native_body(), OWNED_WYSCOUT_NATIVE_SHA256, owned_wyscout_native_body()
+        )
+        _authenticate_exact(
+            owned_wyscout_bindings_body(),
+            OWNED_WYSCOUT_BINDINGS_SHA256,
+            owned_wyscout_bindings_body(),
+        )
+        return
     if source != owned_source():
         raise EvidenceError("SOURCE_NOT_QUALIFIED_FOR_DESCRIPTIVE_EVIDENCE")
     if not isinstance(body, bytes) or len(body) > MAX_BODY_BYTES:
