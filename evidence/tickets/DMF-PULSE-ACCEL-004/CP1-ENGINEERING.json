@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-30T03:43:00.060601+00:00",
+  "checkpoint": "CP1",
+  "checks": [
+    {
+      "command": "uv run ruff format --check .",
+      "formatted_files": 1056,
+      "result": "PASS"
+    },
+    {
+      "command": "uv run ruff check .",
+      "result": "PASS"
+    },
+    {
+      "command": "uv run mypy src/dmf_pulse",
+      "result": "PASS",
+      "source_files": 391
+    },
+    {
+      "command": "uv run pytest tests/unit/credentials tests/unit/cli/test_pulse.py tests/unit/ingestion/test_fpl_direct.py tests/unit/ingestion/test_fpl_direct_transport.py tests/unit/ingestion/test_operator_odds_transient.py tests/unit/dashboard/test_current_mode.py -q --basetemp review_pack/pytest-cp1-integrated -p no:cacheprovider",
+      "passed": 161,
+      "result": "PASS",
+      "seconds": 276.98
+    },
+    {
+      "command": "uv run pytest tests/unit/credentials tests/unit/cli/test_pulse.py tests/unit/private_v1/test_actionability.py tests/unit/ingestion/test_one_command_odds_transient.py tests/unit/ingestion/test_horizon_rights_approval.py -q --basetemp review_pack/pytest-cp1-complete -p no:cacheprovider",
+      "passed": 116,
+      "result": "PASS",
+      "seconds": 5.75
+    }
+  ],
+  "dirty_availability_worktree_changed": false,
+  "initial_failures_retained": [
+    "three independent secret-boundary findings fixed before checkpoint",
+    "historical transient full-file digest refused intentional credential seam; exact new reviewed exception preserves both old maps",
+    "old pre-client missing-env test updated to actual authorized client refusal before transport construction",
+    "initial unfrozen installer dependency resolution replaced by exact frozen runtime sync before native execution"
+  ],
+  "native_final_wheel_repetition_required": true,
+  "native_first_probe_original_bytes_preserved": true,
+  "native_first_receipt_sha256": "9673f38eb3cb3dfb4ca2131133b5889f36aebd487dacf5b713aaf0a296e0e9bc",
+  "numerical_kernels_changed": false,
+  "parent": "31b5ebaeae1082f796e6e40898931899a96866a4",
+  "production_activation": false,
+  "production_targets_read": 0,
+  "provider_requests": 0,
+  "review_receipts": {
+    "CREDENTIAL-CODE-REVIEW-INITIAL.json": "f31463510c933cfc48fe7ecb1734b7c4894dc3af03ebb4dc28ac93834a39865a",
+    "CREDENTIAL-DESIGN-REVIEW.json": "7a8955df8f47f9229a9bdefbbcb00323d32463ac2b4eb904949a581da922585f",
+    "CREDENTIAL-INITIAL-PROBES.json": "7775b26106521dd588610eb94502671f3ad987b8cfe54d34839386809b93944a",
+    "CREDENTIAL-INTEGRATION-REVIEW.json": "d29cf91def2c33bc457243ae238e3b60cf3f9a3eb23e8dea770a2536a6faf528",
+    "OPERATION-INDEPENDENT-REVIEW.json": "229a14425120c81992161c3725c4ecb5792cebe784bc3ed505f559281913bfac",
+    "P01-CANONICAL-AUTHORITY-REVIEW.json": "25a5be06ca1ba00f17b2ae49c088c2b0042795f8f40a20fd05bbf7d06072a52e",
+    "P01-CANONICAL-AUTHORITY-TRACE.json": "4aa9f8b4f168225482ee5fb5c45d58944219e3e19555f5d9987e1e6473d16a34",
+    "P01-CODE-POLICY-TRACE.json": "c5810fae8c61492ac07ff1f55ab218e12053b1a041610d8c419c747a57705cc1"
+  },
+  "schema_version": "accel004-checkpoint-v1",
+  "status": "ENGINEERING_CHECKPOINT_FINAL_WAVE_GATES_PENDING"
+}

@@ -71,43 +71,53 @@ def test_offset_clock_normalizes_and_cpu_after_cutoff_is_allowed():
     assert guard.check(DEADLINE) == NOW
 
 
-def test_cli_publication_rechecks_after_service_and_never_prints_expired_report(monkeypatch):
+def test_cli_shared_publication_never_prints_a_report_rejected_by_runtime(monkeypatch):
     from types import SimpleNamespace
 
     from typer.testing import CliRunner
 
+    from dmf_pulse.authorization_errors import AuthorizationError
     from dmf_pulse.cli import pulse
     from dmf_pulse.cli.app import app
+    from dmf_pulse.operation.console import publish_runtime
 
     report = "SYNTHETIC_ACTION_MUST_NOT_PRINT"
     receipt = DeadlineGuard(lambda: NOW).bind(
         deadline_at=DEADLINE, decision_sha256="a" * 64, report=report
     )
 
-    class Clock:
-        @classmethod
-        def now(cls, tz):
-            return DEADLINE
+    class Runtime:
+        def refresh(self, horizon):
+            return SimpleNamespace(status="COMPLETE", job_id="owned-expired")
 
-    class Service:
-        def __init__(self, **kwargs):
-            self.progress = kwargs["progress"]
-
-        def run(self, request):
-            return SimpleNamespace(
+        def view(self):
+            result = SimpleNamespace(
                 report=report,
                 decision=SimpleNamespace(semantic_sha256="a" * 64),
                 actionability=receipt,
                 publication_not_before=NOW,
             )
+            try:
+                checked_report(result, clock=lambda: DEADLINE)
+            except PrivateV1Error:
+                raise AuthorizationError("REFRESH_GRANT_EXPIRED", "EXPIRED") from None
+            pytest.fail("expired report admitted")
 
-    monkeypatch.setattr(pulse, "datetime", Clock)
-    monkeypatch.setattr(pulse, "PrivateV1OneCommandService", Service)
-    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-placeholder")
-    result = CliRunner().invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
+        def close(self):
+            self.closed = True
+
+    runtime = Runtime()
+
+    def enrolled(**kwargs):
+        return publish_runtime(runtime, horizon=kwargs["horizon"], publish=kwargs["publish"])
+
+    monkeypatch.setattr(pulse, "run_enrolled_current", enrolled)
+    result = CliRunner().invoke(
+        app, ["pulse", "--entry-id", "42", "--no-progress", "--refresh-approval", "OWNED-TEST"]
+    )
     assert result.exit_code == 2 and result.stdout == ""
     assert report not in result.output
-    assert "deadline has been reached" in result.stderr
+    assert "REFRESH_GRANT_EXPIRED" in result.stderr and runtime.closed
 
 
 def test_publication_checks_clock_after_hash_validation(monkeypatch):

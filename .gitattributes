@@ -20,6 +20,9 @@ tests/fixtures/evaluation/a03_stopped_metadata_gate.json binary
 evidence/tickets/DMF-PULSE-ACCEL-001/REQUEST.txt binary
 tickets/DMF-PULSE-ACCEL-002/REQUEST.txt binary
 tickets/DMF-PULSE-ACCEL-003/REQUEST.txt binary
+# Hash-authenticated Wave004 receipts retain exact captured/native line endings.
+evidence/tickets/DMF-PULSE-ACCEL-004/*.json binary
+evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-FIRST-PROBE.txt binary
 tickets/DMF-PULSE-ACCEL-004/REQUEST.txt binary
 evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-PARITY-1.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-PARITY-3.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

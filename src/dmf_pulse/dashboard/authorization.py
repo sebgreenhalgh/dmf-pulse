@@ -20,21 +20,14 @@ from typing import Annotated, Any, Literal, Self, cast
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
+from dmf_pulse.authorization_errors import AuthorizationError as AuthorizationError
+from dmf_pulse.authorization_errors import AuthorizationState
 
 Sha = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 Ref = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$")]
 Provider = Literal["FPL", "ODDS", "OPENFOOTBALL"]
 Classification = Literal["OWNED_SYNTHETIC", "PRIVATE_CURRENT"]
-State = Literal["RIGHTS_APPROVAL_REQUIRED", "SOURCE_NOT_AVAILABLE", "BLOCKED", "EXPIRED"]
-
-
-class AuthorizationError(ValueError):
-    """A bounded code safe for the dashboard; no source or approval payload."""
-
-    def __init__(self, code: str, state: State = "BLOCKED") -> None:
-        super().__init__(code)
-        self.code = code
-        self.state = state
+State = AuthorizationState
 
 
 class _Contract(BaseModel):

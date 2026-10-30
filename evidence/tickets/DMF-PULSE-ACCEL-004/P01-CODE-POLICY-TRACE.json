@@ -1,0 +1,171 @@
+{
+  "accepted_implementation": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "accepted_sources": {
+    "acquisition": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/ingestion/openfootball/team_strength_acquisition.py",
+      "locators": [
+        {
+          "line": 69,
+          "source": "def acquire_team_strength_snapshot("
+        }
+      ],
+      "sha256": "755354a8da5ed1732cc6a213d14ec7d99f4392a0276892b06d001e31036cbeeb"
+    },
+    "cli": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/cli/team_strength.py",
+      "locators": [
+        {
+          "line": 67,
+          "source": "def prospective_score_command("
+        },
+        {
+          "line": 78,
+          "source": "value = load_public_forecast(forecast, expected_forecast_sha256=forecast_sha256)"
+        }
+      ],
+      "sha256": "2cc3be8bcab4e6e35e1d3bba568006a5f10a473072edc9ebd7f30372dbe4f326"
+    },
+    "descriptor_discovery": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/ingestion/openfootball/team_strength_current.py",
+      "locators": [
+        {
+          "line": 66,
+          "source": "def discover_current_resource("
+        }
+      ],
+      "sha256": "689f990c3f53479c4fc8bbc0012cc2e891961f60149f9fbc86b34ccd6749021f"
+    },
+    "draw_authenticator": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/football_events/team_strength_parameter_draws.py",
+      "locators": [
+        {
+          "line": 259,
+          "source": "def _validated_draw_json(artifact_json: str, draws_json: str) -> ParameterDrawSetV1:"
+        },
+        {
+          "line": 262,
+          "source": "expected = joint_parameter_draws(artifact, policy=draws.policy)"
+        },
+        {
+          "line": 284,
+          "source": "def authenticate_parameter_draws("
+        },
+        {
+          "line": 288,
+          "source": "return _validated_draw_json(artifact.model_dump_json(), draws.model_dump_json())"
+        }
+      ],
+      "sha256": "0bfbe387ebe292c5167ce170a1271011c7ec7904c8fdae0be08a85a6e92421d0"
+    },
+    "forecast_and_scorer": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/evaluation/team_strength_prospective.py",
+      "locators": [
+        {
+          "line": 231,
+          "source": "def validate_frozen_forecasts(self) -> Self:"
+        },
+        {
+          "line": 260,
+          "source": "draws = authenticate_parameter_draws(self.artifact, self.draw_set)"
+        },
+        {
+          "line": 321,
+          "source": "draws = authenticate_parameter_draws(artifact, draws)"
+        },
+        {
+          "line": 462,
+          "source": "def score_public_team_forecasts("
+        },
+        {
+          "line": 466,
+          "source": "forecast, outcomes = authenticate(forecast), authenticate(outcomes)"
+        }
+      ],
+      "sha256": "969024da204a6382d211f5f70c7877e1714c8fb0bd098a5c1b08bcafc9f96fe1"
+    },
+    "generic_authenticator": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/ingestion/openfootball/team_strength_data.py",
+      "locators": [
+        {
+          "line": 105,
+          "source": "def authenticate[T: SealedEvidence](value: T, expected: str | None = None) -> T:"
+        },
+        {
+          "line": 106,
+          "source": "validated = type(value).model_validate_json(value.model_dump_json())"
+        }
+      ],
+      "sha256": "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0"
+    },
+    "store": {
+      "git_commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "git_path": "src/dmf_pulse/evaluation/team_strength_prospective_store.py",
+      "locators": [
+        {
+          "line": 52,
+          "source": "def load_public_forecast("
+        },
+        {
+          "line": 56,
+          "source": "PublicTeamStrengthForecastV1.model_validate_json(path.read_bytes()),"
+        }
+      ],
+      "sha256": "e7d6d1f9b9b9ecb984217e4ff490e37c2880311c5f37a255795d319491292ed2"
+    }
+  },
+  "assessed_at": "2026-10-30T03:32:17.491289+00:00",
+  "canonical_authority_distinction": "Original canonical OpenFootball scope is not proven consumed by A02/A03, but the exact implementation/no-regeneration conjunction blocks execution. A04 remains an unrelated fallback-policy boundary, not an automatic solution to this code gate.",
+  "conditional_nonexecuted_route_plan": {
+    "label_contract": "Only final home/away goals for all10original unique fixtures, exact frozen registry, actual played-dateD+2 and accepted UTC availability gates; no partial score/cohort change.",
+    "maximum_requests_if_resumed": 5,
+    "redirects_retries_polling": "NONE; terminate on transport/schema/hash/identity/finality disagreement.",
+    "report_policy": "Descriptive-only original-canonical resumption with explicit post-origin source-policy history; never silently relabel fallbackepoch003 or claim unchanged confirmatoryepoch001.",
+    "sequence": [
+      {
+        "count": 1,
+        "method": "GET",
+        "purpose": "Resolve current head once to immutable40hexcommit; no branch content admitted.",
+        "url": "https://api.github.com/repos/openfootball/football.json/commits/master"
+      },
+      {
+        "count": 2,
+        "method": "GET",
+        "purpose": "Accepted descriptor discovery only.",
+        "url_templates": [
+          "https://raw.githubusercontent.com/openfootball/football.json/{commit}/LICENSE.md",
+          "https://raw.githubusercontent.com/openfootball/football.json/{commit}/2026-27/en.1.json"
+        ]
+      },
+      {
+        "count": 2,
+        "method": "GET",
+        "purpose": "Accepted independently authenticated acquisition of same immutable bytes.",
+        "url_templates": [
+          "https://raw.githubusercontent.com/openfootball/football.json/{commit}/LICENSE.md",
+          "https://raw.githubusercontent.com/openfootball/football.json/{commit}/2026-27/en.1.json"
+        ]
+      }
+    ],
+    "status": "NOT_AUTHORIZED_NOT_EXECUTABLE_PENDING_CODE_POLICY_RESOLUTION_AND_INDEPENDENT_REVIEW"
+  },
+  "draw_generation_invocations": 0,
+  "evaluation_tree_paths_sha256": "0119daff3023ecadf430234a2f389445989103765d521c8a561960d51446be43",
+  "finding": "The accepted exact381 CLI/store and scorer authenticate the full forecast type. Its after-validator calls authenticate_parameter_draws, whose cold-cache path rederives joint parameter draws. A generic raw semantic hash does not provide an accepted nongenerative scorer input at381. Cache seeding, model_construct, substituted types or monkeypatches would bypass accepted validation and are not authorized.",
+  "later_nongenerative_view": {
+    "authority_transfer_inferred": false,
+    "path": "src/dmf_pulse/evaluation/p01_frozen_view.py",
+    "sha256": "ee756a31cb9cde20b02f5a4f967623c25334b2629a86153990dd8c5b29f21a11"
+  },
+  "method": "Static git show/ls-tree only; no forecast import/validation, draws, model execution, source request or credentials.",
+  "nongenerative_view_present_at_accepted_commit": false,
+  "provider_requests": 0,
+  "schema_version": "accel004-p01-nongenerative-code-policy-assessment-v1",
+  "scoring_invocations": 0,
+  "status": "BLOCKED_EXACT_ACCEPTED_CODE_AND_NO_REGENERATION_CONFLICT"
+}

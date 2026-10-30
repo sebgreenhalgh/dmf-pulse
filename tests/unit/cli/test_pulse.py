@@ -1,308 +1,126 @@
-"""Operator UX proofs for the top-level one-command surface."""
+"""The top-level console delegates to the existing enrolled worker runtime."""
 
-from __future__ import annotations
-
-from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from typer._click._compat import strip_ansi
 from typer.core import TyperGroup
 from typer.main import get_command
 from typer.testing import CliRunner
 
+from dmf_pulse.authorization_errors import AuthorizationError
 from dmf_pulse.cli import pulse as pulse_module
 from dmf_pulse.cli.app import app
-from dmf_pulse.ingestion.errors import IngestionError
-from dmf_pulse.private_v1.actionability import DeadlineGuard
-from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.credentials.service import CredentialService
 
 runner = CliRunner()
 
 
-def _display_result(report, now):
-    return SimpleNamespace(
-        report=report,
-        decision=SimpleNamespace(semantic_sha256="a" * 64),
-        publication_not_before=now,
-        actionability=DeadlineGuard(lambda: now).bind(
-            deadline_at=now + timedelta(hours=1), decision_sha256="a" * 64, report=report
-        ),
-    )
-
-
-def test_pulse_help_exposes_entry_identifier_and_progress_suppression_only() -> None:
+def test_help_offers_an_installed_approval_identifier_and_no_secret_input():
     result = runner.invoke(app, ["pulse", "--help"], color=False)
-    help_output = strip_ansi(result.stdout)
-
     assert result.exit_code == 0
-    root_command = get_command(app)
-    assert isinstance(root_command, TyperGroup)
-    pulse_options = {
+    root = get_command(app)
+    assert isinstance(root, TyperGroup)
+    options = {
         option
-        for parameter in root_command.commands["pulse"].params
+        for parameter in root.commands["pulse"].params
         for option in getattr(parameter, "opts", ())
     }
-    assert pulse_options == {"--entry-id", "--horizon-gameweeks", "--no-progress"}
-    assert "--horizon-gameweeks" in help_output
-    assert "Optimisation horizon" in help_output
-    assert "token" not in help_output.casefold()
-    assert "bootstrap" not in help_output.casefold()
-    assert "fixtures" not in help_output.casefold()
-    assert "score-prior" not in help_output.casefold()
+    assert options == {"--entry-id", "--horizon-gameweeks", "--no-progress", "--refresh-approval"}
 
 
-def test_missing_odds_key_is_the_first_actionable_blocker(monkeypatch) -> None:
-    monkeypatch.delenv("THE_ODDS_API_KEY", raising=False)
-    marker = "secret-that-must-not-appear"
-    monkeypatch.setenv("DMF_FPL_BEARER_TOKEN", marker)
-
+def test_no_approval_refuses_before_credential_resolution_or_worker(monkeypatch):
+    monkeypatch.setattr(CredentialService, "resolve", lambda *a: pytest.fail("vault accessed"))
+    monkeypatch.setattr(
+        pulse_module, "run_enrolled_current", lambda **kw: pytest.fail("worker launched")
+    )
     result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
-
     assert result.exit_code == 2
     assert result.stdout == ""
-    assert result.stderr.strip() == "THE_ODDS_API_KEY is missing."
+    assert "reviewed refresh approval is required" in result.stderr
+
+
+def test_unenrolled_id_refuses_before_vault_or_current_source(monkeypatch):
+    monkeypatch.setattr(CredentialService, "resolve", lambda *a: pytest.fail("vault accessed"))
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--refresh-approval", "NOT-ENROLLED"])
+    assert result.exit_code == 2
+    assert "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED" in result.stderr
+    assert "Traceback" not in result.output
+
+
+@pytest.mark.parametrize("horizon", [1, 3])
+@pytest.mark.parametrize("no_progress", [False, True])
+def test_valid_console_delegates_scope_and_publishes_runtime_report(
+    monkeypatch, horizon, no_progress
+):
+    calls = []
+
+    def run(**kwargs):
+        calls.append(kwargs)
+        if kwargs["progress"] is not None:
+            kwargs["progress"]("FPL state ready")
+        kwargs["publish"](SimpleNamespace(team=SimpleNamespace(report="VALIDATED REPORT")))
+
+    monkeypatch.setattr(pulse_module, "run_enrolled_current", run)
+    args = [
+        "pulse",
+        "--entry-id",
+        "42",
+        "--refresh-approval",
+        "OWNED-TEST",
+        "--horizon-gameweeks",
+        str(horizon),
+    ]
+    if no_progress:
+        args.append("--no-progress")
+    result = runner.invoke(app, args)
+    assert result.exit_code == 0
+    assert result.stdout == "VALIDATED REPORT\n"
+    assert result.stderr == ("" if no_progress else "FPL state ready\n")
+    assert calls[0]["entry_id"] == 42
+    assert calls[0]["horizon"] == horizon
+    assert calls[0]["authorization_id"] == "OWNED-TEST"
+    assert set(calls[0]) == {"entry_id", "horizon", "authorization_id", "publish", "progress"}
+
+
+@pytest.mark.parametrize("horizon", [0, 2, 4, -1])
+def test_invalid_horizon_cannot_launch_worker(monkeypatch, horizon):
+    monkeypatch.setattr(pulse_module, "run_enrolled_current", lambda **kw: pytest.fail("launched"))
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--horizon-gameweeks", str(horizon)])
+    assert result.exit_code == 2
+    assert "must be exactly 1 or 3" in result.stderr
+
+
+def test_injected_authorization_error_cannot_echo_raw_message(monkeypatch):
+    marker = "synthetic-private-canary-never-output"
+
+    def deny(**kwargs):
+        raise AuthorizationError(marker)
+
+    monkeypatch.setattr(pulse_module, "run_enrolled_current", deny)
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--refresh-approval", "OWNED-TEST"])
+    assert result.exit_code == 2
     assert marker not in result.output
     assert "Traceback" not in result.output
 
 
-def test_successful_cli_prints_recommendation_and_passes_only_entry_id(monkeypatch) -> None:
-    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
-    monkeypatch.setenv("DMF_FPL_BEARER_TOKEN", "synthetic-fpl-key")
-    requests = []
-    approved_at = datetime(2026, 9, 2, 0, 0, 38, 492580, tzinfo=UTC)
+@pytest.mark.parametrize(
+    "code,action",
+    [
+        ("QUALIFIED_QUOTA_EVIDENCE_STALE", "remaining-credit evidence"),
+        ("AUTHORIZATION_DEADLINE_INVALID", "official deadline evidence"),
+        ("USAGE_LEDGER_SCHEMA_NOT_READY", "control migration"),
+        ("SOURCE_PROFILE_CHANGED", "provider terms/profile"),
+        ("OFFICIAL_DEADLINE_SCOPE_MISMATCH", "target Gameweek"),
+        ("CREDENTIAL_EXPIRED", "set-fpl-token --replace"),
+    ],
+)
+def test_known_operational_blocker_keeps_typed_reason_and_required_action(
+    monkeypatch, code, action
+):
+    def deny(**kwargs):
+        raise AuthorizationError(code)
 
-    class FixedDatetime:
-        @classmethod
-        def now(cls, tz):
-            assert tz is UTC
-            return approved_at
-
-    class Service:
-        def __init__(self, **kwargs) -> None:
-            assert set(kwargs) == {"direct_client_factory", "progress"}
-            self.progress = kwargs["progress"]
-
-        def run(self, request):
-            requests.append(request)
-            self.progress.message("DMF Pulse starting")
-            with self.progress.stage(
-                started="Acquiring current FPL state...",
-                completed="FPL state ready",
-                failed="current FPL state",
-            ):
-                pass
-            self.progress.finish()
-            return _display_result("DMF PULSE - GW2\n\nRECOMMENDATION\nNO TRANSFER\n", approved_at)
-
-    monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
-    monkeypatch.setattr(pulse_module, "datetime", FixedDatetime)
-    result = runner.invoke(app, ["pulse", "--entry-id", "42"])
-
-    assert result.exit_code == 0
-    assert result.stdout.startswith("DMF PULSE - GW2\n\nRECOMMENDATION")
-    assert "DMF Pulse starting" in result.stderr
-    assert "Acquiring current FPL state..." in result.stderr
-    assert "FPL state ready" in result.stderr
-    assert "Total runtime:" in result.stderr
-    assert requests[0].entry_id == 42
-    assert len(requests[0].code_sha) == 40
-    assert requests[0].operator_approved_at == approved_at
-    assert requests[0].run_at == datetime(2026, 9, 2, 0, 5, 38, tzinfo=UTC)
-    assert requests[0].run_at.microsecond == 0
-    assert requests[0].horizon_gameweeks == 1
-
-
-def test_horizon_option_is_explicit_and_rejects_every_value_except_one_or_three(
-    monkeypatch,
-) -> None:
-    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
-    captured = []
-
-    class Service:
-        def __init__(self, **kwargs) -> None:
-            del kwargs
-
-        def run(self, request):
-            captured.append(request)
-            return _display_result("ROLLING REPORT", datetime.now(UTC))
-
-    monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
-
-    rolling = runner.invoke(
-        app,
-        ["pulse", "--entry-id", "42", "--horizon-gameweeks", "3", "--no-progress"],
-    )
-    invalid = runner.invoke(
-        app,
-        ["pulse", "--entry-id", "42", "--horizon-gameweeks", "2", "--no-progress"],
-    )
-
-    assert rolling.exit_code == 0
-    assert captured[0].horizon_gameweeks == 3
-    assert invalid.exit_code == 2
-    assert invalid.stderr.strip() == "--horizon-gameweeks must be exactly 1 or 3."
-
-
-def test_no_progress_suppresses_observability_and_preserves_report(monkeypatch) -> None:
-    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
-    marker = "private-runtime-identifier-that-must-not-appear"
-
-    class Service:
-        def __init__(self, **kwargs) -> None:
-            self.progress = kwargs["progress"]
-
-        def run(self, request):
-            del request
-            self.progress.message(f"forbidden {marker}")
-            return _display_result("UNCHANGED FINAL REPORT", datetime.now(UTC))
-
-    monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
-    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
-
-    assert result.exit_code == 0
-    assert result.stdout == "UNCHANGED FINAL REPORT\n"
-    assert result.stderr == ""
-    assert marker not in result.output
-
-
-def test_expected_service_error_has_no_traceback(monkeypatch) -> None:
-    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
-
-    class Service:
-        def __init__(self, **kwargs) -> None:
-            del kwargs
-
-        def run(self, request):
-            del request
-            raise PrivateV1Error("FPL_AUTH_REQUIRED", "Set DMF_FPL_BEARER_TOKEN.")
-
-    monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
-    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--no-progress"])
-
-    assert result.exit_code == 2
-    assert result.stderr.strip() == "Set DMF_FPL_BEARER_TOKEN."
-    assert "Traceback" not in result.output
-
-
-def test_prompting_provider_uses_environment_without_disclosure() -> None:
-    marker = "synthetic-fpl-secret"
-    provider = pulse_module._PromptingCredentialProvider({"DMF_FPL_BEARER_TOKEN": marker})
-
-    credential = provider.get()
-
-    assert credential.source == "ENVIRONMENT"
-    assert marker not in repr(credential)
-
-
-def test_prompting_provider_is_interactive_only_and_validates_hidden_input(
-    monkeypatch,
-) -> None:
-    provider = pulse_module._PromptingCredentialProvider({})
-    monkeypatch.setattr(pulse_module.sys.stdin, "isatty", lambda: False)
-    with pytest.raises(IngestionError) as non_interactive:
-        provider.get()
-    assert getattr(non_interactive.value, "code", None) == "CREDENTIAL_MISSING"
-
-    monkeypatch.setattr(pulse_module.sys.stdin, "isatty", lambda: True)
-    monkeypatch.setattr(pulse_module.getpass, "getpass", lambda _prompt: "")
-    with pytest.raises(IngestionError) as empty:
-        provider.get()
-    assert getattr(empty.value, "code", None) == "CREDENTIAL_MISSING"
-
-    monkeypatch.setattr(pulse_module.getpass, "getpass", lambda _prompt: " hidden-token ")
-    with pytest.raises(IngestionError) as invalid:
-        provider.get()
-    assert getattr(invalid.value, "code", None) == "CREDENTIAL_INVALID"
-
-    monkeypatch.setattr(pulse_module.getpass, "getpass", lambda _prompt: "hidden-token")
-    assert provider.get().source == "HIDDEN_PROMPT"
-
-
-def test_code_identity_override_is_strict_and_git_head_supports_checkout_forms(
-    monkeypatch, tmp_path
-) -> None:
-    configured_sha = "a" * 40
-    monkeypatch.setenv("DMF_CODE_SHA", configured_sha.upper())
-    assert pulse_module._code_sha() == configured_sha
-    monkeypatch.setenv("DMF_CODE_SHA", "not-a-sha")
-    with pytest.raises(PrivateV1Error) as invalid:
-        pulse_module._code_sha()
-    assert invalid.value.code == "CODE_IDENTITY_INVALID"
-
-    detached = tmp_path / "detached"
-    (detached / ".git").mkdir(parents=True)
-    (detached / ".git" / "HEAD").write_text(configured_sha, encoding="ascii")
-    assert pulse_module._git_head(detached) == configured_sha
-
-    symbolic = tmp_path / "symbolic"
-    ref = symbolic / ".git" / "refs" / "heads" / "test"
-    ref.parent.mkdir(parents=True)
-    (symbolic / ".git" / "HEAD").write_text("ref: refs/heads/test", encoding="ascii")
-    ref.write_text(configured_sha, encoding="ascii")
-    assert pulse_module._git_head(symbolic) == configured_sha
-
-    worktree = tmp_path / "worktree"
-    git_dir = tmp_path / "worktree-metadata"
-    worktree.mkdir()
-    git_dir.mkdir()
-    (worktree / ".git").write_text("gitdir: ../worktree-metadata", encoding="utf-8")
-    (git_dir / "HEAD").write_text(configured_sha, encoding="ascii")
-    assert pulse_module._git_head(worktree) == configured_sha
-
-    (worktree / ".git").write_text("malformed", encoding="utf-8")
-    assert pulse_module._git_head(worktree) is None
-
-    unreadable = tmp_path / "missing-head"
-    (unreadable / ".git").mkdir(parents=True)
-    assert pulse_module._git_head(unreadable) is None
-
-
-def test_installed_content_identity_fails_closed_without_package_files(
-    monkeypatch, tmp_path
-) -> None:
-    monkeypatch.setattr(
-        pulse_module.importlib.metadata,
-        "distribution",
-        lambda _name: SimpleNamespace(files=()),
-    )
-    with pytest.raises(PrivateV1Error) as absent:
-        pulse_module._installed_content_sha()
-    assert absent.value.code == "CODE_IDENTITY_UNAVAILABLE"
-
-    class MissingFileDistribution:
-        files = (Path("dmf_pulse/missing.py"),)
-
-        @staticmethod
-        def locate_file(_relative):
-            return tmp_path / "does-not-exist.py"
-
-    monkeypatch.setattr(
-        pulse_module.importlib.metadata,
-        "distribution",
-        lambda _name: MissingFileDistribution(),
-    )
-    assert pulse_module._installed_content_sha() == "da39a3ee5e6b4b0d3255bfef95601890afd80709"
-
-
-def test_cli_does_not_duplicate_a_failure_already_reported_by_the_service(
-    monkeypatch,
-) -> None:
-    monkeypatch.setenv("THE_ODDS_API_KEY", "synthetic-odds-key")
-
-    class Service:
-        def __init__(self, **kwargs) -> None:
-            self.progress = kwargs["progress"]
-
-        def run(self, request):
-            del request
-            self.progress.failure("service stage", "FPL_AUTH_REQUIRED")
-            raise PrivateV1Error("FPL_AUTH_REQUIRED", "Authentication failed.")
-
-    monkeypatch.setattr(pulse_module, "PrivateV1OneCommandService", Service)
-    result = runner.invoke(app, ["pulse", "--entry-id", "42"])
-
-    assert result.exit_code == 2
-    assert result.stderr.count("FAILED: service stage") == 1
-    assert "FAILED: command preflight" not in result.stderr
+    monkeypatch.setattr(pulse_module, "run_enrolled_current", deny)
+    result = runner.invoke(app, ["pulse", "--entry-id", "42", "--refresh-approval", "OWNED-TEST"])
+    assert result.exit_code == 2 and result.stdout == ""
+    assert code in result.stderr and action in result.stderr

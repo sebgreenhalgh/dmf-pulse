@@ -1,5 +1,5 @@
 {
-  "lock_sha256": "532cd3017a97762c6c8531a33c35e8f283b0b0c931b6b0a5511965c4c2c47e3d",
+  "lock_sha256": "f546cf5551363697579f3b927f5c36bc2e9dfb04ea7ef1a6e523da00e59c41cb",
   "manifest_version": "1.1",
   "packages": [
     {
@@ -220,6 +220,12 @@
     {
       "activated_extras": [],
       "dependencies": [],
+      "name": "pywin32-ctypes",
+      "version": "0.2.3"
+    },
+    {
+      "activated_extras": [],
+      "dependencies": [],
       "name": "pyyaml",
       "version": "6.0.3"
     },
@@ -338,6 +344,7 @@
     "fastapi",
     "psycopg",
     "pydantic",
+    "pywin32-ctypes",
     "pyyaml",
     "sqlalchemy",
     "typer",

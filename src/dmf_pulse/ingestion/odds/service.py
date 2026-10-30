@@ -18,6 +18,7 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session, sessionmaker
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.credentials.providers import AutomaticOddsCredentialProvider
 from dmf_pulse.data_model.models import require_utc
 from dmf_pulse.data_model.tables import (
     data_provider,
@@ -52,7 +53,6 @@ from dmf_pulse.ingestion.odds.client import (
 from dmf_pulse.ingestion.odds.config import load_provider_config, load_rights_profiles
 from dmf_pulse.ingestion.odds.credentials import (
     CredentialProvider,
-    RuntimeOddsCredentialProvider,
     credential_configuration_hint,
 )
 from dmf_pulse.ingestion.odds.mapping import OddsMappingPlan, load_mapping_plan
@@ -190,7 +190,7 @@ class OddsIngestionService:
         monotonic: Callable[[], float] = time.monotonic,
     ) -> None:
         self.repository_root = (repository_root or Path.cwd()).resolve()
-        self.credential_provider = credential_provider or RuntimeOddsCredentialProvider()
+        self.credential_provider = credential_provider or AutomaticOddsCredentialProvider()
         self.transport_factory = transport_factory
         self.clock = clock
         self.processing_clock = processing_clock

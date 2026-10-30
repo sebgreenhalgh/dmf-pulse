@@ -11,7 +11,7 @@ live pilot, retention, model promotion or production activation.
   asset roots, preserve the dirty Availability worktree and seal the contract.
   Additional forecast-family authentication continues in CP2; no new cohort is
   designed before that inventory.
-- [ ] CP1 implement native current-user Windows credential setup/status/rotation/
+- [x] CP1 implement native current-user Windows credential setup/status/rotation/
   deletion and automatic authorized Odds lookup; review FPL expiry separately.
 - [ ] CP2 recover and classify existing real, synthetic, reconstructed and
   unverified freezes before proposing another cohort; retain metadata only.
@@ -33,6 +33,14 @@ Credential and live-account authority remain separate. Synthetic native vault
 acceptance uses a fresh owned namespace and always deletes only its own entry.
 Opening the dashboard/demo must not query the vault; authorized acquisition
 resolves secrets locally after rights checks and any required reservation.
+
+CP1 engineering/security and the first installed native checkpoint passed.
+The native receipt binds its preserved checkpoint wheel and exact executed probe;
+repeat it on the final wave wheel. Shared console now uses the existing enrolled
+worker/ledger, with fixed typed operator remedies. Independent credential findings
+are resolved; final integration, numerical, packaging and exact-SHA CI remain CP6.
+CP4 setup/recovery/preflight and CP5 owned formation adapter are implemented;
+the existing account plan/quota/rights and owner pilot decision remain distinct.
 
 ## DMF-PULSE-ACCEL-003 — current-mode execution and prospective evidence
 

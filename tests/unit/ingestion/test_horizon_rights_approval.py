@@ -53,6 +53,12 @@ _R8B_UNMODIFIED_EXECUTABLE_HASHES = {
 _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS = {
     "ingestion/odds/transient.py": "3d457edf7c94e822f9589e838a1939a359341283eb2fd018359dee25e16eee50",
 }
+# REQUEST004 sections5.1/5.3 authorize native automatic credentials and deferring
+# lookup until rights/quota checks. All numerical transformations remain frozen.
+# Independent review and exact change: ACCEL-004/TRANSIENT-FREEZE-EXCEPTION.md.
+_ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS = {
+    "ingestion/odds/transient.py": "3faeb93796f3989a92ea58a63da64269161d64d4e490ca2d08f1a8e3aa472a81",
+}
 
 
 @pytest.fixture
@@ -183,7 +189,7 @@ def test_missing_required_capability_rejected_by_schema(governed_gate, capabilit
         RightsProfile.model_validate(raw)
 
 
-def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_accel003_reviewed_seam(
+def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_reviewed_seam(
     repository_root,
 ) -> None:
     import hashlib
@@ -192,9 +198,16 @@ def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_accel003_r
         actual = hashlib.sha256(
             (repository_root / "src/dmf_pulse" / relative).read_bytes()
         ).hexdigest()
-        assert actual == digest or (
-            relative in _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS
-            and actual == _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
+        assert (
+            actual == digest
+            or (
+                relative in _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS
+                and actual == _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
+            )
+            or (
+                relative in _ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS
+                and actual == _ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
+            )
         )
     assert (
         hashlib.sha1(
@@ -209,6 +222,7 @@ def test_static_guard_excludes_intentionally_evolving_a1_rolling_and_a2_one_comm
     assert "private_v1/one_command.py" not in _R8B_UNMODIFIED_EXECUTABLE_HASHES
     assert len(_R8B_UNMODIFIED_EXECUTABLE_HASHES) == 8
     assert set(_ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS) == {"ingestion/odds/transient.py"}
+    assert set(_ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS) == {"ingestion/odds/transient.py"}
     assert (
         _R8B_UNMODIFIED_EXECUTABLE_HASHES["ingestion/odds/transient.py"]
         == "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e"

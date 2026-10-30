@@ -1,0 +1,74 @@
+{
+  "actual_human_console_entry_claimed": false,
+  "captured_at": "2026-10-30T03:38:01.416656+00:00",
+  "frozen_runtime_requirements_sha256": "fd24aaa672bdc49f29389c9f599aa1ba7318800a89a4bb46ed77af39fc593b02",
+  "namespace_class": "FRESH_OWNED_SYNTHETIC_UUID_ONLY",
+  "normal_target_namespace_overridden_only_by_injected_backend": true,
+  "outside_checkout_cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-vault-m1ct3bw5",
+  "phases": [
+    {
+      "input_boundary": "TYPER_HIDDEN_PROMPT_WITH_OWNED_IN_MEMORY_INPUT_SHIM",
+      "installed_package": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\review_pack\\installed-cp1\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+      "observed_at": "2026-10-30T03:37:44.747988+00:00",
+      "phase": "create",
+      "pid": 15188,
+      "production_targets_read": 0,
+      "provider_requests": 0,
+      "secret_values_recorded": false,
+      "status": "PASS"
+    },
+    {
+      "input_boundary": "TYPER_HIDDEN_PROMPT_WITH_OWNED_IN_MEMORY_INPUT_SHIM",
+      "installed_package": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\review_pack\\installed-cp1\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+      "observed_at": "2026-10-30T03:37:49.437834+00:00",
+      "phase": "resolve",
+      "pid": 23484,
+      "production_targets_read": 0,
+      "provider_requests": 0,
+      "secret_values_recorded": false,
+      "status": "PASS"
+    },
+    {
+      "input_boundary": "TYPER_HIDDEN_PROMPT_WITH_OWNED_IN_MEMORY_INPUT_SHIM",
+      "installed_package": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\review_pack\\installed-cp1\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+      "observed_at": "2026-10-30T03:37:53.432704+00:00",
+      "phase": "delete",
+      "pid": 36340,
+      "production_targets_read": 0,
+      "provider_requests": 0,
+      "secret_values_recorded": false,
+      "status": "PASS"
+    },
+    {
+      "input_boundary": "TYPER_HIDDEN_PROMPT_WITH_OWNED_IN_MEMORY_INPUT_SHIM",
+      "installed_package": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\review_pack\\installed-cp1\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+      "observed_at": "2026-10-30T03:37:57.351055+00:00",
+      "phase": "absent",
+      "pid": 13044,
+      "production_targets_read": 0,
+      "provider_requests": 0,
+      "secret_values_recorded": false,
+      "status": "PASS"
+    },
+    {
+      "input_boundary": "TYPER_HIDDEN_PROMPT_WITH_OWNED_IN_MEMORY_INPUT_SHIM",
+      "installed_package": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\review_pack\\installed-cp1\\venv\\Lib\\site-packages\\dmf_pulse\\__init__.py",
+      "observed_at": "2026-10-30T03:38:00.840227+00:00",
+      "phase": "delete",
+      "pid": 32852,
+      "production_targets_read": 0,
+      "provider_requests": 0,
+      "secret_values_recorded": false,
+      "status": "PASS"
+    }
+  ],
+  "probe_sha256": "866fd3458bd1c752819c9774a1cc66137334703937891eafdde6424946fa8c06",
+  "production_targets_read": 0,
+  "provider_requests": 0,
+  "schema_version": "installed-native-vault-acceptance-v1",
+  "secret_values_recorded": false,
+  "separate_powershell_processes": 5,
+  "status": "PASS",
+  "synthetic_input_shim": true,
+  "wheel_sha256": "fe205ef4e2dea72c81c8b587ba8a6404a127aa9064db3db24e39c23d483ab684"
+}

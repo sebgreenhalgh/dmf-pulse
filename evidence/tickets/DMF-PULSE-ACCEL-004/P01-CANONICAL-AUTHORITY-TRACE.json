@@ -1,0 +1,180 @@
+{
+  "assessed_at": "2026-10-30T03:25:30.475264+00:00",
+  "conditional_minimal_candidate_for_independent_review": {
+    "controller_review_required": "Bind the original request, exact3815152 package and original forecast/fixture hashes; verify the latest fallback amendments do not revoke this canonical scope and predeclare report epoch/provenance before inspecting any metrics.",
+    "exact_accepted_implementation": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+    "mandatory_label_gates": [
+      "all10originalfixtureIDs match uniquely",
+      "FULL_TIME with strict nonnegative home/awaygoals",
+      "actualplayeddateD+2 eligible",
+      "frozen_at before outcomes and retrieval/usable timestamps coherent",
+      "exactfixture-registrySHA",
+      "original3products/metrics/promotionrules unchanged"
+    ],
+    "no_new_owner_permission_claimed": true,
+    "no_polling_or_retries": "One bounded manual reassessment is the candidate scope, no recurring poll or recovery retries; fail closed on transport/schema/identity/finality/time disagreement.",
+    "p01_byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+    "p01_semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+    "purpose": "Resume the original canonical P01-SCORE task, not A03 retry or fallback source switch",
+    "requires_clean_checkout": true,
+    "source_profile": "openfootball_football_json_team_strength_v1",
+    "source_scope": "openfootball/football.json current immutable resolvedcommit, LICENSE.md and2026-27/en.1.json only"
+  },
+  "credential_reads": 0,
+  "decision": "CANONICAL_RESUMPTION_POTENTIALLY_SUPPORTED_REQUIRES_INDEPENDENT_AUTHORITY_REVIEW",
+  "findings": [
+    {
+      "fact": "Explicit owner instruction permits governed public OpenFootball reassessment and P01 scoring only at exact clean accepted3815152 checkout. Incomplete outcomes stop with counts and earliest safe retry condition. No canonical one-shot consumption marker or expiry is specified in that request.",
+      "id": "CANONICAL_ORIGINAL_SCOPE",
+      "locator": "original_owner_score_request sections2,5,6,7,8,18,19"
+    },
+    {
+      "fact": "Unchanged approved pinned CC0 EPL profile permits private raw/derived retention and automated source access within its exact purpose; original P01-SCORE separately names this profile for outcomes. This does not authorize private FPL/Odds acquisition or public raw redistribution.",
+      "id": "STANDING_RIGHTS",
+      "locator": "config/rights/openfootball_profiles.json profileopenfootball_football_json_team_strength_v1; team_strength_data.py require_team_strength_rights/SourceLineage"
+    },
+    {
+      "fact": "A02/A03 consumption binds OpenLigaDB fallback execution and its three fixed routes. The future A04 metadata-policy checklist concerns that fallback boundary. It is not evidence that the original canonical OpenFootball permission has a consumed marker. A03 nonetheless forbids acquisition/switching/scoring in its stopped execution; it cannot be retried.",
+      "id": "NO_GLOBAL_A04_INFERENCE",
+      "locator": "a03_contract paragraphs1,executionroutes,reconciliation; d2_contract BeforeanyA04; a04_readiness_context Non-executablefutureA04checklist"
+    },
+    {
+      "fact": "A02 records SINGLE_QUALIFIED_FALLBACK_SOURCE/EVALUATION_EPOCH_003, but retains original canonical admission semantics and later OpenFootball reconciliation. No P01 metrics or admitted fallback artifact exist. Independent review must decide the original-canonical resumption/source-policy/epoch interpretation before any request; recovery cannot silently reinterpret a fallback attempt as canonical authority.",
+      "id": "SOURCE_POLICY_REVIEW_NEEDED",
+      "locator": "a02_context source_policy/evaluation_epoch; current_wave_request section7.2"
+    },
+    {
+      "fact": "Current Wave004 HEAD is not exact3815152. Standing library capability or preserved scorer semantics alone does not transfer the original exact-checkout execution binding. A clean3815152 execution/review path is the narrow existing-authority candidate; any current-code execution needs its authority binding independently established.",
+      "id": "EXACT_CODE_GATE",
+      "locator": "original_owner_score_request section2/18/19"
+    },
+    {
+      "fact": "Reconciliation is an append-only no-network audit requiring an already admitted PublicP01FallbackOutcomesV1 plus a canonical ParsedSnapshot. No fallback artifact was admitted. This API cannot by itself authorize source retrieval or turn the first canonical score into reconciliation.",
+      "id": "RECONCILIATION_IS_DIFFERENT",
+      "locator": "src/dmf_pulse/evaluation/p01_fallback.py reconcile_openfootball lines271+"
+    },
+    {
+      "fact": "Last authenticated local canonical snapshot was received2026-10-14 and held0FULL_TIME/10missing target fixtures. Current October30 source availability was not queried. It is incorrect to say the current provider still has no results.",
+      "id": "LAST_LOCAL_LABEL_STATE",
+      "locator": "old_outcome_handoff"
+    }
+  ],
+  "mode": "READ_ONLY_LOCAL_AUTHORITY_TRACE_NO_PROVIDER_REQUEST_OR_SCORING",
+  "provider_requests": 0,
+  "schema_version": "accel004-p01-canonical-authority-assessment-v1",
+  "scoring_invocations": 0,
+  "source_comparison_to_original_accepted_code": {
+    "config/rights/openfootball_profiles.json": {
+      "bytes_equal": true,
+      "current_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+      "original_accepted_sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545"
+    },
+    "src/dmf_pulse/evaluation/team_strength_prospective.py": {
+      "bytes_equal": false,
+      "current_sha256": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5",
+      "original_accepted_sha256": "969024da204a6382d211f5f70c7877e1714c8fb0bd098a5c1b08bcafc9f96fe1"
+    },
+    "src/dmf_pulse/ingestion/openfootball/team_strength_acquisition.py": {
+      "bytes_equal": true,
+      "current_sha256": "755354a8da5ed1732cc6a213d14ec7d99f4392a0276892b06d001e31036cbeeb",
+      "original_accepted_sha256": "755354a8da5ed1732cc6a213d14ec7d99f4392a0276892b06d001e31036cbeeb"
+    },
+    "src/dmf_pulse/ingestion/openfootball/team_strength_current.py": {
+      "bytes_equal": true,
+      "current_sha256": "689f990c3f53479c4fc8bbc0012cc2e891961f60149f9fbc86b34ccd6749021f",
+      "original_accepted_sha256": "689f990c3f53479c4fc8bbc0012cc2e891961f60149f9fbc86b34ccd6749021f"
+    },
+    "src/dmf_pulse/ingestion/openfootball/team_strength_data.py": {
+      "bytes_equal": true,
+      "current_sha256": "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0",
+      "original_accepted_sha256": "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0"
+    }
+  },
+  "source_receipts": {
+    "a02_consumption": {
+      "bytes": 797,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\config\\evaluation\\team_strength_p01_a02_consumption.json",
+      "sha256": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486"
+    },
+    "a02_context": {
+      "bytes": 8557,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\config\\evaluation\\team_strength_p01_fallback_a02.json",
+      "sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32"
+    },
+    "a03_contract": {
+      "bytes": 3615,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\tickets\\CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03\\CONTRACT.md",
+      "sha256": "9d8fc62831c0f25f100317dcd967fcfb75d3d77e47a28e0e0a3c384074ade9aa"
+    },
+    "a03_execution_authority": {
+      "bytes": 1841,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\config\\evaluation\\team_strength_p01_fallback_a03.json",
+      "sha256": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c"
+    },
+    "a04_readiness_context": {
+      "bytes": 5637,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\tickets\\DMF-PULSE-ACCEL-001\\P01-POLICY-AND-READINESS.md",
+      "sha256": "92837d46b4b703c9e1de3db39e1c5d42360c1e6a453aea525de02e88d78e6684"
+    },
+    "canonical_acquisition": {
+      "bytes": 5350,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\src\\dmf_pulse\\ingestion\\openfootball\\team_strength_acquisition.py",
+      "sha256": "755354a8da5ed1732cc6a213d14ec7d99f4392a0276892b06d001e31036cbeeb"
+    },
+    "canonical_scorer": {
+      "bytes": 27557,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\src\\dmf_pulse\\evaluation\\team_strength_prospective.py",
+      "sha256": "177cdac586be9d0cb944181fc832a600c118480648547936af987ef543623dc5"
+    },
+    "current_openfootball_rights": {
+      "bytes": 3920,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\config\\rights\\openfootball_profiles.json",
+      "sha256": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545"
+    },
+    "current_wave_contract": {
+      "bytes": 4829,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\tickets\\DMF-PULSE-ACCEL-004\\CONTRACT.md",
+      "sha256": "356f73dd801a594ac27d0e246fb3853bfed9acfb0ee3a0044c94e1aa9444b6c6"
+    },
+    "current_wave_request": {
+      "bytes": 28963,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\tickets\\DMF-PULSE-ACCEL-004\\REQUEST.txt",
+      "sha256": "02ec1d31b449e8dfc3f217615e61f7321d57531f9753846129918fcd2e1098be"
+    },
+    "d2_contract": {
+      "bytes": 5924,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\tickets\\CURRENT-TEAM-STRENGTH-001V-P01-FALLBACK-A03-D2\\CONTRACT.md",
+      "sha256": "9d98a76c81a6d69cf18eac7ae7e579eb127b3b37b01a8406a48ba8f6f599eaa6"
+    },
+    "descriptor_discovery": {
+      "bytes": 14163,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\src\\dmf_pulse\\ingestion\\openfootball\\team_strength_current.py",
+      "sha256": "689f990c3f53479c4fc8bbc0012cc2e891961f60149f9fbc86b34ccd6749021f"
+    },
+    "fallback_reconciliation": {
+      "bytes": 12483,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\src\\dmf_pulse\\evaluation\\p01_fallback.py",
+      "sha256": "9bd304ffe2531e9cbdc7473b5efd3d090ad938fbcc37acd8778316fbf7ca002b"
+    },
+    "old_outcome_handoff": {
+      "bytes": 1643,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\artifacts\\public-prospective\\CURRENT-TEAM-STRENGTH-001V-P01-SCORE\\executions\\20261014T130320Z\\OUTCOME-ACQUISITION-HANDOFF.json",
+      "sha256": "b10a79a748b3719a89d26395e28ca5e587ed1ac07454e68a1159634c55843c69"
+    },
+    "original_owner_score_request": {
+      "bytes": 15286,
+      "local_locator": "C:\\Users\\sebgr\\.codex\\attachments\\27e72703-a260-4f9d-9e0f-feb193b0820b\\Pasted text.txt",
+      "sha256": "9803feb28be9b4c8129d113a5a82771b3c7229c9ef2b84e1435e5db60651d1e7"
+    },
+    "original_protocol": {
+      "bytes": 4668,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\artifacts\\public-prospective\\CURRENT-TEAM-STRENGTH-001V-PROTOCOL\\public-team-strength-protocol\\93b9c2e8a0b0f6c00e1299cb410784daabf1eb04efa01baaab5f10d85d10e029.json",
+      "sha256": "2f18299c878dded604cab5de4fe27bc3afc3a76dafb55fcd2cc67c918e217fa7"
+    },
+    "rights_authenticator": {
+      "bytes": 24630,
+      "local_locator": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\src\\dmf_pulse\\ingestion\\openfootball\\team_strength_data.py",
+      "sha256": "b8f1b9f6fcb81328231f39bd58303ec8f5e0963f8f3ea9faffbb4974777d0bb0"
+    }
+  }
+}

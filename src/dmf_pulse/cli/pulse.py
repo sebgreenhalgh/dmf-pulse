@@ -1,114 +1,74 @@
-"""One-command private current recommendation CLI."""
+"""One current recommendation through the enrolled dashboard worker and ledger."""
 
 from __future__ import annotations
 
-import getpass
-import hashlib
-import importlib.metadata
-import os
-import re
-import sys
-from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Annotated, Literal, cast
 
 import typer
-from pydantic import SecretStr
 
-from dmf_pulse.ingestion.errors import IngestionError
-from dmf_pulse.ingestion.fpl.direct import (
-    DIRECT_FPL_TOKEN_ENV,
-    DirectFplClient,
-    DirectFplCredential,
-    DirectFplCredentialProvider,
-)
-from dmf_pulse.private_v1.actionability import checked_report
-from dmf_pulse.private_v1.errors import PrivateV1Error
-from dmf_pulse.private_v1.one_command import (
-    OneCommandRequest,
-    PrivateV1OneCommandService,
-)
-from dmf_pulse.private_v1.progress import HumanCliProgress, NullProgress
+from dmf_pulse.authorization_errors import AuthorizationError
+from dmf_pulse.operation.console import run_enrolled_current
 
-_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
-
-
-class _PromptingCredentialProvider(DirectFplCredentialProvider):
-    def get(self) -> DirectFplCredential:
-        try:
-            return super().get()
-        except IngestionError as exc:
-            if exc.code != "CREDENTIAL_MISSING" or not sys.stdin.isatty():
-                raise
-        token = getpass.getpass("Short-lived FPL bearer token: ")
-        if not token:
-            raise IngestionError("CREDENTIAL_MISSING", f"{DIRECT_FPL_TOKEN_ENV} is missing.")
-        try:
-            return DirectFplCredential(source="HIDDEN_PROMPT", bearer_token=SecretStr(token))
-        except ValueError:
-            raise IngestionError("CREDENTIAL_INVALID", "FPL bearer token is invalid.") from None
-
-
-def _git_head(start: Path) -> str | None:
-    try:
-        for directory in (start, *start.parents):
-            marker = directory / ".git"
-            if marker.is_file():
-                text = marker.read_text(encoding="utf-8").strip()
-                if not text.startswith("gitdir: "):
-                    continue
-                git_dir = (directory / text.removeprefix("gitdir: ")).resolve()
-            elif marker.is_dir():
-                git_dir = marker
-            else:
-                continue
-            head = (git_dir / "HEAD").read_text(encoding="ascii").strip()
-            if _SHA_PATTERN.fullmatch(head):
-                return head
-            if head.startswith("ref: "):
-                ref_path = git_dir / head.removeprefix("ref: ")
-                if ref_path.is_file():
-                    value = ref_path.read_text(encoding="ascii").strip()
-                    if _SHA_PATTERN.fullmatch(value):
-                        return value
-    except (OSError, UnicodeError):
-        return None
-    return None
-
-
-def _installed_content_sha() -> str:
-    """Fallback wheel-content identity when installed outside a Git checkout."""
-
-    digest = hashlib.sha1(usedforsecurity=False)
-    distribution = importlib.metadata.distribution("dmf-pulse")
-    candidates = tuple(
-        sorted(
-            str(item)
-            for item in distribution.files or ()
-            if str(item).replace("\\", "/").startswith("dmf_pulse/")
-            and not str(item).endswith((".pyc", "RECORD"))
-        )
-    )
-    if not candidates:
-        raise PrivateV1Error("CODE_IDENTITY_UNAVAILABLE", "installed code identity is unavailable")
-    for relative in candidates:
-        path = Path(str(distribution.locate_file(relative)))
-        if not path.is_file():
-            continue
-        digest.update(relative.replace("\\", "/").encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(path.read_bytes())
-        digest.update(b"\0")
-    return digest.hexdigest()
-
-
-def _code_sha() -> str:
-    configured = os.environ.get("DMF_CODE_SHA", "").strip().casefold()
-    if configured:
-        if _SHA_PATTERN.fullmatch(configured) is None:
-            raise PrivateV1Error("CODE_IDENTITY_INVALID", "DMF_CODE_SHA is invalid")
-        return configured
-    return _git_head(Path.cwd()) or _installed_content_sha()
+_ACTIONS = {
+    "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED": "Enroll a reviewed refresh approval; run dmf operation status.",
+    "PRODUCTION_APPROVAL_NOT_ENROLLED": "Install the reviewed enrollment wheel; run dmf operation status.",
+    "CREDENTIAL_UNAVAILABLE": "Configure the required credentials with dmf credentials; check dmf credentials status.",
+    "CREDENTIAL_NOT_CONFIGURED": "Configure the required credentials with dmf credentials; check dmf credentials status.",
+    "CREDENTIAL_EXPIRED": "Replace the expired FPL token with dmf credentials set-fpl-token --replace --expires-at <actual-expiry>.",
+    "CREDENTIAL_CORRUPT": "Explicitly replace the invalid entry through dmf credentials.",
+    "CREDENTIAL_BACKEND_UNAVAILABLE": "Use the correct Windows user session and check Windows Credential Manager.",
+    "FPL_AUTH_REQUIRED": "Obtain an authorized current FPL token and replace it through dmf credentials.",
+    "AUTHORIZATION_REVOKED": "Obtain a new reviewed approval; this approval was revoked.",
+    "AUTHORIZATION_EXPIRED": "Obtain a new reviewed approval and current official deadline evidence.",
+    "REFRESH_GRANT_EXPIRED": "Obtain a new reviewed approval and current official deadline evidence.",
+    "ACQUISITION_CUTOFF_PASSED": "The acquisition window closed; obtain a new reviewed scope.",
+    "ONE_SHOT_CONSUMED": "This attempt is spent; a fresh explicit authorization is required.",
+    "QUOTA_EXHAUSTED": "Qualify remaining account credits and obtain an approved budget before retrying.",
+    "DAILY_BUDGET_EXHAUSTED": "The approved daily request budget is spent.",
+    "MONTHLY_BUDGET_EXHAUSTED": "The approved monthly credit budget is spent.",
+    "SOURCE_REQUEST_BUDGET_EXHAUSTED": "The approved source attempt budget is spent.",
+    "USAGE_LEDGER_UNAVAILABLE": "Recover the existing canonical control ledger with dmf operation recover-control.",
+    "USAGE_LEDGER_IDENTITY_MISMATCH": "Recover the expected canonical ledger; do not initialize a replacement.",
+    "IMPLEMENTATION_IDENTITY_CHANGED": "Install the exact reviewed wheel and its matching enrollment.",
+    "AUTHORIZATION_SCOPE_MISMATCH": "Use the exact approved manager and source scope.",
+    "AUTHORIZATION_HORIZON_NOT_APPROVED": "Use an approved one- or three-GW horizon.",
+    "AUTHORIZATION_DEADLINE_SCOPE_MISMATCH": "Qualify the exact official deadline in the installed approval.",
+    "RUN_TIMEOUT": "The worker timed out; inspect control usage before any authorized retry.",
+    "QUALIFIED_QUOTA_EVIDENCE_STALE": "Qualify fresh dated remaining-credit evidence; no live quota probe is authorized.",
+    "AUTHORIZATION_DEADLINE_INVALID": "Replace invalid or expired official deadline evidence in a reviewed approval.",
+    "USAGE_LEDGER_SCHEMA_NOT_READY": "Install and run the accepted canonical control migration before recovery.",
+    "SOURCE_PROFILE_CHANGED": "Review the changed provider terms/profile and enroll its exact current hash.",
+    "OFFICIAL_DEADLINE_SCOPE_MISMATCH": "Use the exact target Gameweek and qualified official deadline.",
+    "ACQUISITION_CLOSED": "The acquisition phase is closed; use a fresh reviewed attempt if needed.",
+    "ACQUISITION_WINDOW_EXCEEDED": "Reduce acquisition to the reviewed time window or obtain a new approval.",
+    "AUTHORIZATION_CLOCK_INVALID": "Correct the local UTC clock before retrying an authorized operation.",
+    "AUTHORIZATION_CLOCK_REGRESSED": "Correct the local UTC clock and recover the existing control ledger.",
+    "CONTROL_DATABASE_REFERENCE_INVALID": "Configure the accepted private control database reference.",
+    "MANAGER_SCOPE_INVALID": "Use the exact manager entry approved for this refresh.",
+    "OPERATOR_CONTROL_CONTEXT_REQUIRED": "Complete canonical control setup and reviewed enrollment with dmf operation.",
+    "OWNED_SOURCE_INJECTION_REQUIRED": "Use owned injected sources for this synthetic acceptance run.",
+    "PRIVATE_CONTROL_DATABASE_REQUIRED": "Use the canonical private control database for a real refresh.",
+    "PRODUCTION_CONTROL_STORE_NOT_ACCEPTED": "Use the accepted PostgreSQL control ledger and installed enrollment.",
+    "REFRESH_GRANT_ALREADY_CLAIMED": "This grant was already claimed; audit usage before a fresh authorized attempt.",
+    "REFRESH_GRANT_INVALID": "Recover the canonical ledger and exact reviewed enrollment; do not edit a grant.",
+    "REFRESH_GRANT_NOT_CLAIMED": "Launch through the enrolled worker; a copied grant cannot authorize acquisition.",
+    "SOURCE_CLASSIFICATION_MISMATCH": "Keep real and owned synthetic source enrollments separate.",
+    "SOURCE_PROFILE_NOT_AVAILABLE": "Install the exact reviewed provider profile before refresh.",
+    "SOURCE_ROUTE_NOT_AUTHORIZED": "Use only the source routes in the installed approval.",
+    "SOURCE_SCOPE_INVALID": "Qualify the exact source scope and purpose before enrollment.",
+    "TRUSTED_APPROVAL_REGISTRY_INVALID": "Reinstall the reviewed wheel; arbitrary approval JSON is not accepted.",
+    "USAGE_LEDGER_ACCOUNT_MISMATCH": "Recover the existing ledger for the exact approved quota account.",
+    "USAGE_LEDGER_BACKEND_INVALID": "Use the canonical PostgreSQL ledger backend for private current refresh.",
+    "USAGE_LEDGER_CAPACITY_REACHED": "Review and maintain the existing ledger without resetting spent usage.",
+    "USAGE_LEDGER_CONFIGURATION_INVALID": "Correct the canonical control database configuration.",
+    "USAGE_LEDGER_IDENTITY_INVALID": "Recover the expected canonical ledger identity; do not invent a replacement.",
+    "USAGE_LEDGER_INITIALIZATION_FAILED": "Inspect canonical control initialization before repeating explicit setup.",
+    "USAGE_LEDGER_INVALID": "Recover and audit the existing ledger; do not reset its usage history.",
+    "USAGE_LEDGER_REQUIRED": "Complete explicit canonical control setup with dmf operation.",
+    "USAGE_LEDGER_TRANSACTION_REQUIRED": "Use the accepted transactional control database adapter.",
+    "WORKER_CLEANUP_FAILED": "Close the session and resolve worker cleanup before any new refresh.",
+    "WORKER_RESULT_BINDING_INVALID": "Discard this result and inspect the exact installed worker/enrollment identity.",
+}
 
 
 def pulse_command(
@@ -124,44 +84,38 @@ def pulse_command(
         bool,
         typer.Option("--no-progress", help="Suppress human progress output on STDERR."),
     ] = False,
+    refresh_approval: Annotated[
+        str | None,
+        typer.Option("--refresh-approval", help="Reviewed approval ID in the installed registry."),
+    ] = None,
 ) -> None:
-    """Produce one current private FPL recommendation without retaining provider bodies."""
-
-    progress = (
-        NullProgress()
-        if no_progress
-        else HumanCliProgress(write=lambda value: typer.echo(value, err=True))
-    )
+    """Publish one read-only current recommendation under an installed approval."""
+    if horizon_gameweeks not in {1, 3}:
+        typer.echo("--horizon-gameweeks must be exactly 1 or 3.", err=True)
+        raise typer.Exit(2)
+    if not refresh_approval:
+        typer.echo("A reviewed refresh approval is required. Run dmf operation status.", err=True)
+        raise typer.Exit(2)
     try:
-        if horizon_gameweeks not in {1, 3}:
-            raise PrivateV1Error("USAGE_INVALID", "--horizon-gameweeks must be exactly 1 or 3.")
-        if not os.environ.get("THE_ODDS_API_KEY", "").strip():
-            raise PrivateV1Error("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
-        approved_at = datetime.now(UTC)
-        information_cutoff = (approved_at + timedelta(minutes=5)).replace(microsecond=0)
-        credential_provider = _PromptingCredentialProvider()
-        service = PrivateV1OneCommandService(
-            direct_client_factory=lambda attestation: DirectFplClient(
-                attestation, credential_provider=credential_provider
-            ),
-            progress=progress,
+        run_enrolled_current(
+            authorization_id=refresh_approval,
+            entry_id=entry_id,
+            horizon=cast(Literal[1, 3], horizon_gameweeks),
+            publish=lambda view: typer.echo(view.team.report),
+            progress=None if no_progress else lambda value: typer.echo(value, err=True),
         )
-        result = service.run(
-            OneCommandRequest(
-                entry_id=entry_id,
-                code_sha=_code_sha(),
-                run_at=information_cutoff,
-                operator_approved_at=approved_at,
-                horizon_gameweeks=cast(Literal[1, 3], horizon_gameweeks),
+    except AuthorizationError as error:
+        # Fixed known diagnostics preserve the required operator action without
+        # copying arbitrary worker/transport text into the console.
+        code = error.code
+        if type(code) is str and code in _ACTIONS:
+            message = f"{code}: {_ACTIONS[code]}"
+        else:
+            message = (
+                "Current refresh was blocked or expired. Run dmf operation status for readiness."
             )
-        )
-        report = checked_report(result, clock=lambda: datetime.now(UTC))
-        typer.echo(report)
-    except PrivateV1Error as exc:
-        if not progress.failure_reported:
-            progress.failure("command preflight", exc.code)
-        typer.echo(exc.message, err=True)
-        raise typer.Exit(2) from exc
+        typer.echo(message, err=True)
+        raise typer.Exit(2) from None
 
 
 __all__ = ["pulse_command"]

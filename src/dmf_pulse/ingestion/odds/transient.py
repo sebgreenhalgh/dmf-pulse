@@ -7,11 +7,12 @@ from datetime import UTC, datetime
 from typing import Literal, cast
 from uuid import NAMESPACE_URL, uuid5
 
+from dmf_pulse.credentials.providers import AutomaticOddsCredentialProvider
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.client import OddsClient
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
-from dmf_pulse.ingestion.odds.credentials import EnvironmentOddsCredentialProvider
+from dmf_pulse.ingestion.odds.credentials import CredentialProvider
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
 from dmf_pulse.ingestion.odds.models import QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
@@ -26,7 +27,7 @@ class CurrentOddsTransientService:
     def __init__(
         self,
         *,
-        credential_provider: EnvironmentOddsCredentialProvider | None = None,
+        credential_provider: CredentialProvider | None = None,
         client_factory: Callable[..., OddsClient] = OddsClient,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         rights_profile: RightsProfile | None = None,
@@ -38,7 +39,7 @@ class CurrentOddsTransientService:
             type(maximum_attempts) is not int or maximum_attempts != 1
         ):
             raise ValueError("only a single-attempt narrowing is supported")
-        self._credential_provider = credential_provider or EnvironmentOddsCredentialProvider()
+        self._credential_provider = credential_provider or AutomaticOddsCredentialProvider()
         self._client_factory = client_factory
         self._clock = clock
         self._profile = rights_profile
@@ -65,16 +66,9 @@ class CurrentOddsTransientService:
             raise IngestionError("QUOTA_EVIDENCE_REQUIRED", "qualified Odds quota is required")
         if self._quota is not None and self._quota.remaining < 2:
             raise IngestionError("QUOTA_EXHAUSTED", "Odds quota is insufficient")
-        if self._profile is not None:
-            require_rights(
-                self._profile, RightsCapability.AUTOMATED_ACCESS, checked_at=self._clock()
-            )
-            require_rights(
-                self._profile, RightsCapability.TRANSIENT_PROCESSING, checked_at=self._clock()
-            )
-        if not self._credential_provider._configured():
-            raise IngestionError("CREDENTIAL_UNAVAILABLE", "THE_ODDS_API_KEY is missing.")
         profile = self._profile or load_rights_profiles()[ODDS_PRIVATE_PROFILE_ID]
+        require_rights(profile, RightsCapability.AUTOMATED_ACCESS, checked_at=self._clock())
+        require_rights(profile, RightsCapability.TRANSIENT_PROCESSING, checked_at=self._clock())
         client_options: dict[str, object] = {}
         if self._maximum_attempts is not None:
             client_options["maximum_attempts"] = self._maximum_attempts

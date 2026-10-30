@@ -106,18 +106,21 @@ def test_transient_service_invokes_existing_client_parser_and_current_builder(
     assert result.events[0].provider_event_id == "todapi-event-001"
 
 
-def test_transient_service_fails_before_client_when_key_is_missing() -> None:
-    called = False
+def test_transient_service_missing_key_refuses_at_authorized_client_before_transport() -> None:
+    from dmf_pulse.ingestion.odds.client import OddsClient
 
-    class Client:
-        def __init__(self, *args, **kwargs) -> None:
-            nonlocal called
-            del args, kwargs
-            called = True
+    constructed = []
+
+    def transport_factory():
+        constructed.append(True)
+        pytest.fail("missing credential reached transport construction")
+
+    def client_factory(profile, **kwargs):
+        return OddsClient(profile, transport_factory=transport_factory, **kwargs)
 
     service = CurrentOddsTransientService(
         credential_provider=EnvironmentOddsCredentialProvider(environment={}),
-        client_factory=Client,
+        client_factory=client_factory,
         clock=lambda: USABLE,
     )
     with pytest.raises(IngestionError) as caught:
@@ -126,4 +129,4 @@ def test_transient_service_fails_before_client_when_key_is_missing() -> None:
             commence_to=datetime(2026, 8, 23, tzinfo=UTC),
         )
     assert caught.value.code == "CREDENTIAL_UNAVAILABLE"
-    assert called is False
+    assert not constructed

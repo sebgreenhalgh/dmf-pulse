@@ -9,6 +9,10 @@ from datetime import datetime
 from importlib.resources import files
 from typing import Literal, Protocol
 
+from dmf_pulse.credentials.providers import (
+    AutomaticFplCredentialProvider,
+    AutomaticOddsCredentialProvider,
+)
 from dmf_pulse.dashboard.synthetic import demo_inputs
 from dmf_pulse.ingestion.fpl.direct import (
     DirectFplClient,
@@ -239,12 +243,13 @@ class CurrentSourceFactories:
             credentials = DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": "placeholder"})
         else:
             delegate = DirectUrllibTransport()
-            credentials = DirectFplCredentialProvider()
+            credentials = AutomaticFplCredentialProvider(clock=self._clock)
         return DirectFplClient(
             attestation,
             profile=self._fpl_profile,
             transport=GuardedFplTransport(self._guard, delegate),
             credential_provider=credentials,
+            clock=self._clock,
             maximum_attempts=1,
             sleeper=(lambda _: None) if self._owned else time.sleep,
             pace_seconds=0 if self._owned else 0.25,
@@ -256,7 +261,7 @@ class CurrentSourceFactories:
                 environment={"THE_ODDS_API_KEY": "placeholder" + "-placeholder"}
             )
             if self._owned
-            else EnvironmentOddsCredentialProvider()
+            else AutomaticOddsCredentialProvider()
         )
 
         def client(profile: RightsProfile, **kwargs: object) -> OddsClient:

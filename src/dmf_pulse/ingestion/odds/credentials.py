@@ -176,6 +176,10 @@ def credential_configuration_hint(provider: CredentialProvider) -> bool | None:
     an unknown secret-bearing boundary merely to choose error precedence.
     """
 
+    from dmf_pulse.credentials.providers import AutomaticOddsCredentialProvider
+
+    if isinstance(provider, AutomaticOddsCredentialProvider):
+        return provider.configuration_hint()
     if isinstance(provider, UnavailableCredentialProvider):
         return False
     if isinstance(provider, StaticCredentialProvider):

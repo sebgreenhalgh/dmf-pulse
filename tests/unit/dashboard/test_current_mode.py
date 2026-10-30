@@ -553,8 +553,10 @@ def test_unenrolled_production_cannot_resolve_control_database_or_credentials(mo
     monkeypatch.setattr(
         current_module, "_postgres_ledger", lambda *args: pytest.fail("database reached")
     )
+    from dmf_pulse.credentials.service import CredentialService
+
     monkeypatch.setattr(
-        current_module, "_credentials_available", lambda: pytest.fail("credentials reached")
+        CredentialService, "resolve", lambda *args: pytest.fail("credentials reached")
     )
     with pytest.raises(AuthorizationError, match="RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED"):
         CurrentRefreshSession.enrolled(

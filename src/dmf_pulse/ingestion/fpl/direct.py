@@ -24,6 +24,11 @@ from typing import Literal, Protocol, Self
 
 from pydantic import SecretStr, field_validator, model_validator
 
+from dmf_pulse.authorization_errors import (
+    AuthorizationError,
+    AuthorizationState,
+    safe_authorization_fields,
+)
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.config import load_provider_config
 from dmf_pulse.ingestion.models import (
@@ -88,11 +93,23 @@ class DirectFplRunAttestation(FrozenModel):
 
 
 class DirectFplCredential(FrozenModel):
-    source: Literal["ENVIRONMENT", "HIDDEN_PROMPT"]
+    source: Literal["ENVIRONMENT", "HIDDEN_PROMPT", "OS_VAULT"]
     bearer_token: SecretStr
+    expires_at: datetime | None = None
+
+    @field_validator("expires_at")
+    @classmethod
+    def expiry_is_aware(cls, value: datetime | None) -> datetime | None:
+        if value is None:
+            return None
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("FPL token expiry must be timezone-aware")
+        return value.astimezone(UTC)
 
     @model_validator(mode="after")
     def token_is_bounded(self) -> Self:
+        if self.source == "OS_VAULT" and self.expires_at is None:
+            raise ValueError("stored FPL bearer token requires explicit expiry")
         value = self.bearer_token.get_secret_value()
         if not value or value != value.strip() or len(value) > 16_384 or "\x00" in value:
             raise ValueError("FPL bearer token is invalid")
@@ -376,6 +393,7 @@ class DirectFplClient:
         maximum_attempts: int = 3,
         pace_seconds: float = 0.25,
         before_request: Callable[[], None] | None = None,
+        clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._attestation = attestation
         self._profile = profile or load_rights_profiles()[DIRECT_FPL_PROFILE_ID]
@@ -390,6 +408,7 @@ class DirectFplClient:
         self._maximum_attempts = maximum_attempts
         self._pace_seconds = pace_seconds
         self._before_request = before_request
+        self._clock = clock
         self._request_count = 0
         self._endpoint_classes: list[DirectFplResource] = []
         if not _profile_is_exact(self._profile):
@@ -446,9 +465,30 @@ class DirectFplClient:
         entry_id: int | None = None,
         gameweek: int | None = None,
     ) -> bytes:
+        outcome = _direct_fetch_scope(self, resource, entry_id, gameweek)
+        del self
+        if outcome.authorization_failure is not None:
+            code, state = outcome.authorization_failure
+            raise AuthorizationError(code, state) from None
+        if outcome.failure is not None:
+            code, message, retryable = outcome.failure
+            raise IngestionError(code, message, retryable=retryable) from None
+        if outcome.body is None:
+            raise IngestionError("INTERNAL_INVARIANT", "FPL result is unavailable")
+        return outcome.body
+
+    def _unsafe_fetch(
+        self,
+        resource: DirectFplResource,
+        *,
+        entry_id: int | None = None,
+        gameweek: int | None = None,
+    ) -> bytes:
         path = direct_path(resource, entry_id=entry_id, gameweek=gameweek)
         if self._before_request is not None:
             self._before_request()
+        if self._request_count >= self._maximum_requests:
+            raise IngestionError("REQUEST_BUDGET_EXHAUSTED", "FPL request budget exhausted")
         credential = (
             self._credential_provider.get() if resource is DirectFplResource.MY_TEAM else None
         )
@@ -460,6 +500,17 @@ class DirectFplClient:
                 self._sleeper(self._pace_seconds)
             if self._before_request is not None:
                 self._before_request()
+            if credential is not None and credential.expires_at is not None:
+                now = self._clock()
+                if (
+                    now.tzinfo is None
+                    or now.utcoffset() is None
+                    or now.astimezone(UTC) >= credential.expires_at
+                ):
+                    del credential, request
+                    raise IngestionError(
+                        "CREDENTIAL_EXPIRED", "The FPL bearer token expired before transport."
+                    )
             self._request_count += 1
             self._endpoint_classes.append(resource)
             response = self._transport.send(request)
@@ -490,6 +541,69 @@ class DirectFplClient:
                 raise IngestionError("HTTP_4XX", "FPL source rejected the request")
             raise IngestionError("SOURCE_UNAVAILABLE", "FPL source returned an invalid status")
         raise IngestionError("INTERNAL_INVARIANT", "FPL request loop did not terminate")
+
+
+@dataclass(frozen=True, slots=True, repr=False)
+class _DirectFetchOutcome:
+    body: bytes | None = None
+    failure: tuple[str, str, bool] | None = None
+    authorization_failure: tuple[str, AuthorizationState] | None = None
+
+
+_PUBLIC_FAILURES = {
+    "CREDENTIAL_MISSING": "DMF_FPL_BEARER_TOKEN is missing.",
+    "CREDENTIAL_INVALID": "FPL bearer token is invalid.",
+    "CREDENTIAL_NOT_CONFIGURED": "FPL credential is not configured. Use secure credentials setup.",
+    "CREDENTIAL_BACKEND_UNAVAILABLE": "Windows Credential Manager is unavailable in this user session.",
+    "CREDENTIAL_BACKEND_UNSUPPORTED": "Use the explicit session-only credential mechanism on this platform.",
+    "CREDENTIAL_CORRUPT": "The stored FPL credential is invalid. Replace it through secure setup.",
+    "CREDENTIAL_EXPIRED": "The FPL bearer token expired before transport.",
+    "REQUEST_BUDGET_EXHAUSTED": "FPL request budget exhausted",
+    "RIGHTS_BLOCKED": "FPL source rights do not permit this request.",
+    "REDIRECT_BLOCKED": "FPL source redirect was blocked",
+    "CONTENT_TYPE_INVALID": "FPL source did not return JSON",
+    "PAYLOAD_TOO_LARGE": "FPL response exceeds the byte limit",
+    "USAGE_INVALID": "FPL endpoint arguments are invalid.",
+    "FPL_AUTH_REQUIRED": "authenticated current FPL team access was rejected",
+    "HTTP_429": "FPL source rate limited the request",
+    "HTTP_5XX": "FPL source returned a server error",
+    "HTTP_4XX": "FPL source rejected the request",
+    "READ_TIMEOUT": "FPL source timed out",
+    "CONNECT_TIMEOUT": "FPL source timed out",
+    "TLS_ERROR": "FPL source TLS validation failed",
+    "SOURCE_UNAVAILABLE": "FPL source is unavailable",
+    "INTERNAL_INVARIANT": "FPL request lifecycle is invalid.",
+}
+
+
+def _direct_fetch_scope(
+    client: DirectFplClient,
+    resource: DirectFplResource,
+    entry_id: int | None,
+    gameweek: int | None,
+) -> _DirectFetchOutcome:
+    """Catch inside the raw scope and detach secret-bearing exception graphs."""
+    try:
+        return _DirectFetchOutcome(
+            body=client._unsafe_fetch(resource, entry_id=entry_id, gameweek=gameweek)
+        )
+    except AuthorizationError as exc:
+        return _DirectFetchOutcome(authorization_failure=safe_authorization_fields(exc))
+    except IngestionError as exc:
+        code = (
+            exc.code
+            if type(exc.code) is str and exc.code in _PUBLIC_FAILURES
+            else "SOURCE_UNAVAILABLE"
+        )
+        failure = (
+            code,
+            _PUBLIC_FAILURES[code],
+            code in {"HTTP_429", "HTTP_5XX", "READ_TIMEOUT", "CONNECT_TIMEOUT"}
+            or (code == "SOURCE_UNAVAILABLE" and exc.retryable is True),
+        )
+    except Exception:
+        failure = ("SOURCE_UNAVAILABLE", "FPL source operation failed safely.", False)
+    return _DirectFetchOutcome(failure=failure)
 
 
 __all__ = [

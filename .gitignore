@@ -4,6 +4,11 @@
 !.env.example
 secrets/
 credentials/
+# Source code and injected tests contain no stored credentials.
+!src/dmf_pulse/credentials/
+!src/dmf_pulse/credentials/**
+!tests/unit/credentials/
+!tests/unit/credentials/**
 auth.json
 *.pem
 *.key

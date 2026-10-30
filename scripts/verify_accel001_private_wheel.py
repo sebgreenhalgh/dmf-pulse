@@ -32,7 +32,10 @@ import dmf_pulse
 from typer.testing import CliRunner
 from dmf_pulse.cli import pulse
 from dmf_pulse.cli.app import app
-from dmf_pulse.private_v1.actionability import ActionabilityReceipt, DeadlineGuard
+from dmf_pulse.private_v1.actionability import ActionabilityReceipt, DeadlineGuard, checked_report
+from dmf_pulse.private_v1.errors import PrivateV1Error
+from dmf_pulse.authorization_errors import AuthorizationError
+from dmf_pulse.operation.console import publish_runtime
 assert Path(dmf_pulse.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
 now = datetime(2026, 9, 1, 12, tzinfo=UTC)
 deadline = now + timedelta(hours=1)
@@ -41,24 +44,32 @@ report = 'SYNTHETIC PRIVATE WHEEL ACTION'
 receipt = DeadlineGuard(lambda: now).bind(
     deadline_at=deadline, decision_sha256='a'*64, report=report)
 assert ActionabilityReceipt.model_validate_json(receipt.model_dump_json()) == receipt
-class Clock(datetime):
-    @classmethod
-    def now(cls, tz=None): return state['now']
-class Service:
-    def __init__(self, **kwargs): pass
-    def run(self, request):
-        return SimpleNamespace(report=report, actionability=receipt, publication_not_before=now,
+class Runtime:
+    def refresh(self, horizon):
+        assert horizon == 1
+        return SimpleNamespace(status='COMPLETE', job_id='owned-installed-publication')
+    def view(self):
+        result = SimpleNamespace(report=report, actionability=receipt, publication_not_before=now,
             decision=SimpleNamespace(semantic_sha256='a'*64))
-pulse.datetime = Clock
-pulse.PrivateV1OneCommandService = Service
-os.environ['THE_ODDS_API_KEY'] = 'synthetic-placeholder'
-args = ['pulse','--entry-id','42','--no-progress']
+        try:
+            checked_report(result, clock=lambda: state['now'])
+        except PrivateV1Error:
+            raise AuthorizationError('REFRESH_GRANT_EXPIRED', 'EXPIRED') from None
+        return SimpleNamespace(team=SimpleNamespace(report=report), gameweeks=(1,),
+            dataset_mode='SYNTHETIC_CURRENT_MODE', job_id='owned-installed-publication')
+    def close(self): state['closed'] = True
+def enrolled(**kwargs):
+    assert kwargs['entry_id'] == 42 and kwargs['authorization_id'] == 'OWNED-TEST'
+    return publish_runtime(Runtime(), horizon=kwargs['horizon'], publish=kwargs['publish'])
+pulse.run_enrolled_current = enrolled
+args = ['pulse','--entry-id','42','--no-progress','--refresh-approval','OWNED-TEST']
 valid = CliRunner().invoke(app,args)
 assert valid.exit_code == 0 and report in valid.stdout, valid.output
 state['now'] = deadline
 expired = CliRunner().invoke(app,args)
 assert expired.exit_code == 2 and expired.stdout == '', expired.output
-assert report not in expired.output and 'deadline has been reached' in expired.stderr
+assert report not in expired.output and 'REFRESH_GRANT_EXPIRED' in expired.stderr
+assert state['closed']
 assert not attempts
 print(json.dumps({'status':'PASS','installed_import':True,'public_pulse_boundary':True,
     'synthetic_service_only':True,'exact_deadline_withheld':True,
@@ -82,7 +93,6 @@ def verify() -> dict[str, object]:
             step="clean private ACCEL environment",
         )
         environment = _environment(venv)
-        environment["THE_ODDS_API_KEY"] = "synthetic-placeholder"
         _run(
             [uv, "sync", "--frozen", "--offline", "--no-dev", "--no-install-project", "--active"],
             cwd=REPOSITORY_ROOT,

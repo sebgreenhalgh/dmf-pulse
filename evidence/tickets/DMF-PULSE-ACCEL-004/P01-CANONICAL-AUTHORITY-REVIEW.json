@@ -1,0 +1,76 @@
+{
+  "checked_at": "2026-10-30T03:32:33.776901+00:00",
+  "credential_reads": 0,
+  "decision": [
+    "A02 and A03 retire specific OpenLigaDB fallback attempts. The sole fallback source wording does not delete the original canonical OpenFootball admission path or prove that canonical reassessment permission was consumed.",
+    "Original P01 SCORE explicitly authorizes a governed canonical reassessment and anticipates retry after an incomplete cohort. No explicit canonical one shot or expiry was found in that original request.",
+    "Current Wave004 creates no new acquisition permission. Existing original permission must independently satisfy its exact implementation and evidence conditions; current package capability is not authority transfer.",
+    "A canonical resumption must be explicit before observing new labels or metrics, retain the A02 and A03 failure history, use the original source policy and report descriptive results only. It cannot masquerade as admitted OpenLigaDB evidence or silently claim unchanged confirmatory epoch001 evidence.",
+    "No fallback outcome artifact was admitted. A first canonical score therefore cannot be labelled a completed reconciliation of such an artifact."
+  ],
+  "exact_accepted_implementation": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+  "execution_not_cleared_reasons": [
+    "Independently confirmed code and policy intersection: exact3815152 accepted loader and scorer regenerate parameter draws during authentication, while later P01 instructions prohibit invoking that generation path.",
+    "No accepted nongenerative equivalent exists in that exact implementation. Model construction bypasses, cache injection or monkeypatching would alter accepted validation and cannot satisfy the original task."
+  ],
+  "forecast_mutations": 0,
+  "model_or_source_performance_selection": "None; this review used local authority text and code only, with no new labels or metrics inspected.",
+  "original_accepted_source_sha256": {
+    "src/dmf_pulse/evaluation/team_strength_prospective.py": "969024da204a6382d211f5f70c7877e1714c8fb0bd098a5c1b08bcafc9f96fe1",
+    "src/dmf_pulse/evaluation/team_strength_prospective_store.py": "e7d6d1f9b9b9ecb984217e4ff490e37c2880311c5f37a255795d319491292ed2",
+    "src/dmf_pulse/football_events/team_strength_parameter_draws.py": "0bfbe387ebe292c5167ce170a1271011c7ec7904c8fdae0be08a85a6e92421d0"
+  },
+  "permitted_next_step": "Prepare a narrow owner decision authorizing the already reviewed nongenerative view at an exact later implementation for original canonical admission, with an explicit descriptive context and bounded reassessment scope. No provider request or score is cleared under the existing mutually incompatible code gates. No A02 or A03 retry is permitted.",
+  "prior_assessment_sha256": "9bbb856c10b0b1fd10d1f5710c66dcb0d570f65f550c6d06da786491121a06c2",
+  "provider_requests": 0,
+  "reviewed_assessment_sha256": "4aa9f8b4f168225482ee5fb5c45d58944219e3e19555f5d9987e1e6473d16a34",
+  "schema_version": "independent-p01-canonical-authority-review-v1",
+  "scoring_invocations": 0,
+  "source_receipts": {
+    "a02_context": {
+      "locator": "original_forecast_epoch and evaluation_epoch are distinct; source_policy is SINGLE_QUALIFIED_FALLBACK_SOURCE",
+      "sha256": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32"
+    },
+    "a02_contract": {
+      "locator": "paragraphs1 and3 retain original protocol and original epoch; fallback uses epoch003",
+      "sha256": "038d4f6eb7370fc3ac4d8d6b132e1a9a3a7642787c50d1b92ed071d1da906cb7"
+    },
+    "a02_owner_request": {
+      "locators": [
+        "section1 sole admitted fallback source",
+        "section12 original authenticated OpenFootball admission remains semantically unchanged",
+        "section15 later canonical reconciliation"
+      ],
+      "sha256": "d366667ab9c4837a5503bfb7c74ca572430ba1cb23130565e611dd0138c6a545"
+    },
+    "a03_contract": {
+      "locator": "No OpenFootball acquisition occurs in this ticket; reconciliation separate",
+      "sha256": "9d8fc62831c0f25f100317dcd967fcfb75d3d77e47a28e0e0a3c384074ade9aa"
+    },
+    "current_owner_request": {
+      "locators": [
+        "section3 does not itself authorize new football provider calls",
+        "section6.1 prohibits silent source switching and retrying A03",
+        "section7.2 original source policy and evidence gates required"
+      ],
+      "sha256": "02ec1d31b449e8dfc3f217615e61f7321d57531f9753846129918fcd2e1098be"
+    },
+    "original_owner_score_request": {
+      "locators": [
+        "section2 exact accepted code and clean checkout",
+        "section5 governed canonical reassessment",
+        "section6 incomplete stop and earliest safe retry condition",
+        "section8 original accepted scorer"
+      ],
+      "sha256": "9803feb28be9b4c8129d113a5a82771b3c7229c9ef2b84e1435e5db60651d1e7"
+    }
+  },
+  "static_trace": [
+    "At exact3815152 prospective_store.py load_public_forecast calls PublicTeamStrengthForecastV1.model_validate_json.",
+    "At exact3815152 prospective.py validate_frozen_forecasts calls authenticate_parameter_draws.",
+    "At exact3815152 team_strength_parameter_draws.py _validated_draw_json calls joint_parameter_draws to regenerate the expected draw set.",
+    "At exact3815152 score_public_team_forecasts independently calls authenticate(forecast), so constructing a forecast instance elsewhere does not avoid the accepted validation path.",
+    "The exact3815152 evaluation tree contains no P01FrozenScoringView or fallback scoring view. Current later nongenerative view cannot be substituted while claiming exact3815152 execution."
+  ],
+  "status": "CANONICAL_RESUMPTION_BLOCKED_BY_EXACT_CODE_AND_NO_GENERATION_REQUIREMENTS"
+}

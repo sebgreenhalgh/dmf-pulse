@@ -12,6 +12,7 @@ from dmf_pulse import __version__
 from dmf_pulse.cli.availability_cmd import availability_app
 from dmf_pulse.cli.chips import chips_app
 from dmf_pulse.cli.config_cmd import config_app
+from dmf_pulse.cli.credentials import credentials_app
 from dmf_pulse.cli.dashboard import dashboard_command
 from dmf_pulse.cli.data_model_cmd import data_model_app
 from dmf_pulse.cli.doctor import build_doctor_report
@@ -32,6 +33,7 @@ from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
 from dmf_pulse.cli.specs_cmd import specs_app
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.operation.cli import operation_app
 
 app = typer.Typer(
     add_completion=False,
@@ -41,6 +43,7 @@ app = typer.Typer(
     pretty_exceptions_enable=False,
 )
 app.add_typer(config_app, name="config")
+app.add_typer(credentials_app, name="credentials")
 app.add_typer(chips_app, name="chips")
 app.add_typer(availability_app, name="availability")
 app.add_typer(data_model_app, name="data-model")
@@ -53,6 +56,7 @@ app.add_typer(market_app, name="market")
 app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
 app.add_typer(optimise_app, name="optimise")
+app.add_typer(operation_app, name="operation")
 app.add_typer(player_evidence_app, name="player-evidence")
 app.add_typer(player_lab_app, name="player-lab")
 app.add_typer(prices_app, name="prices")

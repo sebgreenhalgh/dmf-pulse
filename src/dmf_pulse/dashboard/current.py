@@ -21,6 +21,7 @@ from sqlalchemy import Connection as SqlConnection
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.dashboard.authorization import (
     AuthorizationError,
+    AuthorizationPreview,
     DurableUsageLedger,
     OperatorRefreshApproval,
     QualifiedPlanQuota,
@@ -159,12 +160,6 @@ def profile_fingerprint(profile: RightsProfile) -> str:
     value = profile.model_dump(mode="json", exclude={"capabilities"})
     value["capabilities"] = {key.value: item.value for key, item in profile.capabilities.items()}
     return canonical_sha256(value)
-
-
-def _credentials_available() -> bool:
-    # This is reached only after exact approved scope/quota reservation. No value
-    # is returned, serialized, logged or retained; defaults cannot reach it.
-    return bool(os.environ.get("DMF_FPL_BEARER_TOKEN")) and bool(os.environ.get("THE_ODDS_API_KEY"))
 
 
 @dataclass(frozen=True, slots=True, repr=False)
@@ -438,7 +433,7 @@ class CurrentRefreshSession:
         ledger: UsageLedger | None = None,
         deadline_at: datetime | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
-        credentials_available: Callable[[], bool] = _credentials_available,
+        credentials_available: Callable[[], bool] | None = None,
         database_ref: DatabaseReference = "OPERATOR_CONTROL_DATABASE",
     ) -> None:
         self._entry_id, self._approval, self._ledger = entry_id, approval, ledger
@@ -454,7 +449,7 @@ class CurrentRefreshSession:
     def owned_sources(self) -> bool:
         return self._owned_sources
 
-    def prepare(self, horizon: Literal[1, 3]) -> CurrentLaunch:
+    def _request(self, horizon: Literal[1, 3]) -> RefreshRequest:
         approval = self._approval
         if approval is None:
             raise AuthorizationError(
@@ -470,7 +465,7 @@ class CurrentRefreshSession:
         # The exact official deadline must come from the separately qualified
         # pilot scope, not a browser timestamp or a stale previous-GW squad.
         deadline = self._deadline
-        request = RefreshRequest(
+        return RefreshRequest(
             authorization_id=approval.authorization_id,
             implementation_sha=implementation_fingerprint(),
             review_sha256=approval.review_sha256,
@@ -482,7 +477,17 @@ class CurrentRefreshSession:
             information_cutoff=cutoff,
             deadline_at=deadline,
         )
+
+    def preflight(self, horizon: Literal[1, 3]) -> AuthorizationPreview:
+        """Use the same complete policy without reserving, credentials or workers."""
+        return self._authorizer.preflight(self._request(horizon))
+
+    def prepare(self, horizon: Literal[1, 3]) -> CurrentLaunch:
+        request = self._request(horizon)
         grant = self._authorizer.authorize(request)
+        approval = self._approval
+        if approval is None or self._entry_id is None:
+            raise AuthorizationError("OPERATOR_CONTROL_CONTEXT_REQUIRED")
         launch = CurrentLaunch(
             grant=grant,
             ledger_path=self._ledger.path if isinstance(self._ledger, DurableUsageLedger) else None,
@@ -501,7 +506,9 @@ class CurrentRefreshSession:
             ),
         )
         _launch_is_bound(launch)
-        if not self._credentials_available():
+        # Ordinary execution defers lookup to the claimed authorized worker.
+        # The explicit callback is an owned-test preflight injection only.
+        if self._credentials_available is not None and not self._credentials_available():
             raise AuthorizationError("CREDENTIAL_UNAVAILABLE")
         self._state = "ENGINEERING_READY" if self.owned_sources else "REAL_RUN_AUTHORIZED"
         self._error = None
