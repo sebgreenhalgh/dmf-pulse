@@ -59,6 +59,11 @@ _ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS = {
 _ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS = {
     "ingestion/odds/transient.py": "3faeb93796f3989a92ea58a63da64269161d64d4e490ca2d08f1a8e3aa472a81",
 }
+# Exact input-quota annotation only; no response-header contract or acquisition
+# algorithm changes. See ACCEL-005/QUOTA-BOUNDARY-EXCEPTION.md.
+_ACCEL005_REVIEWED_EXECUTABLE_EXCEPTIONS = {
+    "ingestion/odds/transient.py": "e73d0b95d9f11ec47ec81e2ee05448002db2c2a276a21b1a7a2e369a04347086",
+}
 
 
 @pytest.fixture
@@ -208,6 +213,10 @@ def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_reviewed_s
                 relative in _ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS
                 and actual == _ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
             )
+            or (
+                relative in _ACCEL005_REVIEWED_EXECUTABLE_EXCEPTIONS
+                and actual == _ACCEL005_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
+            )
         )
     assert (
         hashlib.sha1(
@@ -223,6 +232,7 @@ def test_static_guard_excludes_intentionally_evolving_a1_rolling_and_a2_one_comm
     assert len(_R8B_UNMODIFIED_EXECUTABLE_HASHES) == 8
     assert set(_ACCEL003_REVIEWED_EXECUTABLE_EXCEPTIONS) == {"ingestion/odds/transient.py"}
     assert set(_ACCEL004_REVIEWED_EXECUTABLE_EXCEPTIONS) == {"ingestion/odds/transient.py"}
+    assert set(_ACCEL005_REVIEWED_EXECUTABLE_EXCEPTIONS) == {"ingestion/odds/transient.py"}
     assert (
         _R8B_UNMODIFIED_EXECUTABLE_HASHES["ingestion/odds/transient.py"]
         == "6dc8e6195b84491697caf7530b194fbc5d164982c9a20377d63eca0608ebb49e"

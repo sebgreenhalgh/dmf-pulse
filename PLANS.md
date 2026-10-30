@@ -18,7 +18,7 @@ value is read, copied, decoded, stored or used.
   canonical control workflow using the existing registry/authorizer/worker.
 - [x] CP3 implement the narrow nongenerative canonical P01 controller, proposed
   owner code-binding decision and cold literal-oracle compatibility proof.
-- [ ] CP4 implement approved locator onboarding and qualified player custody,
+- [x] CP4 implement approved locator onboarding and qualified player custody,
   point-only/full-distribution adapters, protocol/coverage/holdout integration.
 - [ ] CP5 finish explicit eight-stage readiness, token/budget/rights/expiry
   remedies and practical reviewed operator launch without UI redesign.
@@ -41,8 +41,12 @@ slot and cannot read/migrate the exposed legacy slot. CP2 review packaging,
 permit-gated assembly and reviewed default launch are implemented and scoped
 independent review is clear. Actual source/account qualification, detached owner
 acceptance and trusted carrier installation remain separate prerequisites.
-CP3 canonical scoring and CP4 locator/player work are in progress; their drafts
-are not approved operations.
+CP3 nongenerative canonical scoring and CP4 locator/player engineering are
+complete with scoped independent review clear. The code-binding decision,
+source qualifications and actual research protocols remain unaccepted. CP4
+native directory-relative handles close reproduced junction races; 112 retained
+and new PostgreSQL tests pass. CP5 operator hardening and CP6 full release
+acceptance remain separate checkpoints.
 
 ## DMF-PULSE-ACCEL-004 — existing forecasts and secure operation
 

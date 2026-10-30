@@ -726,7 +726,13 @@ def run_matrix(
     nrm006 = baseline_revision == "20260725_0004"
     min007f = baseline_revision == "20260803_0005"
     accel002 = baseline_revision == "20260807_0006"
-    if accel002:
+    plan = _revision_plan(baseline_revision, target)
+    if plan.target == "20261030_0009":
+        destination = REPOSITORY_ROOT / "evidence/tickets/DMF-PULSE-ACCEL-005"
+        report_path = report_path or destination / "migration_report.json"
+        offline_sql_path = offline_sql_path or destination / "offline_upgrade.sql"
+        schema_manifest_path = schema_manifest_path or destination / "schema_manifest.json"
+    elif accel002:
         destination = REPOSITORY_ROOT / "evidence/tickets/DMF-PULSE-ACCEL-002"
         report_path = report_path or destination / "migration_report.json"
         offline_sql_path = offline_sql_path or destination / "offline_upgrade.sql"
@@ -765,7 +771,6 @@ def run_matrix(
     except ValueError as exc:
         raise MatrixError("migration evidence outputs must remain inside the repository") from exc
     database_url, parsed_url = _configured_test_url()
-    plan = _revision_plan(baseline_revision, target)
     first_manifest: dict[str, Any] | None = None
     destructive_started = False
     stage = "preflight"
@@ -779,7 +784,7 @@ def run_matrix(
             "CREATE TABLE football.team_season",
             "CREATE TABLE fpl.player_season",
         ]
-        if plan.target in {"20261029_0007", "20261029_0008"}:
+        if plan.target in {"20261029_0007", "20261029_0008", "20261030_0009"}:
             required_sql.extend(
                 (
                     "CREATE TABLE evaluation.qualified_source",
@@ -787,6 +792,16 @@ def run_matrix(
                     "CREATE TABLE evaluation.score_pair",
                     "PLAYER_FORECAST_NOT_QUALIFIED",
                     "PLAYER_SOURCE_RIGHTS_BLOCKED",
+                )
+            )
+        if plan.target == "20261030_0009":
+            required_sql.extend(
+                (
+                    "CREATE FUNCTION evaluation.real_authority()",
+                    "CREATE FUNCTION evaluation.guard_real_artifact()",
+                    "CREATE FUNCTION evaluation.guard_real_source()",
+                    "CREATE UNIQUE INDEX uq_real_player_deadline_population",
+                    "REAL_PLAYER_NATIVE_FORECAST_BACKDATE",
                 )
             )
         if odd005:
@@ -946,7 +961,9 @@ def run_matrix(
         "status": "PASS",
         "target_revision": plan.target,
         "ticket_id": (
-            "DMF-PULSE-ACCEL-003"
+            "DMF-PULSE-ACCEL-005"
+            if plan.target == "20261030_0009"
+            else "DMF-PULSE-ACCEL-003"
             if plan.target == "20261029_0008"
             else "DMF-PULSE-ACCEL-002"
             if plan.target == "20261029_0007"

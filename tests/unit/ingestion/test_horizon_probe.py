@@ -38,6 +38,9 @@ _R8A_UNMODIFIED_SOURCE_HASHES = {
     # behavior is separately asserted by test_team_strength_l1.
     "ingestion/odds/client.py": "a9b483aacd5e3c12a5dbdd049ad5c3dd51f0917a5d867ad1d4237b3c031d1c64",
 }
+_ACCEL005_QUOTA_ANNOTATION = {
+    "ingestion/odds/client.py": "996f134785a8f70a369688aa977cae764cadc632131f1750a4b222130efca803",
+}
 
 
 def _script():
@@ -581,12 +584,14 @@ def test_inherited_depth_and_body_limits(fpl, body):
         observe(fpl, body)
 
 
-def test_unmodified_provider_sources_remain_parent_identical():
+def test_provider_sources_parent_identical_or_exact_reviewed_quota_annotation():
     import hashlib
 
     # Parent bytes, independent of Git availability or CI clone depth.
     for name, digest in _R8A_UNMODIFIED_SOURCE_HASHES.items():
-        assert hashlib.sha256((ROOT / "src/dmf_pulse" / name).read_bytes()).hexdigest() == digest
+        actual = hashlib.sha256((ROOT / "src/dmf_pulse" / name).read_bytes()).hexdigest()
+        assert actual == digest or actual == _ACCEL005_QUOTA_ANNOTATION.get(name)
+    assert set(_ACCEL005_QUOTA_ANNOTATION) == {"ingestion/odds/client.py"}
 
 
 def test_r8a_static_guard_excludes_intentionally_evolving_sources():

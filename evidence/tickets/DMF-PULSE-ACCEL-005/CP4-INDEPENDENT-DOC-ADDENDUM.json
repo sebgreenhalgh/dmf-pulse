@@ -1,0 +1,57 @@
+{
+  "all_nineteen_other_prior_reviewed_files_unchanged": true,
+  "change_scope": "Only final paragraph records bounded completed engineering checks and leaves CP6 acceptance separate; exact original paragraph reconstruction recovers the prior reviewed whole-file hash",
+  "checked_at": "2026-10-30T19:37:42.587463+00:00",
+  "child_launcher_current_observation": {
+    "bytes": 1559,
+    "path": "review_pack/run_postgres_owned.py",
+    "sha256": "5038f7563ff9801664d657d34414cbc18028aa32313c15322a1abe0f71710d7a"
+  },
+  "child_launcher_custody_limit": "The command receipt pins capture005.py as its own capture helper. It does not separately pin the child PostgreSQL launcher at execution time. This addendum authenticates the stated112 result against the capture helper and raw log, without claiming that the current child-launcher hash was captured historically.",
+  "command_capture_helper": {
+    "bytes": 1852,
+    "path": "review_pack/capture005.py",
+    "sha256": "3e1db583f9c57f757225068be1976519f38d6cb90404c7434454e20a33be1d3c"
+  },
+  "findings": [],
+  "limits": "This carries forward the prior exact-byte scoped review and authenticates the paragraph evidence; it does not independently rerun the parent's112 tests or the other reviewer's48/64/5 cases, or grant real rights, evaluation, activation or final CP6 acceptance.",
+  "native_sql_tests_repeated": false,
+  "previous_document_sha256": "b691ff285a75d0f3231d44ff14ebcc5c875f47eae21d2f8630481133ab0362b2",
+  "prior_review": {
+    "bytes": 9156,
+    "path": "review_pack/accel005-independent-cp4-integration-review-a22cd0dafe0f0aac73512e2ffd43de71975a41e6aa521baac0553f22bc949b29.json",
+    "sha256": "a22cd0dafe0f0aac73512e2ffd43de71975a41e6aa521baac0553f22bc949b29"
+  },
+  "provider_or_vault_or_database_access_by_addendum": 0,
+  "root_postgres_command_evidence": {
+    "bytes": 693,
+    "path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP4-POSTGRES-ACCEPTANCE.json",
+    "sha256": "980d1e35e849e947f0e7415c8e20b2595dc7f6d235aa48d227969dfb1b128f2b"
+  },
+  "root_postgres_command_log": {
+    "bytes": 195,
+    "path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP4-POSTGRES-ACCEPTANCE.LOG",
+    "sha256": "fc09fb15395e0dcbee051730daaeed204c12f5b465f2aa028202ccd1e83e11c7"
+  },
+  "root_postgres_passed": 112,
+  "schema_version": "accel005-independent-cp4-doc-addendum-v1",
+  "separate_locator_review": {
+    "bytes": 6260,
+    "path": "review_pack/accel005-independent-locator-final-97cae2fc107de5c34dc12c9cd2aed3920fd254f8f154fb68cf70235a69684949.json",
+    "sha256": "97cae2fc107de5c34dc12c9cd2aed3920fd254f8f154fb68cf70235a69684949"
+  },
+  "separate_review_source_hash_maps_match_current_files": true,
+  "separate_scientific_review": {
+    "bytes": 7076,
+    "path": "review_pack/accel005-independent-cp4-scientific-4f170a8e1e77ab63f1ff213f4a21633c18dbacd7bb2535ef697fcbe5af5d4a1b.json",
+    "sha256": "4f170a8e1e77ab63f1ff213f4a21633c18dbacd7bb2535ef697fcbe5af5d4a1b"
+  },
+  "source_or_tracked_document_edits_by_reviewer": false,
+  "status": "PASS_METADATA_ONLY_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "unchanged_secret_scanner_findings": 0,
+  "updated_document": {
+    "bytes": 4897,
+    "path": "tickets/DMF-PULSE-ACCEL-005/CP4.md",
+    "sha256": "b215de0f638927a0d5b483e60e2ad6eb6e2d48954aab704d081ea1eed976e771"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "actual_credential_or_vault_access": false,
+  "actual_forecasts_or_football_outcomes_used": false,
+  "actual_owner_locator_accessed": false,
+  "checked_at": "2026-10-30T19:33:10.101404+00:00",
+  "findings": [],
+  "initial_probe_history": [
+    "An owned ps1 setup was blocked by existing execution policy; a fixed direct New-Item invocation reproduced the initial race without changing policy.",
+    "After handle binding, old spies against locator.os.scandir became obsolete; owned spies now target the actual DirectoryPins.scan boundary. The CLI metadata-envelope assertion was corrected to inspect payload.",
+    "The first restricted-token native-remediation attempt stopped before the attack; its cleanup guard now removes only an actually created and verified owned junction. Normal-user native probes then passed."
+  ],
+  "native_remediation_receipt": {
+    "bytes": 1998,
+    "path": "review_pack/accel005-independent-native-handle-remediation-a085482e5fce2f71ef48976dbca28203bba36a319511e9ede148ebaed7bc0134.json",
+    "sha256": "a085482e5fce2f71ef48976dbca28203bba36a319511e9ede148ebaed7bc0134"
+  },
+  "native_windows_race_cases_passed": 5,
+  "owned_focused_checks": 23,
+  "platform_evidence": {
+    "posix": "Descriptor-relative branch reviewed statically; actual Linux execution remains a final CI gate.",
+    "restricted_token": "The Codex restricted token refuses relative native opens before any body read. The product retains the fail-closed response and has no path fallback.",
+    "windows_native": "Actual owned native operations under the separately authorized normal-user context"
+  },
+  "preserved_initial_findings_and_design_history": {
+    "accel005-independent-locator-race-58f757c23a748fcab1d7ae03b9e991bf823712c4a688deb1d9db017e39181dbf.json": {
+      "bytes": 947,
+      "sha256": "58f757c23a748fcab1d7ae03b9e991bf823712c4a688deb1d9db017e39181dbf"
+    },
+    "accel005-independent-recovery-race-511c7330159ed0ec8773b92c678d2c8e1ae3f0a1368a27063efbbf19f6f6a493.json": {
+      "bytes": 817,
+      "sha256": "511c7330159ed0ec8773b92c678d2c8e1ae3f0a1368a27063efbbf19f6f6a493"
+    },
+    "accel005-owned-directory-pin-design-bf6f0357e0b4251bd138007df7d46f413c17af524e49abc956f79729c5b8c54c.json": {
+      "bytes": 735,
+      "sha256": "bf6f0357e0b4251bd138007df7d46f413c17af524e49abc956f79729c5b8c54c"
+    }
+  },
+  "probe_sha256": "80d17288b0ddc42b5ebcdc345f8c99446eeebbb213b8b7ca7c67072277633554",
+  "provider_requests": 0,
+  "real_custody_or_rights_or_evaluation_granted": false,
+  "remaining_milestone_gates": [
+    "Final Linux CI",
+    "Installed-wheel and whole-package source custody",
+    "Complete final-SHA CI and publication acceptance",
+    "Separate owner-approved locators and qualified source/custody before real retention or evaluation"
+  ],
+  "reproduce": [
+    ".venv/Scripts/python.exe review_pack/probe_locator_handle_remediation.py",
+    ".venv/Scripts/python.exe review_pack/seal_locator_independent_review.py"
+  ],
+  "resolution": "Both directory enumeration and single-file recovery now anchor each path component to a held OS directory handle. Windows enumerates the held directory with GetFileInformationByHandleEx and opens one child component through NtCreateFile RootDirectory with OPEN_REPARSE_POINT. Final object type and identity are verified before hashing held descriptors. POSIX uses descriptor-relative nofollow opens and scandir(fd).",
+  "retained_locator_and_recovery_checks": 41,
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/cli/recovery.py": "808c4bd49de882fa58587f63f4b7191e832050b5b3eddbdbc0085eb7bfabf06f",
+    "src/dmf_pulse/player_lab/local_handles.py": "15c4d874dacfb90966335150a923bba48276a09901e60f7a133a52e143d7b765",
+    "src/dmf_pulse/player_lab/locator.py": "9aa5de4856eee41c140f206cb3f9a084e98f938d5f3db643b3e9b303867b6fce",
+    "src/dmf_pulse/player_lab/recovery.py": "8f4fd862479d229a637b84511c76c6688070585e6107276c06172e9356442a08",
+    "src/dmf_pulse/player_lab/recovery_models.py": "98f2bc50d2b6ddc38b2c7eda2c27102db14f13dc6cde5994fa3e017b984285d2",
+    "src/dmf_pulse/player_lab/resources/recovered_forecasts_v1.json": "3dde6cd2322e72cf9e7a4232c8f98a679b5bd6c687c19af5adbce0ac2bafb4f3"
+  },
+  "schema_version": "accel005-independent-bounded-locator-review-v1",
+  "source_bytes_rechecked_after_tests": true,
+  "source_edits_by_reviewer": 0,
+  "status": "PASS_SCOPED_LOCATOR_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "test_files_sha256": {
+    "review_pack/test_locator_independent.py": "08d6a981b9237fff53f075567c5921ffd67ac031f25d7a82517a3de47022ce55",
+    "tests/unit/player_lab/test_locator.py": "615027570fa28dcead2926d545133f7ad2ad26c982816663eccbfdacf8ca3914",
+    "tests/unit/player_lab/test_recovery.py": "3ab8eb046360df035d85ba80c8f162688d5761783cd974745838f1bf5a5f8c0f"
+  },
+  "test_inventory_sha256": "30a42fb9df02844533873a3b687cdf3dcf2d46d7680eea9ea0fc8cc9a1b3a293",
+  "total_focused_checks_passed": 64,
+  "tripwire_attempts": {
+    "native_credential_import": 0,
+    "network": 0
+  },
+  "verified_invariants": [
+    "Actual owned NTFS rename attacks cannot redirect directory enumeration or direct single-file verification.",
+    "An actual in-place junction conversion succeeds during the attack, but held-directory enumeration stays with the original empty directory and the relative child open cannot read the target.",
+    "Static child junctions and restricted lexical roots are refused; no owner locator or production credential location is searched.",
+    "File, byte, entry and depth bounds remain finite. Census opens held metadata-capable descriptors; the byte budget is enforced before reading candidate bodies.",
+    "Executable owned pickle and self-asserted forecast JSON are hashed without execution or interpretation; unknown bytes remain unverified with no fabricated freeze time.",
+    "Private immutable metadata inventory retains relative locators and hashes; public CLI output contains aggregates without locator names or raw bodies.",
+    "Unsafe, changed, malformed and overbudget inputs produce fixed errors after raw helper frames unwind; prior output metadata is never overwritten.",
+    "A reviewed original-byte match establishes only the catalogue classification. It grants neither source rights nor evaluation eligibility."
+  ]
+}

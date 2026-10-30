@@ -93,6 +93,7 @@ from dmf_pulse.ingestion.rights import (
 
 DATABASE_REF = "env:DMF_TEST_DATABASE_URL"
 TARGET_REVISION = "20261029_0008"
+COMPATIBLE_REVISIONS = frozenset({TARGET_REVISION, "20261030_0009"})
 DEFAULT_CAPTURED_AT = datetime(2026, 8, 21, 17, 0, tzinfo=UTC)
 DEFAULT_INFORMATION_CUTOFF = datetime(2026, 8, 21, 17, 30, tzinfo=UTC)
 _PROCESSING_TIME_POLICY = "PROCESSING_TIME_V1"
@@ -246,7 +247,7 @@ def _engine(reference: str) -> Engine:
             revision = connection.execute(
                 text("SELECT version_num FROM alembic_version")
             ).scalar_one()
-        if revision != TARGET_REVISION:
+        if revision not in COMPATIBLE_REVISIONS:
             engine.dispose()
             raise IngestionError("DATABASE_SCHEMA_BEHIND", "database migration is not current")
         return engine

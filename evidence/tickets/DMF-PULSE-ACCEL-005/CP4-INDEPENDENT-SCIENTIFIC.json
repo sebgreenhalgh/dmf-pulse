@@ -1,0 +1,105 @@
+{
+  "accepted_parent": "f07c063b4f6e4cb8451b9189771a0410329f23f0",
+  "actual_forecast_or_football_labels_used": false,
+  "actual_p01_scores": 0,
+  "checked_at": "2026-10-30T19:10:21.729707+00:00",
+  "database_connections": 0,
+  "findings": [],
+  "model_generation_calls": 0,
+  "native_vault_calls": 0,
+  "observed_failure_history": [
+    {
+      "database_engine_factory_calls": 0,
+      "failed": 1,
+      "failing_test": "test_denied_capability_normalizes_before_database",
+      "later_resolved": true,
+      "observed_exception": "IngestionError",
+      "passed": 34,
+      "scope": "Expanded owned scientific tests before rights normalization"
+    },
+    {
+      "actual_data_used": false,
+      "later_resolved": true,
+      "owned_nan_support_adapter_was_accepted": true,
+      "scope": "Earlier malformed PMF boundary observation"
+    }
+  ],
+  "owned_checks_passed": 48,
+  "owned_harness_history": [
+    "The initial tripwire harness stopped before collecting tests because pytest writes its own bookkeeping keys. Those two exact pytest keys now use an in-memory overlay; no actual environment mutation or product permission was added.",
+    "The next harness attempt could not import the explicitly owned repository test helper because script execution places review_pack first on sys.path. The exact ROOT5 directory is now added for owned fixture imports, matching python -m pytest behavior."
+  ],
+  "owned_registry_injections_only": true,
+  "owned_test_file": {
+    "path": "review_pack/test_cp4_scientific_independent.py",
+    "sha256": "91fa74f79c517597737e090dd75cf049625c9394e351a36ace262a006ec728e9"
+  },
+  "probe_sha256": "eb6438f4cac1909372149a3c1a325aaf160f6d57529ed4cbe6c662c53a9c8a21",
+  "provider_requests": 0,
+  "real_credentials_accessed": false,
+  "real_evaluation_or_retention_authorized": false,
+  "real_source_registry_empty": true,
+  "remaining_milestone_gates": [
+    "Native SQL and complete migration acceptance",
+    "Final package/source identity association and installed wheel",
+    "Whole mandatory final-SHA CI and publication review",
+    "Separately accepted source qualifications, custody and owner protocol intent before any real evaluation"
+  ],
+  "reproduce": ".venv/Scripts/python.exe review_pack/seal_cp4_scientific_review.py",
+  "resolved_findings": [
+    {
+      "issue": "Undeclared qualified source profiles could enter a registered protocol",
+      "resolution": "The initial immutable source manifest fixes profile and purpose identities. Only independently qualified new vintages within that exact profile scope can enter forecast/catalogue/outcome records."
+    },
+    {
+      "issue": "Point adapters accepted nonnumeric or numerically duplicated PMF support",
+      "resolution": "Canonical integer support and Decimal mean reconciliation reject malformed support before retention. Pure point forecasts keep an empty PMF."
+    },
+    {
+      "issue": "Denied capabilities escaped the ledger error boundary as IngestionError",
+      "resolution": "Known rights failures unwind before a fixed OperationError; the owned denial reaches no engine and has no retained exception cause/context."
+    },
+    {
+      "issue": "Resealed scorecards could contradict their cohort denominator",
+      "resolution": "Cross-field validation binds counts, unique forecast/label identities and complete optional diagnostics."
+    }
+  ],
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/player_lab/real.py": "cc57807b0c413aac23a1eb5d9c788a88716f0d3d7a964e85f416735968b80462",
+    "src/dmf_pulse/player_lab/real_integrity.py": "c2840494fd1f5468aafefc6077e931f7a07724eb3db2f0685395dc7ec97ba677",
+    "src/dmf_pulse/player_lab/real_rights.py": "6e0eff4c89fdb543d808b66eee7f324a9205faba4b34630c430624bd66b5f8a5",
+    "src/dmf_pulse/player_lab/real_store.py": "aeb905f024a56d35f4e1924d799e7386d1f474280bee14ddeddae1d8d8eadbda",
+    "src/dmf_pulse/player_lab/resources/real-source-registry.json": "c6aa2c22853998ee69e67a791f3b3cde09186bda0964b544270127faed2e1bb0"
+  },
+  "schema_version": "accel005-independent-cp4-scientific-review-v1",
+  "sql_review_scope": "The integrity helper was inspected read-only, including exact zero-argument function identities. Native SQL guard/transaction/deep-lineage acceptance and migration-source custody are separate independent reviews; no native database clearance is inferred here.",
+  "status": "PASS_SCOPED_SCIENTIFIC_CONTRACTS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "test_inventory_sha256": "6e7803ca5988fc48c17a17c9531620133bf7cfca2258749f916d8491c15c844c",
+  "tripwire_attempts": {
+    "database_engine": 0,
+    "generation": 0,
+    "native_vault_import": 0,
+    "network": 0,
+    "secret_environment": 0
+  },
+  "unchanged_stage12_and_v1_contract_bytes_sha256": {
+    "src/dmf_pulse/evaluation/artifacts.py": "63dd401ee00eee9ffbb9b72e5bdcc15dbc585e95a0d757be2875e10040c0470f",
+    "src/dmf_pulse/evaluation/benchmarks.py": "d93eebe28c042a68f3bc907865115c2b7c6b5838099f3615fbf9c2189b184710",
+    "src/dmf_pulse/evaluation/calibration.py": "72a6313be434de31b30609c0a1cb2ae4304336ad4e2de1430d0a0a5bffb31632",
+    "src/dmf_pulse/evaluation/distribution_metrics.py": "91356e8773a1b9ac5685ec610f862d690d7a9051afa7046db41644a2e2f59279",
+    "src/dmf_pulse/evaluation/models.py": "2356bfbb1b665bcd02e1cf8322a9df358adf24ba1985d462dc1016710a5be904",
+    "src/dmf_pulse/evaluation/point_metrics.py": "1d0173f00ff7ec28c7ce5f70b5b212ea1de14294c64abf022dec8fcc4996d4a7",
+    "src/dmf_pulse/evaluation/probability_metrics.py": "6bb8f1850ce75049bccdad2451acb5a699695e4dbd4d43d8e3fe2de7218fa16b",
+    "src/dmf_pulse/player_lab/contracts.py": "ac6e2b5ac83b3a998ac29e574af06d0e9a7d5bfbee1d7848da7c492d563c1d1f"
+  },
+  "verified_invariants": [
+    "The existing full forecast retains original mean, PMF, components, minutes, model, rules, code, sources and all stored cutoffs; scoring does not mutate it.",
+    "Point-only inputs receive point metrics while PMF, components, minutes, starts and60-minute diagnostics remain explicitly unavailable. Mixed cohorts do not select only available rows.",
+    "All catalogue players and all predeclared model cells must join exactly. Missing, duplicate, changed model/code/rules, catalogue and labels fail before the metric kernel.",
+    "Prospective protocols register before the first exact deadline and score a strictly later holdout; post-origin recovery remains descriptive and never gains a newly claimed confirmatory split.",
+    "Label values and complete populations require qualification beyond source rights. Every retained upstream source must independently permit immutable retention and evaluation.",
+    "An explicit complete label vintage is required; mixed revision, source or finalization within a Gameweek rejects. Complete correction vintages preserve original forecast hashes.",
+    "Stage12 point, probability and distribution outputs agree directly on owned fixtures, with the inherited metric source bytes unchanged.",
+    "No statistical independence of player rows is claimed, clustered inference is not computed, and promotion remains forbidden."
+  ]
+}

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import Connection, Engine, select, text
 from sqlalchemy.dialects.postgresql import insert
@@ -27,6 +27,16 @@ from dmf_pulse.player_lab.rights import (
     require_qualified_outcome,
     require_sources,
 )
+
+if TYPE_CHECKING:
+    from dmf_pulse.player_lab.real import (
+        DeadlinePopulation,
+        RealDeadlineRegistration,
+        RealPlayerProtocol,
+        RealPointForecast,
+        RealPointFreeze,
+        RealPointScorecard,
+    )
 
 
 def _refs(sources: Iterable[SourceRef]) -> list[dict[str, object]]:
@@ -56,6 +66,72 @@ class PostgresResearchLedger:
 
     def __init__(self, engine_factory: Callable[[], Engine]) -> None:
         self._engine_factory = engine_factory
+
+    def register_real_protocol(self, proposal: RealPlayerProtocol) -> RealPlayerProtocol:
+        from dmf_pulse.player_lab.real_store import register_protocol
+
+        return register_protocol(self._engine_factory, proposal)
+
+    def register_real_population(
+        self,
+        protocol_sha256: str,
+        population: DeadlinePopulation,
+        *,
+        external_proof_sha256: str | None = None,
+        original_body: bytes | None = None,
+    ) -> RealDeadlineRegistration:
+        from dmf_pulse.player_lab.real_store import register_population
+
+        return register_population(
+            self._engine_factory,
+            protocol_sha256,
+            population,
+            external_proof_sha256=external_proof_sha256,
+            original_body=original_body,
+        )
+
+    def freeze_real_forecast(
+        self,
+        protocol_sha256: str,
+        population_sha256: str,
+        forecast: RealPointForecast,
+        *,
+        external_proof_sha256: str | None = None,
+        original_body: bytes | None = None,
+    ) -> RealPointFreeze:
+        from dmf_pulse.player_lab.real_store import freeze_forecast
+
+        return freeze_forecast(
+            self._engine_factory,
+            protocol_sha256,
+            population_sha256,
+            forecast,
+            external_proof_sha256=external_proof_sha256,
+            original_body=original_body,
+        )
+
+    def append_real_label(self, label: FinalPlayerOutcome) -> str:
+        from dmf_pulse.player_lab.real_store import append_label
+
+        return append_label(self._engine_factory, label)
+
+    def evaluate_real(
+        self,
+        protocol_sha256: str,
+        model_id: str,
+        *,
+        expected_sources: tuple[SourceRef, ...],
+        label_sha256s: tuple[str, ...],
+    ) -> RealPointScorecard:
+        from dmf_pulse.player_lab.real_store import evaluate_stored
+
+        return evaluate_stored(
+            self._engine_factory,
+            protocol_sha256,
+            model_id,
+            expected_sources=expected_sources,
+            label_sha256s=label_sha256s,
+        )
 
     @staticmethod
     def _put(

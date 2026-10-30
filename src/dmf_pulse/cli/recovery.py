@@ -41,6 +41,42 @@ def verify(artifact: Annotated[Path, typer.Option("--artifact")]) -> None:
         _fail(error)
 
 
+@recovery_app.command("add-locator")
+def add_locator(
+    locator: Annotated[Path, typer.Option(help="Exact approved absolute local file or directory.")],
+    output: Annotated[
+        Path, typer.Option(help="New private metadata inventory; do not commit private locators.")
+    ],
+    maximum_files: Annotated[int, typer.Option(min=1, max=128)] = 32,
+    maximum_depth: Annotated[int, typer.Option(min=0, max=3)] = 0,
+    maximum_total_bytes: Annotated[int, typer.Option(min=1, max=536870912)] = 134217728,
+) -> None:
+    """Hash a bounded selected locator; never parse JSON/pickle or infer custody."""
+    from dmf_pulse.operation.models import OperationError
+    from dmf_pulse.operation.packages import write_metadata
+    from dmf_pulse.player_lab.locator import LocatorBounds, onboard_locator
+
+    try:
+        inventory = onboard_locator(
+            locator,
+            now=datetime.now(UTC),
+            bounds=LocatorBounds(
+                maximum_files=maximum_files,
+                maximum_depth=maximum_depth,
+                maximum_total_bytes=maximum_total_bytes,
+            ),
+        )
+        write_metadata(output, inventory)
+    except (RecoveryError, OperationError) as error:
+        _fail(
+            error
+            if isinstance(error, RecoveryError)
+            else RecoveryError("RECOVERY_INVENTORY_WRITE_FAILED")
+        )
+        return
+    typer.echo(json.dumps(inventory.public_summary(), sort_keys=True))
+
+
 @recovery_app.command("p01-canonical-proposal")
 def p01_canonical_proposal(
     output: Annotated[

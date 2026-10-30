@@ -1,0 +1,136 @@
+{
+  "accepted_parent": "f07c063b4f6e4cb8451b9189771a0410329f23f0",
+  "all_review_disposable_databases_cleaned_up": true,
+  "author_database_mutations_or_truncation": false,
+  "checked_at": "2026-10-30T19:27:53.072456+00:00",
+  "engineering_data_classification": "INVENTED_OWNED_TEST_FIXTURES_ONLY_NOT_REAL_FORECAST_OR_EVALUATION_EVIDENCE",
+  "findings": [],
+  "head_at_review": "f622e794d19a915e7bc320660bde1447b49a3ed6",
+  "history_preserved": [
+    {
+      "bytes": 2943,
+      "path": "review_pack/accel005-independent-cp4-owned-database-review-39055e6286bcddba41d62a8ed10345fd035a2321fd835d657b6d67f5fe00d032.json",
+      "sha256": "39055e6286bcddba41d62a8ed10345fd035a2321fd835d657b6d67f5fe00d032"
+    },
+    {
+      "bytes": 3438,
+      "path": "review_pack/accel005-independent-cp4-owned-database-review-b478ebe13a0650139df6828d3cc7c5d66d64fd0c32700108600c8938fa6664bf.json",
+      "sha256": "b478ebe13a0650139df6828d3cc7c5d66d64fd0c32700108600c8938fa6664bf"
+    },
+    {
+      "bytes": 2620,
+      "path": "review_pack/accel005-independent-finite-freeze-exception-review-5e3f2907d87077bbd101adfbe415049c7a99826142cfd0b00184497a58a0ee23.json",
+      "sha256": "5e3f2907d87077bbd101adfbe415049c7a99826142cfd0b00184497a58a0ee23"
+    }
+  ],
+  "limits": [
+    "This is an exact-byte source and owned native integration review, not CP6 installed-wheel, final native credential workflow or complete CI acceptance",
+    "Scientific evaluation policy is covered separately by the independent scientific review; these owned SQL cases establish no real skill, source rights, approval or operational activation",
+    "The PostgreSQL server and its administrator remain a trusted control root; these checks reject tested guard and session drift and do not claim defense against complete server compromise",
+    "Legacy matrix targets were isolated routing fixtures under the current single-head rule, not claims of executing old targets in the active matrix",
+    "The worktree has parent-owned uncommitted implementation changes; this receipt binds exact scoped file bytes rather than treating HEAD alone as source custody"
+  ],
+  "normal_vault_or_real_credential_access": 0,
+  "operator_database_access": 0,
+  "preseal_unchanged_secret_scan_findings": 0,
+  "proofs": {
+    "finite_freeze_exception": {
+      "bytes": 2620,
+      "path": "review_pack/accel005-independent-finite-freeze-exception-review-f13e3fd31758484ebed139f1148b48264060fa8022fe9d55b8ec40b96a19552a.json",
+      "sha256": "f13e3fd31758484ebed139f1148b48264060fa8022fe9d55b8ec40b96a19552a"
+    },
+    "matrix_output_routing": {
+      "bytes": 4623,
+      "path": "review_pack/accel005-independent-matrix-output-routing-cc6ecd5944623695e3b5bdb48804b77f6e5df70dd0181cf5b3d78c6aa9d6abc6.json",
+      "sha256": "cc6ecd5944623695e3b5bdb48804b77f6e5df70dd0181cf5b3d78c6aa9d6abc6"
+    },
+    "native_compatibility_and_guard_drift": {
+      "bytes": 4025,
+      "path": "review_pack/accel005-independent-cp4-owned-database-review-4c9cc54d48f56f1ee11348b87d60d27099629289b74b8a9b7c1bab80f276c31f.json",
+      "sha256": "4c9cc54d48f56f1ee11348b87d60d27099629289b74b8a9b7c1bab80f276c31f"
+    },
+    "native_typed_and_coherent_lineage": {
+      "bytes": 4197,
+      "path": "review_pack/accel005-independent-cp4-native-lineage-review-abf9c8151c7bc6934980747a887034cb4a7d8a1c6e198fcdfb00a6d6e3e032fb.json",
+      "sha256": "abf9c8151c7bc6934980747a887034cb4a7d8a1c6e198fcdfb00a6d6e3e032fb"
+    }
+  },
+  "provider_calls": 0,
+  "real_forecasts_or_labels_used": false,
+  "real_source_qualification_or_owner_acceptance_inferred": false,
+  "resolved_findings": [
+    "A name-keyed function query could hide a mutated zero-argument guard behind an overload; exact regprocedure identities now reject the attack",
+    "Function execution attributes and same-result replacement authority code were insufficiently pinned; exact accepted bodies and attributes now reject substitutions",
+    "Replica session mode could disable ordinary trigger execution; origin is now required",
+    "Project canonical JSON dependencies were outside the exact-body closure; both accepted bodies and attributes are now checked",
+    "Target9 defaults could write into historical ticket locations; all three default paths now resolve to the active ticket before configuration IO",
+    "Nested, nonfinite and inconsistent full-legacy values lacked SQL parity; current Python and SQL both reject owned invalid values",
+    "The annotation proof could remove runtime unions; normalization is now limited to exact quota input annotations and runtime changes remain observable"
+  ],
+  "results": {
+    "changed_final_annotation_normalizer_tests": {
+      "passed": 4,
+      "seconds": 0.29
+    },
+    "coherently_resealed_lineage_substitutions_rejected": 18,
+    "consumed_route_and_daily_budget_stay_spent_after_upgrade": true,
+    "default_empty_qualification_schema_sha256": "64d37a2f4fd8830515edec2d903e8c44ebd3917b4ad359bc1b79cada99506eea",
+    "finite_exception_grouped_controls": 8,
+    "full_legacy_typed_substitutions_rejected_python_and_sql": 16,
+    "matrix_output_routing_controls": 10,
+    "native_compatibility_and_guard_cases": 19,
+    "nonzero_control_event_history_preserved": true,
+    "owned_native_positive_forecasts": 2,
+    "retained_boundary_tests_before_final_test_only_tightening": {
+      "passed": 196,
+      "seconds": 5.02
+    },
+    "source_proof_hashes_still_match_current_files": true
+  },
+  "reviewed_files_sha256": {
+    "scripts/test_migration_matrix.py": "32b1e836fb03297e54b2795278690dad6618dfef820356858e41e4020c21343a",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "69a699561805b403f8eecfb222cd3cabc0025152ab6622121bf054a4633a8ba9",
+    "src/dmf_pulse/data_model/tables.py": "97dbb004f126af92dffaf108820e58c549541224bd14c7f673e73c97ee0a2110",
+    "src/dmf_pulse/database/migrations/versions/20261030_0009_real_player_custody.py": "b76026268fa50679421969ca5106bf7637f4c8573a918166a5f150d2249a78ca",
+    "src/dmf_pulse/ingestion/fpl/service.py": "d72beb03ab602e058281ac24c8d4ebc3c968e92353d6c374bb2b32c410caade3",
+    "src/dmf_pulse/ingestion/odds/client.py": "996f134785a8f70a369688aa977cae764cadc632131f1750a4b222130efca803",
+    "src/dmf_pulse/ingestion/odds/transient.py": "e73d0b95d9f11ec47ec81e2ee05448002db2c2a276a21b1a7a2e369a04347086",
+    "src/dmf_pulse/player_lab/real.py": "cc57807b0c413aac23a1eb5d9c788a88716f0d3d7a964e85f416735968b80462",
+    "src/dmf_pulse/player_lab/real_integrity.py": "c2840494fd1f5468aafefc6077e931f7a07724eb3db2f0685395dc7ec97ba677",
+    "src/dmf_pulse/private_v1/team_strength_live.py": "008c44b31aeb6d27b07ab3653ed25571e673f20a1841b6146226519fb3c0d82e",
+    "src/dmf_pulse/private_v1/team_strength_live_network.py": "e58d19b0720b93ecff192524fc8e2fea238868751d76e6e2b69dc7d6c0313f31",
+    "tests/accel005_legacy_freeze_support.py": "f22dbb67b65aee4eeb94ff8152bfee1855cdd9514a3af99b68938e887b259f38",
+    "tests/integration/migrations/test_migrations.py": "997a364279fd4c57a9ecc44f429bf369063b856949e3ba11a15c36600f1717ae",
+    "tests/integration/player_lab/test_real_custody.py": "49a500e26e685a1fad29b9db416e9f36ca5e3999b3be76111a994754bd15aac8",
+    "tests/unit/ingestion/test_horizon_probe.py": "23c5556efb91303f3f547d3e71c07f6327bd9b29053552a20b33cf22cb8671a2",
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "b0f5c1d4bd15a46f37116c86401b7dad3a3239276838639c64d6e47b902fc24f",
+    "tests/unit/operation/test_accel005_frozen_boundaries.py": "dc98c77987db71ad88d629d3b9cf552d45e715b7ca70f5031560e9d5b73ba1b2",
+    "tests/unit/private_v1/test_team_strength_l2.py": "b84a4ef0e225382a067c91cfc0000719de288c423f3227f94a4d3c54bc995749",
+    "tickets/DMF-PULSE-ACCEL-005/CP4.md": "b691ff285a75d0f3231d44ff14ebcc5c875f47eae21d2f8630481133ab0362b2",
+    "tickets/DMF-PULSE-ACCEL-005/QUOTA-BOUNDARY-EXCEPTION.md": "f00960a3cb910725b5ba9f257e178118337ca2647c7efae4d4309156b7f20e62"
+  },
+  "schema_version": "accel005-independent-cp4-integration-and-freeze-review-v1",
+  "scope": [
+    "Explicit schema8 and schema9 FPL/control compatibility with unchanged historical control policy",
+    "Revision9-only index creation and historical revision7/8 absence",
+    "Exact installed real-source DB authority, guard OID/body/attributes, trigger and canonical-function identity",
+    "Origin replication role and server-clock native custody checks",
+    "Coherently resealed forecast field/lineage and full-legacy typed payload rejections",
+    "Matrix default routing and historical output-path preservation",
+    "Finite exact whole-file quota-input annotation exceptions and exact supplier-permission fragment normalization"
+  ],
+  "source_or_tracked_test_edits_by_reviewer": false,
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "test_logs": [
+    {
+      "bytes": 530,
+      "path": "review_pack/accel005-independent-retained-boundary-pytest.log",
+      "sha256": "dec287ea8e2f7ef6da47d5c9c793e619f6a79e4a339d4c22e8e3aa81f7d1d861"
+    },
+    {
+      "bytes": 202,
+      "path": "review_pack/accel005-independent-final-freeze-pytest.log",
+      "sha256": "b04c91a0aa2d520578951e176632597c01bc8ca04dd46345a88c57c9379200fc"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ from tests.accel002_legacy_freeze_support import (
     original_fpl_registry_bytes,
     without_accel002_presentation,
 )
+from tests.accel005_legacy_freeze_support import without_accel005_permission
 
 pytestmark = pytest.mark.unit
 PARENT = "f4585eee4a3ea492b6a535f33fa13183734ab2ac"
@@ -315,7 +316,10 @@ def test_d1_through_d7_live_control_flow_changes_only_l8_metadata():
         .replace('run_id="CURRENT-TEAM-STRENGTH-001P-L7"', 'run_id="CURRENT-TEAM-STRENGTH-001P-L8"')
     )
     assert (
-        Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8")
+        without_accel005_permission(
+            Path("src/dmf_pulse/private_v1/team_strength_live.py").read_text(encoding="utf-8"),
+            "src/dmf_pulse/private_v1/team_strength_live.py",
+        )
         == expected
     )
 
@@ -338,6 +342,8 @@ def test_d1_through_d7_live_control_flow_changes_only_l8_metadata():
 )
 def test_model_decision_and_provider_boundaries_are_parent_identical(path):
     current = Path(path).read_text(encoding="utf-8")
+    if path == "src/dmf_pulse/private_v1/team_strength_live_network.py":
+        current = without_accel005_permission(current, path)
     if path in {"src/dmf_pulse/private_v1/service.py", "src/dmf_pulse/private_v1/rolling.py"}:
         current = without_accel002_presentation(current, path)
     assert current == parent_text(path)

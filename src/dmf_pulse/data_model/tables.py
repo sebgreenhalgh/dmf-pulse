@@ -4045,6 +4045,19 @@ Index(
     postgresql_where=text("kind = 'LABEL'"),
 )
 
+Index(
+    "uq_real_player_deadline_population",
+    text("(payload ->> 'protocol_sha256'::text)"),
+    text("(((payload -> 'population'::text) ->> 'gameweek'::text)::integer)"),
+    unique=True,
+    postgresql_where=text(
+        "((dataset_mode = 'PROSPECTIVE_REAL'::text) AND ((payload ->> 'schema_version'::text) = 'qualified-real-player-deadline-registration-v1'::text))"
+    ),
+    _table=player_research_artifact,
+).ddl_if(callable_=lambda *_args, **_kwargs: False)
+# Historical revision 7 creates this shared Table. Revision 9 alone creates this
+# later index through explicit DDL; it remains declared here for drift checking.
+
 player_research_pair = Table(
     "score_pair",
     metadata,

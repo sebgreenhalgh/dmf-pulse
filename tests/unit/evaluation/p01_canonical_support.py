@@ -53,7 +53,11 @@ def owned_snapshot(view, *, omit_last=False, changes=None, registry=None):
     source = seal(
         SourceLineage,
         **{
-            **{name: getattr(view.public_schedule.lineage, name) for name in type(view.public_schedule.lineage).model_fields if name != "semantic_sha256"},
+            **{
+                name: getattr(view.public_schedule.lineage, name)
+                for name in type(view.public_schedule.lineage).model_fields
+                if name != "semantic_sha256"
+            },
             "retrieval_started_at": AT,
             "received_at": AT,
             "validated_at": AT,

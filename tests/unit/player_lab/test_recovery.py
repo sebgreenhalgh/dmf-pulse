@@ -231,6 +231,7 @@ def test_regular_file_identity_swap_fails_closed(tmp_path, monkeypatch):
             st_size=value.st_size,
             st_ino=value.st_ino + 1,
             st_dev=value.st_dev,
+            st_mtime_ns=value.st_mtime_ns,
         )
 
     monkeypatch.setattr(os, "fstat", swapped)

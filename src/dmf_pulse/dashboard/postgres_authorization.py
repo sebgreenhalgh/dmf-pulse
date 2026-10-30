@@ -29,6 +29,7 @@ ConnectionFactory = Callable[[], AbstractContextManager[Connection]]
 DatabaseRef = Literal["OPERATOR_CONTROL_DATABASE", "SYNTHETIC_TEST_DATABASE"]
 CONTROL_VERSION = "postgres-refresh-control-v1"
 CONTROL_REVISION = "20261029_0008"
+CONTROL_COMPATIBLE_REVISIONS = frozenset({CONTROL_REVISION, "20261030_0009"})
 _SHA = re.compile(r"^[0-9a-f]{64}$")
 _REF = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$")
 _COMMON = {"kind", "at", "reservation_id", "ledger_id", "sequence", "previous_sha256", "sha256"}
@@ -151,7 +152,7 @@ class PostgresUsageLedger(UsageLedger):
         connection.execute(text("SET LOCAL statement_timeout = '10s'"))
         connection.execute(text("SET LOCAL synchronous_commit = 'on'"))
         if (
-            current_alembic_revision(connection) != CONTROL_REVISION
+            current_alembic_revision(connection) not in CONTROL_COMPATIBLE_REVISIONS
             or str(connection.execute(text("SHOW timezone")).scalar_one()) != "UTC"
             or str(connection.execute(text("SHOW fsync")).scalar_one()) != "on"
         ):

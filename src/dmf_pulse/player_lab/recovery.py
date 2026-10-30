@@ -11,6 +11,7 @@ from typing import Literal
 
 from pydantic import ValidationError
 
+from dmf_pulse.player_lab.local_handles import DirectoryPins
 from dmf_pulse.player_lab.recovery_models import ArtifactVerification, RecoveryCatalogue
 
 _RESOURCE = "recovered_forecasts_v1.json"
@@ -28,7 +29,12 @@ class RecoveryError(ValueError):
 
     def __init__(
         self,
-        code: Literal["RECOVERY_CATALOGUE_UNAVAILABLE", "RECOVERY_ARTIFACT_UNSAFE_OR_UNREADABLE"],
+        code: Literal[
+            "RECOVERY_CATALOGUE_UNAVAILABLE",
+            "RECOVERY_ARTIFACT_UNSAFE_OR_UNREADABLE",
+            "RECOVERY_LOCATOR_UNSAFE_OR_BUDGET_EXCEEDED",
+            "RECOVERY_INVENTORY_WRITE_FAILED",
+        ],
     ) -> None:
         self.code = code
         super().__init__(code)
@@ -67,8 +73,7 @@ def recovery_catalogue() -> RecoveryCatalogue:
     return outcome
 
 
-def _artifact_digest(path: Path) -> tuple[str, int]:
-    # No recursive search. The operator selects one local regular artifact.
+def _safe_lexical_path(path: Path) -> None:
     raw = str(path)
     if (
         raw.startswith(("\\\\", "//"))
@@ -84,33 +89,86 @@ def _artifact_digest(path: Path) -> tuple[str, int]:
         )
     ):
         raise ValueError("unsafe input identity")
-    for candidate in (path, *path.parents):
-        metadata = candidate.lstat()
-        if stat.S_ISLNK(metadata.st_mode) or getattr(metadata, "st_file_attributes", 0) & 0x400:
-            raise ValueError("links and reparse points are excluded")
-    selected = path.lstat()
-    if not stat.S_ISREG(selected.st_mode) or selected.st_size > _MAX_ARTIFACT_BYTES:
-        raise ValueError("input is not a bounded regular file")
-    flags = (
-        os.O_RDONLY
-        | getattr(os, "O_BINARY", 0)
-        | getattr(os, "O_NOFOLLOW", 0)
-        | getattr(os, "O_NONBLOCK", 0)
+
+
+def _artifact_digest(
+    path: Path,
+    *,
+    maximum_bytes: int | None = None,
+    expected_identity: tuple[int, int, int, int] | None = None,
+    pins: DirectoryPins | None = None,
+) -> tuple[str, int]:
+    _safe_lexical_path(path)
+    if any(part in {".", ".."} for part in path.parts):
+        raise ValueError("noncanonical local locator")
+    path = path.absolute()
+    initial = path.lstat()
+    limit = (
+        _MAX_ARTIFACT_BYTES if maximum_bytes is None else min(maximum_bytes, _MAX_ARTIFACT_BYTES)
     )
-    descriptor = os.open(path, flags)
+    if (
+        not stat.S_ISREG(initial.st_mode)
+        or getattr(initial, "st_file_attributes", 0) & 0x400
+        or initial.st_size > limit
+    ):
+        raise ValueError("input is not a bounded regular file")
+    if expected_identity is None:
+        expected_identity = (initial.st_dev, initial.st_ino, initial.st_size, initial.st_mtime_ns)
+    if pins is not None:
+        return _bound_digest(
+            path,
+            pins.open_file(path),
+            maximum_bytes=maximum_bytes,
+            expected_identity=expected_identity,
+        )
+    with DirectoryPins() as local:
+        return _bound_digest(
+            path,
+            local.open_file(path),
+            maximum_bytes=maximum_bytes,
+            expected_identity=expected_identity,
+        )
+
+
+def _bound_digest(
+    path: Path,
+    file_descriptor: int,
+    *,
+    maximum_bytes: int | None,
+    expected_identity: tuple[int, int, int, int] | None,
+) -> tuple[str, int]:
+    # No recursive search. The operator selects one local regular artifact.
+    _safe_lexical_path(path)
+    limit = (
+        _MAX_ARTIFACT_BYTES if maximum_bytes is None else min(maximum_bytes, _MAX_ARTIFACT_BYTES)
+    )
+    if limit < 0:
+        raise ValueError("artifact byte budget is invalid")
+    selected = os.fstat(file_descriptor)
+    if (
+        expected_identity is not None
+        and (selected.st_dev, selected.st_ino, selected.st_size, selected.st_mtime_ns)
+        != expected_identity
+    ):
+        raise ValueError("input changed after approved census")
+    if not stat.S_ISREG(selected.st_mode) or selected.st_size > limit:
+        raise ValueError("input is not a bounded regular file")
+    descriptor = os.dup(file_descriptor)
+    os.lseek(descriptor, 0, os.SEEK_SET)
     with os.fdopen(descriptor, "rb") as handle:
         metadata = os.fstat(handle.fileno())
         if (
             not stat.S_ISREG(metadata.st_mode)
-            or metadata.st_size > _MAX_ARTIFACT_BYTES
+            or metadata.st_size > limit
             or (selected.st_ino, selected.st_dev) != (metadata.st_ino, metadata.st_dev)
+            or (selected.st_size, selected.st_mtime_ns) != (metadata.st_size, metadata.st_mtime_ns)
         ):
             raise ValueError("input is not a bounded regular file")
         digest = hashlib.sha256()
         size = 0
-        while chunk := handle.read(min(1024 * 1024, _MAX_ARTIFACT_BYTES - size + 1)):
+        while chunk := handle.read(min(1024 * 1024, limit - size + 1)):
             size += len(chunk)
-            if size > _MAX_ARTIFACT_BYTES:
+            if size > limit:
                 raise ValueError("input grew beyond limit")
             digest.update(chunk)
         final_metadata = os.fstat(handle.fileno())

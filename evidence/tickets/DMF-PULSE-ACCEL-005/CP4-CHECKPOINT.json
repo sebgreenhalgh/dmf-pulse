@@ -1,0 +1,38 @@
+{
+  "actual_p01_scores": 0,
+  "actual_player_comparisons": 0,
+  "actual_player_freezes": 0,
+  "actual_provider_requests": 0,
+  "actual_qualified_real_sources": 0,
+  "additional_owner_freezes": "UNRESOLVED_NOT_DISPROVED",
+  "full_release_acceptance": "CP6_PENDING",
+  "implementation_state": "BOUNDED_LOCATORS_AND_EXISTING_REAL_LEDGER_INTERFACES_COMPLETE",
+  "independent_locator_focused_checks": 64,
+  "independent_native_locator_cases": 5,
+  "independent_reviews": [
+    {
+      "path": "CP4-INDEPENDENT-SCIENTIFIC.json",
+      "sha256": "4f170a8e1e77ab63f1ff213f4a21633c18dbacd7bb2535ef697fcbe5af5d4a1b"
+    },
+    {
+      "path": "CP4-INDEPENDENT-INTEGRATION.json",
+      "sha256": "a22cd0dafe0f0aac73512e2ffd43de71975a41e6aa521baac0553f22bc949b29"
+    },
+    {
+      "path": "CP4-INDEPENDENT-LOCATOR.json",
+      "sha256": "97cae2fc107de5c34dc12c9cd2aed3920fd254f8f154fb68cf70235a69684949"
+    }
+  ],
+  "independent_scientific_cases": 48,
+  "normal_vault_reads": 0,
+  "original_dirty_files": 19,
+  "original_p01_unchanged": true,
+  "owner_code_binding": "PROPOSED_UNACCEPTED",
+  "parent": "f622e794d19a915e7bc320660bde1447b49a3ed6",
+  "postgres_tests": 112,
+  "production_active": false,
+  "protected_git_blobs": 11,
+  "protected_numerical_files": 157,
+  "schema_version": "accel005-cp4-checkpoint-v1",
+  "sealed_at": "2026-10-30T19:35:51.440380+00:00"
+}

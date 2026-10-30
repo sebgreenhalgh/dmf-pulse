@@ -51,8 +51,15 @@ def request(ready, **changes):
     )
 
 
+class OwnedNoNetworkTransport:
+    def send(self, request):
+        del request
+        raise AssertionError("historical control test must not send an owned request")
+
+
 def service(**kwargs):
     marker = "synthetic-test-only-value"
+    kwargs.setdefault("fpl_transport", OwnedNoNetworkTransport())
     return live.TeamStrengthL1ObservationService(
         clock=lambda: STAMP + timedelta(minutes=1),
         fpl_credentials=DirectFplCredentialProvider({"DMF_FPL_BEARER_TOKEN": marker}),
@@ -163,7 +170,9 @@ def test_first_fpl_transport_attempt_consumes_even_failure_no_retry(readiness, r
 
 def test_missing_credential_before_transport_does_not_consume(readiness):
     active = live.TeamStrengthL1ObservationService(
-        clock=lambda: STAMP + timedelta(minutes=1), fpl_credentials=DirectFplCredentialProvider({})
+        clock=lambda: STAMP + timedelta(minutes=1),
+        fpl_credentials=DirectFplCredentialProvider({}),
+        fpl_transport=OwnedNoNetworkTransport(),
     )
     result = offline_run(active, request(readiness), readiness)
     assert result["reason"] == "CREDENTIAL_UNAVAILABLE"
