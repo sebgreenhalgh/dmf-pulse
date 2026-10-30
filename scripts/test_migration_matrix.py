@@ -130,8 +130,14 @@ def _revision_plan(baseline: str, requested_target: str) -> RevisionPlan:
     if current is None:
         raise MatrixError("target is not a linear descendant of the requested baseline")
     revisions.reverse()
-    if not revisions or len(revisions) > 3:
-        raise MatrixError("migration matrix requires one to three ordered revisions")
+    inherited_wave005 = baseline_script.revision == "20260803_0005" and tuple(revisions) == (
+        "20260807_0006",
+        "20261029_0007",
+        "20261029_0008",
+        "20261030_0009",
+    )
+    if not revisions or (len(revisions) > 3 and not inherited_wave005):
+        raise MatrixError("migration matrix requires a reviewed ordered revision path")
     if baseline_script.revision == "20260724_0002" and tuple(revisions) != (
         "20260725_0003",
         "20260725_0004",

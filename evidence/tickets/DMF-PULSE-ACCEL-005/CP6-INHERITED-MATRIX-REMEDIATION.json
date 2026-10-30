@@ -1,0 +1,17 @@
+{
+  "actual_provider_calls": 0,
+  "actual_vault_calls": 0,
+  "command": [
+    "python",
+    "review_pack/run_postgres_owned.py",
+    "review_pack/run005_matrix.py"
+  ],
+  "completed_at": "2026-10-30T19:46:17.459472+00:00",
+  "cwd": "DEDICATED_WAVE005_WORKTREE",
+  "environment": "CLOSED_NONSECRET_TEST_WHITELIST",
+  "exit_code": 0,
+  "helper_sha256": "3e1db583f9c57f757225068be1976519f38d6cb90404c7434454e20a33be1d3c",
+  "log_sha256": "fa0c0febb3840873318db8cf1d2925211f882394878512f98e43a773d482558f",
+  "schema_version": "accel005-owned-command-v1",
+  "started_at": "2026-10-30T19:46:11.743849+00:00"
+}

@@ -1,0 +1,236 @@
+{
+  "captured_parent_native_matrix": {
+    "capture_helper": {
+      "bytes": 1852,
+      "path": "review_pack/capture005.py",
+      "sha256": "3e1db583f9c57f757225068be1976519f38d6cb90404c7434454e20a33be1d3c"
+    },
+    "downgrades": 2,
+    "log": {
+      "bytes": 1852,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-INHERITED-MATRIX-REMEDIATION.LOG",
+      "sha256": "fa0c0febb3840873318db8cf1d2925211f882394878512f98e43a773d482558f"
+    },
+    "offline_sql_and_schema_manifest_hashes_match": true,
+    "receipt": {
+      "bytes": 605,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-005/CP6-INHERITED-MATRIX-REMEDIATION.json",
+      "sha256": "90773ce46c93df8b02c47c61b59b70c0691b6327713dc547f29c05a53c59c67e"
+    },
+    "report": {
+      "bytes": 1741,
+      "path": "review_pack/release005/matrix/migration_report.json",
+      "sha256": "63202cf610d8237cac051706deb7b1abbd926492089631e8ac7129c88f8fb024"
+    },
+    "schema_sha256": "64d37a2f4fd8830515edec2d903e8c44ebd3917b4ad359bc1b79cada99506eea",
+    "transitions": 5,
+    "upgrades": 3
+  },
+  "cases": [
+    {
+      "case": "actual_installed_history_exact_four_revision_path",
+      "outcome": "ACCEPTED"
+    },
+    {
+      "case": "owned_exact_four_revision_allowance",
+      "outcome": "ACCEPTED"
+    },
+    {
+      "case": "four_revision_permutation_1",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_2",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_3",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_4",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_5",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_6",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_7",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_8",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_9",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_10",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_11",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_12",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_13",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_14",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_15",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_16",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_17",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_18",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_19",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_20",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_21",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_22",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_permutation_23",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_substitution_0",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_substitution_1",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_substitution_2",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "four_revision_substitution_3",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "exact_sequence_wrong_baseline_20260725_0004",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "exact_sequence_wrong_baseline_owned-other-baseline",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "unrelated_future_five_revision_span",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "empty_path",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "multiple_heads",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "requested_target_not_head",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "disconnected_exact_sequence",
+      "outcome": "REJECTED"
+    },
+    {
+      "case": "retained_ordinary_span_1",
+      "outcome": "ACCEPTED"
+    },
+    {
+      "case": "retained_ordinary_span_2",
+      "outcome": "ACCEPTED"
+    },
+    {
+      "case": "retained_ordinary_span_3",
+      "outcome": "ACCEPTED"
+    },
+    {
+      "case": "historical_odd005_exact_two_revision_rule",
+      "outcome": "ACCEPTED"
+    },
+    {
+      "case": "historical_odd005_nonexact_two_revision_rule",
+      "outcome": "REJECTED"
+    }
+  ],
+  "checked_at": "2026-10-30T19:48:59.224406+00:00",
+  "current_script": {
+    "bytes": 45616,
+    "path": "scripts/test_migration_matrix.py",
+    "sha256": "23c0dae0fb67151ac5b72876bc0327a64592b970e3d03ef2d0fbac0e8480a8be"
+  },
+  "database_or_provider_or_vault_access_by_reviewer": 0,
+  "findings": [],
+  "limits": [
+    "No native SQL rerun: the parent-owned five-transition matrix is authenticated against captured exit/log/report/artifact bindings; previous independent SQL proofs remain separate.",
+    "The capture receipt pins capture005.py, not historical child-launcher bytes; current child helpers were inspected only, without inferring a historical child hash.",
+    "Complete unchanged20-job exact-final-SHA CI and installed-wheel acceptance remain pending; this finite script exception grants no owner conditions, source rights or operational authorization."
+  ],
+  "new_tests": {
+    "bytes": 1035,
+    "path": "tests/unit/scripts/test_accel005_migration_plan.py",
+    "sha256": "55a16b4e3d08ca36ca5e702cf7420d864819ce3116f9b35a0f1def7e4ca72854"
+  },
+  "only_exact_span_guard_block_changed": true,
+  "previous_script_sha256": "32b1e836fb03297e54b2795278690dad6618dfef820356858e41e4020c21343a",
+  "prior_review": {
+    "bytes": 9156,
+    "path": "review_pack/accel005-independent-cp4-integration-review-a22cd0dafe0f0aac73512e2ffd43de71975a41e6aa521baac0553f22bc949b29.json",
+    "sha256": "a22cd0dafe0f0aac73512e2ffd43de71975a41e6aa521baac0553f22bc949b29"
+  },
+  "schema_version": "accel005-independent-matrix-span-review-v1",
+  "source_or_tracked_test_edits_by_reviewer": false,
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "targeted_pytest": {
+    "log": {
+      "bytes": 202,
+      "path": "review_pack/accel005-independent-matrix-span-pytest.log",
+      "sha256": "79f5b3d70b7459d42ab214def574300c31c2c3c58f132a466c2d64576f496bcd"
+    },
+    "passed": 4,
+    "seconds": 0.96
+  },
+  "unchanged_workflow_git_blob_sha256": {
+    ".github/workflows/ci.yml": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+    ".github/workflows/windows-smoke.yml": "f04ce4d61d35f007b53e87d0eb26a35d212f0e6e0023288e793cc6066678c6ee"
+  }
+}

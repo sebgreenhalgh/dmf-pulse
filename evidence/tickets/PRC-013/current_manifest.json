@@ -2606,9 +2606,9 @@
       "sha256": "85c88f4fd719c8ada636dc15649a98d592ad46751be046d6ab801a959a27b07a"
     },
     {
-      "bytes": 45386,
+      "bytes": 45616,
       "path": "scripts/test_migration_matrix.py",
-      "sha256": "32b1e836fb03297e54b2795278690dad6618dfef820356858e41e4020c21343a"
+      "sha256": "23c0dae0fb67151ac5b72876bc0327a64592b970e3d03ef2d0fbac0e8480a8be"
     },
     {
       "bytes": 17705,
@@ -8079,6 +8079,11 @@
       "bytes": 8790,
       "path": "tests/unit/scripts/test_accel003_wheel_probe.py",
       "sha256": "98e31330cb84a25e101bf20f31a86df14342c9d51465c487e0e76def2f4ad3a3"
+    },
+    {
+      "bytes": 1035,
+      "path": "tests/unit/scripts/test_accel005_migration_plan.py",
+      "sha256": "55a16b4e3d08ca36ca5e702cf7420d864819ce3116f9b35a0f1def7e4ca72854"
     },
     {
       "bytes": 25365,
