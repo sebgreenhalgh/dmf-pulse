@@ -15,10 +15,13 @@ import hashlib
 import io
 import json
 import math
+import os
 import re
+import stat
 import statistics
 import subprocess
 import sys
+import tempfile
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path, PurePosixPath
 
@@ -1455,8 +1458,92 @@ def _command_verify_artifacts(arguments: argparse.Namespace) -> dict[str, object
     }
 
 
+def _coverage_transport_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    value: dict[str, object] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ShardPlannerError("coverage transport contains duplicate object keys")
+        value[key] = item
+    return value
+
+
+def _coverage_transport_constant(_value: str) -> object:
+    raise ShardPlannerError("coverage transport contains a nonfinite number")
+
+
 def _command_verify_branch_report(arguments: argparse.Namespace) -> dict[str, object]:
-    return verify_branch_report(arguments.coverage_json)
+    """Validate branch data, then losslessly normalize its JSON transport only."""
+    path = arguments.coverage_json
+    staged: Path | None = None
+    try:
+        identity = path.lstat()
+        if not stat.S_ISREG(identity.st_mode):
+            raise ShardPlannerError("coverage transport must be a regular file")
+        original = path.read_bytes()
+        result = verify_branch_report(path)
+        payload = json.loads(
+            original,
+            object_pairs_hook=_coverage_transport_object,
+            parse_constant=_coverage_transport_constant,
+        )
+        compact = (
+            json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n"
+        ).encode("utf-8")
+        if json.loads(compact) != payload:
+            raise ShardPlannerError("coverage transport payload changed during encoding")
+        if compact != original:
+            with tempfile.NamedTemporaryFile(
+                mode="wb", prefix=".coverage-transport-", dir=path.parent, delete=False
+            ) as stream:
+                staged = Path(stream.name)
+                stream.write(compact)
+                stream.flush()
+                os.fsync(stream.fileno())
+            if staged.read_bytes() != compact:
+                raise ShardPlannerError("staged coverage transport differs from encoded bytes")
+            current = path.lstat()
+            if (
+                not stat.S_ISREG(current.st_mode)
+                or (current.st_dev, current.st_ino) != (identity.st_dev, identity.st_ino)
+                or path.read_bytes() != original
+            ):
+                raise ShardPlannerError("coverage transport changed during validation")
+            os.replace(staged, path)
+            staged = None
+        else:
+            current = path.lstat()
+            if (
+                not stat.S_ISREG(current.st_mode)
+                or (current.st_dev, current.st_ino) != (identity.st_dev, identity.st_ino)
+                or path.read_bytes() != original
+            ):
+                raise ShardPlannerError("coverage transport changed during validation")
+        print(
+            json.dumps(
+                {
+                    "schema_version": "ci-coverage-json-transport-v1",
+                    "input_bytes": len(original),
+                    "output_bytes": len(compact),
+                    "input_sha256": hashlib.sha256(original).hexdigest(),
+                    "output_sha256": hashlib.sha256(compact).hexdigest(),
+                    "semantic_payload_preserved": True,
+                    "rewritten": compact != original,
+                },
+                sort_keys=True,
+            ),
+            file=sys.stderr,
+        )
+        return result
+    except ShardPlannerError:
+        raise
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise ShardPlannerError("coverage JSON transport could not be normalized") from exc
+    finally:
+        if staged is not None:
+            try:
+                staged.unlink(missing_ok=True)
+            except OSError as exc:
+                raise ShardPlannerError("staged coverage transport cleanup failed") from exc
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -1491,7 +1578,9 @@ def _parser() -> argparse.ArgumentParser:
     verify.add_argument("--git-sha", required=True)
     verify.set_defaults(handler=_command_verify_artifacts)
 
-    branch = subparsers.add_parser("verify-branch-report")
+    branch = subparsers.add_parser(
+        "verify-branch-report", help="Validate branch data and losslessly compact JSON transport."
+    )
     branch.add_argument("coverage_json", type=Path)
     branch.set_defaults(handler=_command_verify_branch_report)
     return parser

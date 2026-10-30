@@ -1,0 +1,28 @@
+{
+  "archive_sha256": "c1cb70823265eb8aa5f9186dcd5a8732344adab5ab09d76cb43c9851fd22243a",
+  "artifact_id": 13013203569,
+  "compact_bytes": 4790490,
+  "compact_sha256": "fa4ef06907f27c67122d5b31cd4b58e67cdb258eee0575f4c90816cdb8532215",
+  "fits_unchanged_scan_limit": true,
+  "raw_bytes": 5347882,
+  "raw_sha256": "ee058414e0a9849035efb4b6c958baf47b48b73093abc7c6ea791ded08d18abe",
+  "run_id": 41127743784,
+  "semantic_payload_equal": true,
+  "source_checkpoint": "e177e889adde887cd6bec8ec678916057ea3dfc6",
+  "totals": {
+    "covered_branches": 15546,
+    "covered_lines": 55595,
+    "excluded_lines": 310,
+    "missing_branches": 2700,
+    "missing_lines": 3898,
+    "num_branches": 18246,
+    "num_partial_branches": 2386,
+    "num_statements": 59493,
+    "percent_branches_covered": 85.20223610654391,
+    "percent_branches_covered_display": "85",
+    "percent_covered": 91.51262558046798,
+    "percent_covered_display": "92",
+    "percent_statements_covered": 93.44796866858286,
+    "percent_statements_covered_display": "93"
+  }
+}

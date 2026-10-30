@@ -1,0 +1,115 @@
+{
+  "archive_member": "coverage.json",
+  "artifact_bindings": [
+    {
+      "bytes": 458616,
+      "path": "review_pack/release005-final/ci-e177-coverage/coverage-artifact.zip",
+      "sha256": "c1cb70823265eb8aa5f9186dcd5a8732344adab5ab09d76cb43c9851fd22243a"
+    },
+    {
+      "bytes": 5347882,
+      "path": "review_pack/release005-final/ci-e177-coverage/coverage.raw.json",
+      "sha256": "ee058414e0a9849035efb4b6c958baf47b48b73093abc7c6ea791ded08d18abe"
+    },
+    {
+      "bytes": 4790490,
+      "path": "review_pack/release005-final/ci-e177-coverage/coverage.compact.json",
+      "sha256": "fa4ef06907f27c67122d5b31cd4b58e67cdb258eee0575f4c90816cdb8532215"
+    },
+    {
+      "bytes": 1062,
+      "path": "review_pack/release005-final/ci-e177-coverage/PROVENANCE.json",
+      "sha256": "e66d82701e7a461c284d200f54f2b4b2c85ec30c2e707db21a2f1513ebd34acb"
+    }
+  ],
+  "claimed_official_artifact_id": 13013203569,
+  "claimed_official_run_id": 41127743784,
+  "complete_payload_node_counts": {
+    "bool": 2,
+    "classes_entries": 1926,
+    "dict": 14266,
+    "executed_branches_entries": 46629,
+    "executed_lines_entries": 166785,
+    "float": 20172,
+    "functions_entries": 4389,
+    "int": 348975,
+    "list": 88344,
+    "missing_branches_entries": 8100,
+    "missing_lines_entries": 11694,
+    "str": 20174
+  },
+  "coverage": {
+    "branch_percent": 85.20223610654391,
+    "combined_percent": 91.51262558046798,
+    "statement_percent": 93.44796866858286
+  },
+  "database_calls": 0,
+  "file_count": 408,
+  "findings": [],
+  "limitations": [
+    "This artifact inspection uses the retained root-supplied official artifact/provenance; it independently recomputes archive/member hashes and payload identity but does not fetch fresh GitHub metadata.",
+    "The e177 post-coverage failure is retained; no exact final twenty-job CI success is inferred. The isolated-worktree CLI change remains pending independent implementation review.",
+    "CLI normalization makes generated JSON scannable under the existing size limit. It does not waive or certify the later actual secret scan."
+  ],
+  "normal_vault_reads": 0,
+  "provider_calls": 0,
+  "recursive_all_keys_order_types_lists_and_values_equal": true,
+  "required_implementation_guards": [
+    "Keep pure verify_branch_report unchanged and read-only; mutate only explicit CLI transport after validation succeeds.",
+    "Strict complete-payload roundtrip equality, same-directory atomic replacement, original-byte drift detection, cleanup on failure and idempotent no-write path.",
+    "No scanner, allowlist, workflow, numerical gate, application, configuration or dependency change; no truncation or removed keys/arcs/functions/classes.",
+    "Tests must preserve original file on failed original branch proof and write/drift/atomic errors; stdout branch-proof schema stays unchanged."
+  ],
+  "review_helper": {
+    "bytes": 8166,
+    "path": "review_pack/review_accel005_coverage_payload.py",
+    "sha256": "e52b0ff943eef3e4b6365d6657b51da6b71fb7c769afe993b014ea086d5a7deb"
+  },
+  "reviewed_at": "2026-10-30T22:00:22.756246+00:00",
+  "schema_version": "accel005-independent-coverage-transport-review-v1",
+  "source_checkpoint": "e177e889adde887cd6bec8ec678916057ea3dfc6",
+  "status": "PASS_ACTUAL_PAYLOAD_AND_DESIGN_IMPLEMENTATION_REVIEW_PENDING",
+  "strict_duplicate_free_standard_finite_json": true,
+  "transport_only_design_within_scope": true,
+  "unchanged_branch_proof": {
+    "covered_branches": 15546,
+    "num_branches": 18246,
+    "schema_version": "ci-coverage-branch-proof-v1",
+    "status": "PASS"
+  },
+  "unchanged_gcs008_proof": {
+    "aggregate": {
+      "branch_percent": 88.730853,
+      "statement_percent": 94.738752
+    },
+    "critical_files": {
+      "src/dmf_pulse/football_events/_decimal.py": {
+        "branch_percent": 94.230769,
+        "statement_percent": 95.522388
+      },
+      "src/dmf_pulse/football_events/coherence.py": {
+        "branch_percent": 100.0,
+        "statement_percent": 100.0
+      },
+      "src/dmf_pulse/football_events/market_constraints.py": {
+        "branch_percent": 86.30137,
+        "statement_percent": 93.623188
+      },
+      "src/dmf_pulse/football_events/poisson.py": {
+        "branch_percent": 81.25,
+        "statement_percent": 93.181818
+      },
+      "src/dmf_pulse/football_events/score_distribution.py": {
+        "branch_percent": 92.982456,
+        "statement_percent": 96.987952
+      },
+      "src/dmf_pulse/football_events/score_projection.py": {
+        "branch_percent": 90.740741,
+        "statement_percent": 92.715232
+      }
+    },
+    "file_count": 22,
+    "schema_version": "gcs008-coverage-gate-v1",
+    "status": "PASS"
+  }
+}

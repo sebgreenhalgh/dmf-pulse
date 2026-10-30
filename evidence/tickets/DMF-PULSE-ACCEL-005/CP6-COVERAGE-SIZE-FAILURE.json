@@ -1,0 +1,64 @@
+{
+  "actual_provider_requests": 0,
+  "compact_bytes": 4790490,
+  "completed_stages": "All16 coverage shards, combined branch/GCS gates, all five workflow wheel verifiers and repository validation passed",
+  "evidence": [
+    {
+      "bytes": 4675,
+      "path": "CP6-INDEPENDENT-COVERAGE-PAYLOAD.json",
+      "sha256": "78627682196e651e23e4f77e139808551c75ca76e1ca0222e797bb8c79f4bf7f"
+    },
+    {
+      "bytes": 4565,
+      "path": "CP6-INDEPENDENT-COVERAGE-TRANSPORT.json",
+      "sha256": "fda01afae4b1555b1d0552ac1b640d88def7f399c2f4c9b80fa07aef29174f0b"
+    },
+    {
+      "bytes": 1361,
+      "path": "CP6-COVERAGE-TRANSPORT-TARGETED.json",
+      "sha256": "a3716559bdcb37c1b194423431bfda1da3c7529e71b455efab59880a8146b87b"
+    },
+    {
+      "bytes": 101,
+      "path": "CP6-COVERAGE-TRANSPORT-TARGETED.LOG",
+      "sha256": "915e0e004e32775717e904c8a12464b6f1a04b2c83a2360f8aa33a42f8455c55"
+    },
+    {
+      "bytes": 1009,
+      "path": "CP6-COVERAGE-TRANSPORT-ACTUAL-COMMAND.json",
+      "sha256": "93cffd177b091a33d4232e54fa04476309a64c43bf8a9682ea136c00c01b7896"
+    },
+    {
+      "bytes": 1790,
+      "path": "CP6-COVERAGE-TRANSPORT-ACTUAL-COMMAND.LOG",
+      "sha256": "8814234fe457a17218e84cb228ffac614248760c32c40240dc3f464b5135a9aa"
+    },
+    {
+      "bytes": 2157,
+      "path": "CP6-COVERAGE-TRANSPORT-ACTUAL.json",
+      "sha256": "d91bd8ccd5b860df3bfcd75b0c8fc5b8f0d9b467e29ad6f95ad7cabbb6f14aae"
+    },
+    {
+      "bytes": 1062,
+      "path": "CP6-COVERAGE-ARTIFACT-PROVENANCE.json",
+      "sha256": "e66d82701e7a461c284d200f54f2b4b2c85ec30c2e707db21a2f1513ebd34acb"
+    }
+  ],
+  "failure": {
+    "path": "evidence/tickets/GCS-008/coverage.json",
+    "raw_bytes": 5347882,
+    "reason": "file exceeds the bounded secret-scan size",
+    "rule_id": "SCAN_COVERAGE",
+    "stage": "First-party secret scan",
+    "unchanged_limit_bytes": 5242880
+  },
+  "job_id": 124325282372,
+  "new_final_ci_required": true,
+  "normal_vault_reads": 0,
+  "remedy": "Lossless JSON transport compaction after successful branch validation; no field, type, order, coverage value, gate, workflow, scanner or allowlist removal",
+  "run_id": 41127743784,
+  "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/41127743784",
+  "schema_version": "accel005-retained-ci-coverage-size-failure-v1",
+  "semantic_payload_equal": true,
+  "source_commit": "e177e889adde887cd6bec8ec678916057ea3dfc6"
+}

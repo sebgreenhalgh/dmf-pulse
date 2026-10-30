@@ -35,6 +35,14 @@ bounded transaction retry preserves the inherited overlap-race assertions.
 regression and final installed-wheel publication remain required; their actual
 completion is recorded in detached final receipts rather than predicted here.
 
+CP6 final CI exposed a generated coverage JSON transport of 5,347,882 bytes,
+above the unchanged scanner's five-MiB bound. An isolated report-only correction
+will compact the complete validated JSON to 4,790,490 bytes with exact semantic
+equality. The pure branch validator, all fields/coverage counts/gates, protected
+workflow, scanner and allowlist remain unchanged. Current Windows testing stays
+on clean e177; a final content bridge must distinguish that application evidence
+from the fresh exact-SHA CI and focused report-transport checks.
+
 No real scoring is inferred from owned tests. Additional owner-reported freezes
 remain unresolved, not disproved. Original P01/fallback consumption/authority
 history and all157 numerical sources remain pinned. The old consumed Odds

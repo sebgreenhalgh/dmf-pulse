@@ -1,0 +1,62 @@
+{
+  "actual_provider_requests": 0,
+  "branch_proof": {
+    "covered_branches": 15546,
+    "num_branches": 18246,
+    "schema_version": "ci-coverage-branch-proof-v1",
+    "status": "PASS"
+  },
+  "formatter_source_sha256": "7909a69de302691a12c023bb813e4af84b3827cd3ba379dded5cacea59bbce99",
+  "gcs_gate": {
+    "aggregate": {
+      "branch_percent": 88.730853,
+      "statement_percent": 94.738752
+    },
+    "critical_files": {
+      "src/dmf_pulse/football_events/_decimal.py": {
+        "branch_percent": 94.230769,
+        "statement_percent": 95.522388
+      },
+      "src/dmf_pulse/football_events/coherence.py": {
+        "branch_percent": 100.0,
+        "statement_percent": 100.0
+      },
+      "src/dmf_pulse/football_events/market_constraints.py": {
+        "branch_percent": 86.30137,
+        "statement_percent": 93.623188
+      },
+      "src/dmf_pulse/football_events/poisson.py": {
+        "branch_percent": 81.25,
+        "statement_percent": 93.181818
+      },
+      "src/dmf_pulse/football_events/score_distribution.py": {
+        "branch_percent": 92.982456,
+        "statement_percent": 96.987952
+      },
+      "src/dmf_pulse/football_events/score_projection.py": {
+        "branch_percent": 90.740741,
+        "statement_percent": 92.715232
+      }
+    },
+    "file_count": 22,
+    "schema_version": "gcs008-coverage-gate-v1",
+    "status": "PASS"
+  },
+  "input_bytes": 5347882,
+  "input_sha256": "ee058414e0a9849035efb4b6c958baf47b48b73093abc7c6ea791ded08d18abe",
+  "normal_vault_reads": 0,
+  "output_bytes": 4790490,
+  "output_sha256": "fa4ef06907f27c67122d5b31cd4b58e67cdb258eee0575f4c90816cdb8532215",
+  "semantic_payload_equal": true,
+  "status": "PASS",
+  "transport_receipt": {
+    "input_bytes": 5347882,
+    "input_sha256": "ee058414e0a9849035efb4b6c958baf47b48b73093abc7c6ea791ded08d18abe",
+    "output_bytes": 4790490,
+    "output_sha256": "fa4ef06907f27c67122d5b31cd4b58e67cdb258eee0575f4c90816cdb8532215",
+    "rewritten": true,
+    "schema_version": "ci-coverage-json-transport-v1",
+    "semantic_payload_preserved": true
+  },
+  "unchanged_scanner_findings": 0
+}

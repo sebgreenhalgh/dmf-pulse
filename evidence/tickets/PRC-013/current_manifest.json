@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 219855,
+      "bytes": 220401,
       "path": "PLANS.md",
-      "sha256": "d5311cf0923c99a0a61108838dfb06acf9d0bd808ae16d3d8afe22d9541339fe"
+      "sha256": "02410c0de6aa4e4c521152bce903f852316de7af4046b01606471c372bfe101b"
     },
     {
       "bytes": 2761,
@@ -2421,9 +2421,9 @@
       "sha256": "683d62aff383d66ff66cfdfe278f1744189473155252d0e0b632cc98b291febb"
     },
     {
-      "bytes": 64346,
+      "bytes": 68000,
       "path": "scripts/ci_coverage_shards.py",
-      "sha256": "35d6376527fd31b33f5b58386c85b4b8c6e7db92459339bcacbb1f3057ca6d44"
+      "sha256": "7909a69de302691a12c023bb813e4af84b3827cd3ba379dded5cacea59bbce99"
     },
     {
       "bytes": 5852,
@@ -8091,6 +8091,11 @@
       "sha256": "c420d903c4396e8841bfc0dfd24e726211e7903d539345fd4d2cab0b069179aa"
     },
     {
+      "bytes": 8174,
+      "path": "tests/unit/scripts/test_ci_coverage_transport.py",
+      "sha256": "00fb6d5fd32bf6d57c68c721396729852c0496ff218c56464e4cd033a16ab025"
+    },
+    {
       "bytes": 17868,
       "path": "tests/unit/scripts/test_ci_workflow_contract.py",
       "sha256": "c8e94ac5fce9524f30fccaf8d12bfb285f317d9dbccc8231d22e3ef61937f609"
@@ -8756,9 +8761,9 @@
       "sha256": "0f75e7ca9031d4cc17a6ba9c311680024ae44ad2570caacbc57956c1e1bf39d3"
     },
     {
-      "bytes": 4919,
+      "bytes": 6351,
       "path": "tickets/DMF-PULSE-ACCEL-005/CP6.md",
-      "sha256": "d7b6658b457e9887b35ecc39c7384529e9afb22c102dab84bf4582704b4384cb"
+      "sha256": "af5ede684c843155e74989422c7f553f859bcdfc973a6b61486eeb27e069117d"
     },
     {
       "bytes": 1376,

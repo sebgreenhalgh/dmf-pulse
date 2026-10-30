@@ -68,3 +68,23 @@ final 9a9c50dca5ed6632daa332237c69255d7a25553a7968a31779c3f1527559c458
 wheel remains content-identical; exact Git-to-wheel equality must bridge it to
 the new commit. Complete clean-source Windows regression and exact-final-SHA CI
 must run afresh. No predecessor partial results are combined as final acceptance.
+
+Exact e177 CI passed all sixteen coverage shards, combined branch/GCS gates,
+five workflow wheel verifiers and repository validation. Its final scanner failed
+closed because the generated complete coverage JSON was 5,347,882 bytes, above
+the unchanged 5,242,880-byte scan bound. The original artifact, published digest
+and failed run remain retained. The explicit verify-branch-report CLI now
+losslessly compacts its validated JSON transport to 4,790,490 bytes. Every field,
+type, list, order and value remains; branch/function/class detail is preserved.
+The pure branch validator is unchanged and read-only. CLI stdout retains its
+original proof schema; stderr records transport byte hashes and lengths.
+
+Strict duplicate/nonfinite parsing, verified flushed staging, input identity/byte
+drift checks, atomic replacement, typed failure/cleanup and idempotent no-write
+behavior are tested. All 51 inherited/new targeted cases and 25 independent fault
+controls pass. The exact downloaded CI body passes unchanged branch/GCS and
+secret-scan gates after formatting. No scanner/allowlist/workflow/coverage-floor,
+application, configuration, dependency, model or source-permission change occurs.
+Fresh final-SHA twenty-job CI remains mandatory. The isolated checkout preserves
+the running e177 Windows evidence; final publication must explicitly bridge its
+byte-identical application scope and separately verify the new transport cases.

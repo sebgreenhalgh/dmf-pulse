@@ -1,0 +1,79 @@
+{
+  "active_root_helpers_unchanged_sha256": {
+    "compose_windows005.py": "e34fd44b66e442393025aa9941b2fe59c40bf565d44a9b8eab8336e9c7b4cebc",
+    "run_windows_closed005_final.py": "0b85ca60397d739e56743b894da28d9c14ea4003fd7f3fc2ce4dcceecafbd860",
+    "run_windows_rerun02_closed005.py": "c35083f25326e3ec880d9fd2cd6d0967ab68aaba30c7b4c0ab05b7c399713b8a",
+    "windows_rerun02_005.py": "d7b9b0c3f2a929ad9575e357b3ca214c2f76176d8fb79684551f5ebae06274f1",
+    "windows_shards005_final.py": "e9fef927ff31c2391e36bc7977cb8ba665fda6fae882aea6980961902aea33f4"
+  },
+  "actual_payload_review": {
+    "bytes": 4675,
+    "path": "review_pack/accel005-independent-coverage-payload-review-78627682196e651e23e4f77e139808551c75ca76e1ca0222e797bb8c79f4bf7f.json",
+    "sha256": "78627682196e651e23e4f77e139808551c75ca76e1ca0222e797bb8c79f4bf7f"
+  },
+  "candidate_source": {
+    "bytes": 68000,
+    "path": "review_pack/CI-TRANSPORT/scripts/ci_coverage_shards.py",
+    "sha256": "7909a69de302691a12c023bb813e4af84b3827cd3ba379dded5cacea59bbce99"
+  },
+  "candidate_tests": {
+    "bytes": 8174,
+    "path": "review_pack/CI-TRANSPORT/tests/unit/scripts/test_ci_coverage_transport.py",
+    "sha256": "00fb6d5fd32bf6d57c68c721396729852c0496ff218c56464e4cd033a16ab025"
+  },
+  "database_calls": 0,
+  "eleven_protected_exact": {
+    ".github/workflows/ci.yml": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392",
+    ".secret-scan-allowlist.json": "4a85e7700a19dfdfc97bbbc57a78e932c27f9e2d7ae1ebfb597582de71c141ad",
+    "config/evaluation/team_strength_p01_a02_consumption.json": "e5cdbabb890153014938448f8846c81e2384121f0b94ff8ef565498a5e6f4486",
+    "config/evaluation/team_strength_p01_fallback_a02.json": "57dd39cac37553649b922684b380e8ea0ea5b5f7045ad5507abaf01386d8bf32",
+    "config/evaluation/team_strength_p01_fallback_a03.json": "8cc27b3f8fce8d0b1dde8f6054e9d58965669b3f729554d9df4d67b6687e6f4c",
+    "config/models/current_team_strength_governance.json": "441432d6ee68222c9892fb9d74194c8c0718f99add6a4aa5284d67b5a06b6fb3",
+    "config/rights/fpl_profiles.json": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+    "config/rights/odds_profiles.json": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+    "config/rights/openfootball_profiles.json": "aa351d0662e8943bcd4caf8ca43bba3a87d2d1603b312fb1760751feaeaf5545",
+    "config/rights/openligadb_p01_fallback.json": "9010711f99a697394a82c8dbb43e48d45e96622d660e9ee9cf05ee7dab788d24",
+    "scripts/verify_team_strength_coverage.py": "50fc6cecf7778b12ba261a4a3869f2574e23a3b91822355433105041e328699a"
+  },
+  "findings": [],
+  "independent_controls": {
+    "bytes": 5412,
+    "path": "review_pack/accel005-independent-coverage-cli-review-23f12654f849ce0083f5609c171252d1a9a28c739a927f12a47ccbea20b17c47.json",
+    "sha256": "23f12654f849ce0083f5609c171252d1a9a28c739a927f12a47ccbea20b17c47"
+  },
+  "limits": [
+    "The original e177 exact CI failed the unchanged bounded scanner on the oversized generated coverage JSON; no old CI failure was relabeled.",
+    "Only formatting is authorized in the CLI transport; pure branch verifier and all prior non-CLI functions remain unchanged.",
+    "No actual new complete twenty-job CI or full Windows acceptance is claimed. Package identity carry-forward and final test-source scope require explicit later binding after commit."
+  ],
+  "normal_vault_reads": 0,
+  "numerical_and_runtime_package_config_dependency_diff_empty": true,
+  "provider_calls": 0,
+  "reviewed_at": "2026-10-30T22:06:35.975084+00:00",
+  "root_source_remains_clean_e177": true,
+  "scanner_allowlist_workflow_authority_unchanged": true,
+  "schema_version": "accel005-independent-coverage-remediation-addendum-v1",
+  "source_parent": "e177e889adde887cd6bec8ec678916057ea3dfc6",
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "targeted_pytest": {
+    "capture_scope": "Direct tool result observation; no separately preserved raw subprocess log is claimed.",
+    "command": [
+      "../../.venv/Scripts/python.exe",
+      "../run_owned.py",
+      "-m",
+      "pytest",
+      "tests/unit/scripts/test_ci_coverage_transport.py",
+      "tests/unit/scripts/test_ci_coverage_shards.py",
+      "-q",
+      "-o",
+      "cache_dir=../t/b-coverage-transport-pytest-cache",
+      "--basetemp",
+      "../t/b-coverage-transport-pytest"
+    ],
+    "cwd": "review_pack/CI-TRANSPORT",
+    "exit_code": 0,
+    "passed": 51,
+    "seconds_reported": 0.97,
+    "stdout_observed": "................................................... [100%]\n51 passed in 0.97s"
+  }
+}

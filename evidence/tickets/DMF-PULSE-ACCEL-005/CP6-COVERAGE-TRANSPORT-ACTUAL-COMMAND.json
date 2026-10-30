@@ -1,0 +1,20 @@
+{
+  "actual_provider_requests": 0,
+  "capture_helper_sha256": "d8f3bfb3a587ad7ba8d7bed6d5e43a7fa5addfeaaa4561185967a3eb467916c4",
+  "command": [
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\.venv\\Scripts\\python.exe",
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-005\\review_pack\\apply_transport_actual005.py"
+  ],
+  "completed_at": "2026-10-30T22:09:18.328764+00:00",
+  "exit_code": 0,
+  "input_files_sha256": {
+    "scripts/ci_coverage_shards.py": "7909a69de302691a12c023bb813e4af84b3827cd3ba379dded5cacea59bbce99",
+    "tests/unit/scripts/test_ci_coverage_transport.py": "00fb6d5fd32bf6d57c68c721396729852c0496ff218c56464e4cd033a16ab025"
+  },
+  "log_sha256": "8814234fe457a17218e84cb228ffac614248760c32c40240dc3f464b5135a9aa",
+  "normal_vault_reads": 0,
+  "schema_version": "accel005-isolated-ci-transport-check-v1",
+  "seconds": 2.965,
+  "started_at": "2026-10-30T22:09:15.363637+00:00",
+  "worktree": "ISOLATED_CI_TRANSPORT_CHILD_OF_E177"
+}
