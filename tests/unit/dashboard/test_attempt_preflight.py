@@ -193,3 +193,63 @@ def test_private_test_database_selector_denies_attempt_preflight_before_connecti
     )
     with pytest.raises(AuthorizationError, match="PRIVATE_CONTROL_DATABASE_REQUIRED"):
         ledger.preflight_attempt(private, WORKER, **_scope())
+
+
+@pytest.mark.parametrize(
+    "boundary,expected",
+    [
+        ("past_cutoff", "ACQUISITION_CUTOFF_PASSED"),
+        ("expiry", "REFRESH_GRANT_EXPIRED"),
+        ("naive", "AUTHORIZATION_CLOCK_INVALID"),
+        ("worker", "REFRESH_GRANT_INVALID"),
+    ],
+)
+def test_post_control_window_refusal_preserves_spent_attempt_without_second_backend(
+    tmp_path, boundary, expected
+):
+    ledger, grant = _claimed(tmp_path)
+    # Simulate a valid transaction whose lock/commit returns only after time
+    # advances. The actual attempt has already been durably and singly spent.
+    ledger.attempt(grant, WORKER, **_scope())
+    spent = _bytes(ledger)
+    assert len([path for path in spent if path != "identity.json"]) == 3
+    ledger._transaction = lambda: pytest.fail("post-control fence opened another transaction")
+    now = grant.request.information_cutoff + timedelta(microseconds=1)
+    worker = WORKER
+    if boundary == "expiry":
+        now = grant.expires_at
+    elif boundary == "naive":
+        now = NOW.replace(tzinfo=None)
+    elif boundary == "worker":
+        worker = "invalid"
+    with pytest.raises(AuthorizationError, match=expected):
+        ledger.check_transport_window(grant, worker, now=now)
+    assert _bytes(ledger) == spent
+
+
+@pytest.mark.parametrize("at_cutoff", [False, True])
+def test_post_control_window_uses_exact_existing_cutoff_boundary_without_writes(
+    tmp_path, at_cutoff
+):
+    ledger, grant = _claimed(tmp_path)
+    ledger.attempt(grant, WORKER, **_scope())
+    spent = _bytes(ledger)
+    ledger._transaction = lambda: pytest.fail("pure window check reached a backend")
+    now = grant.request.information_cutoff if at_cutoff else NOW
+    assert ledger.check_transport_window(grant, WORKER, now=now) is None
+    assert _bytes(ledger) == spent
+
+
+def test_private_test_selector_pure_window_denies_without_connection(tmp_path):
+    _, grant = _claimed(tmp_path)
+    private = grant.model_copy(
+        update={"classification": "PRIVATE_CURRENT", "ledger_backend": "POSTGRES"}
+    )
+    ledger = PostgresUsageLedger(
+        lambda: pytest.fail("private test fence reached DB"),
+        grant.ledger_id,
+        account_ref="owned-test-account",
+        database_ref="SYNTHETIC_TEST_DATABASE",
+    )
+    with pytest.raises(AuthorizationError, match="PRIVATE_CONTROL_DATABASE_REQUIRED"):
+        ledger.check_transport_window(private, WORKER, now=NOW)

@@ -597,6 +597,15 @@ class UsageLedger:
         if now > grant.request.information_cutoff:
             raise AuthorizationError("ACQUISITION_CUTOFF_PASSED", "EXPIRED")
 
+    def check_transport_window(self, grant: RefreshGrant, worker_id: str, *, now: datetime) -> None:
+        """Recheck the same grant/window after a blocking durable attempt.
+
+        This pure check opens no control transaction and grants no route or
+        claim. The caller must already have recorded its exact attempt. A late
+        refusal keeps that spent record; it does not refund or reset anything.
+        """
+        self._attempt_ready(grant, worker_id, now)
+
     def _available_attempt_route(
         self,
         records: list[dict[str, Any]],
