@@ -1,0 +1,73 @@
+{
+  "all_review_and_failure_receipts_copied_before_scan": true,
+  "new_full_exact_sha_ci_required": true,
+  "package_model_test_rights_workflow_dependencies_unchanged": true,
+  "real_provider_calls": 0,
+  "records": [
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-30T00:31:04.598282+00:00",
+      "label": "FORMAT",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-FORMAT.LOG",
+      "log_sha256": "509a079f767f1e45e1cbd35e7bcf9cc076889895357f39ab4b2cdfac71708ed1",
+      "seconds": 0.32,
+      "started_at": "2026-10-30T00:31:04.278506+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-30T00:31:04.872602+00:00",
+      "label": "LINT",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-LINT.LOG",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "seconds": 0.274,
+      "started_at": "2026-10-30T00:31:04.598804+00:00"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-30T00:31:04.985180+00:00",
+      "label": "DIFF",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-DIFF.LOG",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "seconds": 0.112,
+      "started_at": "2026-10-30T00:31:04.873076+00:00"
+    },
+    {
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+        "scripts/scan_secrets.py"
+      ],
+      "exit_code": 0,
+      "finished_at": "2026-10-30T00:31:49.805890+00:00",
+      "label": "SECRET-SCAN",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-SECRET-SCAN.LOG",
+      "log_sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7",
+      "seconds": 44.82,
+      "started_at": "2026-10-30T00:31:04.985613+00:00"
+    }
+  ],
+  "scanner_allowlist_unchanged": true,
+  "schema_version": "accel003-metadata-correction-gates-v1",
+  "source_checkpoint": "a4410905db69b4253c1ad74e2ab1b6faad4a5221",
+  "status": "PASS",
+  "subsequent_machine_writes": "Only this fixed-shape command receipt and exact Git-index evidence and repository hash manifests precede commit."
+}

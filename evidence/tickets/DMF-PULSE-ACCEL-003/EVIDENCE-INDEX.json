@@ -1,6 +1,11 @@
 {
   "files": [
     {
+      "bytes": 5290,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/A441-CHECKPOINT-CI-FAILURE.json",
+      "sha256": "6f77ec0e2c2e4b2ecaa2740ccff16b93f24143c35626ce311d62df8425a3cdef"
+    },
+    {
       "bytes": 99,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/AUTH-CLI-68-PASS.log",
       "sha256": "659dfc90d4108489f08fa1dbc087e6e490ba13c57340c7892c841f3b975e232c"
@@ -221,6 +226,11 @@
       "sha256": "d28042b9f305efab6970f644084633a81fedb793e9713f4a7cabe4b2e0df2762"
     },
     {
+      "bytes": 1285,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-SCAN-SUPERSEDED.json",
+      "sha256": "465056ef30f4b39960fbf1eebe51937fdacfdebfdb946e89bbb726f375a88eb0"
+    },
+    {
       "bytes": 99,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/FINAL-VERIFIER-TESTS-CORRECTED.LOG",
       "sha256": "969a514c3c7073b5a6a17a5c13a4a227eaf70104c39f850e48ffbdb1a20009d8"
@@ -294,6 +304,11 @@
       "bytes": 3312,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-PUBLICATION-3GW.json",
       "sha256": "b85372d35be21f38ab5ea3a28fcef597d12e4cdced0bb479ae44536ec48048b2"
+    },
+    {
+      "bytes": 3124,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-REPOSITORY-METADATA-REVIEW.json",
+      "sha256": "99b7bc7f2b33b0366bb2765ad4e1799239b644ef2162264681d8ca42fcaa4166"
     },
     {
       "bytes": 4298,
@@ -391,6 +406,31 @@
       "sha256": "5f37d05e6289bfe0be06b200c47c3281c72a00618764115d9381df7051313ec7"
     },
     {
+      "bytes": 0,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-DIFF.LOG",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 29,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-FORMAT.LOG",
+      "sha256": "509a079f767f1e45e1cbd35e7bcf9cc076889895357f39ab4b2cdfac71708ed1"
+    },
+    {
+      "bytes": 19,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-LINT.LOG",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 2669,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-LOCAL-GATES.json",
+      "sha256": "6047b8aafd9c0247678c3ff759961398281acad9d44d6d43f41c37a7ec7c09d0"
+    },
+    {
+      "bytes": 63,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/METADATA-CORRECTION-SECRET-SCAN.LOG",
+      "sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+    },
+    {
       "bytes": 24549,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/PERFORMANCE-ASSESSMENT.json",
       "sha256": "52ade395742461404e19d6731a6be7f8e3542ef95c9bca7197f4995175dcd9dd"
@@ -406,9 +446,9 @@
       "sha256": "24f5a4ec9b3e671c2b81f2f1cb574913b23670efb8f71c8ba0e67af46344adab"
     },
     {
-      "bytes": 10663,
+      "bytes": 11136,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/RELEASE-HANDOFF.md",
-      "sha256": "21a3b71762aac0e46dac09d5015a55e0d6d9640760630e99ffdd9e42f5d17c3e"
+      "sha256": "777dd67ad76e1c2698c854f9d23dead974394a2dac3293dc8a4e2023e0140698"
     },
     {
       "bytes": 117651,
@@ -421,14 +461,19 @@
       "sha256": "ee7200ff400cbe4e29c2ce3f7860563ea0896c562785d3858deea258dec4d5ee"
     },
     {
+      "bytes": 1032,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/REPOSITORY-METADATA-NORMALIZATION.json",
+      "sha256": "7c8b360ad8358fec2ba6c39c5f8b70895e93c450dc276155cf5e0092d0508329"
+    },
+    {
       "bytes": 4554,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-CHECKS.json",
       "sha256": "f12ab56e2debc4ba2b2b1d4ffadb1a8709b4cad1a95e62d048619b4878e6b782"
     },
     {
-      "bytes": 4236,
+      "bytes": 5310,
       "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-HANDOFF.json",
-      "sha256": "c379b742417100c3d6d3cfc41057f78d265558cd402312d649cb2394286f4ba6"
+      "sha256": "a4f3194fedb62cef89f3b6e60d379ef4ee5535e289bc7c50a050931028266035"
     },
     {
       "bytes": 746,

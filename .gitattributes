@@ -24,6 +24,7 @@ evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-PARITY-1.json -text whitespace=bl
 evidence/tickets/DMF-PULSE-ACCEL-003/INSTALLED-PARITY-3.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-LEGACY-* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-SECURITY-FIXTURE-* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+evidence/tickets/DMF-PULSE-ACCEL-003/INDEPENDENT-REPOSITORY-METADATA-* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 evidence/tickets/DMF-PULSE-ACCEL-002/*.log binary
 evidence/tickets/DMF-PULSE-ACCEL-002/INDEPENDENT-* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 evidence/tickets/DMF-PULSE-ACCEL-002/LEGACY-FREEZE-REMEDIATION.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

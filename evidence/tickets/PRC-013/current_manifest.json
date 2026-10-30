@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 2157,
+      "bytes": 2298,
       "path": ".gitattributes",
-      "sha256": "6260efb5d0147a1c1d2576087cef71ff653e94168ebb395b426d6d6997a1bf8c"
+      "sha256": "2a225889688dd6bcd64139bc5ad5174bf6ed3224e5797e64c464b1b1205adf9d"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 211166,
+      "bytes": 211710,
       "path": "PLANS.md",
-      "sha256": "f67f6c87dd28d1809e125d40d068b689f4dd42136f77c1dd0a7c0cd40e49f09f"
+      "sha256": "c433f0c91f4b90a833d021d9c25dc44d3a8b96cac4cc55f11caeb724c98d6b20"
     },
     {
       "bytes": 2761,

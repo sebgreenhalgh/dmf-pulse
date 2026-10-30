@@ -1,0 +1,177 @@
+{
+  "conclusion": "failure",
+  "disposition": "All coverage shards, combined coverage, performance and five installed-wheel commands passed. The final diagnostic scan failed; aggregate quality correctly failed. Preserve this actual failure and require fresh complete CI on the corrected metadata commit.",
+  "failure": {
+    "fingerprint": "ab671541ab517e02a6cbc2dd653d8b8ffc2a4233a3994f3a00523130b8b68fa8",
+    "line": 45,
+    "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-HANDOFF.json",
+    "rule_id": "HIGH_ENTROPY_TOKEN",
+    "stage": "First-party secret scan"
+  },
+  "head_sha": "a4410905db69b4253c1ad74e2ab1b6faad4a5221",
+  "job_count": 20,
+  "jobs": [
+    {
+      "conclusion": "success",
+      "id": 123796105074,
+      "name": "Pre-flight",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551304,
+      "name": "Coverage shard 0 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551308,
+      "name": "Coverage shard 2 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551310,
+      "name": "Coverage shard 13 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551316,
+      "name": "Coverage shard 12 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551332,
+      "name": "Coverage shard 10 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551348,
+      "name": "Coverage shard 11 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551352,
+      "name": "Coverage shard 5 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551353,
+      "name": "Coverage shard 1 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551362,
+      "name": "Coverage shard 6 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551377,
+      "name": "Coverage shard 9 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551423,
+      "name": "Coverage shard 3 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551467,
+      "name": "Coverage shard 8 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551504,
+      "name": "Coverage shard 15 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551531,
+      "name": "Coverage shard 7 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551631,
+      "name": "Coverage shard 4 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123796551763,
+      "name": "Coverage shard 14 of 16",
+      "status": "completed"
+    },
+    {
+      "conclusion": "success",
+      "id": 123812065268,
+      "name": "Combined coverage gate",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123812392774,
+      "name": "Post-coverage acceptance",
+      "status": "completed"
+    },
+    {
+      "conclusion": "failure",
+      "id": 123815792033,
+      "name": "Python 3.13 / Ubuntu",
+      "status": "completed"
+    }
+  ],
+  "package_model_test_workflow_scanner_allowlist_changes": false,
+  "post_coverage_step_conclusions": {
+    "Build distributions": "success",
+    "Check out without persisted credentials": "success",
+    "Complete job": "success",
+    "Download verified combined coverage report": "success",
+    "FPL regression and ODD-005 synthetic vertical slice": "success",
+    "First-party secret scan": "failure",
+    "Frozen dependency sync": "success",
+    "GCS-008 score-distribution vertical slice": "success",
+    "Initialize containers": "success",
+    "Initialize the fresh acceptance database": "success",
+    "Install the pinned uv frontend": "success",
+    "Performance smoke (without coverage)": "success",
+    "Post Check out without persisted credentials": "success",
+    "Post Set up Python 3.13": "skipped",
+    "Preserve accepted team-strength branch coverage gate": "success",
+    "Rules source and golden vertical slice": "success",
+    "Set up Python 3.13": "success",
+    "Set up job": "success",
+    "Stop containers": "success",
+    "Validate GCS-008 acceptance": "skipped",
+    "Validate repository": "success",
+    "Verify installed wheels outside source tree": "success"
+  },
+  "raw_log_bodies_copied_to_evidence": false,
+  "raw_metadata": {
+    "bytes": 110292,
+    "path": "review_pack/ci-a441-completed.json",
+    "sha256": "462401caeacfc9c13811845e26714cee0ce2fb4cd3bd24554e6fceff180713e5"
+  },
+  "raw_post_coverage_log": {
+    "bytes": 293104,
+    "path": "review_pack/ci-job-123812392774.log",
+    "sha256": "09a781284ffa101c7afad2edaeb16c1316ff238cfb23ecfaacb242d4dfb8ff4d"
+  },
+  "real_provider_calls": 0,
+  "run_id": 40973596699,
+  "schema_version": "accel003-a441-checkpoint-ci-history-v1",
+  "status": "completed",
+  "success_job_count": 18,
+  "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40973596699"
+}

@@ -1,0 +1,30 @@
+{
+  "cause": "A copied owned diagnostic receipt was added after the prior whole-repository scan. Omitting its repeated body from the capped review does not satisfy the repository scan.",
+  "command": [
+    "python",
+    "scripts/scan_secrets.py"
+  ],
+  "exit_code": 1,
+  "finding_count": 1,
+  "findings": [
+    {
+      "fingerprint": "ab671541ab517e02a6cbc2dd653d8b8ffc2a4233a3994f3a00523130b8b68fa8",
+      "line": 45,
+      "message": "high-entropy opaque token",
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-HANDOFF.json",
+      "rule_id": "HIGH_ENTROPY_TOKEN"
+    }
+  ],
+  "head_sha": "a4410905db69b4253c1ad74e2ab1b6faad4a5221",
+  "package_and_numerical_source_changes": false,
+  "raw_capture": {
+    "bytes": 748,
+    "path": "review_pack/secret-scan-final-committed.log",
+    "sha256": "924e52a4872565e51a84ae3e36f1b618bee8a672ea4d83ff6e39ebe7f40947e9"
+  },
+  "real_provider_calls": 0,
+  "remediation": "Preserve the original receipt in Git and its author capture; narrowly normalize the diagnostic prose without changing test proofs. Require independent review, a new complete repository scan and a fresh full exact-SHA CI run.",
+  "scanner_or_allowlist_changes": false,
+  "schema_version": "accel003-final-scan-followup-v1",
+  "status": "FAIL"
+}

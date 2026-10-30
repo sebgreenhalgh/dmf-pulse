@@ -141,6 +141,13 @@ by the integration fixtures. The historical hash map, default client behavior,
 production append-only guards and every mandatory CI job remain intact. The
 detached receipt requires a fresh complete CI run of the final evidence commit.
 
+The a4410905 follow-up whole-repository scan found one diagnostic phrase in an
+author receipt copied after the earlier scan. Its duplicate body had already
+been excluded from the capped pack; the repository still needed correction.
+The original blob/capture and scan failure remain retained. Only diagnostic
+metadata is normalized, with independent review and a new full scan and CI run.
+No package, model, test, scanner, allowlist or workflow change is part of that fix.
+
 Protected audit verifies 11 paths, 157 numerical files, authority and immutable P01
 byte/semantic pins. Original Availability HEAD/status are unchanged; CP0 did not
 individually baseline its dirty bytes, so this is not a blanket dirty-file byte

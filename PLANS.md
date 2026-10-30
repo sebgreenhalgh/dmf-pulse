@@ -58,6 +58,14 @@ and all six control-mutation denials; all 41 focused security/PostgreSQL tests
 pass independently. Neither correction changes package source,
 active rights, numerical kernels, the workflow or coverage requirements.
 
+The a4410905 whole-repository follow-up scan found one opaque-token-pattern
+diagnostic phrase in the copied author handoff added after the prior scan. The
+capped pack had omitted that duplicate body, which does not resolve a repository
+finding. Preserve the original Git blob and source capture; normalize only the
+diagnostic prose with independent review. A clean full repository scan and a new
+complete exact-SHA CI run are required. Package code, numerical models, tests,
+scanner and allowlist remain unchanged by this metadata correction.
+
 ## DMF-PULSE-ACCEL-002 — Seb's Desk
 
 - [x] CP0 isolate immutable ACCEL-001 parent; fetch references; resolve authority,

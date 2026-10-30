@@ -1,0 +1,58 @@
+{
+  "added_fields": [
+    "metadata_normalization"
+  ],
+  "changed_original_fields": [
+    "independent_full_test_confirmation"
+  ],
+  "credentials_inspected": false,
+  "direct_file_scan_findings": 0,
+  "exact_change": "Two joined separators in the one owned prose list became comma-space. All original words/counts and every other original JSON field remain exact.",
+  "finished_at": "2026-10-30T00:30:19.862660+00:00",
+  "full_repository_scan": {
+    "command": [
+      "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-003\\.venv\\Scripts\\python.exe",
+      "scripts/scan_secrets.py"
+    ],
+    "exit_code": 0,
+    "raw_log": "review_pack\\independent-repository-metadata-full-scan.log",
+    "raw_log_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+    "result": {
+      "finding_count": 0,
+      "findings": [],
+      "status": "PASS"
+    }
+  },
+  "implementation_fingerprint": "184c31258cfbb9d87ad7c6e462244d72ad0a4718",
+  "limit": "Clears this exact metadata prose normalization, not the failed or still-running a441CI. Parent must update evidence index/manifests, commit only metadata, rescan committed state and run complete fresh exact-SHA20-job CI. Refreshing the detached helper review HEAD binding does not replace any final live gates.",
+  "normalized_sha256": "a4f3194fedb62cef89f3b6e60d379ef4ee5535e289bc7c50a050931028266035",
+  "original_author_worktree_bytes_unchanged": true,
+  "original_git_blob_id": "efd158c39868c3edd9ae68ff02808092d4cf6ea1",
+  "original_git_sha": "a4410905db69b4253c1ad74e2ab1b6faad4a5221",
+  "original_sha256": "c379b742417100c3d6d3cfc41057f78d265558cd402312d649cb2394286f4ba6",
+  "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-HANDOFF.json",
+  "product_tests_scanner_allowlist_workflow_dependency_diffs": 0,
+  "provider_calls": 0,
+  "publication_helper_sha256": {
+    "accel003_publication.py": "ed9f4345bd536d85d21766ca355f6c02343eb9494133482e00082df6742fdf15",
+    "build_final_review.py": "786706a1ed41729e65abdc5eaa6964e6f79dff1564e62d271c56b43f50a0417f",
+    "prepare_publication_audit.py": "cc4acc1e78c53337eaaf7496a135bca4df93610f7e9fb6ff8dae41d7a4cbd728",
+    "seal_publication.py": "cb0c6798d5d8bf47a9dbdc525819d4f5fd20b9f910d6337fe55bf0f7d088c93e"
+  },
+  "reviewer": "/root/accel003_evaluation_review",
+  "schema_version": "accel003-independent-repository-metadata-review-v1",
+  "source_test_sha256": {
+    "tests/security/test_fpl_rights_raw_retention.py": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df",
+    "tests/security/test_odds_credentials_quota_retention.py": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
+  },
+  "started_at": "2026-10-30T00:29:34.963029+00:00",
+  "status": "PASS_METADATA_ONLY_NO_UNRESOLVED_MATERIAL_FINDINGS",
+  "tracked_edits_by_reviewer": false,
+  "unchanged_proof_counts": {
+    "all_metadata_table_count": 76,
+    "author_direct_mutation_denials": 6,
+    "independent_actual_fixture_checks_passed": 23,
+    "ordinary_reset_table_count": 73,
+    "targeted_tests_passed": 41
+  }
+}

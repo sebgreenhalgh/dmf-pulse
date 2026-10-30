@@ -1,0 +1,20 @@
+{
+  "affected_json_pointer": "/independent_full_test_confirmation",
+  "all_other_original_fields_exact": true,
+  "classification": "OWNED_METADATA_ONLY_NORMALIZATION_NOT_CI_SUCCESS",
+  "direct_scan_findings": 0,
+  "full_repository_scan": {
+    "command": [".venv/Scripts/python", "scripts/scan_secrets.py"],
+    "exit_code": 0,
+    "status": "PASS",
+    "finding_count": 0,
+    "scope": "Actual full unchanged first-party scanner after this owned metadata normalization; root will rescan after its final index/manifest publication commit."
+  },
+  "finding_value_printed": false,
+  "normalized_sha256": "a4f3194fedb62cef89f3b6e60d379ef4ee5535e289bc7c50a050931028266035",
+  "original_git_blob_id": "efd158c39868c3edd9ae68ff02808092d4cf6ea1",
+  "original_git_sha": "a4410905db69b4253c1ad74e2ab1b6faad4a5221",
+  "original_sha256": "c379b742417100c3d6d3cfc41057f78d265558cd402312d649cb2394286f4ba6",
+  "path": "evidence/tickets/DMF-PULSE-ACCEL-003/SECURITY-FIXTURE-AUTHOR-HANDOFF.json",
+  "proofs_counts_sources_tests_unchanged": true
+}
