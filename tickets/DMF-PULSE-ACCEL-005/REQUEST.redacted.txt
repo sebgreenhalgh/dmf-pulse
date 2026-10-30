@@ -1,0 +1,587 @@
+# DMF PULSE — ACCELERATION WAVE 005
+## FIRST REAL OPERATION, EXISTING-ACCOUNT ENROLLMENT, P01 SCORING AND PLAYER EVALUATION
+### IMPLEMENTATION FIRST — GIT-FIRST / RESUMABLE / INDEPENDENTLY REVIEWED
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Immutable Wave 004 parent:
+`f07c063b4f6e4cb8451b9189771a0410329f23f0`
+
+Branch:
+`readiness/DMF-PULSE-ACCEL-004-real-operation`
+
+Exact-SHA CI:
+https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/41009967327
+
+Programme:
+`DMF-PULSE-ACCEL-005`
+
+Preferred branch:
+`readiness/DMF-PULSE-ACCEL-005-first-real-operation`
+
+## 1. MISSION
+
+Advance DMF Pulse to its first genuinely useful, rights-qualified, current-season private operation and first independently valid real forecast evaluation.
+
+Four acceleration waves have already delivered:
+
+- full FPL prediction and optimisation machinery;
+- local Seb's Desk dashboard;
+- current-mode worker;
+- one-/three-GW recommendation execution;
+- player xPts explorer;
+- forecast-versus-actual evaluation machinery;
+- source and usage authorization controls;
+- PostgreSQL control and evaluation ledgers;
+- Windows Credential Manager integration;
+- real pre-outcome P01 match forecasts.
+
+**Do not build another dashboard, redesign the model or duplicate existing infrastructure.**
+
+The primary goal is now operational:
+
+1. Make the owner's existing accounts usable through approved private execution.
+2. Complete trusted pilot enrollment.
+3. Qualify and execute the first real read-only dashboard refresh if separately authorized.
+4. Resolve the P01 historical-code conflict.
+5. Obtain a valid real evaluation where source and outcome permissions permit.
+6. Start a repeatable path toward player-level predictive validation.
+
+This is a substantial implementation assignment, not a research-only ticket.
+
+## 2. OWNER INFORMATION ALREADY PROVIDED
+
+The owner has confirmed:
+
+- Existing The Odds API account: YES.
+- Existing The Odds API key: YES.
+- Secure Windows Credential Manager Odds slot: CONFIGURED.
+- FPL entry ID: **[PRIVATE_ENTRY_ID]**.
+- Working Seb's Desk MVP: YES.
+- Additional historical frozen forecasts may exist outside the previously searched authorized locations.
+
+**Do not request another Odds API account.**
+
+**Do not request the Odds API secret again.**
+
+The account email is not needed in source code, Git evidence or the operator package. Use an opaque account reference and qualify account entitlements from nonsecret evidence.
+
+The FPL bearer token previously shared in conversation must be considered exposed. Do not use, copy, decode, store, replay, or transmit that token.
+
+Require a freshly issued replacement before any separately authorized real pilot. The owner must provide it only through the reviewed hidden-input Windows credential workflow, with its actual expiry.
+
+Do not print secrets in logs or prompt for them inside Codex.
+
+Credential possession is not source permission or operational approval.
+
+## 3. STARTUP AND AUTHORITY
+
+Fetch GitHub and verify:
+
+- `main`;
+- exact Wave 004 parent;
+- existing branch ancestry;
+- approved source profiles;
+- current source rights and external terms;
+- Wave 004 credentials implementation;
+- Wave 003 current-mode worker;
+- trusted production enrollment registry;
+- PostgreSQL control ledger;
+- original P01 forecast and code-policy decisions;
+- evaluation and source-custody architecture;
+- accepted DMFP-20 decisions.
+
+Read `AGENTS.md`, `PLANS.md`, authority manifests and the controlling Wave 004 runbooks.
+
+Create a clean dedicated worktree.
+
+Preserve the original dirty Availability worktree.
+
+Use immutable, reviewable checkpoints.
+
+No PR, merge, tag, unauthorized history rewrite or human-acceptance record.
+
+Do not issue real provider requests under this engineering prompt alone.
+
+## 4. WORKSTREAM A — QUALIFY THE EXISTING ODDS ACCOUNT
+
+This is the first operational priority.
+
+Wave 004 completed secure credential retrieval, but actual account plan, credit balance and reset details were not checked.
+
+Implement or reuse a safe operator workflow for supplying nonsecret account evidence.
+
+Required fields:
+
+- exact account reference;
+- account plan;
+- covered sport;
+- eligible markets;
+- quota/reset period;
+- remaining credits at an observed timestamp;
+- other known account usage;
+- relevant vendor terms;
+- applicable purpose and geography;
+- owner-approved request budget.
+
+Do not extract the Odds secret to determine these fields.
+
+Do not initiate an unauthorized authenticated quota request.
+
+Allow the owner to enter or supply redacted nonsecret evidence locally.
+
+Validate all facts against the existing provider and rights contracts.
+
+The initial proposed pilot remains:
+
+- English Premier League;
+- one sport-wide request;
+- UK region;
+- `h2h,totals`;
+- one manually initiated refresh;
+- two conservatively reserved credits;
+- zero automatic retries;
+- one-GW horizon;
+- no persistence of restricted provider bodies.
+
+These are proposed pilot limits, not verified account entitlements.
+
+Do not invent a remaining balance or quota reset.
+
+If entitlement evidence is incomplete, report the exact missing fields while completing independent implementation work.
+
+## 5. WORKSTREAM B — COMPLETE THE FIRST LIVE DASHBOARD ENROLLMENT
+
+Reuse the existing:
+
+- `RefreshAuthorizer`;
+- trusted production enrollment registry;
+- `OperatorRefreshApproval`;
+- `CurrentRefreshSession`;
+- PostgreSQL control ledger;
+- current-mode worker;
+- `PrivateV1OneCommandService`;
+- Windows credential resolver.
+
+Do not create a second authorization system.
+
+Target FPL manager:
+
+**Entry ID [PRIVATE_ENTRY_ID]**
+
+Keep this identifier in private operator configuration rather than unnecessarily embedding it in public Git artifacts.
+
+Implement the complete enrollment workflow so an appropriately reviewed operator package can be prepared and installed without hand-editing application source.
+
+Required checks:
+
+1. Actual provider access rights.
+2. Correct account and plan.
+3. Exact FPL manager and route scope.
+4. Odds sport/region/market scope.
+5. Pinned OpenFootball scope.
+6. Source-purpose eligibility.
+7. Current official deadline.
+8. Exact reviewed implementation.
+9. Installed-wheel identity.
+10. Canonical PostgreSQL ledger.
+11. Permitted control-metadata retention.
+12. Fresh quotas and budgets.
+13. Explicit owner authorization.
+14. One-shot consumption and expiry.
+15. No unauthorized credentials or transport before approval.
+
+A draft approval must never become executable merely because fields are filled in.
+
+The installed trusted registry must remain the authority boundary.
+
+If all independent eligibility conditions are established, prepare an independently reviewed enrolled wheel and exact first-pilot procedure.
+
+If conditions are missing, do not fabricate approval.
+
+### Live operation
+
+The intended user experience after approval is:
+
+Open Seb's Desk → Pair browser → Click Refresh → Receive real current recommendation.
+
+The secure Odds API key must resolve automatically from Windows Credential Manager.
+
+The refreshed FPL token must resolve through its own protected slot.
+
+My Team, Players and Decisions must share one authenticated current information set.
+
+No account writes.
+
+No automatic refresh on page reload.
+
+No repeated Odds key entry.
+
+No hidden requests.
+
+No source-content persistence under currently denied rights.
+
+Do not conduct a real pilot without the required supplier eligibility and separate exact owner authorization.
+
+## 6. WORKSTREAM C — SCORE THE EXISTING P01 FORECAST
+
+The P01 prediction already exists.
+
+It was frozen before the target fixtures and is genuine prospective match-level evidence.
+
+Origin:
+`2026-10-03T13:38:40.513349Z`
+
+Frozen:
+`2026-10-03T13:40:19.466686Z`
+
+Semantic SHA:
+`96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a`
+
+Byte SHA:
+`e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee`
+
+Ten fixtures, three forecast products per fixture.
+
+These are ten fixture outcomes, not thirty statistically independent outcomes.
+
+### The exact problem
+
+Wave 004 identified a conflict between:
+
+- the original canonical scoring authority bound to historical commit `3815152e978dd55e1dc1f115055050d4ed6b1735`; and
+- the later prohibition on regenerating parameter draws or the forecast.
+
+The original validation path can invoke cold draw generation.
+
+The later nongenerative scoring view does not automatically inherit the original code's execution authority.
+
+**Resolve this properly. Do not bypass either requirement.**
+
+### Required implementation
+
+Develop and independently review the narrowest nongenerative canonical scoring/admission controller.
+
+It must:
+
+- authenticate the original literal forecast bytes;
+- preserve all original forecast and source hashes;
+- perform no fitting;
+- generate no parameter draws;
+- refreeze nothing;
+- retain ten exact fixture identities;
+- preserve the original score distributions and metrics;
+- enforce source and temporal admission;
+- require complete qualified final results;
+- refuse ambiguous/incomplete provider evidence;
+- disclose post-origin source-policy changes;
+- preserve the original model-promotion restrictions.
+
+Produce a clear, versioned owner decision for accepting the new code binding.
+
+Do not self-approve it.
+
+### Outcome acquisition
+
+A02 and A03 are permanently consumed.
+
+The inactive OpenLigaDB display-name candidate remains unapproved.
+
+A04 remains unauthorized.
+
+Do not retry the previous fallback attempts.
+
+The separate proposed canonical OpenFootball reassessment remains conditional on exact authority, including its previously documented five-GET maximum and zero-retry scope.
+
+No request is permitted by this prompt alone.
+
+If an existing, already qualified local label artifact is sufficient, score it without new provider access.
+
+If not, prepare the exact admission/authority package for separate approval.
+
+Do not leave P01 blocked merely because generic research is unfinished; identify the specific admissible route and code-policy decision.
+
+## 7. WORKSTREAM D — EXISTING PLAYER-LEVEL FORECAST RECOVERY
+
+Wave 004 authenticated P01 but did not authenticate the other owner-reported frozen player forecasts.
+
+Do not conclude they do not exist.
+
+Provide a safe, narrow operator workflow to add an approved local forecast artifact or directory locator.
+
+Requirements:
+
+- no secret scanning;
+- no unrestricted home-directory search;
+- no arbitrary pickle execution;
+- no copying sensitive bodies to Git;
+- no post-hoc reconstruction represented as prospective;
+- exact file identity;
+- original origin/cutoff verification;
+- documented custody limitations;
+- explicit source and evaluation rights.
+
+Classify all recovered artifacts by:
+
+- real pre-outcome forecast;
+- synthetic engineering evidence;
+- reconstructed historical backtest;
+- post-outcome observation;
+- unverified custody;
+- evaluation-ineligible.
+
+If a genuine player-level forecast is found, integrate its validated lineage with the existing player-lab evaluation framework.
+
+Do not assume every old real-looking decision log contains preserved player xPts distributions.
+
+## 8. WORKSTREAM E — GENUINE PLAYER-LEVEL EVALUATION
+
+Use the existing PostgreSQL player-lab ledger and Stage-12 scoring kernels.
+
+The intended sequence is:
+
+Frozen player forecast → qualified finalized player result → authenticated join → scorecard → model diagnostics.
+
+Prioritize:
+
+- player xPts error;
+- expected-minutes error;
+- start probability;
+- 60-minute probability;
+- goal/assist components;
+- clean-sheet contribution;
+- bonus/defensive contribution;
+- confidence calibration.
+
+Use actual, independently qualified source data.
+
+Do not invent final player points.
+
+Do not reuse a synthetic engineering oracle as a real model evaluation.
+
+Do not retain a real player forecast unless every relevant upstream dependency permits that retention and evaluation purpose.
+
+Produce:
+
+- predeclared evaluation protocol;
+- complete cohort-coverage report;
+- chronological holdout;
+- benchmark definitions;
+- qualified-source checks;
+- real versus synthetic separation in Model Performance.
+
+Where historical forecasts are missing, use the next verifiably future deadline, not an already completed Gameweek.
+
+The earlier GW9 proposal for 31 October 2026 is time-sensitive. Verify the actual official deadline and applicable source permissions. Do not backdate or rush an unauthorized freeze to meet that date.
+
+## 9. WORKSTREAM F — OPERATIONAL USABILITY
+
+The owner considers the dashboard MVP satisfactory.
+
+Avoid major UI redesign.
+
+Improve the workflow around actual source use:
+
+- secure FPL token status and expiry;
+- Odds credential configured status;
+- account entitlement state;
+- qualified remaining-budget state;
+- official deadline;
+- source freshness;
+- trust/enrollment status;
+- real/demo classification;
+- clear reasons real Refresh is blocked;
+- specific next operator action.
+
+Provide a nonsecret readiness report that distinguishes:
+
+`ENGINEERING_READY`
+
+`CREDENTIALS_CONFIGURED`
+
+`ACCOUNT_ENTITLEMENT_VERIFIED`
+
+`PROJECT_RIGHTS_APPROVED`
+
+`CONTROL_LEDGER_READY`
+
+`LIVE_PILOT_AUTHORIZED`
+
+`LIVE_PILOT_EXECUTED`
+
+`PRODUCTION_ACTIVE`
+
+No status may become successful through a placeholder, browser input, environment assertion or synthetic test.
+
+Support a straightforward real-operator runbook.
+
+The owner should not need to understand Git commit hashes or source manifest internals merely to launch a previously reviewed and approved dashboard.
+
+## 10. DURABLE CHECKPOINTS
+
+Implement using sealed checkpoints:
+
+**CP0 — Source, Git and account baseline**
+
+Confirm exact Wave 004 ancestry, protected hashes, rights, operator inputs and outstanding blockers.
+
+**CP1 — Existing account operational qualification**
+
+Complete nonsecret entitlement handling, quota/budget validation and approval preparation.
+
+**CP2 — Trusted live enrollment**
+
+Finish the reviewable installed-wheel and PostgreSQL control setup path, with comprehensive injected-current-worker tests.
+
+**CP3 — P01 nongenerative scoring authority**
+
+Complete implementation, independent code-policy review and conditional score readiness.
+
+**CP4 — Forecast recovery and player evaluation**
+
+Add safe bounded artifact onboarding, verify historic freeze identities and implement remaining authentic scoring interfaces.
+
+**CP5 — Operator hardening**
+
+Complete credential-status, FPL expiry, budget, readiness and failure reporting, without unnecessary interface redesign.
+
+**CP6 — Adversarial review and final publication**
+
+Complete regression, installed-wheel, database, secret scanning, numerical parity and exact-SHA CI.
+
+Push each independently complete checkpoint according to repository publication rules.
+
+Do not lose successful work because another workstream needs owner authorization.
+
+## 11. REQUIRED ACCEPTANCE
+
+The final engineering release must demonstrate:
+
+1. Current Windows Odds key is not requested again for an eligible run.
+2. Previously exposed FPL token is never used or retained by the programme.
+3. Fresh FPL token can be securely supplied through the approved local mechanism.
+4. Exact FPL entry scope [PRIVATE_ENTRY_ID] is enforced by the private pilot request.
+5. Source authorization precedes credential retrieval.
+6. Correct qualified budget is reserved before external transport.
+7. One-/three-GW numerical behavior remains unchanged.
+8. Current-mode dashboard runs end-to-end using authenticated owned source injections.
+9. Missing enrollment and missing rights continue to block every real transport.
+10. P01 original forecast remains byte- and semantic-hash identical.
+11. Nongenerative P01 scoring compatibility is independently demonstrated offline.
+12. Real outcome scoring occurs only with complete authorized actual labels.
+13. Existing real player forecast candidates are classified without inventing custody.
+14. Historical model performance remains null where no qualified real labels exist.
+15. All protected evidence, P01 restrictions and historical one-shot consumption remain intact.
+
+No unauthorized real football provider requests during automated tests.
+
+Independent review must clear P0/P1 and material P2 findings.
+
+Maintain Python 3.13, full regression and source-contract tests, formatting, Ruff, strict mypy, database migrations, installed-wheel verification, coverage and the unchanged twenty-job CI workflow.
+
+Require exact-SHA GitHub CI success.
+
+No PR, merge, tag, model promotion or production activation.
+
+## 12. FINAL HANDOFF
+
+Report clearly:
+
+### A. Real operational status
+
+Can the owner now perform one authorized real dashboard refresh?
+
+If not, what exactly remains missing?
+
+Do not state only "rights-blocked"; identify every unresolved evidence or approval field.
+
+### B. Existing Odds account
+
+What is verified about:
+
+- plan;
+- covered markets;
+- request cost;
+- quota;
+- reset;
+- budget;
+- source-purpose authorization?
+
+What remains unverified?
+
+Do not disclose account email or secret.
+
+### C. FPL manager
+
+Is entry [PRIVATE_ENTRY_ID] correctly bound to the private pilot?
+
+Has the old exposed token been excluded?
+
+What fresh-token setup remains for the owner?
+
+### D. P01
+
+Is the nongenerative canonical code binding complete?
+
+Was the policy explicitly accepted?
+
+Are qualified actual outcomes available?
+
+Was the real forecast scored?
+
+What do any valid scores show, with sample and evaluation limitations?
+
+### E. Player evaluation
+
+Which real forecasts exist?
+
+Which have authenticated custody?
+
+Which can be evaluated?
+
+How many real player-level comparisons are valid?
+
+What remains source-rights or final-label blocked?
+
+### F. Release
+
+Provide:
+
+- branch;
+- checkpoint SHAs;
+- final local/remote SHA;
+- complete test counts and coverage;
+- independent review;
+- exact-SHA CI;
+- installed-wheel acceptance;
+- protected evidence;
+- remaining owner decisions;
+- concrete next operator commands.
+
+## 13. SUCCESS DEFINITION
+
+Minimum technical delivery:
+
+- Complete usable existing-account approval/enrollment tooling.
+- Exact manager-bound live-worker readiness.
+- Automatic credential integration retained.
+- Fully reviewed nongenerative P01 scoring path.
+- Safe additional historical forecast recovery capability.
+- Genuine player evaluation readiness without invented data.
+- No regressions, rights bypasses or provider-secret disclosure.
+- All twenty mandatory CI jobs green.
+
+Stretch outcomes, only where separately authorized:
+
+- First real, read-only Seb's Desk recommendation.
+- First valid scored P01 evaluation.
+- First rights-qualified player-level prospective cohort.
+
+The primary success metric is no longer the number of tests or implemented abstractions.
+
+It is progress toward **a real current-data recommendation and scientifically valid measurement of model predictions**.
+
+Do the maximum implementable work now, isolate exact owner-dependent blockers, preserve completed checkpoints and finish with:
+
+`DMF_PULSE_ACCELERATION_WAVE_005_FINAL_HANDOFF`

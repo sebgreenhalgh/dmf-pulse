@@ -1,5 +1,37 @@
 # DMF Pulse execution plans
 
+## DMF-PULSE-ACCEL-005 — first real operation and evaluation
+
+Immutable parent: `f07c063b4f6e4cb8451b9189771a0410329f23f0`.
+The retained owner request authorizes implementation, documentary source review,
+bounded approved locator onboarding and normal checkpoint publication. Provider
+requests, exact pilot acceptance, source retention, P01 code binding, promotion
+and production activation remain separate. The actual manager input and original
+request remain private; public ticket bytes are redacted. No exposed FPL token
+value is read, copied, decoded, stored or used.
+
+- [x] CP0 fetch main/parent, isolate worktree, authenticate authority, P01 and
+  protected identities, preserve original dirty files, retain private inputs.
+- [ ] CP1 complete nonsecret existing-account evidence, quotas/provenance and
+  separate new-purpose approval preparation; fresh FPL v2 blind setup.
+- [ ] CP2 implement private reviewed enrollment/wheel assembly/install and
+  canonical control workflow using the existing registry/authorizer/worker.
+- [ ] CP3 implement the narrow nongenerative canonical P01 controller, proposed
+  owner code-binding decision and cold literal-oracle compatibility proof.
+- [ ] CP4 implement approved locator onboarding and qualified player custody,
+  point-only/full-distribution adapters, protocol/coverage/holdout integration.
+- [ ] CP5 finish explicit eight-stage readiness, token/budget/rights/expiry
+  remedies and practical reviewed operator launch without UI redesign.
+- [ ] CP6 independent adversarial review, full retained regressions, exact
+  one-/three-GW parity, installed/native/database/provenance/coverage gates,
+  actual capped packet, normal publication and final-SHA twenty-job CI.
+
+No real scoring is inferred from owned tests. Additional owner-reported freezes
+remain unresolved, not disproved. Original P01/fallback consumption/authority
+history and all157 numerical sources remain pinned. The old consumed Odds
+purpose cannot authorize this new pilot. A caller-resealed JSON decision,
+completed draft, environment assertion or browser input cannot enroll a grant.
+
 ## DMF-PULSE-ACCEL-004 — existing forecasts and secure operation
 
 Immutable engineering parent: `9b6d3f957e130e0832b39aee9940810eefa05535`.

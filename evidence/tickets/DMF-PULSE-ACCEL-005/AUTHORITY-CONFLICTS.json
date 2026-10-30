@@ -1,0 +1,37 @@
+{
+  "authority_manifest_changed": false,
+  "conflicts": [
+    {
+      "additional_locator": "29: prior written consent for Game intellectual-property use",
+      "affected_operation": "New automated live FPL acquisition and pilot enrollment",
+      "higher_authority_locator": "Player Responsibilities28(d)",
+      "higher_authority_url": "https://fantasy.premierleague.com/help/terms",
+      "id": "FPL-SUPPLIER-AUTOMATION-001",
+      "lower_authority_config_sha256": "0020088935e52f4c9d33ec771cf18ddb5e5f49289d7c6062d002ad4210453f57",
+      "lower_authority_path": "config/rights/fpl_profiles.json",
+      "lower_authority_profile": "fpl_official_private_operator_initiated_read_v1",
+      "lower_authority_statement": "Operator contractual risk acceptance; explicitly not Premier League permission or a licence.",
+      "owner_approval_alone_sufficient": false,
+      "resolution": "Record exact supplier permission or applicable exception and independently review purpose/routes/retention against terms before trusted enrollment. Do not self-approve or infer an exception.",
+      "short_excerpt": "use automated systems to access the Game and extract information from the Game",
+      "source_capture_kind": "OFFICIAL_PRIMARY_SEARCH_INDEX_FULL_TERMS_TEXT_DIRECT_HTML_READER_NO_READABLE_TEXT",
+      "source_version_header": "2026/27 Fantasy Premier League Terms and Conditions",
+      "state": "BLOCKED_PENDING_INDEPENDENTLY_QUALIFIED_SUPPLIER_PERMISSION_OR_APPLICABLE_EXCEPTION",
+      "unaffected_work": "Offline implementation, owned-source tests, nonsecret evidence, private configuration, approved locator tooling, nongenerative P01 controller."
+    },
+    {
+      "higher_authority_locator": "CURRENT-TEAM-STRENGTH-001P-L8 consumed one-shot authority",
+      "id": "ODDS-CONSUMED-PURPOSE-001",
+      "lower_authority_config_sha256": "04e1120deffb07b5a38c5f0c20447d2d19e4b5ed92f7cb461f2abdd40d47e7cc",
+      "lower_authority_path": "config/rights/odds_profiles.json",
+      "lower_authority_profile": "the_odds_api_private_analytics_v1",
+      "resolution": "Qualify account and current terms, propose separate Wave005 private purpose, and require independent source review plus exact owner acceptance; no consumed authority reuse.",
+      "state": "NEW_PURPOSE_ACCEPTANCE_REQUIRED_OLD_RECORD_UNCHANGED"
+    }
+  ],
+  "legacy_fpl_token_read_or_used": false,
+  "normal_credential_reads": 0,
+  "observed_at": "2026-10-30T15:55:11.236200+00:00",
+  "provider_data_requests": 0,
+  "schema_version": "accel005-authority-conflicts-v1"
+}

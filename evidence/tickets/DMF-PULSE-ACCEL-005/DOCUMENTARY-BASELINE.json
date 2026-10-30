@@ -1,0 +1,49 @@
+{
+  "account_or_quota_requests": 0,
+  "capture_kind": "PUBLIC_DOCUMENTARY_WEB_TOOL_RENDERING_AND_PRIMARY_SEARCH_INDEX_NO_DATA_API",
+  "future_forecast_frozen": false,
+  "live_authority_granted": false,
+  "observed_at": "2026-10-30T15:51:48.228918+00:00",
+  "p01_acquisition_authority_granted": false,
+  "provider_data_requests": 0,
+  "rights_profiles_unchanged": true,
+  "schema_version": "accel005-public-documentary-review-v1",
+  "sources": [
+    {
+      "last_updated": "2026-08-31",
+      "observation": "General terms describe dashboard/analytics use; exact account entitlement, purpose approval and source retention remain separate. Old project CTS-L8 purpose is consumed and not reused.",
+      "qualification": "DOCUMENTARY_REFERENCE_NOT_ACCOUNT_OR_PROJECT_APPROVAL",
+      "title": "The Odds API Terms and Conditions",
+      "url": "https://the-odds-api.com/terms-and-conditions.html"
+    },
+    {
+      "locator": "GET odds / Usage Quota Costs",
+      "observation": "Two requested markets in one region support conservative two-credit reservation. No actual balance, plan, reset or used quota is inferred.",
+      "qualification": "DOCUMENTARY_REFERENCE_ONLY",
+      "title": "Odds API Documentation V4",
+      "url": "https://the-odds-api.com/liveapi/guides/v4/"
+    },
+    {
+      "deadline_at": "2026-10-31T11:00:00Z",
+      "gameweek": 9,
+      "observation": "Direct official public page explicitly identifies Saturday31October at11:00GMT; documentary future deadline verified. No catalogue, fixture API, account, token or result request.",
+      "published_date": "2026-10-30",
+      "qualification": "VERIFIED_DOCUMENTARY_FUTURE_DEADLINE_REVALIDATE_BEFORE_ANY_FREEZE_NOT_AUTHORITY",
+      "season": "2026/27",
+      "title": "Everything you need for Gameweek 9 of FPL with the latest tips and advice",
+      "url": "https://www.premierleague.com/en/news/4750452/everything-you-need-for-gameweek-9-of-fpl-with-the-latest-tips-and-advice"
+    },
+    {
+      "direct_reader": "NO_READABLE_LINES",
+      "locators": [
+        "Player Responsibilities clause28(d)",
+        "Intellectual property clause29"
+      ],
+      "observation": "Official current-season indexed terms prohibit automated extraction. The direct HTML reader provides no readable text; no current raw-HTTP document hash is claimed. Prior operator contractual risk acceptance is not supplier permission.",
+      "qualification": "OBSERVED_AUTOMATED_EXTRACTION_RESTRICTION_NO_SUPPLIER_EXCEPTION_ESTABLISHED",
+      "search_index": "OFFICIAL_2026_27_FULL_TERMS_INDEXED_TEXT",
+      "title": "FPL Terms and Conditions",
+      "url": "https://fantasy.premierleague.com/help/terms"
+    }
+  ]
+}

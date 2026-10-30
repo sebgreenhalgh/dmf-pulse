@@ -1,5 +1,10 @@
 * text=auto eol=lf
 
+# Wave005 byte-authenticated captures keep native line endings in every checkout.
+evidence/tickets/DMF-PULSE-ACCEL-005/*.json binary
+evidence/tickets/DMF-PULSE-ACCEL-005/*.LOG binary
+tickets/DMF-PULSE-ACCEL-005/REQUEST.redacted.txt binary
+
 # Preserve byte-hashed captured stdout/stderr, including native line endings.
 evidence/tickets/CURRENT-TEAM-STRENGTH-001U/COMMAND-*.log binary
 
