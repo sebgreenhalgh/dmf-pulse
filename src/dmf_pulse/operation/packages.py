@@ -143,8 +143,8 @@ def write_metadata(path: Path, value: Metadata) -> str:
     return hashlib.sha256(body).hexdigest()
 
 
-def read_metadata[T: Metadata](path: Path, contract: type[T]) -> T:
-    """Authenticate strict bounded metadata without trusting arbitrary JSON authority."""
+def _read_metadata_scope[T: Metadata](path: Path, contract: type[T]) -> T | None:
+    """Discard invalid bytes and parser exception frames before a public error exists."""
 
     def unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
         result: dict[str, object] = {}
@@ -182,4 +182,12 @@ def read_metadata[T: Metadata](path: Path, contract: type[T]) -> T:
             raise ValueError("metadata hash differs")
         return result
     except (OSError, ValueError, TypeError, RecursionError):
-        raise OperationError("OPERATOR_ARTIFACT_INVALID") from None
+        return None
+
+
+def read_metadata[T: Metadata](path: Path, contract: type[T]) -> T:
+    """Authenticate bounded metadata; failed parser payloads cannot escape as context."""
+    result = _read_metadata_scope(path, contract)
+    if result is None:
+        raise OperationError("OPERATOR_ARTIFACT_INVALID")
+    return result

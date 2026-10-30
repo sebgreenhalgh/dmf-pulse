@@ -342,3 +342,23 @@ def test_nonregular_descriptor_is_rejected_before_json(tmp_path, monkeypatch):
     )
     with pytest.raises(OperationError, match="ARTIFACT_INVALID"):
         read_metadata(path, OwnerPackage)
+
+
+def test_invalid_metadata_does_not_retain_raw_canary_in_error_chain_or_loader_frames(tmp_path):
+    from dmf_pulse.operation import packages
+
+    canary = "OWNED_SYNTHETIC_INVALID_METADATA_VALUE_DO_NOT_RETAIN"
+    path = tmp_path / "invalid-private-field.json"
+    path.write_text(
+        json.dumps({"payload": {"api_key": canary}, "semantic_sha256": "a" * 64}), encoding="utf-8"
+    )
+    with pytest.raises(OperationError) as caught:
+        read_metadata(path, OwnerPackage)
+    error = caught.value
+    assert error.__context__ is None and error.__cause__ is None
+    assert canary not in repr(error.args)
+    traceback = error.__traceback__
+    while traceback is not None:
+        if traceback.tb_frame.f_code.co_filename == packages.__file__:
+            assert canary not in repr(traceback.tb_frame.f_locals)
+        traceback = traceback.tb_next
