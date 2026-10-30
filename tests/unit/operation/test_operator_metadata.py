@@ -130,7 +130,7 @@ def test_pilot_draft_rejects_authority_or_scope_shortcuts(attack):
     elif attack == "secret":
         with pytest.raises(ValidationError):
             PilotProposal.model_validate(
-                {"authorization_id": "ACCEL004-PILOT-test", "api_key": "OWNED_FORBIDDEN_TEST_VALUE"}
+                {"authorization_id": "ACCEL004-PILOT-test", "api_key": "example"}
             )
     elif attack == "budget":
         package = prepare_pilot(PilotProposal(authorization_id="ACCEL004-PILOT-test"), now=NOW)
