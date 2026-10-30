@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager, contextmanager
 from datetime import UTC, datetime, timedelta
@@ -350,6 +351,48 @@ def _write_new(path: Path, value: dict[str, object]) -> None:
         os.fsync(stream.fileno())
 
 
+class LedgerAudit(_Contract):
+    """Authenticated control metadata only; no source facts or new execution grant."""
+
+    ledger_id: Sha
+    backend: Literal["OWNED_JSON", "POSTGRES"]
+    event_count: int = Field(ge=0, le=100000)
+    head_sha256: Sha
+    reservation_count: int = Field(ge=0)
+    claim_count: int = Field(ge=0)
+    check_count: int = Field(ge=0)
+    attempt_count: int = Field(ge=0)
+    last_event_at: datetime | None
+
+
+class ReservationBudget(_Contract):
+    """Qualified snapshot minus canonical reservations; not a live provider balance."""
+
+    daily_requests_used: int = Field(ge=0)
+    monthly_requests_used: int = Field(ge=0)
+    daily_requests_available: int = Field(ge=1)
+    monthly_requests_available: int = Field(ge=1)
+    daily_credits_available: int = Field(ge=2)
+    monthly_credits_available: int = Field(ge=2)
+    qualified_credits_available: int = Field(ge=2)
+
+
+class LedgerInspection(_Contract):
+    audit: LedgerAudit
+    budget: ReservationBudget
+
+
+class AuthorizationPreview(_Contract):
+    """A read-only observation; reserve/claim checks still run at actual Refresh."""
+
+    schema_version: Literal["refresh-authorization-preview-v1"] = "refresh-authorization-preview-v1"
+    approval_sha256: Sha
+    request_sha256: Sha
+    checked_at: datetime
+    expires_at: datetime
+    ledger: LedgerInspection
+
+
 class UsageLedger:
     """Shared authorization policy over authenticated atomic storage hooks.
 
@@ -381,6 +424,98 @@ class UsageLedger:
         if records and now < datetime.fromisoformat(str(records[-1]["at"])):
             raise AuthorizationError("AUTHORIZATION_CLOCK_REGRESSED")
 
+    def _audit(self, records: list[dict[str, Any]]) -> LedgerAudit:
+        counts = Counter(row.get("kind") for row in records)
+        if set(counts) - {"RESERVATION", "CLAIM", "CHECK", "ATTEMPT"}:
+            raise AuthorizationError("USAGE_LEDGER_INVALID")
+        return LedgerAudit(
+            ledger_id=self.ledger_id,
+            backend=self.backend_discriminator,
+            event_count=len(records),
+            head_sha256=records[-1]["sha256"] if records else "0" * 64,
+            reservation_count=counts["RESERVATION"],
+            claim_count=counts["CLAIM"],
+            check_count=counts["CHECK"],
+            attempt_count=counts["ATTEMPT"],
+            last_event_at=datetime.fromisoformat(str(records[-1]["at"])) if records else None,
+        )
+
+    def audit(self) -> LedgerAudit:
+        """Authenticate an existing ledger; never initialize, append or reset it."""
+        with self._transaction() as records:
+            return self._audit(records)
+
+    @staticmethod
+    def _reservation_budget(
+        records: list[dict[str, Any]], approval: OperatorRefreshApproval, issued_at: datetime
+    ) -> ReservationBudget:
+        reservations = [row for row in records if row.get("kind") == "RESERVATION"]
+        authorization_hash = canonical_sha256(approval.authorization_id)
+        same_approval = [
+            row for row in reservations if row["authorization_sha256"] == authorization_hash
+        ]
+        if approval.usage == "ONE_SHOT" and same_approval:
+            raise AuthorizationError("ONE_SHOT_CONSUMED")
+        account_hash = canonical_sha256(approval.plan_quota.account_ref)
+        account_rows = [row for row in reservations if row["account_sha256"] == account_hash]
+        day = issued_at.date().isoformat()
+        period = approval.plan_quota.period_started_at.isoformat()
+        daily = sum(row["day"] == day for row in account_rows)
+        monthly = sum(row["period"] == period for row in account_rows)
+        if (
+            daily + 1 > approval.daily_request_limit
+            or 2 * (daily + 1) > approval.daily_credit_limit
+        ):
+            raise AuthorizationError("DAILY_BUDGET_EXHAUSTED")
+        if (
+            monthly + 1 > approval.monthly_request_limit
+            or 2 * (monthly + 1) > approval.monthly_credit_limit
+        ):
+            raise AuthorizationError("MONTHLY_BUDGET_EXHAUSTED")
+        since_quota = sum(
+            datetime.fromisoformat(str(row["at"])) >= approval.plan_quota.observed_at
+            for row in account_rows
+        )
+        qualified = (
+            approval.plan_quota.remaining_credits
+            - 2 * since_quota
+            - approval.safety_reserve_credits
+        )
+        if qualified < 2:
+            raise AuthorizationError("QUOTA_EXHAUSTED")
+        return ReservationBudget(
+            daily_requests_used=daily,
+            monthly_requests_used=monthly,
+            daily_requests_available=approval.daily_request_limit - daily,
+            monthly_requests_available=approval.monthly_request_limit - monthly,
+            daily_credits_available=approval.daily_credit_limit - 2 * daily,
+            monthly_credits_available=approval.monthly_credit_limit - 2 * monthly,
+            qualified_credits_available=qualified,
+        )
+
+    def preflight(
+        self, approval: OperatorRefreshApproval, request: RefreshRequest, *, now: datetime
+    ) -> LedgerInspection:
+        """Reuse reservation policy under the same authenticated lock without spending."""
+        now = _now(lambda: now)
+        if (
+            approval.classification == "PRIVATE_CURRENT"
+            and self.backend_discriminator != "POSTGRES"
+        ):
+            raise AuthorizationError("PRODUCTION_CONTROL_STORE_NOT_ACCEPTED")
+        _approved_expiry(approval, request, now)
+        if (
+            approval.ledger_id != self.ledger_id
+            or approval.ledger_backend != self.backend_discriminator
+        ):
+            raise AuthorizationError("USAGE_LEDGER_REQUIRED")
+        if approval.classification == "PRIVATE_CURRENT" and approval not in production_approvals():
+            raise AuthorizationError("PRODUCTION_APPROVAL_NOT_ENROLLED", "RIGHTS_APPROVAL_REQUIRED")
+        with self._transaction() as records:
+            self._clock(records, now)
+            budget = self._reservation_budget(records, approval, now)
+            return LedgerInspection(audit=self._audit(records), budget=budget)
+
     def reserve(self, approval: OperatorRefreshApproval, grant: RefreshGrant) -> None:
         if (
             approval.classification == "PRIVATE_CURRENT"
@@ -403,40 +538,11 @@ class UsageLedger:
             raise AuthorizationError("PRODUCTION_APPROVAL_NOT_ENROLLED", "RIGHTS_APPROVAL_REQUIRED")
         with self._transaction() as records:
             self._clock(records, grant.issued_at)
-            reservations = [row for row in records if row.get("kind") == "RESERVATION"]
+            self._reservation_budget(records, approval, grant.issued_at)
             authorization_hash = canonical_sha256(approval.authorization_id)
-            same_approval = [
-                row for row in reservations if row["authorization_sha256"] == authorization_hash
-            ]
-            if approval.usage == "ONE_SHOT" and same_approval:
-                raise AuthorizationError("ONE_SHOT_CONSUMED")
             account_hash = canonical_sha256(approval.plan_quota.account_ref)
-            account_rows = [row for row in reservations if row["account_sha256"] == account_hash]
             day = grant.issued_at.date().isoformat()
             period = approval.plan_quota.period_started_at.isoformat()
-            daily = sum(row["day"] == day for row in account_rows)
-            monthly = sum(row["period"] == period for row in account_rows)
-            if (
-                daily + 1 > approval.daily_request_limit
-                or 2 * (daily + 1) > approval.daily_credit_limit
-            ):
-                raise AuthorizationError("DAILY_BUDGET_EXHAUSTED")
-            if (
-                monthly + 1 > approval.monthly_request_limit
-                or 2 * (monthly + 1) > approval.monthly_credit_limit
-            ):
-                raise AuthorizationError("MONTHLY_BUDGET_EXHAUSTED")
-            since_quota = sum(
-                datetime.fromisoformat(str(row["at"])) >= approval.plan_quota.observed_at
-                for row in account_rows
-            )
-            if (
-                approval.plan_quota.remaining_credits
-                - 2 * since_quota
-                - approval.safety_reserve_credits
-                < 2
-            ):
-                raise AuthorizationError("QUOTA_EXHAUSTED")
             self._append(
                 records,
                 {
@@ -705,7 +811,9 @@ class RefreshAuthorizer:
         value._approvals = (approval,)
         return value
 
-    def authorize(self, request: RefreshRequest) -> RefreshGrant:
+    def _approved(
+        self, request: RefreshRequest
+    ) -> tuple[OperatorRefreshApproval, datetime, datetime, UsageLedger]:
         registry = self._approvals if self._approvals is not None else production_approvals()
         approvals = [row for row in registry if row.authorization_id == request.authorization_id]
         if len(approvals) != 1:
@@ -721,15 +829,29 @@ class RefreshAuthorizer:
             or approval.ledger_backend != self._ledger.backend_discriminator
         ):
             raise AuthorizationError("USAGE_LEDGER_REQUIRED")
+        return approval, now, expires_at, self._ledger
+
+    def preflight(self, request: RefreshRequest) -> AuthorizationPreview:
+        approval, now, expires_at, ledger = self._approved(request)
+        return AuthorizationPreview(
+            approval_sha256=canonical_sha256(approval.model_dump(mode="json")),
+            request_sha256=canonical_sha256(request.model_dump(mode="json")),
+            checked_at=now,
+            expires_at=expires_at,
+            ledger=ledger.preflight(approval, request, now=now),
+        )
+
+    def authorize(self, request: RefreshRequest) -> RefreshGrant:
+        approval, now, expires_at, ledger = self._approved(request)
         grant = RefreshGrant(
             reservation_id=token_hex(32),
-            ledger_id=self._ledger.ledger_id,
-            ledger_backend=self._ledger.backend_discriminator,
+            ledger_id=ledger.ledger_id,
+            ledger_backend=ledger.backend_discriminator,
             approval_sha256=canonical_sha256(approval.model_dump(mode="json")),
             classification=approval.classification,
             request=request,
             issued_at=now,
             expires_at=expires_at,
         )
-        self._ledger.reserve(approval, grant)
+        ledger.reserve(approval, grant)
         return grant

@@ -16,8 +16,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.dashboard.authorization import (
     AuthorizationError,
+    LedgerInspection,
     OperatorRefreshApproval,
     RefreshGrant,
+    RefreshRequest,
     UsageLedger,
 )
 from dmf_pulse.data_model.tables import refresh_control_event, refresh_control_ledger
@@ -124,6 +126,16 @@ class PostgresUsageLedger(UsageLedger):
         ):
             raise AuthorizationError("PRIVATE_CONTROL_DATABASE_REQUIRED")
         super().reserve(approval, grant)
+
+    def preflight(
+        self, approval: OperatorRefreshApproval, request: RefreshRequest, *, now: datetime
+    ) -> LedgerInspection:
+        if (
+            approval.classification == "PRIVATE_CURRENT"
+            and self.database_ref != "OPERATOR_CONTROL_DATABASE"
+        ):
+            raise AuthorizationError("PRIVATE_CONTROL_DATABASE_REQUIRED")
+        return super().preflight(approval, request, now=now)
 
     def _valid_grant(self, grant: RefreshGrant, worker_id: str, now: datetime) -> None:
         if (
