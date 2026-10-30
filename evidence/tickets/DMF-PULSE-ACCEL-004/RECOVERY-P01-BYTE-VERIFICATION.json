@@ -1,0 +1,20 @@
+{
+  "elapsed_seconds": 0.0597,
+  "generation_freeze_score_tripwires": true,
+  "method": "Original local regular file hashed only, no JSON/model parsing",
+  "network_audit_guard": true,
+  "provider_requests": 0,
+  "source_body_copied": false,
+  "status": "PASS",
+  "verification": {
+    "byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+    "bytes": 38208223,
+    "catalogue_semantic_sha256": "1746319e02b44649ffeb7be7d0a582d544bccea25b2120b5e929c29217849c8c",
+    "classification": "REAL_PRE_OUTCOME_FROZEN",
+    "family_id": "P01_PUBLIC_MATCH_FORECAST",
+    "retention": "QUALIFIED_PUBLIC_PRIVATE_USE_ONLY",
+    "schema_version": "recovered-artifact-verification-v1",
+    "scoring_authorized": false,
+    "status": "MATCHED_REVIEWED_ORIGINAL_BYTES"
+  }
+}

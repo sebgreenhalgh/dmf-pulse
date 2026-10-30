@@ -133,8 +133,23 @@ async function showPerformance() {
   const c=card('Model Performance');
   try {
     const report=await api('/api/performance');
-    c.append(text('p',report.real_cohort_status,'warning'));
-    if (!report.synthetic_report) {c.append(text('p','Freeze rights-qualified predictions before the deadline and attach later finalized labels. No eligible real longitudinal evidence is registered.'));return;}
+    c.append(text('p',`Player evaluation: ${report.real_cohort_status}`,'warning'));
+    const recovered=report.recovery;
+    if(recovered){
+      const history=card('Recovered forecast evidence',c);
+      history.append(text('p',`Inventory observed at ${recovered.metadata_as_of}; authority assessment and review receipts were recorded later. Existing forecasts were searched before proposing another cohort. Additional forecasts reported by the owner: ${recovered.additional_owner_report}. This bounded search does not prove absence elsewhere.`));
+      table(history,['Family','Level','Temporal custody','Retention','Distinct forecast targets','Evaluation'],recovered.families.map(f=>[f.family_id,f.level,f.classification,f.retention,f.sample_count===null?'Not established':`${f.sample_count} ${f.sample_unit}`,f.evaluation_status]));
+      const original=recovered.families.find(f=>f.family_id==='P01_PUBLIC_MATCH_FORECAST');
+      if(original){
+        const p01=card('P01: original real match forecast',history);
+        p01.append(text('p',`Origin ${original.forecast_origin}; frozen ${original.frozen_at}. ${original.sample_count} fixtures with ${original.products_per_sample} products per fixture (${original.forecast_rows} product rows). The fixture outcome count is ${original.sample_count}; no statistical independence assumption is added.`));
+        p01.append(text('p',original.explanation));
+        p01.append(text('p',`Last authenticated local labels (${recovered.p01_labels.authenticated_at}): ${recovered.p01_labels.final_fixture_count} final, ${recovered.p01_labels.missing_fixture_count} missing or not final. Current provider availability: ${recovered.p01_labels.current_provider_availability}. Real accuracy: unavailable; missing labels are not zero.`,'warning'));
+        p01.append(text('p',`Canonical scoring readiness: ${recovered.canonical_resumption}. No acquisition, source retry, scoring, tuning or promotion is enabled by this catalogue.`));
+      }
+      details(history,'Catalogue identity, original hashes and bounded search coverage',recovered);
+    }
+    if (!report.synthetic_report) {c.append(text('p','Recovered match evidence and unresolved player custody are shown separately. Real player accuracy remains unavailable until original freeze, every source right and finalized labels are qualified.'));return;}
     c.append(text('p','SYNTHETIC ACCEPTANCE ONLY · Analytic fixture forecasts, separate from the recommendation run. No real historical performance claim or model promotion.'));
     const r=report.synthetic_report, grid=text('div','','grid');c.append(grid);
     metric(grid,'FORECASTS / MISSING',`${r.count} / ${r.missing_count}`);

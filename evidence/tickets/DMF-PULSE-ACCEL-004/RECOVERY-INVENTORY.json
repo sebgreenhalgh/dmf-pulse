@@ -1,0 +1,251 @@
+{
+  "credential_inspection": false,
+  "families": [
+    {
+      "approved_locator": "PROJECT_ARTIFACT_ROOT/public-prospective/CURRENT-TEAM-STRENGTH-001V-P01/public-team-strength-prospective/96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a.json",
+      "blockers": [
+        "All ten original fixtures need qualified final labels; missing labels never become zero.",
+        "A02/A03 are permanently consumed; A03 observed metadata mismatch unresolved; display-name compatibility candidate inactive.",
+        "No source retry, switch, refreeze, refit or scoring permission is created by recovery."
+      ],
+      "byte_sha256": "e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee",
+      "classification": "REAL_PRE_OUTCOME_FROZEN",
+      "evaluation_status": "BLOCKED_MISSING_ADMISSIBLE_FINAL_LABELS",
+      "family_id": "P01_PUBLIC_MATCH_FORECAST",
+      "fixture_count": 10,
+      "fixture_registry_sha256": "de447eb368a807d4edf701a75c094a8b3f4925aa3e87cbff9b9f4fadd63eba18",
+      "forecast_origin": "2026-10-03T13:38:40.513349Z",
+      "forecast_rows": 30,
+      "forecast_variables": [
+        "joint home/away final-goal distribution",
+        "1X2/totals/clean-sheet derived probabilities"
+      ],
+      "frozen_at": "2026-10-03T13:40:19.466686Z",
+      "information_cutoff": "2026-10-03T13:35:50.079403Z",
+      "labels": {
+        "current_provider_availability": "NOT_QUERIED",
+        "d_plus_2_eligible_count": 0,
+        "full_time_count": 0,
+        "last_authenticated_at": "2026-10-14T13:03:25.153725+00:00",
+        "missing_not_final_count": 10,
+        "snapshot_sha256": "edde851a1f43aeb4ef38455216a8ab82d3698fff46246d2ddbdfb6af841306ea",
+        "status": "P01_OUTCOMES_INCOMPLETE"
+      },
+      "level": "MATCH",
+      "model_sha256": "f44ff80d48f4c8e78c09ea27f4344c2f63858c92b0ce0a7f19f9267d6bc5e366",
+      "products_per_fixture": 3,
+      "real_accuracy_metrics": null,
+      "retention_status": "ACCEPTED_PUBLIC_SOURCE_PRIVATE_RETENTION_ONLY_NO_GENERAL_REDISTRIBUTION_GRANT",
+      "scheduled_dates": [
+        "2026-10-10",
+        "2026-10-11",
+        "2026-10-12"
+      ],
+      "semantic_sha256": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a",
+      "source_lineage_sha256": "f22766ff90726056f497c23cd5c2992ac90090ac5ac7b30e26053b6e5a6eaa97",
+      "source_mode": "LIVE_OBSERVED",
+      "target_seasons": [
+        "2026/27"
+      ],
+      "training_cutoff": "2026-10-03T13:35:50.079403Z",
+      "training_dataset_sha256": "437b61bbbb18eeda2b931382c795333c6172d1473d5725224bee5f24a46ef549"
+    },
+    {
+      "blockers": [
+        "Authentication/source diagnostic dates do not create a new origin or change the October3 freeze."
+      ],
+      "classification": "POST_OUTCOME",
+      "evaluation_status": "NO_NEW_FORECAST_NO_ADMITTED_COMPLETE_OUTCOME_SET",
+      "family_id": "P01_OCT14_AUTHENTICATION_AND_OCT16_FALLBACK_RECORDS",
+      "level": "MATCH_METADATA_REFERENCE",
+      "new_forecast_origin": false,
+      "population": "Same original ten fixtures/three products",
+      "prospective_forecast_reference": "96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a"
+    },
+    {
+      "blockers": [
+        "Historical live execution/admission claims or output hashes alone do not establish retained forecast distributions and pre-outcome freeze custody.",
+        "Existing private lineage remains transient; every upstream retention/evaluation right must qualify independently.",
+        "Consumed approvals do not authorize recovery requests or fresh acquisitions."
+      ],
+      "classification": "UNVERIFIED_CUSTODY",
+      "evaluation_status": "NO_ADMISSIBLE_RETAINED_PLAYER_FORECAST_COHORT",
+      "family_id": "HISTORICAL_PRIVATE_LIVE_OPERATION_FAMILIES",
+      "forecast_values_authenticated": false,
+      "included_namespaces": [
+        "PRIVATE-V1-LIVE-TRANSIENT",
+        "PRIVATE-V1-E2E",
+        "PRIVATE-V1-ONE-COMMAND",
+        "CURRENT-TEAM-STRENGTH-001P-L1_TO_L8"
+      ],
+      "level": "PRIVATE_PLAYER_DECISION_AND_LIVE_OBSERVATION_METADATA",
+      "qualification": "This is not a claim no real predictions were ever produced; no scored/private cohort is inferred from operation metadata.",
+      "retention_classification": "NOT_QUALIFIED_FOR_RETENTION"
+    },
+    {
+      "blockers": [
+        "Legacy DTO execution_status says REAL_PRIVATE_TRANSIENT_RECOMMENDATION while authoritative paired provenance explicitly says synthetic injected transports.",
+        "REPLAY mode, placeholder code identity and owned-source provenance prevent classification as a genuine private pre-outcome freeze."
+      ],
+      "classification": "SYNTHETIC",
+      "evaluation_status": "EXCLUDED_FROM_REAL_ACCURACY",
+      "family_id": "ACCEL001_CONTROLLED_PRIVATE_PIPELINE_DECISIONS",
+      "information_cutoff": "2026-09-01T12:00:00Z",
+      "level": "PLAYER_AND_MANAGER_DECISION",
+      "population_count": 120,
+      "provenance": "evidence/tickets/DMF-PULSE-ACCEL-001/PRIVATE-private-final-controlled-d2-provenance.json",
+      "retained_copy_count": 8,
+      "retention_status": "OWNED_ENGINEERING_EVIDENCE_ONLY",
+      "target_gameweeks": [
+        2,
+        3,
+        4
+      ],
+      "target_season": "2026/27"
+    },
+    {
+      "classification": "SYNTHETIC",
+      "evaluation_status": "EXCLUDED_FROM_REAL_ACCURACY",
+      "family_id": "ACCEL002_NATIVE_AND_CONTROLLED_NUMERICAL_SNAPSHOTS",
+      "horizons": [
+        1,
+        3
+      ],
+      "level": "PLAYER_PROJECTION_AND_DECISION",
+      "qualification": "Native describes the accepted execution path, not real provider data; copied source-bound snapshots are numerical engineering regressions.",
+      "retention_status": "OWNED_ENGINEERING_EVIDENCE_ONLY"
+    },
+    {
+      "classification": "SYNTHETIC",
+      "cohort_gameweeks": 2,
+      "cohort_players": 4,
+      "distinct_player_gameweek_targets": 8,
+      "evaluation_status": "SCORABLE_SYNTHETIC_THROUGH_EXISTING_STAGE12_ONLY",
+      "family_id": "ACCEL003_COHORT_AND_CURRENT_MODE_PROOFS",
+      "level": "PLAYER_COHORT_AND_CURRENT_MODE_ARCHITECTURE",
+      "qualification": "Explicit owned forecast/labels and current-mode synthetic transports; model quality and real accuracy remain unestablished.",
+      "real_cohort_size": 0,
+      "retention_status": "QUALIFIED_OWNED_SYNTHETIC_ONLY"
+    },
+    {
+      "classification": "UNVERIFIED_CUSTODY",
+      "evaluation_status": "NOT_AN_AUTHENTICATED_PRE_OUTCOME_FORECAST_COHORT",
+      "family_id": "HISTORICAL_PUBLIC_FITS_AND_GOLDEN_REPLAYS",
+      "level": "MODEL_SOURCE_FIT_OR_ENGINEERING_REPLAY_NOT_FORECAST",
+      "observed_reconstructed_source_records": 2,
+      "qualification": "Explicit reconstructed source records remain HISTORICAL_RECONSTRUCTED; a LIVE_OBSERVED source dataset or fitted public model does not itself establish a target forecast frozen before outcomes."
+    },
+    {
+      "activation_status": "NO_ACTIVATION_AUTHORITY_ESTABLISHED_BY_RECOVERY",
+      "classification": "UNVERIFIED_CUSTODY",
+      "evaluation_status": "NOT_A_PROSPECTIVE_FORECAST_COHORT",
+      "family_id": "GW1_CURRENT_EVENT_PRIOR_CANDIDATE",
+      "level": "PARAMETER_CANDIDATE_NOT_FROZEN_PLAYER_FORECAST",
+      "qualification": "Existing candidate/source-manifest/calibration/universe metadata was inspected without copying player values. Parameter evidence and a future forecast freeze are separate; this inventory does not activate the candidate or qualify its source rights."
+    },
+    {
+      "blockers": [
+        "The bounded search has not authenticated an additional real player or match freeze distinct from P01.",
+        "Unrelated private folders and credentials were not searched; inaccessible paths and unparsed/pickle candidates are documented.",
+        "File modification time, Git commit subject/date, a replay and an output hash alone cannot replace original freeze evidence."
+      ],
+      "classification": "UNVERIFIED_CUSTODY",
+      "evaluation_status": "REQUIRES_ADDITIONAL_APPROVED_LOCATOR_OR_CUSTODY_EVIDENCE",
+      "family_id": "OWNER_REPORTED_ADDITIONAL_REAL_FREEZES",
+      "level": "OWNER_REPORTED_FORECASTS_NOT_YET_IDENTIFIED",
+      "not_an_absence_claim": true
+    },
+    {
+      "classification": "HISTORICAL_RECONSTRUCTED",
+      "evaluation_status": "EXCLUDED_FROM_REAL_PROSPECTIVE_ACCURACY",
+      "family_id": "EXPLICIT_RECONSTRUCTED_SOURCE_REPLAY_RECORDS",
+      "level": "SOURCE_OR_ENGINEERING_REPLAY_NOT_REAL_PROSPECTIVE_COHORT",
+      "metadata_record_count": 2,
+      "qualification": "Only records explicitly marked RECONSTRUCTED are counted here. They are not relabelled as pre-outcome freezes; source/replay counts are not independent prediction samples."
+    }
+  ],
+  "generated_at": "2026-10-30T03:17:44.962434+00:00",
+  "git_metadata": [
+    {
+      "commit": "f96eaa3e7261d0db6f23bc8eb7dee18917272d00",
+      "commit_timestamp": "2026-10-16T21:15:01+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "3ecee539605093ef8a36447aabcb9b4f89f35bd1606c9f4d584b425701d87062"
+    },
+    {
+      "commit": "5ca798db9f2d75c8b577e8b37e9ee21205a2d0f0",
+      "commit_timestamp": "2026-10-16T11:36:02+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "08045f4ce461f0d9c7d0986c4bbb7afc8cde17341d43830e95db12b9744d87a4"
+    },
+    {
+      "commit": "04bf0393e011a87ca0d5f85926a8e9b92a889313",
+      "commit_timestamp": "2026-10-16T11:06:12+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "c0e7072612ce02adf951b5e2c52cff049c62a3e30aab9d5cef33f6fd2386e750"
+    },
+    {
+      "commit": "cdc7309486c0cbe3e1d9569c6655d01d2bef5031",
+      "commit_timestamp": "2026-10-10T12:52:18+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "71981a2a288babf3b70c43e3dbe6245d60c7564d62364495e0dafe09176cf9a1"
+    },
+    {
+      "commit": "402c0b5a4acccf7b2b95b666405ebefbafcf1563",
+      "commit_timestamp": "2026-10-10T12:32:08+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "928de00a7e5e05dfe36e61c8cc7c98889fb4ae775bd44c57915ab477bbbf2837"
+    },
+    {
+      "commit": "3815152e978dd55e1dc1f115055050d4ed6b1735",
+      "commit_timestamp": "2026-10-02T21:21:14+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "63ffde4d92f7321069db024381d046a6618c9ecbc60f097f457647d8bee746f8"
+    },
+    {
+      "commit": "412e92acf3e7fc1c45614d1f875a5fd9afa34a64",
+      "commit_timestamp": "2026-10-02T19:56:04+02:00",
+      "role": "GIT_METADATA_ONLY_NOT_FREEZE_PROOF",
+      "subject_sha256": "071aa429d6d9c9c500801f059a6763ba7fee6e42ff6945f97b374e588affa6e5"
+    }
+  ],
+  "head_sha": "8da678e1b5ebb48ec06a4ec73c35bfd76a3401e1",
+  "implementation_gap": "Expose authenticated recovered-forecast metadata and typed classification/label/retention blockers separately from synthetic metrics; reuse existing scorers, never invent missing labels or research rights.",
+  "metadata_only": true,
+  "new_cohort_created": false,
+  "private_bodies_copied": false,
+  "programme": "DMF-PULSE-ACCEL-004",
+  "provider_requests": 0,
+  "real_forecasts_authenticated": {
+    "additional_owner_report": "UNRESOLVED_NOT_DISPROVED",
+    "match_artifact_families": 1,
+    "match_fixtures": 10,
+    "match_products": 30
+  },
+  "real_player_or_manager_values_included": false,
+  "recovery_result": "REAL_P01_MATCH_FREEZE_AUTHENTICATED; NO_ADDITIONAL_ELIGIBLE_REAL_COHORT_AUTHENTICATED_WITHIN_BOUNDED_SEARCH; OWNER_REPORT_REMAINS_OPEN",
+  "schema_version": "accel004-public-safe-recovery-inventory-v1",
+  "scoring_performed": false,
+  "search": {
+    "access_or_absence_gaps": 83,
+    "archive_bodies_read": false,
+    "archive_bound_or_read_gaps": 3,
+    "archive_census_sha256": "3bc577725ced86ffe2f8b7f1915489ac1ddf9d16f0baf5278912a69a88c16aed",
+    "archive_count": 191,
+    "archive_extraction_performed": false,
+    "archive_forecast_named_members": 12,
+    "authorized_project_roots": 76,
+    "candidate_paths": 40498,
+    "cap_hit": false,
+    "considered_files": 78801,
+    "depth_cap": 12,
+    "file_cap": 120000,
+    "git_object_directory_walk": false,
+    "metadata_json_files_read": 377,
+    "mtime_used_as_custody": false,
+    "path_census_sha256": "e5be63c8c6c8361a0d886bff9a742ccbe0b1915c3b220553d038713925db1215",
+    "pickle_deserialized": false,
+    "unrelated_os_profile_scan": false
+  },
+  "semantic_sha256": "970e53dd856fafa22bbe34c9109ec3545d79698941cf245cda3ede57763ea932"
+}

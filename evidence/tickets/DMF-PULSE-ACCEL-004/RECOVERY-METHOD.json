@@ -1,0 +1,47 @@
+{
+  "credentials_read": 0,
+  "draws_generated": 0,
+  "limits": [
+    "Bounded approved project roots only;83accessorabsencegaps and3archivegaps remain explicit.",
+    "Owner additional-real-forecast report remains unresolved, not disproved.",
+    "Last local P01labels October14 were incomplete; currentprovideravailability unqueried.",
+    "Original canonical authority not globally consumed byfallback, but exact381code/noregeneration binding blocks acceptedexecution; independentreviewrecordsneedlaterauthorityresolution before calls."
+  ],
+  "local_full_inventory_uploaded": false,
+  "local_full_metadata_inventory_byte_sha256": "cfb8238de18d5a25b3b64ed82015ac81b715631504ad376eaf0d469648fc9141",
+  "new_cohorts": 0,
+  "original_worktree": "READ_ONLY_UNCHANGED",
+  "prior_failures": [
+    {
+      "cause": "Sandbox ACL denied pytest default OS temp-directory enumeration before test bodies; no model/provider action.",
+      "resolution": "Explicit fresh ignored workspace basetemp; no sandbox/security/test expectation weakened.",
+      "result": "32setupERROR",
+      "stage": "new focused tests initial invocation"
+    },
+    {
+      "cause": "Author test assertions omitted global isolated-home fixture, expected400instead403forqueryguard and used platform-defaulttextencoding.",
+      "resolution": "Corrected test accounting, preserved403securityguard and specifiedUTF8forresourceinspection.",
+      "result": "29passed3failed",
+      "stage": "new focused tests first workspace-temp run"
+    },
+    {
+      "cause": "Raising a fixed error insideexceptretained raw digest/parserexceptioncontext despite fromNone.",
+      "resolution": "Inner read/parser frames now return safe sentinel; public fixed error raised after return. Canarytests inspectcause/context/producttracebacklocals.",
+      "result": "Material security finding corrected",
+      "stage": "independent recovery exception review"
+    },
+    {
+      "cause": "Author changed packaged metadata bytes while the executing test process retained its earlier byte pin/schema; performanceAPIcorrectlyreturned503failclosed.",
+      "log_sha256": "09d36653b4d66bdc747228c736ea432e7ce108eeef6cc84641dac173f694cde6",
+      "resolution": "Freeze source/resource and repeat full target set in a fresh process; no pin or guard was relaxed.",
+      "result": "284passed4failedin354.83seconds",
+      "stage": "broader author checkpoint before resource freeze"
+    }
+  ],
+  "provider_requests": 0,
+  "public_safe_inventory_byte_sha256": "c092e7e8eaea7ac47675525fb75e16eac19d83c25f8f88a6a9d0a2e415e71edb",
+  "raw_or_private_source_bodies_exported": false,
+  "schema_version": "accel004-recovery-method-and-failure-history-v1",
+  "scoring_invocations": 0,
+  "sealed_metadata_copies": "Ignored recovery-sealed public-safe and local-metadata content-addressed directories in the programme worktree."
+}

@@ -20,6 +20,7 @@ from starlette.responses import JSONResponse, Response
 from dmf_pulse.dashboard.current import CurrentEligibility
 from dmf_pulse.dashboard.runtime import DeskRuntime
 from dmf_pulse.dashboard.views import PlayerComparison
+from dmf_pulse.player_lab.recovery import RecoveryError, recovery_catalogue
 from dmf_pulse.private_v1.presentation import PresentationModel
 
 _HEADERS = {
@@ -287,8 +288,14 @@ def create_app(
 
     @app.get("/api/performance")
     async def performance() -> Response:
+        try:
+            recovered = recovery_catalogue()
+        except RecoveryError as error:
+            return _error(error.code, 503)
         result: dict[str, object] = {
-            "real_cohort_status": "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT"
+            "real_cohort_status": "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT",
+            "real_cohort_scope": "PLAYER_COHORT; recovered P01 is a separate MATCH forecast",
+            "recovery": recovered.model_dump(mode="json"),
         }
         if runtime.synthetic_sources:
             from dmf_pulse.player_lab.demo import synthetic_evaluation

@@ -1,0 +1,154 @@
+{
+  "accepted_package_import_probe_tests": 1,
+  "checks": [
+    {
+      "bytes": 101,
+      "command": [
+        ".venv\\Scripts\\python.exe",
+        "-m",
+        "coverage",
+        "run",
+        "--data-file=review_pack/.coverage-recovery-publish",
+        "--source=dmf_pulse.player_lab.recovery,dmf_pulse.player_lab.recovery_models,dmf_pulse.cli.recovery",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/unit/player_lab/test_recovery.py",
+        "tests/contract/player_lab/test_recovery_cli.py",
+        "tests/unit/dashboard/test_recovery_performance.py",
+        "tests/integration/package/test_import_side_effects.py",
+        "--basetemp=review_pack/pytest-recovery-focused-publish",
+        "--tb=short"
+      ],
+      "elapsed_seconds": 12.798,
+      "exit_code": 0,
+      "group": "focused_final",
+      "local_exact_command_receipt_sha256": "378e0a36983f64a9d6ef4cfcfcda87755e02cbc2987370ec0d106fade5022126",
+      "log": "review_pack\\recovery-focused_final.log",
+      "sha256": "c0a11bca9dff1571a2f33442d8522ed007540a9751967f10a950f12d33069900"
+    },
+    {
+      "bytes": 438,
+      "command": [
+        ".venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/unit/player_lab",
+        "tests/contract/player_lab",
+        "tests/unit/dashboard",
+        "--basetemp=review_pack/pytest-recovery-regression-final-001",
+        "--tb=short"
+      ],
+      "elapsed_seconds": 423.193,
+      "exit_code": 0,
+      "group": "regression_final",
+      "local_exact_command_receipt_sha256": "c7775addb816e1db602904d4c7e040187e0e5da00d44b4f21bb6826fa8472d72",
+      "log": "review_pack\\recovery-regression_final.log",
+      "sha256": "edb3455aeee8be26e0f9dadf384cc143ab7b967878eb7339f5a6288985686911"
+    },
+    {
+      "bytes": 19,
+      "command": [
+        ".venv\\Scripts\\ruff.exe",
+        "check",
+        "src/dmf_pulse/player_lab/recovery.py",
+        "src/dmf_pulse/player_lab/recovery_models.py",
+        "src/dmf_pulse/cli/recovery.py",
+        "src/dmf_pulse/dashboard/app.py",
+        "tests/unit/player_lab/test_recovery.py",
+        "tests/contract/player_lab/test_recovery_cli.py",
+        "tests/unit/dashboard/test_recovery_performance.py"
+      ],
+      "elapsed_seconds": 0.078,
+      "exit_code": 0,
+      "group": "ruff_final",
+      "local_exact_command_receipt_sha256": "f3e9892676ba34acb3ea5da2f1447b6f00bda6405c2950b2437cbdf739771e60",
+      "log": "review_pack\\recovery-ruff_final.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 44,
+      "command": [
+        ".venv\\Scripts\\mypy.exe",
+        "src/dmf_pulse/player_lab/recovery.py",
+        "src/dmf_pulse/player_lab/recovery_models.py",
+        "src/dmf_pulse/cli/recovery.py",
+        "src/dmf_pulse/dashboard/app.py"
+      ],
+      "elapsed_seconds": 1.711,
+      "exit_code": 0,
+      "group": "typing",
+      "local_exact_command_receipt_sha256": "0ecded3059330280b6134fe259709ab5e6298f67f1bf73d3d2ef0b3462849ce6",
+      "log": "review_pack\\recovery-typing.log",
+      "sha256": "d9a5631f7d87a741fbecc3236286d1792d22d349ff13846d71cdc9217307bb76"
+    },
+    {
+      "bytes": 68,
+      "command": [
+        ".venv\\Scripts\\python.exe",
+        "scripts/scan_secrets.py"
+      ],
+      "elapsed_seconds": 32.366,
+      "exit_code": 0,
+      "group": "scanner_final",
+      "local_exact_command_receipt_sha256": "aa669209d4da84f9ee342bb357e7c4cb1964bc648861c2f9e0955b7f874d777f",
+      "log": "review_pack\\recovery-scanner_final.log",
+      "sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25"
+    }
+  ],
+  "command_cwd": "AUTHOR_RECOVERY_WORKTREE",
+  "coverage_is_not_full_repository_acceptance": true,
+  "credential_reads": 0,
+  "draw_generation_invocations": 0,
+  "failure_history": "RECOVERY-METHOD.json preserves setup, author assertion, invalidated checkpoint and corrected exception-context findings; no failures were treated as passes.",
+  "full_existing_and_new_player_lab_dashboard_tests": 294,
+  "git_export_text_normalization": "Two new text files normalized CRLF to LF before commit so Git index/export bytes equal reviewed working bytes; no logical source or metadata value changed.",
+  "model_or_promotion_changes": false,
+  "new_recovery_tests": 39,
+  "original_availability_worktree_changed": false,
+  "programme_acceptance": "PENDING_ROOT_INTEGRATION_INSTALLED_WHEEL_FULL_GATES_AND_INDEPENDENT_COMMIT_BINDING",
+  "provider_requests": 0,
+  "raw_private_payloads_exported": false,
+  "root_cli_registration_required": "Register dmf_pulse.cli.recovery.recovery_app as forecasts in the root-owned CLI.",
+  "schema_version": "accel004-recovery-author-checks-v1",
+  "scoring_invocations": 0,
+  "sealed_at": "2026-10-30T03:52:48.168088+00:00",
+  "source_and_evidence_sha256": {
+    "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-INVENTORY.json": "c092e7e8eaea7ac47675525fb75e16eac19d83c25f8f88a6a9d0a2e415e71edb",
+    "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-METHOD.json": "b50943b1639a0ac9c1af4fb715a04a7db119cd1daf21889876561e7033ed61ce",
+    "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-P01-BYTE-VERIFICATION.json": "37cfc45e66ebd34c26df5449d9420821396a8ea6edcd7498840fcc25bd0eef5d",
+    "src/dmf_pulse/cli/recovery.py": "e1caa033c38ede706ef28181749b5c75b930b210757a431b841798218092232c",
+    "src/dmf_pulse/dashboard/app.py": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab",
+    "src/dmf_pulse/dashboard/resources/desk.js": "98fa490adf718b7e8b26e7ff1d2cf4524d2c54164ea52847d6d4b66e6d780868",
+    "src/dmf_pulse/player_lab/recovery.py": "06f395ffffe7be408e48fc8a5ac63429adc5a16fc63b995415bc4cec663ab8f4",
+    "src/dmf_pulse/player_lab/recovery_models.py": "98f2bc50d2b6ddc38b2c7eda2c27102db14f13dc6cde5994fa3e017b984285d2",
+    "src/dmf_pulse/player_lab/resources/recovered_forecasts_v1.json": "3dde6cd2322e72cf9e7a4232c8f98a679b5bd6c687c19af5adbce0ac2bafb4f3",
+    "tests/contract/player_lab/test_recovery_cli.py": "8b7343b77ad638b6349d166ccf927ae733e81e2f4ba158e03f2c736571b41c4d",
+    "tests/unit/dashboard/test_recovery_performance.py": "aa2cda640ec749dedecc07cc5b6b76720121bb4551046437077dfd6e6e2dc829",
+    "tests/unit/player_lab/test_recovery.py": "d090fc13a26a9c417fbd75fdfa0f0f207ee7aca5b7cc064af8839cb46cc9f9a6",
+    "tickets/DMF-PULSE-ACCEL-004/FORECAST-RECOVERY.md": "65a91bacecd2662c7cb83d169f9f499cb6ddb0ff35851f2488b41b202eb112f2"
+  },
+  "source_coverage": {
+    "covered_branches": 36,
+    "covered_lines": 210,
+    "excluded_lines": 0,
+    "missing_branches": 0,
+    "missing_lines": 0,
+    "num_branches": 36,
+    "num_partial_branches": 0,
+    "num_statements": 210,
+    "percent_branches_covered": 100.0,
+    "percent_branches_covered_display": "100",
+    "percent_covered": 100.0,
+    "percent_covered_display": "100",
+    "percent_statements_covered": 100.0,
+    "percent_statements_covered_display": "100"
+  },
+  "source_coverage_scope": [
+    "dmf_pulse.player_lab.recovery",
+    "dmf_pulse.player_lab.recovery_models",
+    "dmf_pulse.cli.recovery"
+  ],
+  "status": "PASS_OWNED_SLICE_CHECKS_ONLY"
+}
