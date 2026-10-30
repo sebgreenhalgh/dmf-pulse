@@ -1,0 +1,72 @@
+{
+  "captured_at": "2026-10-30T05:42:10.485059+00:00",
+  "command_log_policy": "Final command logs are explicitly LF text copies; original native command captures are separately byte-hashed in CP6-LOCAL-GATES.json. All forecast, source, outcome, native acceptance JSON bodies retain exact bytes.",
+  "historical_git_receipts_changed": false,
+  "original_raw_captures_preserved": true,
+  "pairs": [
+    {
+      "historical_git_bytes": 7141,
+      "historical_git_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-CODE-REVIEW-INITIAL.json",
+      "historical_git_sha256": "53365fa1577decc2ce80103f92ee920b71d866ac29c99ba6b3a573ae31473975",
+      "only_native_crlf_vs_lf": true,
+      "original_capture_bytes": 7224,
+      "original_capture_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-CODE-REVIEW-INITIAL-NATIVE-CAPTURE.json",
+      "original_capture_sha256": "f31463510c933cfc48fe7ecb1734b7c4894dc3af03ebb4dc28ac93834a39865a",
+      "semantic_json_equal": true
+    },
+    {
+      "historical_git_bytes": 16074,
+      "historical_git_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-DESIGN-REVIEW.json",
+      "historical_git_sha256": "fb16f450e586755c27cc7dfe01780b26ffed87b32d419bc06cddf41078ef8f6c",
+      "only_native_crlf_vs_lf": true,
+      "original_capture_bytes": 16282,
+      "original_capture_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-DESIGN-REVIEW-NATIVE-CAPTURE.json",
+      "original_capture_sha256": "7a8955df8f47f9229a9bdefbbcb00323d32463ac2b4eb904949a581da922585f",
+      "semantic_json_equal": true
+    },
+    {
+      "historical_git_bytes": 363,
+      "historical_git_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INITIAL-PROBES.json",
+      "historical_git_sha256": "e71f8dd9f05d6a255e8066e10a5540216f87b2af527ee58fbad1d79f4c247249",
+      "only_native_crlf_vs_lf": true,
+      "original_capture_bytes": 379,
+      "original_capture_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INITIAL-PROBES-NATIVE-CAPTURE.json",
+      "original_capture_sha256": "7775b26106521dd588610eb94502671f3ad987b8cfe54d34839386809b93944a",
+      "semantic_json_equal": true
+    },
+    {
+      "historical_git_bytes": 9429,
+      "historical_git_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INTEGRATION-REVIEW.json",
+      "historical_git_sha256": "99b5dfa632252bcd20ab4df337365d824fd3667bed10794f811c9beaf2a7288a",
+      "only_native_crlf_vs_lf": true,
+      "original_capture_bytes": 9532,
+      "original_capture_path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INTEGRATION-REVIEW-NATIVE-CAPTURE.json",
+      "original_capture_sha256": "d29cf91def2c33bc457243ae238e3b60cf3f9a3eb23e8dea770a2536a6faf528",
+      "semantic_json_equal": true
+    },
+    {
+      "historical_git_bytes": 4770,
+      "historical_git_path": "evidence/tickets/DMF-PULSE-ACCEL-004/OPERATION-INDEPENDENT-REVIEW.json",
+      "historical_git_sha256": "14f54b1760adacfee8409347b80645625cf792edf1f3d441e0c967072ab94c9b",
+      "only_native_crlf_vs_lf": true,
+      "original_capture_bytes": 4840,
+      "original_capture_path": "evidence/tickets/DMF-PULSE-ACCEL-004/OPERATION-INDEPENDENT-REVIEW-NATIVE-CAPTURE.json",
+      "original_capture_sha256": "229a14425120c81992161c3725c4ecb5792cebe784bc3ed505f559281913bfac",
+      "semantic_json_equal": true
+    },
+    {
+      "historical_git_bytes": 5726,
+      "historical_git_path": "evidence/tickets/DMF-PULSE-ACCEL-004/P01-CANONICAL-AUTHORITY-REVIEW.json",
+      "historical_git_sha256": "f7a449696e3d85dbf2e32edea4893254921017719d1bc08c04575e439f83b458",
+      "only_native_crlf_vs_lf": true,
+      "original_capture_bytes": 5802,
+      "original_capture_path": "evidence/tickets/DMF-PULSE-ACCEL-004/P01-CANONICAL-AUTHORITY-REVIEW-NATIVE-CAPTURE.json",
+      "original_capture_sha256": "25a5be06ca1ba00f17b2ae49c088c2b0042795f8f40a20fd05bbf7d06072a52e",
+      "semantic_json_equal": true
+    }
+  ],
+  "schema_version": "accel004-capture-and-git-line-endings-v1",
+  "scoped_review_hashes_unchanged": true,
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "status": "PASS_DISTINCT_BYTE_CONTEXTS_PRESERVED"
+}

@@ -1,0 +1,397 @@
+{
+  "captured_at": "2026-10-30T05:36:34.860079+00:00",
+  "classification": "OWNED_SYNTHETIC_AND_OFFLINE_ONLY",
+  "command_receipts": [
+    {
+      "mode": "targeted",
+      "receipt_sha256": "53964f439735be9a1e003d4248ce76fd06f1e1b10dcd0b84e00b709f2b3c3364"
+    },
+    {
+      "mode": "migration-final",
+      "receipt_sha256": "709c94dd132c032c52719211791845c5a7dfa927b88dfd0bdd56cb5546993bb3"
+    },
+    {
+      "mode": "five-wheels",
+      "receipt_sha256": "a552b2b3fac02262c175b1459f7577f3b833554ec87ee2080a944a070656f1b1"
+    }
+  ],
+  "final_browser": "INSTALLED-BROWSER.json",
+  "final_exact_sha_ci": "REQUIRED_SEPARATE_DETACHED_PUBLICATION_RECEIPT",
+  "final_native": "INSTALLED-NATIVE-VAULT-FINAL.json",
+  "interrupted_and_failed_history": [
+    {
+      "evidence": "CI-CHECKPOINT-235-FAILURE.json",
+      "state": "SUPERSEDED_LINUX_TYPING_FAILURE"
+    },
+    {
+      "evidence": "CUTOFF-DISCLOSURE-CORRECTION.json",
+      "state": "SUPERSEDED_962_CUTOFF_REASON_FAILURE_NO_TEST_WEAKENING"
+    },
+    {
+      "evidence": "CP6-LOCAL-GATES-962.json",
+      "state": "OLD_CHECKPOINT_PASSES_AND_BROAD_900_SECOND_TIMEOUT_AND_WRAPPER_PATH_DIAGNOSTIC"
+    },
+    {
+      "evidence": "RELEASE-PACKAGE-CUSTODY-962-ORDER-DIAGNOSTIC.json",
+      "state": "SUPERSEDED_PROOF_ORDERING_NATIVE_CLEANUP_ABSENCE_VERIFIED"
+    }
+  ],
+  "new_real_provider_calls": 0,
+  "no_skipped_tests_or_reused_partial_ci_for_release": true,
+  "portable_log_copy_policy": "Committed logs normalize only native CRLF to LF, matching repository text attributes. Original runner command logs remain unchanged and separately SHA-bound by captured_log_sha256 and original_log.",
+  "production_targets_read": 0,
+  "records": [
+    {
+      "captured_log_bytes": 27,
+      "captured_log_sha256": "9ca44993399d6a58aad4f8ff48964a4584241fcd27d746695110ffd092f5cbc9",
+      "command": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "sync",
+        "--all-groups",
+        "--frozen",
+        "--offline"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:27:58.335004+00:00",
+      "label": "frozen-sync",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-FROZEN-SYNC.LOG",
+      "log_bytes": 27,
+      "log_sha256": "9ca44993399d6a58aad4f8ff48964a4584241fcd27d746695110ffd092f5cbc9",
+      "original_log": "review_pack/cp6-targeted/frozen-sync.log",
+      "seconds": 0.056,
+      "started_at": "2026-10-30T05:27:58.279163+00:00"
+    },
+    {
+      "captured_log_bytes": 29,
+      "captured_log_sha256": "a36db4b65ebb65eae3421e27e0165b35f14b0f0a2331509733b518869c1b5219",
+      "command": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:27:58.549592+00:00",
+      "label": "format",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-FORMAT.LOG",
+      "log_bytes": 29,
+      "log_sha256": "a36db4b65ebb65eae3421e27e0165b35f14b0f0a2331509733b518869c1b5219",
+      "original_log": "review_pack/cp6-targeted/format.log",
+      "seconds": 0.214,
+      "started_at": "2026-10-30T05:27:58.336062+00:00"
+    },
+    {
+      "captured_log_bytes": 19,
+      "captured_log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "command": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "ruff",
+        "check",
+        "."
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:27:58.811009+00:00",
+      "label": "lint",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-LINT.LOG",
+      "log_bytes": 19,
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "original_log": "review_pack/cp6-targeted/lint.log",
+      "seconds": 0.261,
+      "started_at": "2026-10-30T05:27:58.550434+00:00"
+    },
+    {
+      "captured_log_bytes": 46,
+      "captured_log_sha256": "60bced76ab56e76b083157a70181a8162a3589e108419b3cad74bfd1a4f88c64",
+      "command": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "mypy",
+        "--platform",
+        "linux",
+        "src/dmf_pulse"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:28:15.750659+00:00",
+      "label": "typing-linux",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-TYPING-LINUX.LOG",
+      "log_bytes": 45,
+      "log_sha256": "dcbf59c8f805b83a5bd8e80ed667ca2ba50c98ce83542e83f41127d7a1af57ab",
+      "original_log": "review_pack/cp6-targeted/typing-linux.log",
+      "seconds": 16.939,
+      "started_at": "2026-10-30T05:27:58.812047+00:00"
+    },
+    {
+      "captured_log_bytes": 46,
+      "captured_log_sha256": "60bced76ab56e76b083157a70181a8162a3589e108419b3cad74bfd1a4f88c64",
+      "command": [
+        "C:\\Users\\sebgr\\AppData\\Local\\Microsoft\\WinGet\\Packages\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\\uv.EXE",
+        "run",
+        "mypy",
+        "--platform",
+        "win32",
+        "src/dmf_pulse"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:28:32.346597+00:00",
+      "label": "typing-win32",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-TYPING-WIN32.LOG",
+      "log_bytes": 45,
+      "log_sha256": "dcbf59c8f805b83a5bd8e80ed667ca2ba50c98ce83542e83f41127d7a1af57ab",
+      "original_log": "review_pack/cp6-targeted/typing-win32.log",
+      "seconds": 16.592,
+      "started_at": "2026-10-30T05:28:15.754404+00:00"
+    },
+    {
+      "captured_log_bytes": 130,
+      "captured_log_sha256": "372eeeed0ae9aa496ea8067196c924e75d7a15ee42cfccd07fd1821ce0470d32",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "-m",
+        "alembic",
+        "upgrade",
+        "head"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:28:33.868350+00:00",
+      "label": "restore-head",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-RESTORE-HEAD.LOG",
+      "log_bytes": 128,
+      "log_sha256": "84b9cfdaaae75628f3cbd7082d9c05399a66f8049b2a84369fcf326d0622ec92",
+      "original_log": "review_pack/cp6-targeted/restore-head.log",
+      "seconds": 1.52,
+      "started_at": "2026-10-30T05:28:32.347927+00:00"
+    },
+    {
+      "captured_log_bytes": 112,
+      "captured_log_sha256": "f775e7a746fe3bdf9966281636e98a11cb3ce00c47d8f7e485b73808e9d030cf",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/integration/dashboard/test_postgres_authorization.py",
+        "tests/integration/player_lab/test_research_store.py",
+        "-q",
+        "--basetemp",
+        "review_pack/pytest-cp6-control-rights",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:29:36.273760+00:00",
+      "label": "postgres-control-rights",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-POSTGRES-CONTROL-RIGHTS.LOG",
+      "log_bytes": 110,
+      "log_sha256": "6b78f9d948df60e1579806d27057899920566e929d7b8b8163f9d04e1209ba5c",
+      "original_log": "review_pack/cp6-targeted/postgres-control-rights.log",
+      "seconds": 62.405,
+      "started_at": "2026-10-30T05:28:33.869216+00:00"
+    },
+    {
+      "captured_log_bytes": 692,
+      "captured_log_sha256": "6dc8656d94d76e85f341ce7927b0f95b88d668102178f3761d880749c92c343c",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "-m",
+        "performance",
+        "-q",
+        "--basetemp",
+        "review_pack/pytest-cp6-performance-final",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:30:00.241816+00:00",
+      "label": "performance",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-PERFORMANCE.LOG",
+      "log_bytes": 683,
+      "log_sha256": "aba2dffd6d58d67ced1d8c1b7b74087fa1010826300a071c87ea009b899576ce",
+      "original_log": "review_pack/cp6-targeted/performance.log",
+      "seconds": 23.967,
+      "started_at": "2026-10-30T05:29:36.274616+00:00"
+    },
+    {
+      "captured_log_bytes": 1794,
+      "captured_log_sha256": "a65ade47d91714322ac851035f5f17f58748ad0f106c61945f908ae74090dcf9",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/test_migration_matrix.py",
+        "--baseline-revision",
+        "20260803_0005",
+        "--target",
+        "head",
+        "--report",
+        "review_pack/migration_report.json",
+        "--offline-sql",
+        "review_pack/offline_upgrade.sql",
+        "--schema-manifest",
+        "review_pack/schema_manifest.json"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-fp55u8f5",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:31:24.842590+00:00",
+      "label": "migration-matrix",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-MIGRATION-FINAL-MIGRATION-MATRIX.LOG",
+      "log_bytes": 1720,
+      "log_sha256": "f183bdef6cd4339ca3b72b5aa05cf8e0bf3190a62423974b14071d76eba3ea94",
+      "original_log": "review_pack/cp6-migration-final/migration-matrix.log",
+      "seconds": 5.949,
+      "started_at": "2026-10-30T05:31:18.893556+00:00"
+    },
+    {
+      "captured_log_bytes": 13997,
+      "captured_log_sha256": "6c73610163d375badb9349c0a1090b29dccf3e8e7400d49228f3a083938b7bfb",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/verify_odd005_wheel.py"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-9hqssgwv",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:34:11.514304+00:00",
+      "label": "verify_odd005_wheel",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_ODD005_WHEEL.LOG",
+      "log_bytes": 13551,
+      "log_sha256": "490b13c65d54da2523a8a232f2203fe1cc0cb43c4e9313593f1f2024f7d66ad9",
+      "original_log": "review_pack/cp6-five-wheels/verify_odd005_wheel.log",
+      "seconds": 368.131,
+      "started_at": "2026-10-30T05:28:03.383253+00:00"
+    },
+    {
+      "captured_log_bytes": 689,
+      "captured_log_sha256": "d3f5de0efa1282665fe40ce3d4396e6d4cba3ec2db8314b1607f39c8368ef4c8",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/verify_gcs008_wheel.py"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-9hqssgwv",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:34:31.074036+00:00",
+      "label": "verify_gcs008_wheel",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_GCS008_WHEEL.LOG",
+      "log_bytes": 688,
+      "log_sha256": "9284fefb2c17e4083300fab02829e47822210d7cd30345da3d19281b6773ca60",
+      "original_log": "review_pack/cp6-five-wheels/verify_gcs008_wheel.log",
+      "seconds": 19.557,
+      "started_at": "2026-10-30T05:34:11.516797+00:00"
+    },
+    {
+      "captured_log_bytes": 247,
+      "captured_log_sha256": "aa2fd8f53c9e999c0c5980cfec5de97ee187b482d94cb5ff2764b210a451b7d1",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/verify_team_strength_u_wheel.py"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-9hqssgwv",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:35:13.657531+00:00",
+      "label": "verify_team_strength_u_wheel",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_TEAM_STRENGTH_U_WHEEL.LOG",
+      "log_bytes": 246,
+      "log_sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0",
+      "original_log": "review_pack/cp6-five-wheels/verify_team_strength_u_wheel.log",
+      "seconds": 42.583,
+      "started_at": "2026-10-30T05:34:31.074832+00:00"
+    },
+    {
+      "captured_log_bytes": 617,
+      "captured_log_sha256": "981478ecfdbe2d0049b4204a2eedc18dca2d25cc41d4ef7cea9f3f8b0e751328",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/verify_p01_fallback_a02_wheel.py"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-9hqssgwv",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:35:49.169953+00:00",
+      "label": "verify_p01_fallback_a02_wheel",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_P01_FALLBACK_A02_WHEEL.LOG",
+      "log_bytes": 616,
+      "log_sha256": "7f64d3b25e4f0b1bb67fe977293e75d7d3134e1d7ab24c4c15bd099a39af207f",
+      "original_log": "review_pack/cp6-five-wheels/verify_p01_fallback_a02_wheel.log",
+      "seconds": 35.512,
+      "started_at": "2026-10-30T05:35:13.658353+00:00"
+    },
+    {
+      "captured_log_bytes": 309,
+      "captured_log_sha256": "6470265ed388b29a14f90cd3578dfe12c28e7f1a17837cd6c8a1507e77bdf2a4",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/verify_team_strength_l1_wheel.py"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-9hqssgwv",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:35:56.777774+00:00",
+      "label": "verify_team_strength_l1_wheel",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_TEAM_STRENGTH_L1_WHEEL.LOG",
+      "log_bytes": 308,
+      "log_sha256": "d70453a9c481d54e46a0ac5c0df3fce719c563bdef7fdeca21ebf7cea708feba",
+      "original_log": "review_pack/cp6-five-wheels/verify_team_strength_l1_wheel.log",
+      "seconds": 7.607,
+      "started_at": "2026-10-30T05:35:49.170843+00:00"
+    },
+    {
+      "captured_log_bytes": 206,
+      "captured_log_sha256": "efa4e310c97bf1fb97f34d16978dccf0237a3ea7fb03ea8ddc711d2394fcf9f5",
+      "command": [
+        "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\ACCEL-004\\.venv\\Scripts\\python.exe",
+        "scripts/verify_accel001_private_wheel.py"
+      ],
+      "committed_log_encoding": "UTF8_LF_COPY_CRLF_TO_LF_ONLY_ORIGINAL_COMMAND_LOG_PRESERVED",
+      "cwd": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-pulse-accel004-source-9hqssgwv",
+      "exit_code": 0,
+      "finished_at": "2026-10-30T05:36:04.324972+00:00",
+      "label": "verify_accel001_private_wheel",
+      "log": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_ACCEL001_PRIVATE_WHEEL.LOG",
+      "log_bytes": 205,
+      "log_sha256": "621ba3266bc8e0bcf1ef50d27f1c0baeeba5502f76f97a93ea5c4c9c4c3cc5ae",
+      "original_log": "review_pack/cp6-five-wheels/verify_accel001_private_wheel.log",
+      "seconds": 7.546,
+      "started_at": "2026-10-30T05:35:56.778744+00:00"
+    }
+  ],
+  "schema_version": "accel004-final-local-gates-v1",
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "status": "PASS",
+  "tests": {
+    "performance": {
+      "deselected": 6763,
+      "passed": 4,
+      "skipped": 0
+    },
+    "postgres_control_and_research_rights": {
+      "passed": 49,
+      "skipped": 0
+    },
+    "retained_a2_credentials_current_diagnostics": {
+      "capture": "EXEC_TOOL_COMPLETION_OUTPUT",
+      "passed": 93,
+      "seconds": 218.74,
+      "skipped": 0
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "author_commits": [
+    "0304bb4684431a908d5fffae9fd66ce134bf1a2f",
+    "440829b",
+    "26f712089d2e8f03d9d4e828c3c48e29c3ed026d"
+  ],
+  "checked_at": "2026-10-30T03:31:51.183299+00:00",
+  "credential_reads": 0,
+  "current_copy_limit": "Author worktree contains a root owned current.py integration copy. It is not part of these author commits and final root integration remains a separate review gate.",
+  "database_connections": 0,
+  "independent_tests": {
+    "failed": 0,
+    "log_sha256": "4b09f346d21537a496e6685563373127b1af98961632d4479b4758e2cf80e481",
+    "passed": 20,
+    "seconds": 3.63,
+    "test_sha256": "b1a693301a7f1e8120f541b2d98d69afc933eb2cf595858c8ed691058f8f2c31"
+  },
+  "provider_requests": 0,
+  "release_limit": "No real enrollment, provider permission, pilot authorization, final installed wheel proof, final integration acceptance or production activation is created by this review.",
+  "resolved_findings": [
+    {
+      "id": "CP4-C01",
+      "issue": "Stat followed by unbounded read did not enforce the advertised input bound and accepted nonregular inputs.",
+      "locator": "operation/packages.py:read_metadata",
+      "priority": "MATERIAL_P2",
+      "resolution": "Open once, refuse nonregular descriptors, request a bounded byte count, refuse oversize data and use available nofollow and nonblocking flags. No untrusted parent containment guarantee is claimed."
+    },
+    {
+      "id": "CP4-C02",
+      "issue": "Suppressed parser exceptions still retained raw invalid metadata in the public exception context.",
+      "locator": "operation/packages.py:read_metadata",
+      "priority": "MATERIAL_P2",
+      "resolution": "Inner read scope now returns a typed result or none; fixed public OperationError is raised outside the parser frame. Independent invalid payload context test passes."
+    }
+  ],
+  "retained_and_preview_tests": {
+    "failed": 0,
+    "log_sha256": "661cb889f0ba53d3989de082866518b439eb5e3ad34762ffb19e6bd107d9637d",
+    "passed": 65,
+    "paths": [
+      "tests/unit/dashboard/test_live_authorization.py",
+      "tests/unit/operation/test_authorization_preview.py"
+    ],
+    "seconds": 2.05
+  },
+  "root_current_copy_sha256": "fac2a859fafa86aa6d592060ef6890b829e0648b572d70b08d57126d5a5edaf9",
+  "schema_version": "independent-operation-review-v1",
+  "source_sha256": {
+    "src/dmf_pulse/dashboard/authorization.py": "3b732b6d02c2a9d0dffe5f2b32382b7710669bf6a09470a4c18ca0ea410ba5ac",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "3ec2d42571fa2efba20fed52f1681532221d6728622203e763b07821975dc7bb",
+    "src/dmf_pulse/operation/cli.py": "65e18fe1bfc6a5ec895e6985cd6e7682b602e08020549dc26606cbc931ff4ef1",
+    "src/dmf_pulse/operation/console.py": "a78e8b1e0f0dd07f8d9612773be7a297ef803d64da6769f41e7371eb75d5985f",
+    "src/dmf_pulse/operation/control.py": "e88f19c5e7409708f9b8e42e56ca832bdbe6aded77e3f98145eb4b84e32ae72b",
+    "src/dmf_pulse/operation/models.py": "7ffced84b3f8ee068ea27f0782533b817c9fde7cb489a1ae03868ee8adf4ebbf",
+    "src/dmf_pulse/operation/packages.py": "44852df6c70f5439e7504c24a4312858d01ee1aaaab62199dcbd9f41a26d028d",
+    "src/dmf_pulse/operation/validation.py": "e2bda543858af30fc77399f4b2d7bd02b71908916d779e36af8e922781b821d9"
+  },
+  "status": "CP4_OFFLINE_SECURITY_REVIEW_PASS_FINAL_ROOT_INTEGRATION_PENDING",
+  "unresolved_findings": [],
+  "verified": [
+    "Complete forged and freshly resealed proposals can become ready for owner review but retain NOT_GRANTED authority. The fixed production enrollment remains empty and both installed validation and console refuse before database access.",
+    "Incomplete, expired deadline, missing quota and absent retention permission cannot become ready owner packages.",
+    "Payload or hash tampering, duplicate fields, oversized files, directories, stale small stat followed by grown bytes and nonregular descriptors fail closed.",
+    "Private TEST selector forged through model_construct is revalidated before a connection factory. Retention permission requires the actual boolean true.",
+    "Recovery constructs the expected existing ledger and calls audit only; initialize is forbidden in the independent injected backend. No history reset or quota baseline is created.",
+    "The passive operation status command performs no credential or database lookup.",
+    "Authorization preview and reserve share the original policy calculation and locked storage hook. Preview appends no event, creates no grant and does not consume a one shot. The retained authorization suite passes with the new preview suite.",
+    "The console delegates worker and publication checks to the accepted DeskRuntime and closes in finally. It has no caller supplied credential, grant, deadline, source file or quota escape route."
+  ]
+}

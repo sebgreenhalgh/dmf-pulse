@@ -1,0 +1,68 @@
+{
+  "accepted_comparator_unchanged_from_parent": true,
+  "all_model_projection_decision_fields_exact": true,
+  "artifact_bindings": {
+    "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-PARITY-1.json": {
+      "bytes": 419110,
+      "sha256": "8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1"
+    },
+    "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-PARITY-3.json": {
+      "bytes": 841051,
+      "sha256": "bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91"
+    },
+    "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-WHEEL.json": {
+      "bytes": 11642,
+      "sha256": "12f6bde558c41a9bc06d94c5a00f6c54c541dcd5cf007da0a84c88de23174875"
+    }
+  },
+  "classification": "OWNED_SYNTHETIC_ONLY_NO_REAL_FORECAST_ACCURACY_CLAIM",
+  "comparator_sha256": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539",
+  "final_official_twenty_job_ci": "PENDING_EXACT_METADATA_FINAL_HEAD",
+  "full_semantic_hash_parity_claimed": false,
+  "installed_report_sha256": "12f6bde558c41a9bc06d94c5a00f6c54c541dcd5cf007da0a84c88de23174875",
+  "installed_windows_fingerprint": "1e1e32d326d0600ebd8fa711e0ad999dbee93b32",
+  "metadata_head_observed": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "model_runs_or_scoring_by_this_audit": 0,
+  "observed_at": "2026-10-30T05:36:51.868146+00:00",
+  "posix_runtime_fingerprint": "4b95f7277ee8036465e0b476591c5ae695f6a2fe",
+  "provider_requests_by_this_audit": 0,
+  "raw_custody_exclusion_inventory_retained": true,
+  "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+  "restricted_payloads_exported": false,
+  "results": [
+    {
+      "checked_fields": 84053,
+      "custody_exclusion_count": 512,
+      "horizon": 1,
+      "inventory_sha256": "8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1",
+      "model_and_decision_numeric_mismatches": 0,
+      "numeric_fields": 67750,
+      "sole_source_operation_numeric_difference": {
+        "current": 98,
+        "path": "/presentation/market_quota_remaining",
+        "reference": 100
+      }
+    },
+    {
+      "checked_fields": 249449,
+      "custody_exclusion_count": 1007,
+      "horizon": 3,
+      "inventory_sha256": "bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91",
+      "model_and_decision_numeric_mismatches": 0,
+      "numeric_fields": 200409,
+      "sole_source_operation_numeric_difference": {
+        "current": 98,
+        "path": "/presentation/market_quota_remaining",
+        "reference": 100
+      }
+    }
+  ],
+  "reviewer_scope": "Independent publication/installed numerical provenance; excludes self-clearance of this reviewer's recovery implementation. The unchanged comparator was authored in an earlier accepted programme and independently reviewed there; current artifacts and package integration are new root-produced evidence.",
+  "schema_version": "accel004-independent-installed-numerical-provenance-v1",
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "source_implementation_fingerprint": "6ed14deda717204e3ee83354af1132f523e4b690",
+  "source_operation_numeric_difference_explicitly_retained": "presentation.market_quota_remaining: actual owned response98 versus accepted compiled demo100; no other numerical exception.",
+  "status": "PASS_INSTALLED_NUMERICAL_PROVENANCE_RELEASE_GATES_PENDING",
+  "vault_reads_by_this_audit": 0,
+  "wheel_sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+}

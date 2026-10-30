@@ -21,8 +21,11 @@ live pilot, retention, model promotion or production activation.
   and a concrete single-pilot authorization package; no second account or bypass.
 - [x] CP5 advance typed player evidence and current-mode operator reliability,
   with complete owned-injection acceptance and exact numerical parity.
-- [ ] CP6 independent adversarial review, native Windows installed-wheel vault
-  persistence test, unchanged full gates, capped review and exact-SHA 20/20 CI.
+- [x] CP6 local independent source/security review, fresh installed native vault,
+  actual browser, exact one-/three-GW parity, unchanged local/migration/rights gates.
+- [ ] CP6 final publication: exact final-SHA 20/20 CI and actual capped ZIP with
+  independent final evidence review. Detached publication receipts record this
+  external completion without a circular commit-hash dependency.
 
 P01 is real match-level evidence, not a player xPts cohort. Its 3 October origin,
 ten fixtures, thirty products and byte/semantic pins remain immutable. A02/A03

@@ -1,0 +1,212 @@
+{
+  "checked_at": "2026-10-30T05:35:41.134034+00:00",
+  "checks": [
+    {
+      "failed": 0,
+      "log_sha256": "bc36f54eabf8e219cbc08fb6db4494dfbdb9c50554b33d5eb308f49bcb532ec1",
+      "passed": 161,
+      "scope": "credential_and_frozen_authorization",
+      "source_context": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512"
+    },
+    {
+      "failed": 0,
+      "log_sha256": "d74eee8471577da9300fcfd0df333b61472ed1e0843bdf49460cd3c6d635fa30",
+      "passed": 100,
+      "scope": "final_typed_credential_and_current_boundaries",
+      "source_context": "2504368f3170f2cbe7a83ae8710f137d461ed6c8"
+    },
+    {
+      "failed": 0,
+      "log_sha256": "ba6a695a1f35652d62716f48732d927639e1e4ceb9defc2a8cc2df75839f5028",
+      "passed": 26,
+      "scope": "actual_source_prelookup_sidecar_token_and_grant_windows"
+    },
+    {
+      "failed": 0,
+      "heavy_fixture_cases_deselected": 20,
+      "log_sha256": "f8d86af0a4580a788537d85285e459449beff9fa9170ef52c958e29722794562",
+      "passed": 41,
+      "scope": "retained_fast_current_lifecycle"
+    },
+    {
+      "failed": 0,
+      "log_sha256": "7d223f0e7efcf771b6183b20493217bf46934351bd720a75a675eaf8d81f376c",
+      "passed": 46,
+      "scope": "wheel_marker_and_retained_verifier"
+    },
+    {
+      "failed": 0,
+      "focused_passed": 37,
+      "independent_passed": 11,
+      "scope": "recovery"
+    },
+    {
+      "failed": 0,
+      "independent_passed": 8,
+      "retained_and_focused_passed": 128,
+      "scope": "owned_evidence_adapter"
+    },
+    {
+      "failed": 0,
+      "independent_passed": 20,
+      "retained_and_focused_passed": 65,
+      "scope": "operation_and_previews"
+    },
+    {
+      "failed": 0,
+      "log_sha256": "ef1563cbb19a5d91c7524561dcf2b7705a44d69a802d982158e7925c8432edd6",
+      "passed": 100,
+      "scope": "post_cutoff_final_current_credential_boundaries",
+      "source_context": "6ed14deda717204e3ee83354af1132f523e4b690"
+    }
+  ],
+  "final_installed_numerical_review": {
+    "bytes": 2592,
+    "name": "accel004-c-independent-a250-installed-numerical.json",
+    "sha256": "f81c417a565895e033b7b2ed3639fa1329c137ffe21b7e600faa69a1c4fb49c4"
+  },
+  "final_installed_numerical_scope": "The root freshly executed the final903 wheel on both horizons; independent inspection authenticated report12f6, both new raw inventories, exact parent counts/pointer scope, all1519 exclusion values, currentWindows1e1e32, four reference/current workers, cancellation and network guards. Zero model/decision numeric mismatches; sole source-operation numeric difference is current quota98 versus reference100. This inspection does not claim an additional independent installed model execution or whole-semantic-hash parity.",
+  "findings": [],
+  "implementation_fingerprint": "6ed14deda717204e3ee83354af1132f523e4b690",
+  "installed_windows_fingerprint": "1e1e32d326d0600ebd8fa711e0ad999dbee93b32",
+  "native_custody_audit": {
+    "bytes": 1028,
+    "name": "accel004-independent-a250-native-custody-review.json",
+    "sha256": "b25dd5243fff0353a867bb4a558c8ad074eef175dce64e86f5d87525ba2b9ddf"
+  },
+  "native_scope": "Fresh final903 wheel has eight native phases across sixteen distinct PowerShell/Python identities; actual emitted Windows fingerprint1e1e32 matches the accepted installed function and all499 disk/wheel/Git bytes. Hidden prompt shim is disclosed, final cleanup absence verified, and this reviewer made zero vault calls.",
+  "numerical_parity_context": {
+    "current_reviewed_source_fingerprint": "6ed14deda717204e3ee83354af1132f523e4b690",
+    "cutoff_disclosure_delta_receipt_sha256": "0a117ee1029534f3ef2f7960a4ae0e9771b697774fc01a11915af7716b0b1e8d",
+    "fresh_source_checkpoint_fingerprint": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+    "new_installed_wheel_fresh_comparison": "PASS_ACTUAL_FINAL_903_PROOF_AUTHENTICATED",
+    "source_bridges": [
+      {
+        "from": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+        "receipt_sha256": "7cbe09a67b5f587efc84aadfbd26e8c3040461384e5ebdddec8e2c0f673c01ba",
+        "scope": "Windows structural typing only",
+        "to": "2504368f3170f2cbe7a83ae8710f137d461ed6c8"
+      },
+      {
+        "from": "2504368f3170f2cbe7a83ae8710f137d461ed6c8",
+        "receipt_sha256": "0a117ee1029534f3ef2f7960a4ae0e9771b697774fc01a11915af7716b0b1e8d",
+        "scope": "Fixed POST_CUTOFF disclosure map entry only",
+        "to": "6ed14deda717204e3ee83354af1132f523e4b690"
+      }
+    ],
+    "windows_typing_delta_receipt_sha256": "7cbe09a67b5f587efc84aadfbd26e8c3040461384e5ebdddec8e2c0f673c01ba"
+  },
+  "numerical_parity_receiptSHA": "6e876d5731f8c6f9ef4dcc6eea151854a3aa2b7ca1d3f9514b5ab4731b19f9fd",
+  "numerical_scope": "Fresh actual accepted demo and current services for both horizons. Exact forecast, decision, scenario, rule and model identity comparisons retain all numerical leaves. The sole allowed numerical control difference is declared synthetic response quota100 versus98. No earlier numerical output was loaded and no speedup or real skill claim is made.",
+  "pending_publication_gates": [
+    "Corrected metadata helper review and exact final-head twenty-job official CI.",
+    "Fresh post-CI cleanup/protection audit and actual capped archive independent review."
+  ],
+  "prior_complete_native_association_sha256": "9d54211637ec71d9bbbe418895d0cd4c89b9953793a4cae76d5d9f3c6f1fd8a8",
+  "prior_integration_review_sha256": "f57729012f0ebc3a0cfb696b87f810cbbb603ce38e20be5c43df134ccfe6bdf0",
+  "prior_source_association_review_sha256": "d11970a51069a7a1effeef2b2ef923c0de0378d85d69b6d5d5bcdad1189e7721",
+  "production_registry_empty": true,
+  "provider_calls": 0,
+  "real_credentials_accessed": false,
+  "resolved_findings_history": "Initial prompt fallback, parser disclosure, raw typed error graphs, bounded metadata loading, source and credential diagnostic loss, prelookup route validation, token expiry during control wait and grant windows after control waits were reproduced and corrected. Original failures are retained in scoped receipts and ignored logs; no scanner or authority relaxation was used.",
+  "retained_result_security": {
+    "exact_AST_equal_to_accepted_parent": [
+      "CurrentWorkerResult",
+      "_launch_is_bound",
+      "_result_authentication",
+      "_scope_is_bound",
+      "validate_current_result"
+    ],
+    "meaning": "The HMAC envelope, complete presentation and code/GW/fixture/capture/deadline binding functions remain exact. Retained lifecycle tests and root full stack tests complement this static proof; this record does not claim the twenty deselected heavy cases were rerun independently."
+  },
+  "review_scope": "All nineteen new and fifteen changed existing Python modules, explicit resources, CLI and UI integration, plus preserved accepted kernels and source bindings. This is integration clearance; publication acceptance remains separate.",
+  "reviewed_files_sha256": {
+    ".gitignore": "f139c065fa5a960d223c5fdd995973fdbb9f04633589e64b4497e0ec221e989b",
+    "pyproject.toml": "bf159abb2bd3b5b1c58364de20fe334684b882b54fcb71f8827f38346ac6000f",
+    "scripts/accel004_vault_probe.py": "74978f1d6ce8098207956e99171e9f255b0420f04752a8bb5865f237b062d169",
+    "scripts/verify_accel001_private_wheel.py": "09671bbe0870cc59ad3eb58d99e77f24976ac7b96c6d7d2e274ab0c71afaeaff",
+    "scripts/verify_wheel.py": "cf4046fe21c00e2733a60988b4de5d9455cee9084899859581ab7e81df5b42ea",
+    "src/dmf_pulse/authorization_errors.py": "c893c56ed518a3845e9d7069ae82210ebd14a9cdd755fd35488ac6bb8777bc73",
+    "src/dmf_pulse/cli/app.py": "64a455295eab50fe7412ef15f3e85538e887dcca4aa80c2e1c02eae8ecde48d0",
+    "src/dmf_pulse/cli/credential_errors.py": "8060678b5a376a52b3db99448cba6027a4e57914b391a9d09b117b420247b9b5",
+    "src/dmf_pulse/cli/credentials.py": "f8626096f763ac6162d39b021cb18edb91b66e25ba2b6db5b61a2a9b0fc1f83d",
+    "src/dmf_pulse/cli/player_evidence.py": "fd4bb777009b6ed943b1fb26f37496f3af920792cffb4c86e93c721971e3d0f3",
+    "src/dmf_pulse/cli/pulse.py": "d9a77e0a2b2ce6afe4fc643abea8bc738cc1988b1cb1fd2b033eeb990e5a09b0",
+    "src/dmf_pulse/cli/recovery.py": "e1caa033c38ede706ef28181749b5c75b930b210757a431b841798218092232c",
+    "src/dmf_pulse/credentials/__init__.py": "ad208335d17c81f876090fd1f11bc95b45f7f8f88ed43e6536d3d3c8e4fd0980",
+    "src/dmf_pulse/credentials/providers.py": "993c08146a29b7581f757f99972a58a07ae366a54785f42d4788a5f7da19bf3f",
+    "src/dmf_pulse/credentials/service.py": "0a15382fd7301ce64fcf8f022aded021f15418e539b0f5f188f0226b58b43cb9",
+    "src/dmf_pulse/credentials/windows.py": "c24a93645780062a0ba90271678199c7f65531dc77a9a9100b34f69750af064d",
+    "src/dmf_pulse/current_failures.py": "d4cbf75fd17df14477ebbcd23893d2901c0572d5875d0fa63063bc61c47c0597",
+    "src/dmf_pulse/dashboard/app.py": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab",
+    "src/dmf_pulse/dashboard/authorization.py": "5c68e86eea96c8a59070f636454c86c4dec6f287fdcf7654a6ecaebef39c8116",
+    "src/dmf_pulse/dashboard/current.py": "8cad4feee6746e463f18aa9f7df213aeb72c3575a230a29c7e292d8252e7d02e",
+    "src/dmf_pulse/dashboard/current_sources.py": "b7339695e01fb9f296d6ac37cee3c75ff4245a2c3705f1bb1ac5b1a4d40743e5",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "3ec2d42571fa2efba20fed52f1681532221d6728622203e763b07821975dc7bb",
+    "src/dmf_pulse/dashboard/resources/desk.js": "a7698dc6792ca25bb6e45a3f2b65335e533cdc5156c6ff7b0284be8e68446546",
+    "src/dmf_pulse/dashboard/runtime.py": "b3c96c296e461cd4b6643dcac0df323af662172437e4b3dba99b5ef300c0c24f",
+    "src/dmf_pulse/ingestion/errors.py": "7da88fb73307ed74c162d1b18dce71a38584cfaa609409fe44fcd85fc0e6b7ca",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "d5ef2705ec6bc9e695e1a09c8a6ee3f62f80534b02715c64739fd10a95d8cda1",
+    "src/dmf_pulse/ingestion/odds/credentials.py": "3f1beb0b6a22395d9e4f76eb89ce32fd5b1555fec580e48009e881ce5e05952c",
+    "src/dmf_pulse/ingestion/odds/service.py": "6377565a1a679c4cad9f63542d9eae88bf05d05166d783af114659ef5d83bac0",
+    "src/dmf_pulse/ingestion/odds/transient.py": "3faeb93796f3989a92ea58a63da64269161d64d4e490ca2d08f1a8e3aa472a81",
+    "src/dmf_pulse/operation/__init__.py": "6a8bd2c4de15965eaed1edd45d95ce8dd90620e0efb907062362867c2a15517b",
+    "src/dmf_pulse/operation/cli.py": "65e18fe1bfc6a5ec895e6985cd6e7682b602e08020549dc26606cbc931ff4ef1",
+    "src/dmf_pulse/operation/console.py": "a78e8b1e0f0dd07f8d9612773be7a297ef803d64da6769f41e7371eb75d5985f",
+    "src/dmf_pulse/operation/control.py": "e88f19c5e7409708f9b8e42e56ca832bdbe6aded77e3f98145eb4b84e32ae72b",
+    "src/dmf_pulse/operation/models.py": "7ffced84b3f8ee068ea27f0782533b817c9fde7cb489a1ae03868ee8adf4ebbf",
+    "src/dmf_pulse/operation/packages.py": "44852df6c70f5439e7504c24a4312858d01ee1aaaab62199dcbd9f41a26d028d",
+    "src/dmf_pulse/operation/validation.py": "e2bda543858af30fc77399f4b2d7bd02b71908916d779e36af8e922781b821d9",
+    "src/dmf_pulse/player_evidence/qualification.py": "fbf952e94e9c26aa8cf0d5e2b2e30dba9bda337b807687f08f2aad21c76304d1",
+    "src/dmf_pulse/player_evidence/resources/owned-wyscout-bindings-v1.json": "1f074333f89ce1b326db33491eca4a363aa13939c9745ff20491a8b58599ad61",
+    "src/dmf_pulse/player_evidence/resources/owned-wyscout-native-v1.json": "566c3631f423c792e657ab5e38db858b611855ca8deead3332a2053789451aed",
+    "src/dmf_pulse/player_evidence/resources/owned-wyscout-participation-v1.json": "cdb1ec3a066e25e38cd6d66d34ea76c3b065217d16b2e59a384dd279d6b56dc3",
+    "src/dmf_pulse/player_evidence/wyscout.py": "5a160e5404ae2ff265e014d019e63e9e13db193388f993910a986a9552639fcd",
+    "src/dmf_pulse/player_lab/recovery.py": "06f395ffffe7be408e48fc8a5ac63429adc5a16fc63b995415bc4cec663ab8f4",
+    "src/dmf_pulse/player_lab/recovery_models.py": "98f2bc50d2b6ddc38b2c7eda2c27102db14f13dc6cde5994fa3e017b984285d2",
+    "src/dmf_pulse/player_lab/resources/recovered_forecasts_v1.json": "3dde6cd2322e72cf9e7a4232c8f98a679b5bd6c687c19af5adbce0ac2bafb4f3",
+    "tests/unit/ingestion/test_horizon_rights_approval.py": "e56d086e69441c3f76d60f85054208d15b9729715bd7283c7bb6f864e06ca4b1",
+    "uv.lock": "f546cf5551363697579f3b927f5c36bc2e9dfb04ea7ef1a6e523da00e59c41cb"
+  },
+  "rights_and_science": {
+    "a02_a03": "PERMANENTLY_CONSUMED_NOT_RETRIED",
+    "new_real_evidence_source_qualification": "CLOSED",
+    "p01_current_provider_availability": "NOT_QUERIED",
+    "p01_forecast_byte_identity_unchanged": true,
+    "p01_scoring": "NOT_CLEARED_EXACT_HISTORICAL_CODE_REGENERATES_DRAWS",
+    "production_registry_empty": true,
+    "promotion": "FORBIDDEN",
+    "real_accuracy_metrics_computed": false,
+    "real_cohort_created": false
+  },
+  "schema_version": "accel004-independent-integration-review-v1",
+  "scoped_receipts": {
+    "accel004-independent-credential-code-review.json": "f31463510c933cfc48fe7ecb1734b7c4894dc3af03ebb4dc28ac93834a39865a",
+    "accel004-independent-credential-design-review.json": "7a8955df8f47f9229a9bdefbbcb00323d32463ac2b4eb904949a581da922585f",
+    "accel004-independent-credential-integration-review.json": "d29cf91def2c33bc457243ae238e3b60cf3f9a3eb23e8dea770a2536a6faf528",
+    "accel004-independent-current-boundary-review.json": "624771199b76cab223407d822c8cca9999520f44acbc3d5079454241789a64a2",
+    "accel004-independent-final-native-review.json": "0dc23c5fc44bc975dfa72ddcee88d1bc44f91517d67e920faab1ab3829a84522",
+    "accel004-independent-fresh-current-parity.json": "6e876d5731f8c6f9ef4dcc6eea151854a3aa2b7ca1d3f9514b5ab4731b19f9fd",
+    "accel004-independent-operation-review.json": "229a14425120c81992161c3725c4ecb5792cebe784bc3ed505f559281913bfac",
+    "accel004-independent-p01-canonical-authority-final-review.json": "25a5be06ca1ba00f17b2ae49c088c2b0042795f8f40a20fd05bbf7d06072a52e",
+    "accel004-independent-player-adapter-review.json": "1972f475e033399132f0454e217e91488507c50289797a7eb78683a4f940826d",
+    "accel004-independent-post-cutoff-delta-0a117ee1029534f3ef2f7960a4ae0e9771b697774fc01a11915af7716b0b1e8d.json": "0a117ee1029534f3ef2f7960a4ae0e9771b697774fc01a11915af7716b0b1e8d",
+    "accel004-independent-protected-boundaries.json": "87ebf486b1fbaeed42780258cdcc109607254997f63333286f07f0e51d8bd378",
+    "accel004-independent-recovery-final-review.json": "8a6af494bdbdeae0b7c02a8c7707b98eea0c652c08c69364d82bccbc51dd0caf",
+    "accel004-independent-windows-typing-review.json": "7cbe09a67b5f587efc84aadfbd26e8c3040461384e5ebdddec8e2c0f673c01ba"
+  },
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "source_checkpoint_delta": "Two explicitly reviewed bounded source bridges follow the first fresh source proof: Windows structural typing, then the fixed POST_CUTOFF disclosure map entry. The exact current46 inspected file hashes match a250 Git; all499 wheel members match its recipe and config. Historical receipts retain their original identities.",
+  "source_counts": {
+    "changed_existing_python_files": 15,
+    "native_installed_wheel_members": 499,
+    "new_python_files": 19,
+    "python_files": 396,
+    "unchanged_numerical_kernels": 157,
+    "unchanged_protected_files": 11
+  },
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "tracked_implementation_edits_by_reviewer": false,
+  "wheel_marker_scope": "The portable manifest still authenticates the entire lock before direct-root and transitive marker evaluation. Linux removes exactly the Windows-only package and existing platform transitives; shared versions are unchanged. No package source or numerical byte changed in this scripts-only portability fix.",
+  "wheel_sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+}

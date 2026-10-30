@@ -1,0 +1,59 @@
+{
+  "actual_cancelled_workers": 2,
+  "actual_distinct_reference_and_current_workers": 4,
+  "findings": [],
+  "installed_real_cohort_size": 0,
+  "installed_report_bytes": 11642,
+  "installed_report_sha256": "12f6bde558c41a9bc06d94c5a00f6c54c541dcd5cf007da0a84c88de23174875",
+  "installed_windows_fingerprint": "1e1e32d326d0600ebd8fa711e0ad999dbee93b32",
+  "limitations": [
+    "This independent inspection authenticates actual root-produced final installed outputs; it does not independently rerun the installed model.",
+    "The earlier source-only fresh one/three-GW proof retains its original source context and is not relabelled.",
+    "No whole-semantic-hash parity claim; the sole source-operation numeric delta is quota98 versus100.",
+    "Final official20-job CI, corrected helper review, metadata index, fresh cleanup audit and actual ZIP review remain pending."
+  ],
+  "network_guard_receipts": 7,
+  "observed_at": "2026-10-30T05:35:07.796998+00:00",
+  "provider_requests_by_this_inspection": 0,
+  "results": [
+    {
+      "checked_fields": 84053,
+      "custody_exclusions": 512,
+      "custody_value_types_and_lengths_checked": true,
+      "exact_parent_pointer_scope": true,
+      "horizon": 1,
+      "inventory_bytes": 419110,
+      "inventory_sha256": "8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1",
+      "numeric_fields": 67750,
+      "numerical_mismatches": 0,
+      "source_operation_numeric_difference": {
+        "current": 98,
+        "path": "/presentation/market_quota_remaining",
+        "reference": 100
+      }
+    },
+    {
+      "checked_fields": 249449,
+      "custody_exclusions": 1007,
+      "custody_value_types_and_lengths_checked": true,
+      "exact_parent_pointer_scope": true,
+      "horizon": 3,
+      "inventory_bytes": 841051,
+      "inventory_sha256": "bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91",
+      "numeric_fields": 200409,
+      "numerical_mismatches": 0,
+      "source_operation_numeric_difference": {
+        "current": 98,
+        "path": "/presentation/market_quota_remaining",
+        "reference": 100
+      }
+    }
+  ],
+  "schema_version": "accel004-c-independent-a250-installed-numerical-v1",
+  "scoring_and_model_runs_by_this_inspection": 0,
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "source_implementation_fingerprint": "6ed14deda717204e3ee83354af1132f523e4b690",
+  "status": "PASS_FINAL_INSTALLED_NUMERICAL_EVIDENCE_RELEASE_GATES_PENDING",
+  "vault_reads_by_this_inspection": 0,
+  "wheel_sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+}

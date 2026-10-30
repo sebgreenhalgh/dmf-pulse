@@ -1,0 +1,20 @@
+{
+  "actual_human_terminal_entry_claimed": false,
+  "actual_native_phases": 8,
+  "cleanup_absence_verified": true,
+  "distinct_process_ids": 16,
+  "findings": [],
+  "installed_windows_fingerprint": "1e1e32d326d0600ebd8fa711e0ad999dbee93b32",
+  "native_receipt_sha256": "3fffac7a7ffcb197599fa7ce1d7e1d308730f1e11ca4324f302ac678d9887a2b",
+  "package_git_review_sha256": "14d2510442005976d459d7f9789e49a5a63b0940bbcd85076cf72a9c0d8a6c41",
+  "package_members_equal_actual_native_disk_and_wheel": 499,
+  "probe_sha256": "74978f1d6ce8098207956e99171e9f255b0420f04752a8bb5865f237b062d169",
+  "provider_calls": 0,
+  "real_credentials_accessed": false,
+  "reviewer_vault_calls": 0,
+  "runner_sha256": "d8480cc46a3c248349aee7370203f9bb6d0c577e1a6f62eca019642255eee8c0",
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390",
+  "source_fingerprint": "6ed14deda717204e3ee83354af1132f523e4b690",
+  "status": "PASS_EXACT_A250_NATIVE_CUSTODY",
+  "wheel_sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+}

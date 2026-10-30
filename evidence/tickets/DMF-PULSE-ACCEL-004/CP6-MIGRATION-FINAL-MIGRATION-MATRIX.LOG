@@ -1,0 +1,74 @@
+No new upgrade operations detected.
+{
+  "baseline_revision": "20260803_0005",
+  "baseline_state": {
+    "availability_table_count": 12,
+    "revision": "20260803_0005"
+  },
+  "data_preservation": {
+    "baseline_seed": {},
+    "downgraded_seed": {},
+    "final_seed": {},
+    "head_seed": {},
+    "status": "PASS"
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "name": "dmf_pulse_test",
+    "port": 55435,
+    "postgres_version": "18.4"
+  },
+  "matrix": [
+    {
+      "from": "base",
+      "status": "PASS",
+      "to": "20261029_0008"
+    },
+    {
+      "from": "20261029_0008",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20261029_0008"
+    },
+    {
+      "from": "20261029_0008",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20261029_0008"
+    }
+  ],
+  "metadata_drift_check": "PASS",
+  "offline_sql": {
+    "bytes": 279066,
+    "path": "review_pack/offline_upgrade.sql",
+    "secret_free": true,
+    "sha256": "b5f5833d2764fcc4d4a00b00f4d07197ccaac9f864996d731bd2e0f5381d930c"
+  },
+  "revision_count": 3,
+  "revisions": [
+    "20260807_0006",
+    "20261029_0007",
+    "20261029_0008"
+  ],
+  "schema": {
+    "alembic_revision": "20261029_0008",
+    "schema_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f",
+    "table_count": 76,
+    "view_count": 12
+  },
+  "schema_manifest": {
+    "path": "review_pack/schema_manifest.json",
+    "sha256": "cefa49d7d5301f3ddf7bfc59da253b7898d9484074791317637adc4976438fa3"
+  },
+  "status": "PASS",
+  "target_revision": "20261029_0008",
+  "ticket_id": "DMF-PULSE-ACCEL-003"
+}

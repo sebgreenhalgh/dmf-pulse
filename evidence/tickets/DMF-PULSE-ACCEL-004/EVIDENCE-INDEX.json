@@ -1,0 +1,490 @@
+{
+  "captured_at": "2026-10-30T05:37:56.375971+00:00",
+  "external_final_publication_and_review_receipts": "DETACHED_AFTER_EXACT_SHA_CI",
+  "files": [
+    {
+      "bytes": 4117,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CAPTURE-GIT-LINE-ENDINGS.json",
+      "sha256": "a5cedde9bf5f5097a63b506819e91c984e424cbcb1b17ae9ef67f21332e063ec"
+    },
+    {
+      "bytes": 1566,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CI-CHECKPOINT-235-FAILURE.json",
+      "sha256": "d22e356dca5dd98c45278309553354944aeea24d6618a34382fa9a5aca4c1e3d"
+    },
+    {
+      "bytes": 69908,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP0-BASELINE.json",
+      "sha256": "c471a4043052e54459b46ec4d63d94b7ba9f72afa63d7883edad8b391f5d803f"
+    },
+    {
+      "bytes": 3531,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP1-COMMITTED-235-ASSOCIATION.json",
+      "sha256": "2efb5a01b853c2115416ab8225d035d3a8220752d6b9a8714f8c645567d25458"
+    },
+    {
+      "bytes": 5583,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP1-CONTROL-WAIT-INDEPENDENT-REVIEW.json",
+      "sha256": "3364d36c6564fb9ebdb9df329abc004c162e2bd4926079ab0de21e5f675037d5"
+    },
+    {
+      "bytes": 3121,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP1-ENGINEERING.json",
+      "sha256": "f057aa7b3fa61f4babaf999038729e66a48b928a2bf41d347f45f2643f59af10"
+    },
+    {
+      "bytes": 7326,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP1-INDEPENDENT-PRE-WINDOW-REVIEW.json",
+      "sha256": "4bf927325b624ad0fe39f168ca0ca229970eb33a5b409f51ff8cf858c322df15"
+    },
+    {
+      "bytes": 49557,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP2-5-ENGINEERING.json",
+      "sha256": "c1c84187f0031898130744d9d0ef810d8a45924bab77a95c0046aa8626bcc27c"
+    },
+    {
+      "bytes": 205,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_ACCEL001_PRIVATE_WHEEL.LOG",
+      "sha256": "621ba3266bc8e0bcf1ef50d27f1c0baeeba5502f76f97a93ea5c4c9c4c3cc5ae"
+    },
+    {
+      "bytes": 688,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_GCS008_WHEEL.LOG",
+      "sha256": "9284fefb2c17e4083300fab02829e47822210d7cd30345da3d19281b6773ca60"
+    },
+    {
+      "bytes": 13551,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_ODD005_WHEEL.LOG",
+      "sha256": "490b13c65d54da2523a8a232f2203fe1cc0cb43c4e9313593f1f2024f7d66ad9"
+    },
+    {
+      "bytes": 616,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_P01_FALLBACK_A02_WHEEL.LOG",
+      "sha256": "7f64d3b25e4f0b1bb67fe977293e75d7d3134e1d7ab24c4c15bd099a39af207f"
+    },
+    {
+      "bytes": 308,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_TEAM_STRENGTH_L1_WHEEL.LOG",
+      "sha256": "d70453a9c481d54e46a0ac5c0df3fce719c563bdef7fdeca21ebf7cea708feba"
+    },
+    {
+      "bytes": 246,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-FIVE-WHEELS-VERIFY_TEAM_STRENGTH_U_WHEEL.LOG",
+      "sha256": "a9a22c25c12422c2b8dbea2ac283cff9b0ab69956de82b85e06458f58c2490a0"
+    },
+    {
+      "bytes": 13891,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-LOCAL-GATES-962.json",
+      "sha256": "95cd1440ab7101975e40c501376acafae2879e8cfe4d5ebe0a57e75a8428da0f"
+    },
+    {
+      "bytes": 17805,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-LOCAL-GATES.json",
+      "sha256": "dc175b74db0c453f3521527b5c4ba22db81f28fde34c9946d2aa67668010044b"
+    },
+    {
+      "bytes": 1720,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-MIGRATION-FINAL-MIGRATION-MATRIX.LOG",
+      "sha256": "f183bdef6cd4339ca3b72b5aa05cf8e0bf3190a62423974b14071d76eba3ea94"
+    },
+    {
+      "bytes": 63,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-SECRET-SCAN.LOG",
+      "sha256": "78dff4f83938c5d5838647c38f885ee79e8c7e56a45f1052e0cf889c0e999ab7"
+    },
+    {
+      "bytes": 29,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-FORMAT.LOG",
+      "sha256": "a36db4b65ebb65eae3421e27e0165b35f14b0f0a2331509733b518869c1b5219"
+    },
+    {
+      "bytes": 27,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-FROZEN-SYNC.LOG",
+      "sha256": "9ca44993399d6a58aad4f8ff48964a4584241fcd27d746695110ffd092f5cbc9"
+    },
+    {
+      "bytes": 19,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-LINT.LOG",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "bytes": 683,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-PERFORMANCE.LOG",
+      "sha256": "aba2dffd6d58d67ced1d8c1b7b74087fa1010826300a071c87ea009b899576ce"
+    },
+    {
+      "bytes": 110,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-POSTGRES-CONTROL-RIGHTS.LOG",
+      "sha256": "6b78f9d948df60e1579806d27057899920566e929d7b8b8163f9d04e1209ba5c"
+    },
+    {
+      "bytes": 128,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-RESTORE-HEAD.LOG",
+      "sha256": "84b9cfdaaae75628f3cbd7082d9c05399a66f8049b2a84369fcf326d0622ec92"
+    },
+    {
+      "bytes": 45,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-TYPING-LINUX.LOG",
+      "sha256": "dcbf59c8f805b83a5bd8e80ed667ca2ba50c98ce83542e83f41127d7a1af57ab"
+    },
+    {
+      "bytes": 45,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CP6-TARGETED-TYPING-WIN32.LOG",
+      "sha256": "dcbf59c8f805b83a5bd8e80ed667ca2ba50c98ce83542e83f41127d7a1af57ab"
+    },
+    {
+      "bytes": 7224,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-CODE-REVIEW-INITIAL-NATIVE-CAPTURE.json",
+      "sha256": "f31463510c933cfc48fe7ecb1734b7c4894dc3af03ebb4dc28ac93834a39865a"
+    },
+    {
+      "bytes": 7141,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-CODE-REVIEW-INITIAL.json",
+      "sha256": "53365fa1577decc2ce80103f92ee920b71d866ac29c99ba6b3a573ae31473975"
+    },
+    {
+      "bytes": 16282,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-DESIGN-REVIEW-NATIVE-CAPTURE.json",
+      "sha256": "7a8955df8f47f9229a9bdefbbcb00323d32463ac2b4eb904949a581da922585f"
+    },
+    {
+      "bytes": 16074,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-DESIGN-REVIEW.json",
+      "sha256": "fb16f450e586755c27cc7dfe01780b26ffed87b32d419bc06cddf41078ef8f6c"
+    },
+    {
+      "bytes": 379,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INITIAL-PROBES-NATIVE-CAPTURE.json",
+      "sha256": "7775b26106521dd588610eb94502671f3ad987b8cfe54d34839386809b93944a"
+    },
+    {
+      "bytes": 363,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INITIAL-PROBES.json",
+      "sha256": "e71f8dd9f05d6a255e8066e10a5540216f87b2af527ee58fbad1d79f4c247249"
+    },
+    {
+      "bytes": 9532,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INTEGRATION-REVIEW-NATIVE-CAPTURE.json",
+      "sha256": "d29cf91def2c33bc457243ae238e3b60cf3f9a3eb23e8dea770a2536a6faf528"
+    },
+    {
+      "bytes": 9429,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CREDENTIAL-INTEGRATION-REVIEW.json",
+      "sha256": "99b5dfa632252bcd20ab4df337365d824fd3667bed10794f811c9beaf2a7288a"
+    },
+    {
+      "bytes": 1750,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/CUTOFF-DISCLOSURE-CORRECTION.json",
+      "sha256": "872834072349d92c974033307196b8b3acb651b1dc301a3b6daee7443ac239c3"
+    },
+    {
+      "bytes": 13525,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/FINAL-CODE-INDEPENDENT-REVIEW.json",
+      "sha256": "f57729012f0ebc3a0cfb696b87f810cbbb603ce38e20be5c43df134ccfe6bdf0"
+    },
+    {
+      "bytes": 2592,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/FINAL-NUMERICAL-INDEPENDENT-REVIEW.json",
+      "sha256": "f81c417a565895e033b7b2ed3639fa1329c137ffe21b7e600faa69a1c4fb49c4"
+    },
+    {
+      "bytes": 6419,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/FINAL-PACKAGE-INDEPENDENT-REVIEW.json",
+      "sha256": "14d2510442005976d459d7f9789e49a5a63b0940bbcd85076cf72a9c0d8a6c41"
+    },
+    {
+      "bytes": 3480,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/FINGERPRINT-ORDER-DIAGNOSIS.json",
+      "sha256": "06fa7629c602f84373bb937cae035875a48d1b9434f4b122d172ae35483ae81b"
+    },
+    {
+      "bytes": 1172,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/FUTURE-COHORT-PROPOSAL.json",
+      "sha256": "e49780be8276d85caf134b4b2166f28ca4c6cad5c5c056bca0341488d61b4971"
+    },
+    {
+      "bytes": 13709,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INDEPENDENT-INTEGRATION-962.json",
+      "sha256": "d11970a51069a7a1effeef2b2ef923c0de0378d85d69b6d5d5bcdad1189e7721"
+    },
+    {
+      "bytes": 14706,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INDEPENDENT-INTEGRATION-A250-LOCAL.json",
+      "sha256": "9d54211637ec71d9bbbe418895d0cd4c89b9953793a4cae76d5d9f3c6f1fd8a8"
+    },
+    {
+      "bytes": 15518,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INDEPENDENT-INTEGRATION.json",
+      "sha256": "6b5fcf844c0b2b71f50b8e2beec0396a3358975aea57144f9e460c1cc70c04c7"
+    },
+    {
+      "bytes": 2593,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INDEPENDENT-NUMERICAL-962.json",
+      "sha256": "0a80dc3f49a5eaa5789c6458fcea606444687412c7118d2304a73b60758634d4"
+    },
+    {
+      "bytes": 3431,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INDEPENDENT-NUMERICAL.json",
+      "sha256": "9b74a8a3aed6a7c81e01c696039249a84681063fc7bf43021d7b889db159def7"
+    },
+    {
+      "bytes": 6526,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-BROWSER-962.json",
+      "sha256": "ce973bede2bd4fa432608ae1d917d889d73865f5e924d934901a9a9b14468726"
+    },
+    {
+      "bytes": 6522,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-BROWSER.json",
+      "sha256": "3cb307661e986bd9e86702c3f34d901cba670ceb430c4be25cf6809651e70400"
+    },
+    {
+      "bytes": 6714,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-NATIVE-VAULT-235.json",
+      "sha256": "eb04244ee3b0dbee68c85a80f146c2c10ce3c947b0c3873a6217ed1ce04eb75f"
+    },
+    {
+      "bytes": 7440,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-NATIVE-VAULT-962.json",
+      "sha256": "a53368cf30daca44c7c5d88a029ee20de929b5e19824404aa47fd54e0cc3aad6"
+    },
+    {
+      "bytes": 3340,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-NATIVE-VAULT-CP1.json",
+      "sha256": "9673f38eb3cb3dfb4ca2131133b5889f36aebd487dacf5b713aaf0a296e0e9bc"
+    },
+    {
+      "bytes": 7443,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-NATIVE-VAULT-FINAL.json",
+      "sha256": "3fffac7a7ffcb197599fa7ce1d7e1d308730f1e11ca4324f302ac678d9887a2b"
+    },
+    {
+      "bytes": 419110,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-PARITY-1.json",
+      "sha256": "8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1"
+    },
+    {
+      "bytes": 841051,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-PARITY-3.json",
+      "sha256": "bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91"
+    },
+    {
+      "bytes": 11647,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-WHEEL-962.json",
+      "sha256": "1894f970648e51307c334a6cc59068b2c249308424e0b6b7453e73c184f042d3"
+    },
+    {
+      "bytes": 11642,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/INSTALLED-WHEEL.json",
+      "sha256": "12f6bde558c41a9bc06d94c5a00f6c54c541dcd5cf007da0a84c88de23174875"
+    },
+    {
+      "bytes": 1835,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/LOOKUP-PREFLIGHT-AUTHOR.json",
+      "sha256": "36ecb8991c1f6ef2873fe239bc2680a23149f89e27e1157cd21227f6b5550bd1"
+    },
+    {
+      "bytes": 1111,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-235-INDEPENDENT-REVIEW.json",
+      "sha256": "0dc23c5fc44bc975dfa72ddcee88d1bc44f91517d67e920faab1ab3829a84522"
+    },
+    {
+      "bytes": 3560,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-235-RUNNER.txt",
+      "sha256": "5c3930453cf163f7572c7b545faeb63a9c3e5f2b7f77969ed82171ccbc10f4fa"
+    },
+    {
+      "bytes": 3780,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-962-RUNNER.txt",
+      "sha256": "d8480cc46a3c248349aee7370203f9bb6d0c577e1a6f62eca019642255eee8c0"
+    },
+    {
+      "bytes": 1614,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-CUSTODY-962-INDEPENDENT-REVIEW.json",
+      "sha256": "058e337a882cbe09ae61e832abbca74573779499d3e7c7aa7303235ccdc65274"
+    },
+    {
+      "bytes": 1028,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-CUSTODY-INDEPENDENT-REVIEW.json",
+      "sha256": "b25dd5243fff0353a867bb4a558c8ad074eef175dce64e86f5d87525ba2b9ddf"
+    },
+    {
+      "bytes": 3780,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-FINAL-RUNNER.txt",
+      "sha256": "d8480cc46a3c248349aee7370203f9bb6d0c577e1a6f62eca019642255eee8c0"
+    },
+    {
+      "bytes": 2913,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/NATIVE-FIRST-PROBE.txt",
+      "sha256": "866fd3458bd1c752819c9774a1cc66137334703937891eafdde6424946fa8c06"
+    },
+    {
+      "bytes": 8304,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/OPERATION-EVIDENCE-AUTHOR.json",
+      "sha256": "33a5678c43853e50c1d749c80fe917119028bdc4c57d5c9a79e481621259f4e1"
+    },
+    {
+      "bytes": 4840,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/OPERATION-INDEPENDENT-REVIEW-NATIVE-CAPTURE.json",
+      "sha256": "229a14425120c81992161c3725c4ecb5792cebe784bc3ed505f559281913bfac"
+    },
+    {
+      "bytes": 4770,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/OPERATION-INDEPENDENT-REVIEW.json",
+      "sha256": "14f54b1760adacfee8409347b80645625cf792edf1f3d441e0c967072ab94c9b"
+    },
+    {
+      "bytes": 5802,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/P01-CANONICAL-AUTHORITY-REVIEW-NATIVE-CAPTURE.json",
+      "sha256": "25a5be06ca1ba00f17b2ae49c088c2b0042795f8f40a20fd05bbf7d06072a52e"
+    },
+    {
+      "bytes": 5726,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/P01-CANONICAL-AUTHORITY-REVIEW.json",
+      "sha256": "f7a449696e3d85dbf2e32edea4893254921017719d1bc08c04575e439f83b458"
+    },
+    {
+      "bytes": 11812,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/P01-CANONICAL-AUTHORITY-TRACE.json",
+      "sha256": "4aa9f8b4f168225482ee5fb5c45d58944219e3e19555f5d9987e1e6473d16a34"
+    },
+    {
+      "bytes": 7380,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/P01-CODE-POLICY-TRACE.json",
+      "sha256": "c5810fae8c61492ac07ff1f55ab218e12053b1a041610d8c419c747a57705cc1"
+    },
+    {
+      "bytes": 2056,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PACKAGE-235-INDEPENDENT-REVIEW.json",
+      "sha256": "b6911b9747ed97e1cdcb273e1a95b0139f2491708401894872ee2da831fb6f18"
+    },
+    {
+      "bytes": 2240,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PACKAGE-962-INDEPENDENT-REVIEW.json",
+      "sha256": "db2b8e9c3bc3f5e60e8750b59e746ae52752bb7a431cfd872d34693cc11247bd"
+    },
+    {
+      "bytes": 2240,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PACKAGE-NATIVE-INDEPENDENT-REVIEW.json",
+      "sha256": "32ba4d931732b7fe76cb9abba88ed5f94d7bbadd9ed5965a51615f5c7fd39c7a"
+    },
+    {
+      "bytes": 1563,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PILOT-DRAFT-PACKAGE-BOUND-962.json",
+      "sha256": "a236ff773facb07a5e1f1216e1fb7814096f552bfc3cfaed534e5b186b912381"
+    },
+    {
+      "bytes": 1563,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PILOT-DRAFT-PACKAGE-BOUND.json",
+      "sha256": "2f53ac7f29e5faf80f20b3d0e2f833ec71247a128c40555824465bf346169698"
+    },
+    {
+      "bytes": 1518,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PILOT-DRAFT.json",
+      "sha256": "68d6a0ac9f1eb94e5564e2d5282f853df3a0d6cd58d7fa2398f857d7c31cf4b2"
+    },
+    {
+      "bytes": 4801,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PLAYER-ADAPTER-INDEPENDENT-REVIEW.json",
+      "sha256": "1972f475e033399132f0454e217e91488507c50289797a7eb78683a4f940826d"
+    },
+    {
+      "bytes": 2379,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PLAYER-SOURCE-DOCUMENTARY-RECEIPTS.json",
+      "sha256": "bbcbaecbfcdfe0b8955d939c3bf8b3d2432d2124b8a023e7e08f177be10cd4e0"
+    },
+    {
+      "bytes": 1628,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PORTABILITY-CORRECTION.json",
+      "sha256": "fb349b3e272747909f7f1c0178d3cb29020c3a8918dc54dfe7ef63d2482b44cf"
+    },
+    {
+      "bytes": 1289,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/POST-CONTROL-WINDOW-AUTHOR.json",
+      "sha256": "3c37d1883f71668b72b60d4483da5e8713fae6808244063ad5942b2032710bd4"
+    },
+    {
+      "bytes": 802,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/POST-CUTOFF-INDEPENDENT-REVIEW.json",
+      "sha256": "0a117ee1029534f3ef2f7960a4ae0e9771b697774fc01a11915af7716b0b1e8d"
+    },
+    {
+      "bytes": 435,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/PROTECTED-BOUNDARIES-INDEPENDENT-REVIEW.json",
+      "sha256": "87ebf486b1fbaeed42780258cdcc109607254997f63333286f07f0e51d8bd378"
+    },
+    {
+      "bytes": 7103,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-AUTHOR-CHECKS.json",
+      "sha256": "630892ab7148950a2880b68899e174c64b2c15a5569ea015d50559a76a340a78"
+    },
+    {
+      "bytes": 5447,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-INDEPENDENT-REVIEW.json",
+      "sha256": "8a6af494bdbdeae0b7c02a8c7707b98eea0c652c08c69364d82bccbc51dd0caf"
+    },
+    {
+      "bytes": 12477,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-INVENTORY.json",
+      "sha256": "c092e7e8eaea7ac47675525fb75e16eac19d83c25f8f88a6a9d0a2e415e71edb"
+    },
+    {
+      "bytes": 2857,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-METHOD.json",
+      "sha256": "b50943b1639a0ac9c1af4fb715a04a7db119cd1daf21889876561e7033ed61ce"
+    },
+    {
+      "bytes": 789,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RECOVERY-P01-BYTE-VERIFICATION.json",
+      "sha256": "37cfc45e66ebd34c26df5449d9420821396a8ea6edcd7498840fcc25bd0eef5d"
+    },
+    {
+      "bytes": 14724,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RELEASE-HANDOFF.md",
+      "sha256": "db3f89f49a483e051dad2e0115d54e7532fcdc66783c30b03400439ebab660a3"
+    },
+    {
+      "bytes": 58661,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RELEASE-PACKAGE-CUSTODY-235.json",
+      "sha256": "750f7639fe5429087ca52913d0fda7d9ce3439561156108ee53a8a686c798300"
+    },
+    {
+      "bytes": 58887,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RELEASE-PACKAGE-CUSTODY-962-ORDER-DIAGNOSTIC.json",
+      "sha256": "26f63c5e28a0de79d3939f8719698ae371bbc52300b7220f954e3f9df30e061d"
+    },
+    {
+      "bytes": 58998,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RELEASE-PACKAGE-CUSTODY-962.json",
+      "sha256": "2dce1a51691d661d15ee052ba47bb727749c15280c87b81bf375c3bbd3b47df3"
+    },
+    {
+      "bytes": 58998,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/RELEASE-PACKAGE-CUSTODY.json",
+      "sha256": "c1d6734236795fee8e76a6e0cf3c56ad03a14155f90be6558ceed1a04ee82351"
+    },
+    {
+      "bytes": 6959,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/SOURCE-BOUNDARY-INDEPENDENT-REVIEW.json",
+      "sha256": "624771199b76cab223407d822c8cca9999520f44acbc3d5079454241789a64a2"
+    },
+    {
+      "bytes": 2422,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/SOURCE-PARITY-235.json",
+      "sha256": "6e876d5731f8c6f9ef4dcc6eea151854a3aa2b7ca1d3f9514b5ab4731b19f9fd"
+    },
+    {
+      "bytes": 2054,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/WINDOWS-TYPING-FINAL-INDEPENDENT-REVIEW.json",
+      "sha256": "7cbe09a67b5f587efc84aadfbd26e8c3040461384e5ebdddec8e2c0f673c01ba"
+    },
+    {
+      "bytes": 1880,
+      "path": "evidence/tickets/DMF-PULSE-ACCEL-004/WINDOWS-TYPING-INDEPENDENT-REVIEW.json",
+      "sha256": "f0b361ded2597f366615cbaf9586ccec07d2a37fa196d0eef089b55b23e38370"
+    }
+  ],
+  "schema_version": "accel004-ticket-evidence-index-v1",
+  "scope": "EXACT_TRACKED_TICKET_EVIDENCE_SET_MINUS_THIS_INDEX",
+  "secret_values_or_private_provider_bodies_exported": false,
+  "source_checkpoint": "a250fc831d50eb6fff7c3a174c4603b713049390"
+}

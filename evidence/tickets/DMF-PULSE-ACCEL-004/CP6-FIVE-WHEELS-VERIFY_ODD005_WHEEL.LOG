@@ -1,0 +1,446 @@
+{
+  "cleaned_up": true,
+  "database_cleaned_up": true,
+  "database_isolated": true,
+  "foundation": {
+    "clean_environment_outside_repository": true,
+    "cleaned_up": true,
+    "doctor_nvidia_status": "TIMEOUT",
+    "doctor_status": "HEALTHY",
+    "installed_accel003_current_mode": {
+      "all_numeric_projection_and_decision_fields_exact": true,
+      "cancellations": [
+        {
+          "actual_spawn_child_pid": 3404,
+          "owned_attempts_before_cancellation": 1,
+          "pause_marker_observed": true,
+          "phase": "acquisition",
+          "reservation_still_spent": true,
+          "result_withheld": true,
+          "seconds": 2.1577044000150636,
+          "terminated_and_handle_closed": true
+        },
+        {
+          "actual_spawn_child_pid": 34216,
+          "owned_attempts_before_cancellation": 13,
+          "pause_marker_observed": true,
+          "phase": "modelling",
+          "reservation_still_spent": true,
+          "result_withheld": true,
+          "seconds": 29.432726299972273,
+          "terminated_and_handle_closed": true
+        }
+      ],
+      "cases": [
+        {
+          "actual_spawn_child_pid": 27644,
+          "all_numeric_projection_and_decision_fields_exact": true,
+          "blocked": 1,
+          "case_seconds": 55.66019289998803,
+          "catalogue": 121,
+          "checked_fields": 84053,
+          "cleanup": "CONFIRMED",
+          "custody_exclusion_count": 512,
+          "custody_inventory_sha256": "8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1",
+          "default_process_worker": true,
+          "external_provider_requests": 0,
+          "horizon": 1,
+          "numeric_fields": 67750,
+          "owned_transport_attempts": {
+            "FPL": 8,
+            "ODDS": 1,
+            "OPENFOOTBALL": 4
+          },
+          "player_gameweek_details_equal": 120,
+          "projected": 120,
+          "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+          "reference_spawn_child_pid": 35488,
+          "same_run_browser_decision_equal": true,
+          "worker_seconds": 55.52342999994289
+        },
+        {
+          "actual_spawn_child_pid": 47324,
+          "all_numeric_projection_and_decision_fields_exact": true,
+          "blocked": 1,
+          "case_seconds": 152.44228920002934,
+          "catalogue": 121,
+          "checked_fields": 249449,
+          "cleanup": "CONFIRMED",
+          "custody_exclusion_count": 1007,
+          "custody_inventory_sha256": "bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91",
+          "default_process_worker": true,
+          "external_provider_requests": 0,
+          "horizon": 3,
+          "numeric_fields": 200409,
+          "owned_transport_attempts": {
+            "FPL": 8,
+            "ODDS": 1,
+            "OPENFOOTBALL": 4
+          },
+          "player_gameweek_details_equal": 360,
+          "projected": 120,
+          "reference_service": "DEFAULT_DEMO_PROCESS_ACCEPTED_CLI_SYNTHETIC",
+          "reference_spawn_child_pid": 508,
+          "same_run_browser_decision_equal": true,
+          "worker_seconds": 152.0630979000125
+        }
+      ],
+      "classification": "OWNED_SYNTHETIC_ENGINEERING_ONLY",
+      "cleanup": "CONFIRMED",
+      "custody_patterns": [
+        "/decision/run_id",
+        "/decision/semantic_sha256",
+        "/decision/lineage/code_sha",
+        "/decision/lineage/current_state_sha256",
+        "/decision/lineage/current_manager_state_sha256",
+        "/decision/lineage/market_constraints_sha256",
+        "/decision/lineage/score_prior_sha256_by_fixture/*",
+        "/decision/lineage/stage8_result_sha256_by_fixture/*",
+        "/decision/lineage/stage9_result_sha256",
+        "/decision/lineage/private_rules_authority_sha256",
+        "/decision/lineage/execution_input_sha256",
+        "/decision/lineage/optimiser_request_sha256",
+        "/decision/lineage/optimiser_result_sha256",
+        "/decision/lineage/rolling_execution_input_sha256",
+        "/decision/lineage/current_execution_input_sha256",
+        "/decision/lineage/stage8_distribution_sha256_by_gameweek/*/*",
+        "/decision/lineage/fixture_projection_sha256_by_gameweek/*/*",
+        "/decision/lineage/gameweek_projection_sha256_by_gameweek/*",
+        "/decision/lineage/future_gameweek_input_sha256_by_gameweek/*",
+        "/decision/lineage/scenario_tree_sha256",
+        "/decision/lineage/one_gameweek_optimiser_result_sha256",
+        "/decision/transfer_frontier/semantic_sha256",
+        "/decision/transfer_frontier/optimiser_request_sha256",
+        "/decision/transfer_frontier/optimiser_result_sha256",
+        "/decision/transfer_frontier/stage9_projection_sha256",
+        "/decision/transfer_frontier/points/*/semantic_sha256",
+        "/decision/transfer_frontier/points/*/stage11_plan_sha256",
+        "/decision/do_now/tactical_plan_sha256",
+        "/decision/by_gameweek/*/tactical_plan_sha256",
+        "/decision/future_plan/*/tactical_plan_sha256",
+        "/presentation/fixtures/*/result_sha256",
+        "/presentation/fixtures/*/summaries/*/source_bundle_ids",
+        "/presentation/fixtures/*/summaries/*/upstream_stage8_sha256",
+        "/presentation/gameweeks/*/result_sha256",
+        "/presentation/gameweeks/*/summaries/*/source_bundle_ids",
+        "/presentation/gameweeks/*/summaries/*/upstream_stage8_sha256s",
+        "/presentation/source_vintages/*/identity_sha256"
+      ],
+      "disclosure_token_paths": [
+        "/decision/action_space_disclosure",
+        "/decision/transfer_frontier/action_space_disclosure"
+      ],
+      "external_provider_requests": 0,
+      "horizons": [
+        1,
+        3
+      ],
+      "installed_cli": {
+        "cohort_freeze_labels_score": "PASS",
+        "player_evidence_exact_service_equality": true,
+        "player_evidence_players": 6,
+        "real_cohort_size": 0,
+        "report_exact_service_equality": true,
+        "scored_targets": 8
+      },
+      "network_guards": [
+        {
+          "pid": 27644,
+          "role": "__mp_main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        },
+        {
+          "pid": 3404,
+          "role": "__mp_main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        },
+        {
+          "pid": 34216,
+          "role": "__mp_main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        },
+        {
+          "pid": 35488,
+          "role": "__mp_main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        },
+        {
+          "pid": 45732,
+          "role": "__main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        },
+        {
+          "pid": 47324,
+          "role": "__mp_main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        },
+        {
+          "pid": 508,
+          "role": "__mp_main__",
+          "self_test_denials": 1,
+          "unexpected_denials": 0
+        }
+      ],
+      "no_full_semantic_hash_parity_claim": true,
+      "status": "PASS"
+    },
+    "installed_accel003_parity_artifacts": [
+      {
+        "bytes": 419110,
+        "horizon": 1,
+        "path": "review_pack/accel003-installed-parity-903b36191582a8eb/parity-1-8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1.json",
+        "sha256": "8f21004cdf16b1b495223772e7abfec46d6044a39b39f11db6f57d8d8249b8a1",
+        "wheel_sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+      },
+      {
+        "bytes": 841051,
+        "horizon": 3,
+        "path": "review_pack/accel003-installed-parity-903b36191582a8eb/parity-3-bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91.json",
+        "sha256": "bc5d2098cf2e79ee8159291b7c827614410c85afa41abff52d83f7ba89bc3b91",
+        "wheel_sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+      }
+    ],
+    "installed_dashboard_option_parser": {
+      "demo": true,
+      "no_demo": false,
+      "unknown_option_rejected": true
+    },
+    "installed_data_model": {
+      "as_of_assertions": 8,
+      "database_status": "HEALTHY",
+      "demo_assertions": 8,
+      "schema_sha256": "473c88f0e9afe0d29673fe4d644d11740958c357c98b4d3e8029d033be381a2f"
+    },
+    "installed_module_path": "<temporary-environment>/site-packages/dmf_pulse/__init__.py",
+    "installed_runtime_distributions": [
+      {
+        "name": "alembic",
+        "version": "1.18.5"
+      },
+      {
+        "name": "annotated-doc",
+        "version": "0.0.4"
+      },
+      {
+        "name": "annotated-types",
+        "version": "0.7.0"
+      },
+      {
+        "name": "anyio",
+        "version": "4.15.1"
+      },
+      {
+        "name": "click",
+        "version": "8.5.0"
+      },
+      {
+        "name": "colorama",
+        "version": "0.4.6"
+      },
+      {
+        "name": "dmf-pulse",
+        "version": "0.2.0"
+      },
+      {
+        "name": "fastapi",
+        "version": "0.162.0"
+      },
+      {
+        "name": "greenlet",
+        "version": "3.5.4"
+      },
+      {
+        "name": "h11",
+        "version": "0.16.0"
+      },
+      {
+        "name": "idna",
+        "version": "3.20"
+      },
+      {
+        "name": "mako",
+        "version": "1.3.12"
+      },
+      {
+        "name": "markdown-it-py",
+        "version": "4.2.0"
+      },
+      {
+        "name": "markupsafe",
+        "version": "3.0.3"
+      },
+      {
+        "name": "mdurl",
+        "version": "0.1.2"
+      },
+      {
+        "name": "opentelemetry-api",
+        "version": "1.45.1"
+      },
+      {
+        "name": "psycopg",
+        "version": "3.3.4"
+      },
+      {
+        "name": "psycopg-binary",
+        "version": "3.3.4"
+      },
+      {
+        "name": "pydantic",
+        "version": "2.13.4"
+      },
+      {
+        "name": "pydantic-core",
+        "version": "2.46.4"
+      },
+      {
+        "name": "pygments",
+        "version": "2.20.0"
+      },
+      {
+        "name": "pywin32-ctypes",
+        "version": "0.2.3"
+      },
+      {
+        "name": "pyyaml",
+        "version": "6.0.3"
+      },
+      {
+        "name": "rich",
+        "version": "15.0.0"
+      },
+      {
+        "name": "shellingham",
+        "version": "1.5.4"
+      },
+      {
+        "name": "sqlalchemy",
+        "version": "2.0.51"
+      },
+      {
+        "name": "starlette",
+        "version": "1.10.0"
+      },
+      {
+        "name": "typer",
+        "version": "0.27.0"
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0"
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.2"
+      },
+      {
+        "name": "tzdata",
+        "version": "2026.3"
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.54.0"
+      }
+    ],
+    "installed_sebs_desk": {
+      "all_stage9_summaries_equal": true,
+      "blocked": 1,
+      "catalogue": 121,
+      "classification": "REPOSITORY_OWNED_SYNTHETIC_ONLY",
+      "evaluation_pairs": 8,
+      "live_refresh": "RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED",
+      "packaged_assets": [
+        "index.html",
+        "desk.js",
+        "desk.css"
+      ],
+      "projected": 120,
+      "provider_calls": 0,
+      "stage9_snapshot_pairs": 1,
+      "status": "PASS"
+    },
+    "installed_version_output": "dmf 0.2.0",
+    "installed_zoneinfo_fallback": true,
+    "locked_runtime_manifest_sha256": "c4e1b3600d3e55e621d33cdcf433b43a0673a2efa2ef995de480a66c05457fb0",
+    "network_fetch_disabled": true,
+    "platform": {
+      "architecture": "AMD64",
+      "operating_system": "Windows",
+      "python": "3.13.5"
+    },
+    "status": "PASS",
+    "toolchain": {
+      "build": "1.5.0",
+      "build_backend": "hatchling",
+      "hatchling": "1.31.0"
+    },
+    "uv_build_distributions": [
+      {
+        "bytes": 1756405,
+        "name": "dmf_pulse-0.2.0-py3-none-any.whl",
+        "sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+      },
+      {
+        "bytes": 14484011,
+        "name": "dmf_pulse-0.2.0.tar.gz",
+        "sha256": "42e44bbc97844f2d2a5f2744454f90dafd746cf8e707cc481e86f36b5fcea554"
+      }
+    ],
+    "uv_version": "uv 0.11.26 (396ef7ce4 2026-06-30 x86_64-pc-windows-msvc)",
+    "wheel": {
+      "bytes": 1756405,
+      "contains_py_typed": true,
+      "file_count": 504,
+      "name": "dmf_pulse-0.2.0-py3-none-any.whl",
+      "sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf",
+      "zoneinfo_fallback_sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+    }
+  },
+  "fpl004": {
+    "bundle_member_count": 2,
+    "semantic_sha256": "97c82fe5a89609d38b27de113588fb322d5aad61aad63edf9e5f0df504c58c4a",
+    "status": "USABLE"
+  },
+  "network_requests": 0,
+  "odd005": {
+    "market": {
+      "observation_count": 6,
+      "operator_books": 2,
+      "prices": {
+        "book_alpha": {
+          "AWAY": "4.20",
+          "DRAW": "3.60",
+          "HOME": "1.80"
+        },
+        "book_beta": {
+          "AWAY": "4.10",
+          "DRAW": "3.50",
+          "HOME": "1.85"
+        }
+      }
+    },
+    "refusal": {
+      "code": "CREDENTIAL_UNAVAILABLE",
+      "transport_called": false
+    },
+    "replay": {
+      "complete_books_created": 2,
+      "observations_created": 6,
+      "status": "COMPLETE"
+    },
+    "validation_status": "VALID"
+  },
+  "status": "PASS",
+  "wheel": {
+    "contains_odds_resources": true,
+    "contains_py_typed": true,
+    "distribution": "dmf-pulse==0.2.0",
+    "sha256": "903b36191582a8eb5da6e849baaa2214d86196915231a636f3071f4b9c60f7bf"
+  }
+}
