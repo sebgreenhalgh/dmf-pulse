@@ -1,0 +1,123 @@
+{
+  "actual_carriers_or_enrolled_wheels_installed": 0,
+  "actual_registry_empty": true,
+  "actual_supplier_permission_or_owner_approval_authenticated": false,
+  "assurance": [
+    "Base SHA derives from the same bounded snapshot transformed; candidate engine fingerprint derives from actual wheel members",
+    "Only registry resource and RECORD change in an owned accepted transformation",
+    "Default fixed registry remains empty; a complete or resealed review cannot enable assembly",
+    "Permit scope binds exact base wheel, registry and owner package; expiry and output immutability enforce",
+    "Canonical output wheel filename supports ordinary wheel installation",
+    "Carrier review ZIP changes no actual installed state and contains only permit metadata without live scopes",
+    "Independent acceptance and exact trusted carrier installation remain separate external trust transitions",
+    "Carrier packaging does not authenticate caller-supplied decision or reviewer identity"
+  ],
+  "control_database_accessed": false,
+  "exclusions": [
+    "CP6 full installed-wheel acceptance",
+    "CP6 actual native credential proof",
+    "Final complete regression and exact-SHA CI",
+    "Actual supplier facts or exceptions",
+    "Actual account entitlement and quota qualification",
+    "Owner acceptance or carrier installation",
+    "Operational PostgreSQL or real current recommendation execution",
+    "P01 and player evaluation workstreams"
+  ],
+  "findings": [],
+  "git_head": "7e2729dd09eeee0dfdb1e79af47aadfd1e586e7d",
+  "historical_failure_receipts_preserved": [
+    "31ceebd8aa8e96fd81107bfff4bf974f2c93496c42dede9d4725aa5b5eebedf2",
+    "c390da21a9760568a465957e514101257043e86e7bc3f25bb825f2a9c3e69d64"
+  ],
+  "independence": "Reviewer did not author CP2 changes; authored parts of the previously accepted Wave003 baseline authorization and comparison harness, which are not self-cleared as new work here",
+  "independent_owned_cases": 30,
+  "owned_proof_receipts": [
+    {
+      "basename": "accel005-independent-cp2-wip-counterexamples-2ceb0d83a58cf0c563ace0b66b130a3e8a10014b9594b9a64f76ab3d0ebaffaf.json",
+      "bytes": 1821,
+      "sha256": "2ceb0d83a58cf0c563ace0b66b130a3e8a10014b9594b9a64f76ab3d0ebaffaf"
+    },
+    {
+      "basename": "accel005-independent-cp2-wheel-path-probe-c0a84655d8077d5780555e44b76d2844dc0ca1e93f4225c6a26074fd94d5f2c6.json",
+      "bytes": 1013,
+      "sha256": "c0a84655d8077d5780555e44b76d2844dc0ca1e93f4225c6a26074fd94d5f2c6"
+    },
+    {
+      "basename": "accel005-independent-cp2-direct-scope-probe-6471feb6e379202c06efeb69294a3474cf99c61f2b068921db621e4d6ddc202f.json",
+      "bytes": 1081,
+      "sha256": "6471feb6e379202c06efeb69294a3474cf99c61f2b068921db621e4d6ddc202f"
+    },
+    {
+      "basename": "accel005-independent-owned-full-wheel-probe-248649ea929fddf31dd3477e1735f30521447b344f3bcb4cca7299d3b95a2f46.json",
+      "bytes": 1775,
+      "sha256": "248649ea929fddf31dd3477e1735f30521447b344f3bcb4cca7299d3b95a2f46"
+    },
+    {
+      "basename": "accel005-independent-publication-source-revocation-199617754c801ad37285a00694674e0de0409c26530144c3bc8fe9d402493b95.json",
+      "bytes": 635,
+      "sha256": "199617754c801ad37285a00694674e0de0409c26530144c3bc8fe9d402493b95"
+    },
+    {
+      "basename": "accel005-independent-release-carrier-probe-87f2451b7e582c10ef9ac1c74e936137cd6ace00f6d634de2eda5399cd5a7fb2.json",
+      "bytes": 1440,
+      "sha256": "87f2451b7e582c10ef9ac1c74e936137cd6ace00f6d634de2eda5399cd5a7fb2"
+    }
+  ],
+  "parser_cases": [
+    {
+      "context_and_cause_absent": true,
+      "entrypoint": "installed_enrollment"
+    },
+    {
+      "context_and_cause_absent": true,
+      "entrypoint": "production_approvals"
+    }
+  ],
+  "prior_interim_review_sha256": "3b10521d5f291d351d516ea4062b57508e33b4c9bb61f1503600407d9de1bed3",
+  "production_or_model_activation": false,
+  "provider_requests": 0,
+  "real_credentials_or_vault_accessed": false,
+  "resolved_findings": [
+    "Source qualification lifetime now caps grants and is rechecked at actual child and transport time",
+    "Native supplier gate survives current and historical wrappers before owned credential callbacks",
+    "Callback delay and legacy profile cannot borrow or outlive another qualified source permission",
+    "Cross-platform wheel aliases and reserved names fail before transformation",
+    "Populated profile and approval JSON/semantic roundtrips preserve exact accepted structure",
+    "Private registry parser exception graphs discard original private bytes",
+    "Withdrawing source qualification invalidates publication while approval remains installed"
+  ],
+  "reviewed_at": "2026-10-30T17:24:28.319595+00:00",
+  "reviewed_files_sha256": {
+    "scripts/prepare_private_release_carrier.py": "71780dd69794b3db8849bd3ce14aaf2e0c756a27150ded2003d7150ca58c479c",
+    "src/dmf_pulse/dashboard/authorization.py": "49a57537c7e09bade67a7a035ded47eb7755ded8c361a6ca9ad416e3f7882edb",
+    "src/dmf_pulse/dashboard/current.py": "e1bbad7b28426f49a5a5368c76fd3701fa08520924c47e830bb70da1adb02655",
+    "src/dmf_pulse/dashboard/current_sources.py": "b5cdf03705d2cca4fb8da5eac77c0f691f68a26437f80946636b3eab9f9f329b",
+    "src/dmf_pulse/dashboard/resources/production_refresh_enrollments.json": "c3843f5d9f9ad774e1e7f521a0104d9f043a6bc2b0aa75ca26793607573bd6a6",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "3909f1e38aba3511732b6a1adcd771a7cc365762d0dc304988dd7864c4062302",
+    "src/dmf_pulse/operation/cli.py": "f95464df0a4f7efe872cc50ea1c693bc5bda42c0adae2f9561d7698e8126bed7",
+    "src/dmf_pulse/operation/enrollment.py": "fbff3fad32a2a508df6aab0becf757ddb28c36f1326c28a6443d19774937826a",
+    "src/dmf_pulse/operation/packages.py": "ad9f98591dba622290aa7a68b0e25d0abda5acaf818aa44510550069140fbccf",
+    "src/dmf_pulse/operation/wheel.py": "83de49044d15a880512109b9e4254dc2f25d381c9e4224e6ed5a9086e0577b59",
+    "src/dmf_pulse/private_v1/team_strength_live.py": "008c44b31aeb6d27b07ab3653ed25571e673f20a1841b6146226519fb3c0d82e",
+    "src/dmf_pulse/private_v1/team_strength_live_network.py": "e58d19b0720b93ecff192524fc8e2fea238868751d76e6e2b69dc7d6c0313f31",
+    "tests/unit/operation/enrollment_support.py": "4359dca6bd4a8dea649d912cfe03d18e6352160c37a331cedf16cefc2d1a8019",
+    "tests/unit/operation/test_enrolled_wheel.py": "aafec08e40f4d84be2ec4388a4242d965fa473235f21308f0a6f6f7f153343c3",
+    "tests/unit/operation/test_supplier_enrollment.py": "2c1c2b457a7a0c09531616b30cab163824ca34b6f65108255047dea906f81ded"
+  },
+  "reviewer_checks": {
+    "receipt_secret_findings": 0,
+    "targeted_format": "PASS_9_FILES",
+    "targeted_ruff": "PASS"
+  },
+  "schema_version": "accel005-independent-cp2-source-wheel-review-v1",
+  "scope": "CP2 source-policy, existing grant integration, private wheel and external carrier preparation; code and owned evidence only",
+  "source_binding": "Exact reviewed component hashes include current checkpoint changes; no final repository or package acceptance inferred",
+  "source_or_actual_registry_edited": false,
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2",
+  "targeted_pytest": {
+    "command": ".venv/Scripts/python.exe review_pack/run_owned.py -m pytest tests/unit/operation/test_supplier_enrollment.py tests/unit/operation/test_enrolled_wheel.py -q -p no:cacheprovider",
+    "passed": 35,
+    "seconds": 1.45,
+    "skipped": 0
+  }
+}

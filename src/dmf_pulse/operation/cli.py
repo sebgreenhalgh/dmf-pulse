@@ -144,14 +144,26 @@ def prepare_pilot_command(
         Path | None,
         typer.Option(help="Optional authenticated redacted proposal; never a runtime approval."),
     ] = None,
+    input_path: Annotated[
+        Path | None,
+        typer.Option(
+            "--input",
+            help="Editable private proposal input; completing fields cannot grant runtime authority.",
+        ),
+    ] = None,
 ) -> None:
     """Prepare one manual 1-GW, UK h2h+totals, one-GET/two-credit review draft."""
+    from dmf_pulse.operation.packages import read_nonexecuting_input
+
     try:
-        draft = (
-            PilotProposal(authorization_id=authorization_id)
-            if proposal is None
-            else read_metadata(proposal, PilotProposal)
-        )
+        if proposal is not None and input_path is not None:
+            raise OperationError("SELECT_ONE_PROPOSAL_INPUT")
+        if input_path is not None:
+            draft = read_nonexecuting_input(input_path, PilotProposal)
+        elif proposal is not None:
+            draft = read_metadata(proposal, PilotProposal)
+        else:
+            draft = PilotProposal(authorization_id=authorization_id)
         if draft.authorization_id != authorization_id:
             raise OperationError("PILOT_IDENTITY_MISMATCH")
         package = prepare_pilot(draft, now=datetime.now(UTC))
@@ -309,3 +321,120 @@ def validate_installed_command(
         _fail(error)
         return
     _show(result)
+
+
+@operation_app.command("prepare-enrollment")
+def prepare_enrollment_command(
+    base_wheel: Annotated[Path, typer.Option(help="Exact clean reviewed base wheel.")],
+    input_path: Annotated[
+        Path,
+        typer.Option(
+            "--input", help="Private nonexecuting owner package and candidate registry input."
+        ),
+    ],
+    output: Annotated[
+        Path, typer.Option(help="New immutable private wheel-review package; no runtime approval.")
+    ],
+) -> None:
+    from dmf_pulse.operation.packages import read_nonexecuting_input
+    from dmf_pulse.operation.wheel import EnrollmentInput, prepare_enrollment
+
+    try:
+        result = prepare_enrollment(
+            base_wheel, read_nonexecuting_input(input_path, EnrollmentInput), now=datetime.now(UTC)
+        )
+        digest = write_metadata(output, result)
+    except (OperationError, ValidationError) as error:
+        _fail(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "artifact_sha256": digest,
+                "semantic_sha256": result.semantic_sha256,
+                "expected_enrolled_wheel_sha256": result.expected_enrolled_wheel_sha256,
+                "runtime_authority": "NOT_GRANTED",
+            },
+            sort_keys=True,
+        )
+    )
+
+
+@operation_app.command("assemble-wheel")
+def assemble_wheel_command(
+    base_wheel: Annotated[Path, typer.Option()],
+    review: Annotated[Path, typer.Option(help="Authenticated private wheel-review package.")],
+    permit_id: Annotated[
+        str,
+        typer.Option(help="Separately accepted release permit in the trusted installed registry."),
+    ],
+    output: Annotated[
+        Path, typer.Option(help="New private enrolled wheel with a valid wheel filename.")
+    ],
+) -> None:
+    from dmf_pulse.operation.wheel import EnrollmentWheelReview, assemble_enrolled_wheel
+
+    try:
+        digest = assemble_enrolled_wheel(
+            base_wheel,
+            read_metadata(review, EnrollmentWheelReview),
+            output,
+            permit_id=permit_id,
+            now=datetime.now(UTC),
+        )
+    except (OperationError, ValidationError) as error:
+        _fail(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "wheel_sha256": digest,
+                "installation": "PRIVATE_REVIEWED_WHEEL_ONLY",
+                "provider_requests": 0,
+            },
+            sort_keys=True,
+        )
+    )
+
+
+@operation_app.command("launch")
+def launch_command(port: Annotated[int, typer.Option(min=1024, max=65535)] = 8765) -> None:
+    """Launch the installed reviewed default scope; Refresh remains manual."""
+    from dmf_pulse.cli.dashboard import dashboard_command
+    from dmf_pulse.operation.enrollment import installed_enrollment, require_source_closure
+
+    try:
+        registry = installed_enrollment()
+        rows = [
+            row
+            for row in registry.approvals
+            if row.authorization_id == registry.default_authorization_id
+        ]
+        if len(rows) != 1 or rows[0].qualified_deadline_at is None:
+            raise OperationError("REVIEWED_DEFAULT_LAUNCH_REQUIRED")
+        approval = rows[0]
+        deadline = approval.qualified_deadline_at
+        if deadline is None:
+            raise OperationError("REVIEWED_DEFAULT_LAUNCH_REQUIRED")
+        require_source_closure(approval.source_scopes, now=datetime.now(UTC))
+        paths = [
+            route.path
+            for scope in approval.source_scopes
+            if scope.provider == "FPL"
+            for route in scope.routes
+            if route.path.startswith("/api/my-team/")
+        ]
+        if (
+            len(paths) != 1
+            or not paths[0].removeprefix("/api/my-team/").removesuffix("/").isdigit()
+        ):
+            raise OperationError("MANAGER_SCOPE_INVALID")
+        entry_id = int(paths[0].split("/")[-2])
+        dashboard_command(
+            port=port,
+            entry_id=entry_id,
+            refresh_approval=approval.authorization_id,
+            deadline_at=deadline.isoformat(),
+        )
+    except (OperationError, AuthorizationError, ValidationError) as error:
+        _fail(error)

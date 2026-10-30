@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 218517,
+      "bytes": 218724,
       "path": "PLANS.md",
-      "sha256": "623ca2f9a80186d551a9133628351648e00fef1dd550f04bdc12faa6469cb136"
+      "sha256": "380f5a5ff02f702752e25b25b234c67a3ecaad43afd4a99b8786fd8b02a0238c"
     },
     {
       "bytes": 2761,
@@ -2526,6 +2526,11 @@
       "sha256": "508166eb21eaf3648a580461d7f486fefdc9e2af4555d124dafc8c4d02d9d0b7"
     },
     {
+      "bytes": 1525,
+      "path": "scripts/prepare_private_release_carrier.py",
+      "sha256": "71780dd69794b3db8849bd3ce14aaf2e0c756a27150ded2003d7150ca58c479c"
+    },
+    {
       "bytes": 16139,
       "path": "scripts/probe_current_player_posterior_shadow.py",
       "sha256": "3441d418028e6fc647ce112f1d38c92b177167a455f9232c7533acb2ca47a1a9"
@@ -3456,14 +3461,14 @@
       "sha256": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab"
     },
     {
-      "bytes": 38017,
+      "bytes": 38052,
       "path": "src/dmf_pulse/dashboard/authorization.py",
-      "sha256": "59b62407e7ccf1a1f9858d0d65b8459620aed640fb5bf0a5a5b7792f6b0ce979"
+      "sha256": "49a57537c7e09bade67a7a035ded47eb7755ded8c361a6ca9ad416e3f7882edb"
     },
     {
-      "bytes": 31380,
+      "bytes": 31724,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "a78b9e6594a343b9bb47de7aae778ac2b0ab7b2e6c4dd59e987c51c3b3a29f17"
+      "sha256": "e1bbad7b28426f49a5a5368c76fd3701fa08520924c47e830bb70da1adb02655"
     },
     {
       "bytes": 13842,
@@ -4461,9 +4466,9 @@
       "sha256": "c096bbda5cf71a9989d70b9170147de523041eefcfea18491b7de95e17bed006"
     },
     {
-      "bytes": 11051,
+      "bytes": 15725,
       "path": "src/dmf_pulse/operation/cli.py",
-      "sha256": "48e3a85ff8d7e650601a4343c0ca25b2d6841c06d7cc1f85c9b0742f216e808f"
+      "sha256": "cccfa92a41b8b80a17b256043c1fc9af16ec21c57e98d6e8a6f2f48ac3d5bc6b"
     },
     {
       "bytes": 4622,
@@ -4476,9 +4481,9 @@
       "sha256": "3fe67f742878a4b5522330da3ef74f143c15590ed8f7ac89b599dc1d19f35ded"
     },
     {
-      "bytes": 8569,
+      "bytes": 8734,
       "path": "src/dmf_pulse/operation/enrollment.py",
-      "sha256": "72f76c76eaaf51e8810d4fc5803258f21836eed6f15858bdff7d1a713880bfb8"
+      "sha256": "fbff3fad32a2a508df6aab0becf757ddb28c36f1326c28a6443d19774937826a"
     },
     {
       "bytes": 6163,
@@ -4494,6 +4499,11 @@
       "bytes": 2578,
       "path": "src/dmf_pulse/operation/validation.py",
       "sha256": "e2bda543858af30fc77399f4b2d7bd02b71908916d779e36af8e922781b821d9"
+    },
+    {
+      "bytes": 14113,
+      "path": "src/dmf_pulse/operation/wheel.py",
+      "sha256": "83de49044d15a880512109b9e4254dc2f25d381c9e4224e6ed5a9086e0577b59"
     },
     {
       "bytes": 56,
@@ -7326,6 +7336,11 @@
       "sha256": "b40c5114b8cfa427b77ef02ad395eb4edc8521b9da716fc5437277236a03ff5c"
     },
     {
+      "bytes": 5621,
+      "path": "tests/unit/operation/enrollment_support.py",
+      "sha256": "4359dca6bd4a8dea649d912cfe03d18e6352160c37a331cedf16cefc2d1a8019"
+    },
+    {
       "bytes": 6989,
       "path": "tests/unit/operation/test_account_evidence.py",
       "sha256": "cdc4b3763cb20463fa576e19075c61fa210a8b2270b8cd7b963e4b265bac9e28"
@@ -7339,6 +7354,11 @@
       "bytes": 9217,
       "path": "tests/unit/operation/test_console_and_cli.py",
       "sha256": "d8cf4b8a9e5c6cf04c9d22fd0495a29dc5df6d14701b529f5b522abdc610cf23"
+    },
+    {
+      "bytes": 8990,
+      "path": "tests/unit/operation/test_enrolled_wheel.py",
+      "sha256": "aafec08e40f4d84be2ec4388a4242d965fa473235f21308f0a6f6f7f153343c3"
     },
     {
       "bytes": 13370,
@@ -8604,6 +8624,11 @@
       "bytes": 1625,
       "path": "tickets/DMF-PULSE-ACCEL-005/CP1.md",
       "sha256": "469ebbd9bd98477c6a13c794a7dab38ed681a43e50871905d5f6241e39273858"
+    },
+    {
+      "bytes": 2825,
+      "path": "tickets/DMF-PULSE-ACCEL-005/CP2.md",
+      "sha256": "dfb83417cf62ea5fd7f94de0483716aaa74415dc8858d36640b3c6ac3d773944"
     },
     {
       "bytes": 19514,

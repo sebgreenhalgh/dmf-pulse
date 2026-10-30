@@ -621,6 +621,13 @@ class CurrentRefreshSession:
             raise AuthorizationError("AUTHORIZATION_REVOKED")
         if not rows[0].not_before <= now < rows[0].expires_at:
             raise AuthorizationError("AUTHORIZATION_EXPIRED", "EXPIRED")
+        from dmf_pulse.operation.enrollment import require_source_closure
+        from dmf_pulse.operation.models import OperationError
+
+        try:
+            require_source_closure(rows[0].source_scopes, now=now)
+        except OperationError as error:
+            raise AuthorizationError(error.code, "RIGHTS_APPROVAL_REQUIRED") from None
         if grant.request.implementation_sha != implementation_fingerprint():
             raise AuthorizationError("IMPLEMENTATION_IDENTITY_CHANGED")
 

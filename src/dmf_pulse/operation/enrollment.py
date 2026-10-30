@@ -138,7 +138,7 @@ def _unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
     return value
 
 
-def installed_enrollment() -> InstalledEnrollment:
+def _installed_enrollment_or_none() -> InstalledEnrollment | None:
     """Only this fixed installed resource grants source closure or release permits."""
     try:
         body = (
@@ -167,7 +167,14 @@ def installed_enrollment() -> InstalledEnrollment:
             raise ValueError("installed registry fields differ")
         return InstalledEnrollment.model_validate_json(json.dumps(value, allow_nan=False))
     except (OSError, ValueError, TypeError, RecursionError):
-        raise OperationError("TRUSTED_APPROVAL_REGISTRY_INVALID") from None
+        return None
+
+
+def installed_enrollment() -> InstalledEnrollment:
+    result = _installed_enrollment_or_none()
+    if result is None:
+        raise OperationError("TRUSTED_APPROVAL_REGISTRY_INVALID")
+    return result
 
 
 def require_source_closure(scopes: tuple[SourceScope, ...], *, now: datetime) -> datetime:

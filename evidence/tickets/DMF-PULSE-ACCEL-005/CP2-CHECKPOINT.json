@@ -1,0 +1,18 @@
+{
+  "actual_account_qualification": false,
+  "actual_registry_empty": true,
+  "actual_source_qualification": false,
+  "carriers_installed": 0,
+  "enrolled_wheels_installed": 0,
+  "full_release_acceptance": "CP6_PENDING",
+  "implementation": "REVIEW_PREPARATION_TRUSTED_PERMIT_ASSEMBLY_DEFAULT_LAUNCH_COMPLETE",
+  "independent_review_sha256": "51dfdc8b1ada820dc278d2ff3474f81ee48048d809478d4d6e9c9d3e3d7516fe",
+  "normal_vault_reads": 0,
+  "owner_acceptance": false,
+  "parent": "7e2729dd09eeee0dfdb1e79af47aadfd1e586e7d",
+  "production_active": false,
+  "provider_requests": 0,
+  "schema_version": "accel005-cp2-checkpoint-v1",
+  "sealed_at": "2026-10-30T17:31:22.200355+00:00",
+  "targeted_tests": 288
+}

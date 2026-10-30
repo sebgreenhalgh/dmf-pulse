@@ -14,7 +14,7 @@ value is read, copied, decoded, stored or used.
   protected identities, preserve original dirty files, retain private inputs.
 - [x] CP1 complete nonsecret existing-account evidence, quotas/provenance and
   separate new-purpose approval preparation; fresh FPL v2 blind setup.
-- [ ] CP2 implement private reviewed enrollment/wheel assembly/install and
+- [x] CP2 implement private reviewed enrollment/wheel assembly/install and
   canonical control workflow using the existing registry/authorizer/worker.
 - [ ] CP3 implement the narrow nongenerative canonical P01 controller, proposed
   owner code-binding decision and cold literal-oracle compatibility proof.
@@ -37,9 +37,12 @@ missing, with each required field reported separately. Source closure now gates
 reservation, credential resolution and native FPL transport, including actual
 permission expiry and exact profile identity. The old risk acceptance and
 consumed Odds purpose do not qualify. Fresh FPL v2 setup blindly writes a new
-slot and cannot read/migrate the exposed legacy slot. CP2 wheel assembly and
-reviewed default launch, CP3 canonical scoring and CP4 locator/player work are
-in progress; their drafts are not approved operations.
+slot and cannot read/migrate the exposed legacy slot. CP2 review packaging,
+permit-gated assembly and reviewed default launch are implemented and scoped
+independent review is clear. Actual source/account qualification, detached owner
+acceptance and trusted carrier installation remain separate prerequisites.
+CP3 canonical scoring and CP4 locator/player work are in progress; their drafts
+are not approved operations.
 
 ## DMF-PULSE-ACCEL-004 — existing forecasts and secure operation
 

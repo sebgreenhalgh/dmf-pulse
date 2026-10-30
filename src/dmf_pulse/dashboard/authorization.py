@@ -243,7 +243,9 @@ def production_approvals() -> tuple[OperatorRefreshApproval, ...]:
     try:
         return installed_enrollment().approvals
     except OperationError:
-        raise AuthorizationError("TRUSTED_APPROVAL_REGISTRY_INVALID") from None
+        result = None
+    if result is None:
+        raise AuthorizationError("TRUSTED_APPROVAL_REGISTRY_INVALID")
 
 
 def _now(clock: Callable[[], datetime]) -> datetime:

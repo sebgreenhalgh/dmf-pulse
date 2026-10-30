@@ -1,0 +1,86 @@
+{
+  "all_other_prior_reviewed_hashes_unchanged": true,
+  "cases": [
+    {
+      "case": "default_branch_nonexecuting",
+      "outcome": "PASS"
+    },
+    {
+      "case": "editable_branch_nonexecuting",
+      "outcome": "PASS"
+    },
+    {
+      "case": "sealed_branch_nonexecuting",
+      "outcome": "PASS"
+    },
+    {
+      "case": "mutually_exclusive",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "case": "identity_mismatch",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "case": "sealed_is_not_editable",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "case": "editable_is_not_sealed",
+      "outcome": "REJECTED_AS_REQUIRED"
+    },
+    {
+      "case": "output_is_not_overwritten",
+      "outcome": "REJECTED_AS_REQUIRED"
+    }
+  ],
+  "changed_reviewed_files": [
+    "src/dmf_pulse/operation/cli.py"
+  ],
+  "control_database_accessed": false,
+  "current_cli_sha256": "cccfa92a41b8b80a17b256043c1fc9af16ec21c57e98d6e8a6f2f48ac3d5bc6b",
+  "exclusions": [
+    "CP6 full installed-wheel acceptance",
+    "CP6 actual native credential proof",
+    "Final complete regression and exact-SHA CI",
+    "Actual supplier facts or exceptions",
+    "Actual account entitlement and quota qualification",
+    "Owner acceptance or carrier installation",
+    "Operational PostgreSQL or real current recommendation execution",
+    "P01 and player evaluation workstreams"
+  ],
+  "findings": [],
+  "operation_regressions": {
+    "command": ".venv/Scripts/python.exe review_pack/run_owned.py -m pytest tests/unit/operation -q -p no:cacheprovider",
+    "passed": 131,
+    "seconds": 2.4,
+    "skipped": 0
+  },
+  "previous_cli_sha256": "f95464df0a4f7efe872cc50ea1c693bc5bda42c0adae2f9561d7698e8126bed7",
+  "prior_review_sha256": "51dfdc8b1ada820dc278d2ff3474f81ee48048d809478d4d6e9c9d3e3d7516fe",
+  "provider_requests": 0,
+  "real_credentials_or_vault_accessed": false,
+  "review_method": "Current CLI file and explicit branch selection re-reviewed. No authenticated claim that the old full CLI differs only by the reported typing hunk; previous exact full source was not retained.",
+  "reviewed_at": "2026-10-30T17:36:13.781811+00:00",
+  "reviewed_files_sha256": {
+    "scripts/prepare_private_release_carrier.py": "71780dd69794b3db8849bd3ce14aaf2e0c756a27150ded2003d7150ca58c479c",
+    "src/dmf_pulse/dashboard/authorization.py": "49a57537c7e09bade67a7a035ded47eb7755ded8c361a6ca9ad416e3f7882edb",
+    "src/dmf_pulse/dashboard/current.py": "e1bbad7b28426f49a5a5368c76fd3701fa08520924c47e830bb70da1adb02655",
+    "src/dmf_pulse/dashboard/current_sources.py": "b5cdf03705d2cca4fb8da5eac77c0f691f68a26437f80946636b3eab9f9f329b",
+    "src/dmf_pulse/dashboard/resources/production_refresh_enrollments.json": "c3843f5d9f9ad774e1e7f521a0104d9f043a6bc2b0aa75ca26793607573bd6a6",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "3909f1e38aba3511732b6a1adcd771a7cc365762d0dc304988dd7864c4062302",
+    "src/dmf_pulse/operation/cli.py": "cccfa92a41b8b80a17b256043c1fc9af16ec21c57e98d6e8a6f2f48ac3d5bc6b",
+    "src/dmf_pulse/operation/enrollment.py": "fbff3fad32a2a508df6aab0becf757ddb28c36f1326c28a6443d19774937826a",
+    "src/dmf_pulse/operation/packages.py": "ad9f98591dba622290aa7a68b0e25d0abda5acaf818aa44510550069140fbccf",
+    "src/dmf_pulse/operation/wheel.py": "83de49044d15a880512109b9e4254dc2f25d381c9e4224e6ed5a9086e0577b59",
+    "src/dmf_pulse/private_v1/team_strength_live.py": "008c44b31aeb6d27b07ab3653ed25571e673f20a1841b6146226519fb3c0d82e",
+    "src/dmf_pulse/private_v1/team_strength_live_network.py": "e58d19b0720b93ecff192524fc8e2fea238868751d76e6e2b69dc7d6c0313f31",
+    "tests/unit/operation/enrollment_support.py": "4359dca6bd4a8dea649d912cfe03d18e6352160c37a331cedf16cefc2d1a8019",
+    "tests/unit/operation/test_enrolled_wheel.py": "aafec08e40f4d84be2ec4388a4242d965fa473235f21308f0a6f6f7f153343c3",
+    "tests/unit/operation/test_supplier_enrollment.py": "2c1c2b457a7a0c09531616b30cab163824ca34b6f65108255047dea906f81ded"
+  },
+  "runtime_authority": "NOT_GRANTED",
+  "schema_version": "accel005-independent-cp2-cli-followup-v1",
+  "source_edited": false,
+  "status": "PASS_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2_WITHIN_PRIOR_SCOPE"
+}
