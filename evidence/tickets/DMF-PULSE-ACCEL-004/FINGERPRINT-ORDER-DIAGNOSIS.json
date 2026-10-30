@@ -1,0 +1,67 @@
+{
+  "actual_installed_runtime_fingerprint": "3aafe37d86a5346da6eaec6226d02ab936b73359",
+  "actual_runtime_platform": {
+    "os_name": "nt",
+    "path_flavour": "WindowsPath",
+    "python_version": "3.13.5"
+  },
+  "checked_at": "2026-10-30T04:47:22.048968+00:00",
+  "decision": "Correct only the proof derivation to reproduce sorted native Path objects with their platform path semantics, original case UTF8 relative names and exact accepted exclusions. Keep the accepted runtime function unchanged. Bind wheel SHA256 as the portable primary identity, and record source and actual installed fingerprint contexts separately. Require exact agreement with the actual installed function; never ignore a mismatch.",
+  "different_order_positions": 21,
+  "first_order_differences": [
+    {
+      "position": 24,
+      "runtime_windows_order": "availability/resources/__init__.py",
+      "string_order": "availability/resources/MIN-007/canonical_history.json"
+    },
+    {
+      "position": 25,
+      "runtime_windows_order": "availability/resources/current_team_path_policy_2026_27.json",
+      "string_order": "availability/resources/MIN-007/external_mapping_plan.json"
+    },
+    {
+      "position": 26,
+      "runtime_windows_order": "availability/resources/MIN-007/canonical_history.json",
+      "string_order": "availability/resources/MIN-007/training_dataset.json"
+    },
+    {
+      "position": 27,
+      "runtime_windows_order": "availability/resources/MIN-007/external_mapping_plan.json",
+      "string_order": "availability/resources/MIN-007G/contexts/goalkeeper.json"
+    },
+    {
+      "position": 28,
+      "runtime_windows_order": "availability/resources/MIN-007/training_dataset.json",
+      "string_order": "availability/resources/MIN-007G/contexts/hard_ineligible.json"
+    },
+    {
+      "position": 29,
+      "runtime_windows_order": "availability/resources/MIN-007G/contexts/goalkeeper.json",
+      "string_order": "availability/resources/MIN-007G/contexts/high_rotation.json"
+    },
+    {
+      "position": 30,
+      "runtime_windows_order": "availability/resources/MIN-007G/contexts/hard_ineligible.json",
+      "string_order": "availability/resources/MIN-007G/contexts/insufficient_eligible_squad.json"
+    },
+    {
+      "position": 31,
+      "runtime_windows_order": "availability/resources/MIN-007G/contexts/high_rotation.json",
+      "string_order": "availability/resources/MIN-007G/contexts/new_manager.json"
+    }
+  ],
+  "installed_files_exactly_equal_wheel": true,
+  "native_windows_path_order_fingerprint": "3aafe37d86a5346da6eaec6226d02ab936b73359",
+  "package_member_count": 499,
+  "posix_path_order_fingerprint": "3f09c9d42b1f346be80b7f2d945724952f768545",
+  "proof_limit": "The installed function was invoked only to enumerate and hash package files. No CredentialService, WinCred call, provider request or database was used.",
+  "provider_requests": 0,
+  "runtime_path_sequence_exactly_equals_windows_path_sort": true,
+  "schema_version": "independent-native-path-fingerprint-diagnosis-v1",
+  "source_checkpoint": "962c7549454aba55c379ba5c4619d7bd9b82678e",
+  "source_fingerprint": "2504368f3170f2cbe7a83ae8710f137d461ed6c8",
+  "status": "PROOF_SORT_ORDER_ERROR_CONFIRMED_RUNTIME_UNCHANGED",
+  "vault_reads": 0,
+  "wheel_sha256": "7f52e503dfe6dbbcc5ad49d8597b534dbc208ec93c81010a9d030bd7fb182318",
+  "wrong_proof_string_order_fingerprint": "3f09c9d42b1f346be80b7f2d945724952f768545"
+}

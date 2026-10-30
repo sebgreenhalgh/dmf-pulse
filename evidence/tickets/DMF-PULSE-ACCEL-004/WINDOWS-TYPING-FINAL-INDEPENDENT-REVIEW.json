@@ -1,0 +1,28 @@
+{
+  "changed_effective_package_path": "credentials/windows.py",
+  "checked_at": "2026-10-30T04:44:38.707504+00:00",
+  "current_file_sha256": "c24a93645780062a0ba90271678199c7f65531dc77a9a9100b34f69750af064d",
+  "current_source_fingerprint": "2504368f3170f2cbe7a83ae8710f137d461ed6c8",
+  "effective_package_inputs": 468,
+  "findings": [],
+  "independent_tests": {
+    "actual_owned_cross_process_lock_probe": true,
+    "failed": 0,
+    "log_sha256": "d74eee8471577da9300fcfd0df333b61472ed1e0843bdf49460cd3c6d635fa30",
+    "passed": 100,
+    "seconds": 15.21,
+    "source_fingerprint": "2504368f3170f2cbe7a83ae8710f137d461ed6c8"
+  },
+  "initial_typed_review_sha256": "f0b361ded2597f366615cbaf9586ccec07d2a37fa196d0eef089b55b23e38370",
+  "numerical_carry_forward": "Prior fresh one and three gameweek service proof remains evidence at prior source fingerprint. This delta does not alter any accepted service, model, PMF, rule, scenario or dataset and is outside the owned numerical execution path. Final new wheel still requires fresh installed model and native acceptance; old output identities are not relabelled.",
+  "prior_file_sha256": "b5c64fe22e447f41773a1a3f91473e2dfb5ff8fcaeba00f220c9629b23edee7a",
+  "prior_source_checkpoint": "235fd69cd7d79d4d3fe6374b46333941213d98b6",
+  "prior_source_fingerprint": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+  "production_vault_reads": 0,
+  "proof": "Replacing only this file with its exact accepted checkpoint bytes reconstructs the prior full package fingerprint. Removing only the two structural Protocol declarations and identity casts, restoring the equivalent lazy standard module import and inlining the identical flags expression reproduces the exact prior complete module AST. Actual cast and standard module identity were checked. No fallback or API flag changes.",
+  "provider_calls": 0,
+  "real_credentials_accessed": false,
+  "schema_version": "independent-windows-typing-delta-v1",
+  "status": "PASS_SINGLE_WINDOWS_TYPING_DELTA",
+  "unchanged_numerical_files": 157
+}

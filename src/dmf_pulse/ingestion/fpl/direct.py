@@ -564,6 +564,7 @@ _PUBLIC_FAILURES = {
     "CREDENTIAL_CORRUPT": "The stored FPL credential is invalid. Replace it through secure setup.",
     "CREDENTIAL_EXPIRED": "The FPL bearer token expired before transport.",
     "REQUEST_BUDGET_EXHAUSTED": "FPL request budget exhausted",
+    "POST_CUTOFF": "The FPL acquisition cutoff has passed.",
     "RIGHTS_BLOCKED": "FPL source rights do not permit this request.",
     "REDIRECT_BLOCKED": "FPL source redirect was blocked",
     "CONTENT_TYPE_INVALID": "FPL source did not return JSON",

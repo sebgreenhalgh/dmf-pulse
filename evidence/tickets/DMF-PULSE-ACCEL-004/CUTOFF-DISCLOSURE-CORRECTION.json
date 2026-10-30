@@ -1,0 +1,27 @@
+{
+  "ci_failed_test": "tests/unit/private_v1/test_a2_preparation.py::test_cutoff_guard_runs_again_before_a_direct_fpl_retry",
+  "ci_job_id": 123895978004,
+  "ci_observed_result": "1 failed,389 passed; expected POST_CUTOFF got SOURCE_UNAVAILABLE",
+  "ci_run_id": 41004309101,
+  "existing_test_assertions_unchanged": true,
+  "independent_delta_review_sha256": "0a117ee1029534f3ef2f7960a4ae0e9771b697774fc01a11915af7716b0b1e8d",
+  "production_targets_read": 0,
+  "provider_requests": 0,
+  "schema_version": "accel004-cutoff-disclosure-correction-v1",
+  "source_change": "ingestion/fpl/direct.py fixed PUBLIC_FAILURES POST_CUTOFF entry; preserve accepted cutoff reason through sanitized exception boundary. No guard timing, retry budget, transport, credential, numerical, rights or workflow change.",
+  "source_implementation_sha": "6ed14deda717204e3ee83354af1132f523e4b690",
+  "status": "SOURCE_CORRECTED_FINAL_WHEEL_ACCEPTANCE_REQUIRED",
+  "superseded_receipts_preserved": {
+    "INDEPENDENT-INTEGRATION.json": "INDEPENDENT-INTEGRATION-962.json",
+    "INSTALLED-BROWSER.json": "INSTALLED-BROWSER-962.json",
+    "INSTALLED-NATIVE-VAULT-FINAL.json": "INSTALLED-NATIVE-VAULT-962.json",
+    "INSTALLED-WHEEL.json": "INSTALLED-WHEEL-962.json",
+    "NATIVE-CUSTODY-INDEPENDENT-REVIEW.json": "NATIVE-CUSTODY-962-INDEPENDENT-REVIEW.json",
+    "NATIVE-FINAL-RUNNER.txt": "NATIVE-962-RUNNER.txt",
+    "PACKAGE-NATIVE-INDEPENDENT-REVIEW.json": "PACKAGE-962-INDEPENDENT-REVIEW.json",
+    "PILOT-DRAFT-PACKAGE-BOUND.json": "PILOT-DRAFT-PACKAGE-BOUND-962.json",
+    "RELEASE-PACKAGE-CUSTODY.json": "RELEASE-PACKAGE-CUSTODY-962.json"
+  },
+  "superseded_source_checkpoint": "962c7549454aba55c379ba5c4619d7bd9b82678e",
+  "targeted_regression": "PASS1test1.47seconds"
+}

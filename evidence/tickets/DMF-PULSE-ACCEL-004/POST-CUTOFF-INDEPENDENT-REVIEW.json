@@ -1,0 +1,17 @@
+{
+  "all_other_module_ast_identical": true,
+  "changed_source_path": "src/dmf_pulse/ingestion/fpl/direct.py",
+  "credential_lookups": 0,
+  "current_file_sha256": "d5ef2705ec6bc9e695e1a09c8a6ee3f62f80534b02715c64739fd10a95d8cda1",
+  "current_implementation_fingerprint": "6ed14deda717204e3ee83354af1132f523e4b690",
+  "cutoff_guard_calls": 3,
+  "findings": [],
+  "fresh_new_wheel_native_and_installed_numerical_proofs": "REQUIRED_NOT_CLAIMED_BY_THIS_RECEIPT",
+  "prior_file_sha256": "3c7ef45f78b6f6ef2ba9d8cdd95ba0bb1452602417b676e7501ed299182b9d12",
+  "prior_source_checkpoint": "962c7549454aba55c379ba5c4619d7bd9b82678e",
+  "provider_requests": 0,
+  "raw_error_graph_and_message_discarded": true,
+  "retryable": false,
+  "status": "PASS_EXACT_POST_CUTOFF_DISCLOSURE_DELTA",
+  "transport_attempts": 1
+}

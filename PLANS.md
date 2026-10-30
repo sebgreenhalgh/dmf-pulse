@@ -49,6 +49,14 @@ lookup and recheck the same window after blocking control; safe reasons cross
 worker/runtime/CLI/browser. Final source parity, installed acceptance and full
 twenty-job CI remain required; no live pilot or model activation is inferred.
 
+CP6 checkpoint962 passed native persistence, actual installed browser, all six
+installed wheel commands and independent exact one-/three-GW numerical parity.
+CI exposed the pre-existing POST_CUTOFF reason being masked by the new finite
+FPL error allowlist. Preserve that checkpoint and failure; restore only its fixed
+safe code/message, with unchanged accepted regression and independent canary
+review. A fresh wheel, native/browser/parity acceptance and complete final-SHA CI
+remain mandatory. No source permission or real evaluation is inferred.
+
 ## DMF-PULSE-ACCEL-003 — current-mode execution and prospective evidence
 
 Parent: `8b74d5f3dc41eb1246ae82388ec6aab3743241b8`.

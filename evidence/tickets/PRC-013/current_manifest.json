@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 215030,
+      "bytes": 215579,
       "path": "PLANS.md",
-      "sha256": "b5b2b3405894336f9f34dc6198564efcf9d5201320272df05e99fb81d9088484"
+      "sha256": "ee1053d200a5da3b894e6a8b47a00cc7bee52163a4214be95ace9ac75fb94aff"
     },
     {
       "bytes": 2761,
@@ -4171,9 +4171,9 @@
       "sha256": "20fea68f46cb67d4fef68af8ff1512536ed824e59cf5e587d72e18668daea8fd"
     },
     {
-      "bytes": 26773,
+      "bytes": 26834,
       "path": "src/dmf_pulse/ingestion/fpl/direct.py",
-      "sha256": "3c7ef45f78b6f6ef2ba9d8cdd95ba0bb1452602417b676e7501ed299182b9d12"
+      "sha256": "d5ef2705ec6bc9e695e1a09c8a6ee3f62f80534b02715c64739fd10a95d8cda1"
     },
     {
       "bytes": 31073,
@@ -8559,6 +8559,11 @@
       "bytes": 28963,
       "path": "tickets/DMF-PULSE-ACCEL-004/REQUEST.txt",
       "sha256": "02ec1d31b449e8dfc3f217615e61f7321d57531f9753846129918fcd2e1098be"
+    },
+    {
+      "bytes": 5541,
+      "path": "tickets/DMF-PULSE-ACCEL-004/RUNBOOK.md",
+      "sha256": "90dee4743fcf1dd240648d058853b491627dd4447c4d8c07216222c9c6d7c998"
     },
     {
       "bytes": 1214,
