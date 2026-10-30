@@ -1,0 +1,70 @@
+{
+  "actual_private_account_or_manager_input_read": false,
+  "checked_at": "2026-10-30T19:32:15.466121+00:00",
+  "database_or_reservation_calls": 0,
+  "findings": [],
+  "head_at_review": "f622e794d19a915e7bc320660bde1447b49a3ed6",
+  "interpretation": [
+    "Passive reporting reads fixed installed metadata and any explicitly supplied nonexecuting account draft; it checks neither normal vault credentials nor any provider or database",
+    "Reported remaining credits are owner-reported input, separately labelled from the unavailable qualified budget",
+    "Installed approval presence is a custody observation only; account, rights, ledger and pilot stages remain blocked pending current explicit preflight",
+    "The next deadline is a pinned approval-required candidate with original public-index provenance, not a current provider observation or a qualified next cohort",
+    "Explicit credential checks report local presence and fresh FPL v2 registration/expiry metadata, never provider authentication",
+    "Runbook keeps supplier permission, independent review, separate acceptance, deliberate reviewed-wheel installation and current preflight distinct from editable input completeness"
+  ],
+  "limits": [
+    "Status DTOs were injected from invented owned fixtures; no normal-user or native credential lookup was executed by this reviewer",
+    "This review covers the operator report and runbook; it grants no supplier exception, entitlement, owner acceptance, authorization, real forecast, refresh execution or production activation",
+    "Final CP6 installed-wheel/native/full CI acceptance is separate",
+    "Parent-owned uncommitted files are bound by exact hashes; HEAD alone is not treated as source custody"
+  ],
+  "normal_vault_or_real_credential_reads": 0,
+  "owned_temporary_account_directory_removed": true,
+  "proof": {
+    "bytes": 6208,
+    "path": "review_pack/accel005-independent-cp5-readiness-probe-a30f5a06dfa2422c0b0313d1bb5390601590399a3046392e77e853a917a6570b.json",
+    "sha256": "a30f5a06dfa2422c0b0313d1bb5390601590399a3046392e77e853a917a6570b"
+  },
+  "provider_requests": 0,
+  "pytest_log": {
+    "bytes": 202,
+    "path": "review_pack/accel005-independent-cp5-readiness-pytest.log",
+    "sha256": "3f29fbeb4775ca6e3f1370a08ab06c4a7fef711dbbd4bf88d52602dd485ea1f4"
+  },
+  "results": {
+    "account_stale_future_expired_and_insufficient_conditions_blocked": true,
+    "all_eight_stages_have_no_verified_state_by_default": true,
+    "all_twenty_five_credential_state_pairs_checked": true,
+    "backend_errors_stay_unavailable": true,
+    "complete_draft_cannot_establish_entitlement_budget_or_grant": true,
+    "credential_presence_only_can_verify_credential_stage": true,
+    "expired_credential_metadata_preserved_as_expired": true,
+    "independent_owned_cases": 45,
+    "installed_default_presence_requires_current_explicit_preflight": true,
+    "invalid_account_inputs_return_fixed_error_without_path_or_body": true,
+    "missing_account_facts": 22,
+    "passive_credentials_all_not_checked": true,
+    "passive_vault_service_construction_denied": true,
+    "pinned_candidate_expires_at_exact_boundary_and_does_not_advance_gameweek": true,
+    "production_registry_empty": true,
+    "targeted_pytest_passed": 4,
+    "targeted_pytest_seconds": 0.6,
+    "unchanged_secret_scanner_findings": 0
+  },
+  "reviewed_files_sha256": {
+    "src/dmf_pulse/credentials/service.py": "d6bc692ff88442d821ad97d7da5595a74f94b79a3c67cad210f5655bc26fce19",
+    "src/dmf_pulse/dashboard/resources/production_refresh_enrollments.json": "c3843f5d9f9ad774e1e7f521a0104d9f043a6bc2b0aa75ca26793607573bd6a6",
+    "src/dmf_pulse/operation/account.py": "c096bbda5cf71a9989d70b9170147de523041eefcfea18491b7de95e17bed006",
+    "src/dmf_pulse/operation/cli.py": "7ed566bfb01ab6ec0177e48448a1dceb30c3b5cae8be833c6572b8f8c07d66dc",
+    "src/dmf_pulse/operation/enrollment.py": "fbff3fad32a2a508df6aab0becf757ddb28c36f1326c28a6443d19774937826a",
+    "src/dmf_pulse/operation/models.py": "e475538cde6b9331997a3de4172484953c56682aded511bc830bdbd73cce9d53",
+    "src/dmf_pulse/operation/packages.py": "ad9f98591dba622290aa7a68b0e25d0abda5acaf818aa44510550069140fbccf",
+    "src/dmf_pulse/operation/readiness.py": "764693c92f0ce59dbd8122d70b01efe89a11bbddb89d64edefaa32c61b8156f5",
+    "src/dmf_pulse/player_lab/compatibility.py": "06500c5e6536af2f2576589d00d43aafef3dfbfd52313f0354fd6dd8c7922b67",
+    "tests/unit/operation/test_detailed_readiness.py": "1e35a1a5a604ae1c18a6129f46af9c547b9c589e9354f8e6c2707902a81c2f03",
+    "tickets/DMF-PULSE-ACCEL-005/RUNBOOK.md": "bac3531086d73704cbfe3baad64b9a2aacbbb8b9ca85823af309898da75ce2ed"
+  },
+  "schema_version": "accel005-independent-cp5-readiness-review-v1",
+  "source_or_tracked_test_edits": false,
+  "status": "PASS_SCOPED_NO_UNRESOLVED_P0_P1_OR_MATERIAL_P2"
+}

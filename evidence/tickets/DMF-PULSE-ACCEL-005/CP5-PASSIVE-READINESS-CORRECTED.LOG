@@ -1,0 +1,159 @@
+{
+  "payload": {
+    "account_evidence_sha256": null,
+    "account_input_state": "NOT_SUPPLIED",
+    "actual_information_set": "NONE_ACQUIRED_BY_READINESS",
+    "credentials": [
+      {
+        "configured": null,
+        "expires_at": null,
+        "provider": "odds",
+        "provider_authentication_performed": false,
+        "registered_at": null,
+        "state": "NOT_CHECKED"
+      },
+      {
+        "configured": null,
+        "expires_at": null,
+        "provider": "fpl",
+        "provider_authentication_performed": false,
+        "registered_at": null,
+        "state": "NOT_CHECKED"
+      }
+    ],
+    "enrollment_state": "MISSING_TRUSTED_DEFAULT",
+    "missing_account_facts": [
+      "ACCOUNT_EVIDENCE_REF_REQUIRED",
+      "ACCOUNT_REDACTED_EVIDENCE_SHA256_REQUIRED",
+      "ACCOUNT_PLAN_NAME_REQUIRED",
+      "ACCOUNT_PLAN_REF_REQUIRED",
+      "ACCOUNT_COVERED_SPORTS_REQUIRED",
+      "ACCOUNT_COVERED_REGIONS_REQUIRED",
+      "ACCOUNT_COVERED_MARKETS_REQUIRED",
+      "ACCOUNT_OPERATOR_COUNTRY_REQUIRED",
+      "ACCOUNT_PERMITTED_COUNTRIES_REQUIRED",
+      "ACCOUNT_PERMITTED_PURPOSES_REQUIRED",
+      "ACCOUNT_PLAN_CREDIT_ALLOWANCE_REQUIRED",
+      "ACCOUNT_REMAINING_CREDITS_REQUIRED",
+      "ACCOUNT_OBSERVED_AT_REQUIRED",
+      "ACCOUNT_PERIOD_STARTED_AT_REQUIRED",
+      "ACCOUNT_RESETS_AT_REQUIRED",
+      "ACCOUNT_RESET_PERIOD_REQUIRED",
+      "ACCOUNT_OTHER_USAGE_REQUIRED",
+      "ACCOUNT_SAFETY_RESERVE_CREDITS_REQUIRED",
+      "ACCOUNT_PROPOSED_QUOTA_MAX_AGE_SECONDS_REQUIRED",
+      "ACCOUNT_TERMS_VERSION_REQUIRED",
+      "ACCOUNT_TERMS_REVIEWED_AT_REQUIRED",
+      "ACCOUNT_TERMS_EVIDENCE_SHA256_REQUIRED"
+    ],
+    "next_deadline_candidate": {
+      "assessed_at": "2026-10-30T19:29:06.115335Z",
+      "candidate_deadline_at": "2026-10-31T11:00:00Z",
+      "candidate_gameweek": 9,
+      "direct_open_status": "ACCESS_ERROR",
+      "evidence_kind": "OFFICIAL_PUBLIC_HTML_SEARCH_INDEX",
+      "execution_authorized": false,
+      "freeze_attempted": false,
+      "published_date": "2026-10-29",
+      "real_cohort_size": 0,
+      "required_before_freeze": [
+        "Separately approved exact source/account/routes/request budget/purpose/code identity.",
+        "All retained dependencies and final labels independently source-qualified.",
+        "Authenticated current complete catalogue, fixture identities and future deadline.",
+        "Preregistered population, rules/models, benchmarks and holdout policy before outcomes.",
+        "Original append-only trusted-clock forecast custody before deadline."
+      ],
+      "schema_version": "future-player-cohort-candidate-v1",
+      "season": "2026/27",
+      "semantic_sha256": "36b70747c9ebdb67cc250d3b2495a4c5120c2154052deb8e931519228b39c925",
+      "source_url": "https://www.premierleague.com/es/news/4750452/everything-you-need-for-gameweek-9-of-fpl-with-the-latest-tips-and-advice",
+      "status": "FUTURE_CANDIDATE_REQUIRES_APPROVAL"
+    },
+    "operator_actions": [
+      "Complete the private nonsecret account draft, then run operation review-account; a complete draft still requires independent review.",
+      "Obtain exact supplier permission for FPL automated routes and a new Odds pilot purpose; the old risk acceptance and consumed purpose do not grant these.",
+      "Register a freshly issued FPL replacement locally with credentials set fpl --fresh-issued --expires-at <actual-UTC-expiry>; input stays hidden.",
+      "Have the exact manager-bound package, source qualifications, budget, deadline, code and wheel independently reviewed and separately accepted; install only that reviewed private wheel.",
+      "Validate the canonical PostgreSQL control ledger and current quota before a manually initiated refresh.",
+      "After reviewed installation, run operation launch, pair the browser and click Refresh once. Launch and page reload do not fetch data."
+    ],
+    "production_active": false,
+    "provider_requests": 0,
+    "qualified_available_budget": "NOT_CHECKED_REQUIRES_INSTALLED_PREFLIGHT",
+    "readiness": {
+      "checks": [
+        {
+          "checked_at": null,
+          "evidence_sha256": [],
+          "reason_code": "EXPLICIT_CHECK_REQUIRED",
+          "stage": "ENGINEERING_READY",
+          "state": "NOT_CHECKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": null,
+          "evidence_sha256": [],
+          "reason_code": "EXPLICIT_CHECK_REQUIRED",
+          "stage": "CREDENTIALS_CONFIGURED",
+          "state": "NOT_CHECKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": "2026-10-30T19:29:06.115335Z",
+          "evidence_sha256": [],
+          "reason_code": "TRUSTED_ENROLLMENT_REQUIRED",
+          "stage": "ACCOUNT_ENTITLEMENT_VERIFIED",
+          "state": "BLOCKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": "2026-10-30T19:29:06.115335Z",
+          "evidence_sha256": [],
+          "reason_code": "TRUSTED_ENROLLMENT_REQUIRED",
+          "stage": "PROJECT_RIGHTS_APPROVED",
+          "state": "BLOCKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": "2026-10-30T19:29:06.115335Z",
+          "evidence_sha256": [],
+          "reason_code": "TRUSTED_ENROLLMENT_REQUIRED",
+          "stage": "CONTROL_LEDGER_READY",
+          "state": "BLOCKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": "2026-10-30T19:29:06.115335Z",
+          "evidence_sha256": [],
+          "reason_code": "TRUSTED_ENROLLMENT_REQUIRED",
+          "stage": "LIVE_PILOT_AUTHORIZED",
+          "state": "BLOCKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": null,
+          "evidence_sha256": [],
+          "reason_code": "EXPLICIT_CHECK_REQUIRED",
+          "stage": "LIVE_PILOT_EXECUTED",
+          "state": "NOT_CHECKED",
+          "valid_until": null
+        },
+        {
+          "checked_at": null,
+          "evidence_sha256": [],
+          "reason_code": "EXPLICIT_CHECK_REQUIRED",
+          "stage": "PRODUCTION_ACTIVE",
+          "state": "NOT_CHECKED",
+          "valid_until": null
+        }
+      ],
+      "observed_at": "2026-10-30T19:29:06.115335Z",
+      "schema_version": "operator-readiness-v1"
+    },
+    "reported_remaining_credits": null,
+    "reservation_created": false,
+    "schema_version": "operator-detailed-readiness-v1",
+    "source_freshness": "NOT_CHECKED_NO_PROVIDER_REQUEST"
+  },
+  "semantic_sha256": "dbcf82e4f8b4a8e33eab3d61947df9c1974daedfe5fb7f8b1ed7126bfba3ede3"
+}

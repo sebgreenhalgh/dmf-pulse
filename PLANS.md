@@ -20,7 +20,7 @@ value is read, copied, decoded, stored or used.
   owner code-binding decision and cold literal-oracle compatibility proof.
 - [x] CP4 implement approved locator onboarding and qualified player custody,
   point-only/full-distribution adapters, protocol/coverage/holdout integration.
-- [ ] CP5 finish explicit eight-stage readiness, token/budget/rights/expiry
+- [x] CP5 finish explicit eight-stage readiness, token/budget/rights/expiry
   remedies and practical reviewed operator launch without UI redesign.
 - [ ] CP6 independent adversarial review, full retained regressions, exact
   one-/three-GW parity, installed/native/database/provenance/coverage gates,
@@ -45,8 +45,10 @@ CP3 nongenerative canonical scoring and CP4 locator/player engineering are
 complete with scoped independent review clear. The code-binding decision,
 source qualifications and actual research protocols remain unaccepted. CP4
 native directory-relative handles close reproduced junction races; 112 retained
-and new PostgreSQL tests pass. CP5 operator hardening and CP6 full release
-acceptance remain separate checkpoints.
+and new PostgreSQL tests pass. CP5 operator hardening is complete and separately
+reviewed: passive status enumerates missing facts without credentials, DB access
+or requests; explicit credential metadata keeps FPL registration/expiry separate
+from permission. CP6 full release acceptance remains outstanding.
 
 ## DMF-PULSE-ACCEL-004 — existing forecasts and secure operation
 

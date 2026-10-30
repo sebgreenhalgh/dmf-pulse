@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 219034,
+      "bytes": 219228,
       "path": "PLANS.md",
-      "sha256": "5563b72fb39c3c72a9822f6c93dbd696231108997770f6607746fedcb4186b92"
+      "sha256": "94d3a81ae6c88cc27c8689009cd29a2b796caeed215d650f95a5221a8b13c7de"
     },
     {
       "bytes": 2761,
@@ -4486,9 +4486,9 @@
       "sha256": "c096bbda5cf71a9989d70b9170147de523041eefcfea18491b7de95e17bed006"
     },
     {
-      "bytes": 15725,
+      "bytes": 16553,
       "path": "src/dmf_pulse/operation/cli.py",
-      "sha256": "cccfa92a41b8b80a17b256043c1fc9af16ec21c57e98d6e8a6f2f48ac3d5bc6b"
+      "sha256": "7ed566bfb01ab6ec0177e48448a1dceb30c3b5cae8be833c6572b8f8c07d66dc"
     },
     {
       "bytes": 4622,
@@ -4514,6 +4514,11 @@
       "bytes": 9331,
       "path": "src/dmf_pulse/operation/packages.py",
       "sha256": "ad9f98591dba622290aa7a68b0e25d0abda5acaf818aa44510550069140fbccf"
+    },
+    {
+      "bytes": 6221,
+      "path": "src/dmf_pulse/operation/readiness.py",
+      "sha256": "764693c92f0ce59dbd8122d70b01efe89a11bbddb89d64edefaa32c61b8156f5"
     },
     {
       "bytes": 2578,
@@ -7436,6 +7441,11 @@
       "sha256": "d8cf4b8a9e5c6cf04c9d22fd0495a29dc5df6d14701b529f5b522abdc610cf23"
     },
     {
+      "bytes": 3034,
+      "path": "tests/unit/operation/test_detailed_readiness.py",
+      "sha256": "1e35a1a5a604ae1c18a6129f46af9c547b9c589e9354f8e6c2707902a81c2f03"
+    },
+    {
       "bytes": 8990,
       "path": "tests/unit/operation/test_enrolled_wheel.py",
       "sha256": "aafec08e40f4d84be2ec4388a4242d965fa473235f21308f0a6f6f7f153343c3"
@@ -8736,6 +8746,11 @@
       "sha256": "b215de0f638927a0d5b483e60e2ad6eb6e2d48954aab704d081ea1eed976e771"
     },
     {
+      "bytes": 2005,
+      "path": "tickets/DMF-PULSE-ACCEL-005/CP5.md",
+      "sha256": "0f75e7ca9031d4cc17a6ba9c311680024ae44ad2570caacbc57956c1e1bf39d3"
+    },
+    {
       "bytes": 1376,
       "path": "tickets/DMF-PULSE-ACCEL-005/QUOTA-BOUNDARY-EXCEPTION.md",
       "sha256": "f00960a3cb910725b5ba9f257e178118337ca2647c7efae4d4309156b7f20e62"
@@ -8744,6 +8759,11 @@
       "bytes": 19514,
       "path": "tickets/DMF-PULSE-ACCEL-005/REQUEST.redacted.txt",
       "sha256": "cdabad07887ef47e8bb4b154215540dc4cec6618b3054d2059ce99a1e17178cf"
+    },
+    {
+      "bytes": 4017,
+      "path": "tickets/DMF-PULSE-ACCEL-005/RUNBOOK.md",
+      "sha256": "bac3531086d73704cbfe3baad64b9a2aacbbb8b9ca85823af309898da75ce2ed"
     },
     {
       "bytes": 724,

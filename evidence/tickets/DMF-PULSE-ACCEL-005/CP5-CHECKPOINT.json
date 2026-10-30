@@ -1,0 +1,21 @@
+{
+  "account_entitlement_verified": false,
+  "actual_account_missing_fields": 22,
+  "actual_provider_requests": 0,
+  "fresh_fpl_setup": "OWNER_LOCAL_HIDDEN_INPUT_REQUIRED",
+  "full_release_acceptance": "CP6_PENDING",
+  "implementation_state": "EIGHT_STAGE_OPERATOR_REPORT_AND_RUNBOOK_COMPLETE",
+  "independent_owned_checks": 45,
+  "independent_review_sha256": "fbc3ddcb1211c75c85dc083bcfedae608e6c7f73f5a67414b46718cbefebc00f",
+  "live_pilot_authorized": false,
+  "live_pilot_executed": false,
+  "normal_odds_slot": "OWNER_REPORTED_CONFIGURED_NOT_READ",
+  "normal_vault_reads": 0,
+  "parent": "f83065145bbe06f5270bcba0bd826f101047fa5f",
+  "production_active": false,
+  "project_rights_approved": false,
+  "retained_boundary_tests": 240,
+  "root_report_tests": 4,
+  "schema_version": "accel005-cp5-checkpoint-v1",
+  "sealed_at": "2026-10-30T19:41:17.204823+00:00"
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "accel005-public-documentary-deadline-v1",
+  "assessed_at": "2026-10-30T19:41:50Z",
+  "source_url": "https://www.premierleague.com/en/news/4750452/everything-you-need-for-gameweek-9-of-fpl-with-the-latest-tips-and-advice",
+  "publisher": "Premier League",
+  "published_date_displayed": "2026-10-30",
+  "retrieval_method": "READABLE_WEB_TOOL_HTML_EXTRACTION_CACHE_POSSIBLE_NOT_RAW_HTTP_CUSTODY",
+  "readable_lines": "33-37",
+  "season": "2026/27",
+  "gameweek": 9,
+  "deadline_utc": "2026-10-31T11:00:00Z",
+  "future_at_assessment": true,
+  "purpose": "DOCUMENTARY_DEADLINE_RECHECK_ONLY",
+  "raw_http_body_hash_claimed": false,
+  "live_fpl_json_schema_observed": false,
+  "source_access_or_retention_granted": false,
+  "pilot_or_freeze_authorized": false,
+  "action_if_deadline_expires": "VERIFY_A_NEW_ACTUAL_OFFICIAL_FUTURE_DEADLINE_DO_NOT_ADVANCE_OR_BACKDATE_AUTOMATICALLY"
+}

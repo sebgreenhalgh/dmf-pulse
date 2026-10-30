@@ -17,6 +17,32 @@ from dmf_pulse.operation.packages import PilotProposal, prepare_pilot, read_meta
 operation_app = typer.Typer(help="Prepare owner review and recover canonical control metadata.")
 
 
+@operation_app.command("readiness")
+def readiness_command(
+    check_credentials: Annotated[
+        bool,
+        typer.Option(
+            help="Explicit current-user presence/expiry check; no provider authentication."
+        ),
+    ] = False,
+    account_input: Annotated[
+        Path | None,
+        typer.Option(help="Private nonsecret editable account input; cannot grant authority."),
+    ] = None,
+) -> None:
+    """Show eight stages, missing account facts, fresh-token expiry and exact next actions."""
+    from dmf_pulse.operation.readiness import detailed_readiness
+
+    try:
+        result = detailed_readiness(
+            now=datetime.now(UTC), check_credentials=check_credentials, account_input=account_input
+        )
+    except OperationError as error:
+        _fail(error)
+        return
+    _show(result)
+
+
 @operation_app.command("account-draft")
 def account_draft_command(
     account_ref: Annotated[
