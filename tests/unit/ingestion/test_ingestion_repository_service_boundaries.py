@@ -5,11 +5,12 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, NoReturn
 from uuid import UUID
 
 import pytest
 
+from dmf_pulse.credentials.providers import AutomaticOddsCredentialProvider
 from dmf_pulse.ingestion import repository as repository_module
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.service import DATABASE_REF
@@ -17,6 +18,7 @@ from dmf_pulse.ingestion.models import RightsDecision
 from dmf_pulse.ingestion.odds import service as service_module
 from dmf_pulse.ingestion.odds.client import StaticCredentialProvider
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
+from dmf_pulse.ingestion.odds.credentials import UnavailableCredentialProvider
 from dmf_pulse.ingestion.odds.service import (
     OddsImportRequest,
     OddsIngestionService,
@@ -347,7 +349,11 @@ def test_snapshot_invalid_options_and_quota_lookup_failure_remain_offline(
     repository_root: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    service = OddsIngestionService(repository_root=repository_root, clock=lambda: NOW)
+    service = OddsIngestionService(
+        repository_root=repository_root,
+        credential_provider=UnavailableCredentialProvider(),
+        clock=lambda: NOW,
+    )
     with pytest.raises(IngestionError) as invalid:
         service.snapshot(
             provider="unsupported",
@@ -424,3 +430,34 @@ def test_snapshot_invalid_options_and_quota_lookup_failure_remain_offline(
     assert safe_database.value.__context__ is None
     assert "CANARY" not in repr(safe_database.value)
     assert exploding.calls == 0
+
+    calls: list[str] = []
+
+    def denied_backend() -> NoReturn:
+        calls.append("backend")
+        raise AssertionError("quota refusal must not inspect the credential backend")
+
+    def denied_transport() -> NoReturn:
+        calls.append("transport")
+        raise AssertionError("quota refusal must remain offline")
+
+    windows_service = OddsIngestionService(
+        repository_root=repository_root,
+        credential_provider=AutomaticOddsCredentialProvider(
+            platform="nt", environment={}, service_factory=denied_backend
+        ),
+        transport_factory=denied_transport,
+        clock=lambda: NOW,
+    )
+    with pytest.raises(IngestionError) as unknown_windows:
+        windows_service.snapshot(
+            provider="the_odds_api",
+            competition_key="PL",
+            sport_key="soccer_epl",
+            region="uk",
+            market="h2h",
+            as_of=NOW,
+        )
+    assert unknown_windows.value.code == "DATABASE_UNAVAILABLE"
+    assert unknown_windows.value.__context__ is None
+    assert calls == []

@@ -1,0 +1,15 @@
+{
+    "schema_version":  "accel005-owned-windows-regression-abort-v1",
+    "state":  "ABORTED_FAILED_TEST_FIXTURE_NOT_ACCEPTANCE",
+    "source_checkpoint":  "57865c1a4f8ada6e6dfa7fe75bb2deb9a3eb4ae2",
+    "checked_at":  "2026-10-30T20:56:17.4241097Z",
+    "root_process_id":  38876,
+    "owned_tree_process_count":  10,
+    "exact_owned_tree_stop_confirmed":  true,
+    "reason":  "Default missing-credential assumption is not portable; independently approved test-only injection and Windows unknown-state spies require a fresh clean-source full run",
+    "unrelated_processes_touched":  false,
+    "database_deletions":  0,
+    "partial_logs_retained":  true,
+    "pending_owned_database_marker":  "review_pack/release005-final/windows/owned-databases.json",
+    "helper_sha256":  "852c143108f6cfbc828e44fea55ae8d875241d9dab06f54967ba35f9172d8ca4"
+}

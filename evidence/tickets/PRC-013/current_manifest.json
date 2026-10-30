@@ -7296,9 +7296,9 @@
       "sha256": "db2f2af7f27f64daf0171c138031e742e99cb6bc39544e2137f21a63785fc3f1"
     },
     {
-      "bytes": 14805,
+      "bytes": 16112,
       "path": "tests/unit/ingestion/test_ingestion_repository_service_boundaries.py",
-      "sha256": "d5472197c34471908096fb99715d1eef51184e5f57c0a6d78046200b4111c506"
+      "sha256": "b1f8f2dfec7e4566d2c56eb34a5ae1b240a223089e99d3ec4f5fb811317d6c71"
     },
     {
       "bytes": 5263,
@@ -8756,9 +8756,9 @@
       "sha256": "0f75e7ca9031d4cc17a6ba9c311680024ae44ad2570caacbc57956c1e1bf39d3"
     },
     {
-      "bytes": 3978,
+      "bytes": 4919,
       "path": "tickets/DMF-PULSE-ACCEL-005/CP6.md",
-      "sha256": "bb32c5a72b281ca30116253e5046949755d66b95f30f578c6ee91d2f43e70326"
+      "sha256": "d7b6658b457e9887b35ecc39c7384529e9afb22c102dab84bf4582704b4384cb"
     },
     {
       "bytes": 1376,

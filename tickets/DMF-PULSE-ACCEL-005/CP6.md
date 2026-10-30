@@ -55,3 +55,16 @@ qualification, exact reviewed private enrollment and owner pilot acceptance
 remain independent operator prerequisites. The normal vault and exposed legacy
 FPL value have not been read. No real refresh, source acquisition, real player
 freeze, actual model evaluation or production activation is inferred from tests.
+
+The first sharded Windows attempt exposed one further inherited test assumption:
+the default credential hint is unknown on Windows and under explicit environment
+selection. An unavailable-credential fixture now explicitly injects
+UnavailableCredentialProvider. The existing refusal assertions are preserved;
+an added Windows-AUTO case verifies DATABASE_UNAVAILABLE with zero backend and
+transport calls. All 16 module tests and 11 independent state/error controls pass.
+The failed predecessor run is stopped and retained as diagnostic history. This
+test-only correction changes no production, configuration or wheel member. The
+final 9a9c50dca5ed6632daa332237c69255d7a25553a7968a31779c3f1527559c458
+wheel remains content-identical; exact Git-to-wheel equality must bridge it to
+the new commit. Complete clean-source Windows regression and exact-final-SHA CI
+must run afresh. No predecessor partial results are combined as final acceptance.
