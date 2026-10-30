@@ -1,0 +1,928 @@
+# DMF PULSE — ACCELERATION WAVE 004
+## EXISTING FORECAST RECOVERY, FIRST REAL EVALUATION, LIVE DASHBOARD PILOT AND AUTOMATIC SECURE CREDENTIALS
+### MAJOR IMPLEMENTATION — GIT-FIRST / RESUMABLE / INDEPENDENTLY REVIEWED / PUSH AS YOU GO
+
+Repository:
+https://github.com/sebgreenhalgh/dmf-pulse
+
+Immutable ACCEL-003 engineering parent:
+`9b6d3f957e130e0832b39aee9940810eefa05535`
+
+Branch:
+`readiness/DMF-PULSE-ACCEL-003-live-data-evaluation`
+
+Exact-SHA CI:
+https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/40980379092
+
+Programme:
+`DMF-PULSE-ACCEL-004`
+
+Preferred implementation branch:
+`readiness/DMF-PULSE-ACCEL-004-real-operation`
+
+# 1. MISSION
+
+DMF Pulse has completed three major acceleration programmes.
+
+The local dashboard, player explorer, prediction engine, optimisation service, current-mode worker, source authorization controls and prospective evaluation infrastructure now exist.
+
+However, the system has not yet delivered an authorized real-current dashboard recommendation or a scored real player-level prospective evaluation cohort.
+
+The owner has clarified two important facts:
+
+**FIRST: REAL FROZEN PREDICTIONS ALREADY EXIST.**
+
+There is an authenticated public P01 forecast frozen on 3 October 2026, and the owner reports additional predictions frozen approximately two weeks before this programme.
+
+Do not assume no existing real forecasts are available.
+
+Investigate and authenticate what already exists before building more forecasting infrastructure.
+
+**SECOND: THE OWNER ALREADY HAS A THE ODDS API ACCOUNT AND API KEY.**
+
+Do not propose creating another account.
+
+Do not require the owner to enter the Odds API key every time the engine runs.
+
+Implement secure, persistent, automatic local credential retrieval.
+
+## Primary objective
+
+**Move DMF Pulse from an engineering-complete dashboard toward routine, authorized real-data use and scientifically valid evaluation of predictions already made.**
+
+This is an implementation programme, not another general architecture audit.
+
+Prioritize working capabilities and concrete operational outcomes.
+
+Do not spend the entire session writing additional documentation about missing permissions.
+
+Complete all substantial engineering work that can proceed independently of a provider-access decision.
+
+# 2. REQUIRED OUTCOMES
+
+The programme must address five priorities:
+
+1. **Automatic secure credentials:** one-time registration of the existing Odds API key, followed by automatic retrieval on future runs.
+2. **Historical forecast recovery:** discover and authenticate all relevant existing real forecast artifacts, distinguishing P01 from player-level xPts.
+3. **Real evaluation readiness:** identify which forecasts can already be scored, which lack admissible finalized labels, and implement any genuinely missing evaluation integration.
+4. **First real dashboard pilot:** complete the source/account/control-ledger enrollment path and prepare or conduct one authorized, read-only current-data refresh.
+5. **Player-data advancement:** make practical progress toward collecting and evaluating qualified real starts, minutes, player events and actual FPL points.
+
+Do not rebuild Stage-7/8/9/10/11 or the dashboard.
+
+Use their accepted implementations.
+
+# 3. GOVERNANCE AND SOURCE BOUNDARIES
+
+This prompt authorizes engineering, offline research, test execution, local artifact inventory and normal Git publication.
+
+It does not itself authorize new football-provider calls, expand third-party licences, approve a new source purpose or authorize persistent private FPL storage.
+
+An API key proves possession of credentials, not permission for a particular route or purpose.
+
+Preserve source-policy distinctions between:
+
+- provider terms and licence;
+- account/plan entitlement;
+- project rights profile;
+- owner-approved operational scope;
+- reviewed executable implementation;
+- current runtime grant.
+
+No force/unsafe/ignore-rights bypass.
+
+If an exact eligible authority and applicable source permission are independently established, execution may proceed only within that documented scope.
+
+Otherwise complete the engineering and present the precise outstanding owner decision.
+
+Do not repeat any consumed one-shot acquisition.
+
+No FPL account writes.
+
+No automatic transfer submission.
+
+No unauthorized scheduled scraping.
+
+No production activation or model promotion.
+
+# 4. CHECKPOINT 0 — VERIFY GIT, AUTHORITY AND EXISTING ASSETS
+
+Fetch origin and verify the immutable ACCEL-003 parent.
+
+Inspect:
+
+- current main and branch ancestry;
+- accepted DMFP-20 decisions;
+- authority manifest;
+- ACCEL-001/002/003 handoffs;
+- existing rights profiles;
+- accepted current FPL and Odds clients;
+- dashboard current-mode worker;
+- PostgreSQL refresh authorization ledger;
+- player-lab evaluation ledger;
+- P01 evaluation and outcome ingestion;
+- existing local prospective artifact directories.
+
+Read relevant instructions and tickets.
+
+Create a clean isolated worktree.
+
+Preserve the existing dirty Availability worktree.
+
+Record protected file and numerical source identities.
+
+Update `PLANS.md` with independently deliverable checkpoints.
+
+Do not merge or rewrite historical work.
+
+# 5. WORKSTREAM A — AUTOMATIC SECURE CREDENTIAL MANAGEMENT
+
+**This is mandatory and must be fully implemented.**
+
+The owner currently has to re-enter the existing Odds API key repeatedly.
+
+This must be eliminated.
+
+## 5.1 Windows Credential Manager
+
+Implement first-class, Windows-native secure storage for The Odds API key.
+
+Preferred approach:
+
+- Windows Credential Manager, backed by Windows' credential protections;
+- a maintained, appropriately reviewed Python integration;
+- minimal dependency impact;
+- no hand-rolled encryption;
+- no plaintext secrets in application configuration.
+
+If another Windows-native DPAPI-backed solution is demonstrably safer and more compatible with the repository, justify it with an explicit security review.
+
+The key must be stored outside the repository and protected under the current Windows user account.
+
+Do not save secrets in:
+
+- Git;
+- `.env` files;
+- `config/*.json`;
+- PowerShell profile scripts;
+- application logs;
+- review packs;
+- browser storage;
+- command-line arguments;
+- URLs;
+- telemetry;
+- database rows.
+
+## 5.2 One-time setup command
+
+Implement a user-friendly CLI such as:
+
+`dmf credentials set-odds-key`
+
+The command must:
+
+1. Prompt securely without displaying the key.
+2. Validate the supplied secret locally without contacting the provider.
+3. Store it in Windows Credential Manager.
+4. Report success without revealing the secret.
+5. Never retain it in repo-owned files or command evidence.
+
+Also provide commands such as:
+
+`dmf credentials status`
+
+`dmf credentials delete-odds-key`
+
+A status check must disclose only whether a credential is configured.
+
+Support secure rotation/replacement with explicit operator action.
+
+Do not implement a `show-key` command.
+
+## 5.3 Automatic retrieval
+
+After the one-time setup:
+
+**Neither `dmf pulse` nor an eligible Seb's Desk Refresh may require the owner to type the Odds API key again.**
+
+Integrate retrieval into the actual accepted Odds acquisition path.
+
+Current legacy environment variable:
+
+`THE_ODDS_API_KEY`
+
+Preserve backward compatibility where appropriate, but make the protected OS credential store the normal Windows path.
+
+Document exact precedence if both an environment variable and an OS-vault entry exist.
+
+Do not silently choose an unexpected credential.
+
+The actual key must be resolved only when an authorized operation requires it.
+
+In particular:
+
+- no credential lookup during module imports;
+- no credential lookup merely to open the dashboard;
+- no credential lookup for demo runs;
+- no credential lookup before source authorization;
+- no credential lookup before the appropriate usage reservation, where required;
+- no credential serialized into worker grants, IPC payloads or browser responses.
+
+Prefer resolving the credential within the authorized worker or accepted transport boundary.
+
+Do not use an unnecessary broad process-environment mutation that exposes the key to unrelated subprocesses.
+
+Clear temporary references where practical.
+
+Do not claim guaranteed memory erasure in Python.
+
+## 5.4 FPL token handling
+
+Inspect the existing:
+
+`DMF_FPL_BEARER_TOKEN`
+
+and current secure FPL credential-provider integration.
+
+FPL authentication is separate from The Odds API.
+
+Investigate whether a short-lived FPL bearer token can be stored through the same secure OS credential service without broadening its intended use.
+
+If implemented:
+
+- separate credential identity;
+- explicit expiration;
+- no silent reuse after expiry;
+- explicit secure replacement;
+- no automated session extraction;
+- no fabricated refresh token or unsupported renewal mechanism.
+
+If automatic renewal is unavailable or unauthorized, the application must request a new token through an existing approved secure interaction only when necessary.
+
+Do not make repeated Odds API key entry a dependency of an expiring FPL token.
+
+## 5.5 Portability
+
+Windows is the owner's primary environment.
+
+Windows Credential Manager functionality is mandatory.
+
+On Linux, provide a safe supported credential backend if properly available, or a documented explicit session-only environment fallback.
+
+Never silently fall back to plaintext persistent storage.
+
+Missing backend must produce a typed, actionable error.
+
+## 5.6 Security tests
+
+Include:
+
+- first setup;
+- replacement;
+- deletion;
+- missing credential;
+- corrupt/unavailable credential;
+- wrong Windows user context;
+- credential rotation;
+- concurrent runs;
+- authorized lookup;
+- denied lookup;
+- missing rights;
+- expired approval;
+- source quota exhaustion;
+- no credential access in demo mode;
+- no key leak through errors or logs;
+- no key leak through IPC;
+- no key leak through HTTP responses.
+
+Use mocked/injected credential backends for automated tests.
+
+Never put a real secret into a fixture.
+
+Verify from an installed Windows wheel that an operator can:
+
+1. Register a synthetic test key securely.
+2. Start a new PowerShell session.
+3. Resolve it automatically through the production credential-provider interface.
+4. Delete it.
+5. Verify it is no longer available.
+
+No live Odds request is required for this test.
+
+# 6. WORKSTREAM B — RECOVER ALL EXISTING FROZEN PREDICTIONS
+
+**Do this before designing another prospective forecast cohort.**
+
+## 6.1 P01 recovery
+
+The known P01 forecast is frozen and immutable.
+
+Forecast origin:
+`2026-10-03T13:38:40.513349Z`
+
+Frozen:
+`2026-10-03T13:40:19.466686Z`
+
+Semantic SHA:
+
+`96a13e8265095672708586dd1fd2a7f9653857594ba5fa325e82c0b3385ab15a`
+
+Byte SHA:
+
+`e3b7db4ef8db933a6ff5ed940bbe0a250601ad1780361fbef4195282ed27f2ee`
+
+The P01 cohort contains ten fixtures scheduled from 10–12 October 2026, with three forecast products per fixture.
+
+This is real pre-outcome match-level forecasting evidence.
+
+Do not regenerate, refit, overwrite or amend it.
+
+A02 and A03 acquisition attempts are permanently consumed.
+
+The A03 metadata mismatch remains unresolved at the observed-value level.
+
+The later display-name compatibility candidate remains inactive and unapproved.
+
+Do not silently activate it, retry A03 or switch P01 sources.
+
+## 6.2 Search for other existing forecasts
+
+The owner reports additional frozen predictions from approximately two weeks earlier.
+
+Do not incorrectly conclude that P01 is the only real forecast.
+
+Search authorized project-owned local artifact roots, accepted historical runs and relevant Git evidence for:
+
+- pre-deadline player xPts;
+- player fixture projections;
+- Gameweek projection artifacts;
+- private decision artifacts;
+- public team forecasts;
+- forecast origins;
+- model/rules identities;
+- preserved historical prediction data.
+
+Perform a bounded, non-destructive search.
+
+Do not scan unrelated private folders or inspect credentials.
+
+Do not upload private retained data to GitHub.
+
+If an artifact exists only outside the repository, record its authenticated metadata and approved locator rather than copying restricted bytes.
+
+## 6.3 Forecast classification
+
+Create a comprehensive inventory with:
+
+- artifact type;
+- target season/Gameweek/fixture;
+- forecast origin;
+- frozen timestamp;
+- information cutoff;
+- dataset mode;
+- player or match population;
+- forecast variables;
+- SHA-256 identities;
+- source and model lineage;
+- outcome availability;
+- legal evaluation eligibility;
+- retention/evaluation status;
+- missing dependencies.
+
+Distinguish explicitly:
+
+`REAL_PRE_OUTCOME_FROZEN`
+
+`HISTORICAL_RECONSTRUCTED`
+
+`POST_OUTCOME`
+
+`SYNTHETIC`
+
+`UNVERIFIED_CUSTODY`
+
+`NOT_QUALIFIED_FOR_RETENTION`
+
+Do not promote reconstructed or post-outcome values into the real prospective cohort.
+
+## 6.4 Recover existing value
+
+For each qualifying real freeze, determine:
+
+- whether valid final labels already exist;
+- whether those labels are accessible under accepted source permissions;
+- whether historical scores can already be calculated without new provider access;
+- whether additional rights approval is required;
+- whether the scoring implementation is already complete.
+
+Prefer scoring already qualified, genuine historical predictions before creating more synthetic demonstrations.
+
+Do not allow missing labels to become zero outcomes.
+
+# 7. WORKSTREAM C — FIRST GENUINE FORECAST EVALUATION
+
+The objective is to move the Model Performance page beyond synthetic examples.
+
+## 7.1 Evaluate existing freezes first
+
+Use the existing Stage-12 and player-lab evaluation architecture.
+
+Where a frozen artifact and qualified finalized labels are already available:
+
+- authenticate both;
+- enforce correct season, Gameweek and fixture/player identity;
+- verify forecast predates outcomes;
+- enforce source cutoff and finality;
+- score the cohort;
+- compare appropriate benchmarks;
+- report sample sizes;
+- preserve original prediction identity.
+
+Where real labels or lawful retention are missing, clearly identify the blocker.
+
+Do not claim a real evaluation merely because an executable synthetic comparison passes.
+
+## 7.2 P01 outcome readiness
+
+P01 may be scored only when its original protocol's source, policy and evidence gates are satisfied.
+
+Review the inactive compatibility candidate and its independent evidence.
+
+Prepare the narrowest necessary owner approval decision.
+
+Do not let P01 outcome acquisition contaminate player-level model training.
+
+If actual P01 scoring remains unauthorized, publish a precise, reproducible readiness checklist.
+
+Do not spend the entire programme rewriting a pipeline already tested end-to-end.
+
+## 7.3 Real player-level evaluation
+
+Inspect existing player-level forecasts and the ACCEL-002/003 ledger.
+
+For any eligible player cohort, verify retention and evaluation rights for **every upstream dependency**, not just final labels.
+
+If an existing player forecast cannot lawfully be retained, do not insert it into the research database.
+
+If valid historical player freezes are unavailable, prepare a future cohort using an actual future deadline.
+
+Do not backdate a forecast to an already completed Gameweek.
+
+Use exact official deadline evidence and predeclare metrics.
+
+## 7.4 Dashboard integration
+
+Improve Model Performance so it clearly separates:
+
+- real frozen forecast evaluations;
+- synthetic engineering tests;
+- reconstructed historical backtests;
+- unqualified observations;
+- missing labels;
+- pending finality.
+
+Only genuinely authorized real results should contribute to real performance metrics.
+
+Reuse existing scoring and calibration services.
+
+No duplicate evaluation kernel.
+
+## 7.5 Model improvement
+
+Prioritize analysis of:
+
+- starts;
+- minutes;
+- appearances over 60 minutes;
+- goals;
+- assists;
+- clean sheets;
+- bonus;
+- player-event allocation;
+- position and confidence bands.
+
+Compare forecasts to appropriate baselines with chronological evaluation.
+
+No promotion based on a few matches or synthetic evidence.
+
+# 8. WORKSTREAM D — ENROLL THE EXISTING ODDS API ACCOUNT FOR A LIVE DASHBOARD PILOT
+
+The owner already has an existing The Odds API account and key.
+
+Do not propose account creation.
+
+Do not ask Codex to display or inspect the secret.
+
+## 8.1 Reconcile existing account eligibility
+
+Review:
+
+- applicable current vendor terms;
+- supported EPL sport;
+- `h2h` and `totals` markets;
+- UK region;
+- current plan entitlements;
+- remaining credits;
+- monthly reset rules;
+- request pricing;
+- account restrictions;
+- applicable usage rights.
+
+Use non-secret provider account information or operator-supplied redacted plan/quota evidence where available.
+
+Do not invent a current credit balance.
+
+The ACCEL-003 client analysis indicates:
+
+- one sport-wide market request;
+- two market selections;
+- one UK region;
+- approximately two credits per intended refresh.
+
+Verify the accepted client and current plan before adopting the precise budget.
+
+Do not create an unauthorized live quota-check request.
+
+## 8.2 Operational budgets
+
+Prepare the smallest appropriate manually triggered refresh authority.
+
+Include:
+
+- exact account reference;
+- authorized manager;
+- FPL routes;
+- Odds route and markets;
+- OpenFootball scope;
+- purpose;
+- validity window;
+- code and wheel identity;
+- daily request cap;
+- monthly credit cap;
+- reset and remaining-quota evidence;
+- acquisition deadline;
+- control-ledger identity;
+- no-result/no-retry behavior.
+
+The operator must approve real budgets, not inherit synthetic test limits.
+
+Do not reuse the consumed historical team-strength one-shot approval.
+
+## 8.3 Existing control infrastructure
+
+Reuse the ACCEL-003:
+
+- trusted production enrollment;
+- `RefreshAuthorizer`;
+- durable usage grants;
+- canonical PostgreSQL usage ledger;
+- pre-transport authorization;
+- route-specific attempt accounting;
+- quota reservation;
+- current-mode worker;
+- deadline and publication checks.
+
+Avoid creating a second authorization system.
+
+Implement any necessary end-to-end installer, initialization, recovery and operator setup tooling.
+
+The system should be operationally straightforward while preserving one-shot and quota semantics.
+
+## 8.4 One-click real Refresh
+
+After independently eligible source approval and trusted enrollment:
+
+1. Operator opens Seb's Desk.
+2. Browser is paired to the local server.
+3. Operator clicks Refresh.
+4. Existing Odds API key loads automatically from Windows Credential Manager.
+5. Other required credentials are resolved through their approved mechanisms.
+6. Authorized inputs are acquired within the reserved budget.
+7. Existing models and optimizer run.
+8. One coherent current recommendation is displayed.
+
+No separate PowerShell command should be necessary to re-enter the Odds key.
+
+No extra account setup on every run.
+
+A browser reload must not automatically cause another paid market request.
+
+## 8.5 Actual pilot
+
+Prepare a narrow, executable runbook for a **single manually initiated, read-only real refresh**.
+
+Do not execute that pilot unless the exact separate approvals and third-party access rights are established.
+
+If eligibility is established in the execution session, perform only the separately authorized operation.
+
+Otherwise stop at `READY_FOR_OWNER_AUTHORIZATION`, not an invented success status.
+
+The owner must be told exactly what remains missing.
+
+No production activation merely because one pilot succeeds.
+
+# 9. WORKSTREAM E — QUALIFIED REAL PLAYER-DATA EVIDENCE
+
+Continue the valuable work already started in ACCEL-003.
+
+Prioritize legally usable starts/minutes data and finalized player outcomes.
+
+Inspect:
+
+- the existing GW-wide actuals adapter;
+- player canonical identity contracts;
+- source registry;
+- frozen player forecast dependencies;
+- historical starts/minutes evidence slice;
+- candidate suppliers.
+
+Where appropriate, implement the highest-value additional source adapter and temporal validation that can be completed without provider access.
+
+Do not purchase a subscription or collect a new historical dataset without source entitlement and expenditure approval.
+
+Focus on making qualified source ingestion genuinely useful for future Stage-7/9 calibration.
+
+Every new feature must record:
+
+- season;
+- team/player/fixture identities;
+- exact source vintage;
+- usable-at time;
+- coverage and missingness;
+- evidence support;
+- uncertainty;
+- permitted purpose;
+- retention/training rights.
+
+The existing Grade-E/carry-forward prior remains active until a better alternative is independently validated and approved.
+
+# 10. WORKSTREAM F — OPERATOR EXPERIENCE AND RELIABILITY
+
+Avoid redesigning the dashboard.
+
+Improve usability only where it directly enables the real operating workflow.
+
+Priorities:
+
+- secure credential setup/status;
+- clear missing/expired FPL token status;
+- Odds account eligibility and remaining qualified budget;
+- real/demo mode distinction;
+- trusted profile status;
+- refresh availability;
+- source freshness;
+- explicit typed errors;
+- worker progress;
+- official deadline display;
+- no repeated credential entry;
+- no hidden provider calls.
+
+The goal is a genuinely convenient private tool.
+
+Do not replace precise blocking errors with generic messages that hide the required operator action.
+
+# 11. DURABLE IMPLEMENTATION CHECKPOINTS
+
+Use one large implementation programme with reviewable checkpoints.
+
+**CP0 — Baseline and freeze inventory**
+
+Authenticate Git, current authority, P01 and any other existing frozen forecasts.
+
+**CP1 — Windows secure credential service**
+
+Implement complete credential setup, status, rotation, deletion, automatic lookup and integration with engine/dashboard acquisition.
+
+**CP2 — Historical forecast recovery**
+
+Produce the authenticated real/synthetic/unknown forecast inventory and identify genuinely scoreable historical cohorts.
+
+**CP3 — Real evaluation integration**
+
+Implement missing forecast/label joins, qualified scoring and Model Performance views without altering numerical kernels.
+
+**CP4 — Live pilot readiness**
+
+Complete the existing account/profile/quota/ledger/enrollment flow; produce a concrete human authorization package.
+
+**CP5 — Player evidence and operator hardening**
+
+Add the strongest justified source/evaluation improvements; validate full current-mode operation using owned source injections.
+
+**CP6 — Independent review and publication**
+
+Run complete regression, security, installed-wheel, migrations, provenance, packaging and exact-SHA CI acceptance.
+
+Push durable checkpoints normally.
+
+No force-push, destructive reset, rebase of independent authority histories, PR, merge, tag or human acceptance.
+
+# 12. MANDATORY ACCEPTANCE
+
+## A. Automatic Odds credentials
+
+Demonstrate that an operator can securely register a test Odds key once, close PowerShell, start another session and run the accepted credential path without entering the key again.
+
+No real key in tests.
+
+No key in logs or persisted application evidence.
+
+Demo never accesses the credential store.
+
+Missing source approval still blocks transport before credentials are resolved.
+
+## B. Historical forecast recovery
+
+Authenticate the original P01 SHA and its exact October forecast origin.
+
+Inventory additional existing player-level forecasts if present.
+
+Do not invent historical artifacts.
+
+Do not refreeze them.
+
+Identify precisely which real predictions can already be evaluated.
+
+## C. Genuine evaluation readiness
+
+Score real frozen predictions only against qualified actual outcomes.
+
+Otherwise demonstrate all missing conditions with typed, actionable blockers.
+
+Do not combine synthetic engineering metrics with real accuracy estimates.
+
+## D. Live dashboard readiness
+
+From a clean installed wheel, exercise:
+
+- actual dashboard start;
+- secure pairing;
+- single-flight Refresh;
+- production worker architecture;
+- credential resolver;
+- rights/ledger checks;
+- exact model/optimizer integration;
+- Player Lab;
+- My Team;
+- completion and failure states;
+- cancellation, expiry and cleanup.
+
+Use owned synthetic transports for all required automated execution.
+
+## E. No numerical regression
+
+Preserve the existing accepted one-/three-GW model outputs, legal decisions, optimizer behavior, scenarios and public forecast pins.
+
+Use exact controlled-provenance numerical comparisons when code identity legitimately changes.
+
+## F. Full quality gates
+
+Maintain:
+
+- Python 3.13;
+- frozen dependencies;
+- Ruff;
+- strict mypy;
+- Stage-7/8/9/10/11/12 regressions;
+- dashboard browser tests;
+- PostgreSQL migration and rights tests;
+- clean installed-wheel verification;
+- repository/manifest checks;
+- secret scanning;
+- full existing coverage thresholds;
+- all 20 mandatory CI jobs.
+
+No weakened assertions or skipped tests.
+
+Independent review must clear all P0/P1 and material P2 findings.
+
+Record final local/remote SHA equality and exact-SHA CI success.
+
+# 13. REQUIRED FINAL REPORT
+
+At completion, report:
+
+## 1. Automatic credential setup
+
+- exact one-time setup command;
+- exact future dashboard/engine startup commands;
+- Windows Credential Manager implementation;
+- automatic lookup behavior;
+- key rotation/deletion;
+- FPL token limitations;
+- security-test evidence.
+
+Answer explicitly:
+
+**Does the owner need to type the Odds API key again after initial setup?**
+
+Target answer: **No.**
+
+## 2. Recovered real predictions
+
+List each discovered, verified forecast family.
+
+Show:
+
+- forecast origin;
+- target Gameweek;
+- player/match population;
+- exact source and forecast SHA;
+- scoring status;
+- actual labels available;
+- missing rights/evidence.
+
+Do not misclassify P01 as a player-level prediction cohort.
+
+## 3. Evaluation achieved
+
+State:
+
+- real frozen forecasts discovered;
+- real scoreable cohorts;
+- actual real scores computed;
+- legitimate sample sizes;
+- unavailable labels;
+- rights blockers;
+- model-quality findings;
+- next required evidence.
+
+If real evaluation remains blocked, say exactly why.
+
+## 4. Live dashboard status
+
+Distinguish:
+
+`ENGINEERING_READY`
+
+`CREDENTIALS_CONFIGURED`
+
+`ACCOUNT_ENTITLEMENT_VERIFIED`
+
+`PROJECT_RIGHTS_APPROVED`
+
+`CONTROL_LEDGER_READY`
+
+`LIVE_PILOT_AUTHORIZED`
+
+`LIVE_PILOT_EXECUTED`
+
+`PRODUCTION_ACTIVE`
+
+These are distinct statuses.
+
+Never mark an unverified status complete.
+
+## 5. Exact owner decisions
+
+Supply only the genuinely outstanding decisions, with evidence and proposed bounded parameters.
+
+No generic request for another Odds API account.
+
+No request to disclose secret keys.
+
+Separate source permission, account budgets, source retention, prospective evaluation, technical acceptance and production activation.
+
+## 6. Publication
+
+Provide exact:
+
+- branch;
+- commits;
+- local/remote SHA;
+- tests and coverage;
+- independent review;
+- exact-SHA CI;
+- protected evidence;
+- operator runbook;
+- remaining blockers.
+
+# 14. SUCCESS CRITERIA
+
+Minimum outcome:
+
+1. Automatic secure Odds API credential retrieval fully implemented on Windows.
+2. Existing engine and dashboard work without repeated Odds key entry.
+3. Existing P01 and other real frozen forecasts properly inventoried.
+4. Historical forecast scoring eligibility objectively determined.
+5. Any genuinely scoreable real cohort evaluated without introducing hindsight.
+6. Complete real dashboard enrollment and authorization workflow.
+7. Full current-mode injected-source execution.
+8. Meaningful additional player-data/evaluation readiness.
+9. No numerical regression or unauthorized provider access.
+10. Full exact-SHA CI and independent review.
+
+Stretch outcome, conditional on separate source eligibility:
+
+- First authorized private live dashboard refresh.
+- First genuine real scored forecast cohort.
+- A valid future player-level prospective cohort.
+- Actual player minutes/starts evaluation using rights-qualified historical evidence.
+
+Do not fabricate the stretch outcome if permissions are missing.
+
+**The overall goal is to stop building infrastructure we already have, reuse the forecasts and Odds account that already exist, eliminate repeated credential entry, and push DMF Pulse into actual real-world operation and measurement.**
+
+End with:
+
+`DMF_PULSE_ACCELERATION_WAVE_004_FINAL_HANDOFF`

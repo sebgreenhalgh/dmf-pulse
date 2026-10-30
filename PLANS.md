@@ -1,5 +1,39 @@
 # DMF Pulse execution plans
 
+## DMF-PULSE-ACCEL-004 — existing forecasts and secure operation
+
+Immutable engineering parent: `9b6d3f957e130e0832b39aee9940810eefa05535`.
+The retained request authorizes engineering, bounded project-owned artifact
+recovery and normal checkpoint publication. It supplies no new source rights,
+live pilot, retention, model promotion or production activation.
+
+- [x] CP0 authenticate Git/authority/P01, record protected identities and bounded
+  asset roots, preserve the dirty Availability worktree and seal the contract.
+  Additional forecast-family authentication continues in CP2; no new cohort is
+  designed before that inventory.
+- [ ] CP1 implement native current-user Windows credential setup/status/rotation/
+  deletion and automatic authorized Odds lookup; review FPL expiry separately.
+- [ ] CP2 recover and classify existing real, synthetic, reconstructed and
+  unverified freezes before proposing another cohort; retain metadata only.
+- [ ] CP3 integrate eligible existing forecasts/labels and classified performance
+  views using accepted scoring kernels; score only genuinely qualified cohorts.
+- [ ] CP4 complete existing account/plan/budget/control/enrollment operator tools
+  and a concrete single-pilot authorization package; no second account or bypass.
+- [ ] CP5 advance typed player evidence and current-mode operator reliability,
+  with complete owned-injection acceptance and exact numerical parity.
+- [ ] CP6 independent adversarial review, native Windows installed-wheel vault
+  persistence test, unchanged full gates, capped review and exact-SHA 20/20 CI.
+
+P01 is real match-level evidence, not a player xPts cohort. Its 3 October origin,
+ten fixtures, thirty products and byte/semantic pins remain immutable. A02/A03
+stay consumed; the display-name candidate remains inactive. No real credential
+is inspected by the agent, copied to evidence or used in automated tests.
+
+Credential and live-account authority remain separate. Synthetic native vault
+acceptance uses a fresh owned namespace and always deletes only its own entry.
+Opening the dashboard/demo must not query the vault; authorized acquisition
+resolves secrets locally after rights checks and any required reservation.
+
 ## DMF-PULSE-ACCEL-003 — current-mode execution and prospective evidence
 
 Parent: `8b74d5f3dc41eb1246ae82388ec6aab3743241b8`.

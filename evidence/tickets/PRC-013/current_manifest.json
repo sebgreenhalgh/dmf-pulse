@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 2298,
+      "bytes": 2345,
       "path": ".gitattributes",
-      "sha256": "2a225889688dd6bcd64139bc5ad5174bf6ed3224e5797e64c464b1b1205adf9d"
+      "sha256": "419cc8fb458de6b1591fab31b6694bbb8353ea19f16a33750c347a594647a3a6"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 211710,
+      "bytes": 213918,
       "path": "PLANS.md",
-      "sha256": "c433f0c91f4b90a833d021d9c25dc44d3a8b96cac4cc55f11caeb724c98d6b20"
+      "sha256": "730c7a351f8c765facc5ece004414e680a6a8cb7a4b88cd16728771081a62c00"
     },
     {
       "bytes": 2761,
@@ -8329,6 +8329,16 @@
       "bytes": 4508,
       "path": "tickets/DMF-PULSE-ACCEL-003/TRANSIENT-FREEZE-EXCEPTION.md",
       "sha256": "268f5a4329044d89240e412d31bfd78509a49a5c15101e5e8cb68bccead1ce86"
+    },
+    {
+      "bytes": 4829,
+      "path": "tickets/DMF-PULSE-ACCEL-004/CONTRACT.md",
+      "sha256": "356f73dd801a594ac27d0e246fb3853bfed9acfb0ee3a0044c94e1aa9444b6c6"
+    },
+    {
+      "bytes": 28963,
+      "path": "tickets/DMF-PULSE-ACCEL-004/REQUEST.txt",
+      "sha256": "02ec1d31b449e8dfc3f217615e61f7321d57531f9753846129918fcd2e1098be"
     },
     {
       "bytes": 724,
