@@ -2156,9 +2156,9 @@
       "sha256": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539"
     },
     {
-      "bytes": 3503,
+      "bytes": 3642,
       "path": "scripts/accel004_vault_probe.py",
-      "sha256": "18668da495f9c35f24f25e8deb967eef6301b16b6b77031fb7727c6ee919689b"
+      "sha256": "74978f1d6ce8098207956e99171e9f255b0420f04752a8bb5865f237b062d169"
     },
     {
       "bytes": 2059,
@@ -2636,9 +2636,9 @@
       "sha256": "b8b552daa90e60fe562f260131bfcad725b8d183b2b46960823571b2d85e21c6"
     },
     {
-      "bytes": 4911,
+      "bytes": 4935,
       "path": "scripts/verify_accel001_private_wheel.py",
-      "sha256": "7ec2205b1c462638b5fd1fa02f3194e1fa967c4d251cac80d3d577fee3b47500"
+      "sha256": "09671bbe0870cc59ad3eb58d99e77f24976ac7b96c6d7d2e274ab0c71afaeaff"
     },
     {
       "bytes": 4487,
@@ -2801,9 +2801,9 @@
       "sha256": "9b399086ab2e3a6360e894f7c3d9e6977c81517732f4b219f333a8e040f9e150"
     },
     {
-      "bytes": 40239,
+      "bytes": 40772,
       "path": "scripts/verify_wheel.py",
-      "sha256": "c7701d28e3b346252cbf14494a5d786a63adb1d1b982049fa2ea16f6af499f6b"
+      "sha256": "cf4046fe21c00e2733a60988b4de5d9455cee9084899859581ab7e81df5b42ea"
     },
     {
       "bytes": 98771,
@@ -3436,9 +3436,9 @@
       "sha256": "0a15382fd7301ce64fcf8f022aded021f15418e539b0f5f188f0226b58b43cb9"
     },
     {
-      "bytes": 5042,
+      "bytes": 5567,
       "path": "src/dmf_pulse/credentials/windows.py",
-      "sha256": "b5c64fe22e447f41773a1a3f91473e2dfb5ff8fcaeba00f220c9629b23edee7a"
+      "sha256": "c24a93645780062a0ba90271678199c7f65531dc77a9a9100b34f69750af064d"
     },
     {
       "bytes": 9059,
@@ -7979,6 +7979,11 @@
       "bytes": 3761,
       "path": "tests/unit/scripts/test_test_suite.py",
       "sha256": "e9171d6efc76013b70b289e994ab97bdb255a7f9f1b536c38131eff44b206d14"
+    },
+    {
+      "bytes": 2056,
+      "path": "tests/unit/scripts/test_wheel_platform_roots.py",
+      "sha256": "6db8a8beebd991e192cef8797b1e055af12c6baf3d5cad841c113749557a9c77"
     },
     {
       "bytes": 8568,

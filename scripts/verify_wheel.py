@@ -465,7 +465,16 @@ def _expected_runtime_distributions() -> dict[str, str]:
         if isinstance(item, dict) and isinstance(item.get("name"), str)
     }
     selected: set[str] = set()
-    pending = list(roots)
+    # The portable manifest retains every declared root. Installed expectations
+    # must additionally honor the authenticated lock's root markers, just as
+    # the traversal below already honors transitive dependency markers.
+    lock = tomllib.loads((REPOSITORY_ROOT / "uv.lock").read_text(encoding="utf-8"))
+    project = next(item for item in lock["package"] if item["name"] == "dmf-pulse")
+    pending = [
+        item["name"]
+        for item in project["dependencies"]
+        if item.get("marker") is None or Marker(item["marker"]).evaluate()
+    ]
     while pending:
         name = pending.pop()
         if not isinstance(name, str) or name in selected:

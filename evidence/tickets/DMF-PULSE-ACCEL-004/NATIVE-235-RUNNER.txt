@@ -1,0 +1,58 @@
+"""Final synthetic native test in independent hidden PowerShell processes."""
+import hashlib
+import json
+import os
+import subprocess
+import tempfile
+from datetime import UTC, datetime
+from pathlib import Path
+from uuid import uuid4
+
+root=Path.cwd()
+python=root/'review_pack/installed-cp1/venv/Scripts/python.exe'
+probe=root/'scripts/accel004_vault_probe.py'
+custody=json.loads((root/'evidence/tickets/DMF-PULSE-ACCEL-004/RELEASE-PACKAGE-CUSTODY.json').read_bytes())
+namespace='dmf-pulse/acceptance/ACCEL004/'+uuid4().hex
+outside=Path(tempfile.mkdtemp(prefix='dmf-pulse-accel004-vault-final-'))
+assert not outside.resolve().is_relative_to(root.resolve())
+environment={k:os.environ[k] for k in ('SYSTEMROOT','WINDIR','COMSPEC','PATHEXT','PATH','SYSTEMDRIVE','TEMP','TMP','LOCALAPPDATA','APPDATA','USERPROFILE') if k in os.environ}
+rows=[]
+def run(phase):
+    command="& '"+str(python)+"' -I '"+str(probe)+"' --phase '"+phase+"' --namespace '"+namespace+"'; exit $LASTEXITCODE"
+    process=subprocess.Popen(['powershell.exe','-NoProfile','-NonInteractive','-Command',command],cwd=outside,env=environment,
+        stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,creationflags=subprocess.CREATE_NO_WINDOW)
+    try:
+        stdout,stderr=process.communicate(timeout=90)
+    except subprocess.TimeoutExpired:
+        process.kill(); process.communicate()
+        raise RuntimeError('owned native phase timeout: '+phase) from None
+    if process.returncode:
+        raise RuntimeError('owned native phase failed: '+phase+'\n'+stderr)
+    row=json.loads(stdout)
+    assert row['status']=='PASS' and row['binding_backend']=='ctypes' and row['binding_version']=='0.2.3'
+    assert row['provider_requests']==row['production_targets_read']==0
+    row.update({'powershell_pid':process.pid,'powershell_command_sha256':hashlib.sha256(command.encode()).hexdigest()})
+    rows.append(row)
+try:
+    for phase in ('create','resolve','rotate','resolve-rotated','delete','absent'):
+        run(phase)
+finally:
+    run('delete')
+    run('absent')
+assert len({r['pid'] for r in rows})==len(rows)
+assert len({r['powershell_pid'] for r in rows})==len(rows)
+assert len({r['pid'] for r in rows}|{r['powershell_pid'] for r in rows})==2*len(rows)
+runner=Path(__file__).read_bytes()
+receipt={'schema_version':'installed-native-vault-acceptance-v1','status':'PASS',
+ 'captured_at':datetime.now(UTC).isoformat(),'source_checkpoint':custody['source_checkpoint'],
+ 'implementation_sha':custody['implementation_sha'],'wheel_sha256':custody['wheel']['sha256'],
+ 'probe_sha256':hashlib.sha256(probe.read_bytes()).hexdigest(),'runner_sha256':hashlib.sha256(runner).hexdigest(),
+ 'namespace_class':'FRESH_OWNED_SYNTHETIC_UUID_ONLY','outside_checkout_cwd':str(outside),
+ 'separate_powershell_processes':len(rows),'phases':rows,'actual_human_console_entry_claimed':False,
+ 'synthetic_input_shim':True,'normal_target_namespace_overridden_only_by_injected_backend':True,
+ 'frozen_runtime_requirements_sha256':hashlib.sha256((root/'review_pack/installed-cp1/runtime-requirements.txt').read_bytes()).hexdigest(),
+ 'provider_requests':0,'production_targets_read':0,'secret_values_recorded':False,'cleanup_absence_verified':True}
+out=root/'evidence/tickets/DMF-PULSE-ACCEL-004'
+(out/'NATIVE-FINAL-RUNNER.txt').write_bytes(runner)
+(out/'INSTALLED-NATIVE-VAULT-FINAL.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
+print(json.dumps({'status':'PASS','phases':len(rows),'separate_powershell_processes':len(rows),'wheel_sha256':receipt['wheel_sha256']}))

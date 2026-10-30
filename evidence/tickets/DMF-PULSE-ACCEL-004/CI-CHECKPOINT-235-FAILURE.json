@@ -1,0 +1,21 @@
+{
+  "schema_version": "accel004-ci-checkpoint-failure-v1",
+  "source_checkpoint": "235fd69cd7d79d4d3fe6374b46333941213d98b6",
+  "run_id": 41002074522,
+  "job_id": 123888549330,
+  "job_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/41002074522/job/123888549330",
+  "failed_step": "Strict typing on Linux",
+  "result": "FAIL",
+  "error_count": 6,
+  "excerpt": [
+    "2026-10-30T04:17:56.3251481Z src/dmf_pulse/credentials/windows.py:111: error: Module has no attribute \"O_BINARY\"  [attr-defined]",
+    "2026-10-30T04:17:56.3252096Z src/dmf_pulse/credentials/windows.py:111: error: Module has no attribute \"O_NOINHERIT\"  [attr-defined]",
+    "2026-10-30T04:17:56.3252614Z src/dmf_pulse/credentials/windows.py:120: error: Module has no attribute \"locking\"  [attr-defined]",
+    "2026-10-30T04:17:56.3253123Z src/dmf_pulse/credentials/windows.py:120: error: Module has no attribute \"LK_NBLCK\"  [attr-defined]",
+    "2026-10-30T04:17:56.3253943Z src/dmf_pulse/credentials/windows.py:131: error: Module has no attribute \"locking\"  [attr-defined]",
+    "2026-10-30T04:17:56.3254443Z src/dmf_pulse/credentials/windows.py:131: error: Module has no attribute \"LK_UNLCK\"  [attr-defined]",
+    "2026-10-30T04:17:59.5289606Z Found 6 errors in 1 file (checked 396 source files)"
+  ],
+  "remediation": "Use lazy structurally typed Windows locking and OS flag adapters, retaining exact native values/API and refusing non-Windows before lookup; check mypy for both linux and win32. Final exact-SHA full20 CI remains mandatory.",
+  "provider_requests": 0
+}

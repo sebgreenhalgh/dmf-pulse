@@ -1,0 +1,21 @@
+{
+  "cleanup_absence_verified": true,
+  "distinct_powershell_processes": 8,
+  "distinct_python_processes": 8,
+  "findings": [],
+  "first_receipt_and_probe_and_wheel_preserved": true,
+  "human_terminal_entry_claimed": false,
+  "implementation_fingerprint": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+  "probe_sha256": "18668da495f9c35f24f25e8deb967eef6301b16b6b77031fb7727c6ee919689b",
+  "receipt_sha256": "eb04244ee3b0dbee68c85a80f146c2c10ce3c947b0c3873a6217ed1ce04eb75f",
+  "reviewer_provider_requests": 0,
+  "reviewer_vault_reads": 0,
+  "runner_sha256": "5c3930453cf163f7572c7b545faeb63a9c3e5f2b7f77969ed82171ccbc10f4fa",
+  "runtime_requirements_sha256": "fd24aaa672bdc49f29389c9f599aa1ba7318800a89a4bb46ed77af39fc593b02",
+  "schema_version": "independent-final-native-evidence-review-v1",
+  "source_checkpoint": "235fd69cd7d79d4d3fe6374b46333941213d98b6",
+  "status": "PASS_FINAL_NATIVE_RECEIPT_AND_INSTALLED_BYTES",
+  "synthetic_hidden_input_shim_disclosed": true,
+  "wheel_members_compared": 499,
+  "wheel_sha256": "1d4e3755f798381d05a61cbbf6b256c9cb6a276b0fbdb3d57ea5d964fe6bba47"
+}

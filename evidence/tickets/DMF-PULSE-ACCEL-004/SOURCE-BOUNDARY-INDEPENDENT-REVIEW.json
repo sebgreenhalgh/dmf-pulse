@@ -1,0 +1,92 @@
+{
+  "checked_at": "2026-10-30T04:18:59.630257+00:00",
+  "database_connections": 0,
+  "findings": [],
+  "frozen_security_repeat": {
+    "breakdown": "Eighty seven retained authorization, preview, route and pure window cases plus seventy four independent credential and CLI cases.",
+    "credential_test_sha256": "2319dac3d86e32ea81ff93dc991b839af474d8cc62495cb9a6b438e05bdb2038",
+    "failed": 0,
+    "log_sha256": "bc36f54eabf8e219cbc08fb6db4494dfbdb9c50554b33d5eb308f49bcb532ec1",
+    "passed": 161,
+    "seconds": 10.18
+  },
+  "harness_history": "An initial owned malformed Odds scope test expected a later guard error, but strict model_copy validation correctly rejected earlier. The corrected test asserts that earlier closed gate. No product relaxation was made.",
+  "implementation_fingerprint": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+  "independent_actual_adapter_tests": {
+    "failed": 0,
+    "log_sha256": "ba6a695a1f35652d62716f48732d927639e1e4ceb9defc2a8cc2df75839f5028",
+    "passed": 26,
+    "seconds": 12.36,
+    "test_sha256": "fcf5b2b9584d46612234ebb94295a9c4c5ebc7cd6057022499f353099d792c22"
+  },
+  "provider_requests": 0,
+  "release_limit": "Fresh numerical parity is running separately; final exact commit byte association, installed final wheel, repository gates and full exact SHA CI remain publication gates.",
+  "resolved_findings": [
+    {
+      "id": "CURRENT-C01",
+      "issue": "Accepted Odds wrappers collapsed a known control refusal into generic source unavailability.",
+      "priority": "MATERIAL_P2",
+      "resolution": "The actual guard records the first safe constant refusal. An outer service scope returns that bounded sidecar after raw frames return, even if an accepted wrapper catches a refusal and returns apparent success."
+    },
+    {
+      "id": "CURRENT-C02",
+      "issue": "Known corrupt or unavailable Odds credential conditions were flattened to a generic missing credential.",
+      "priority": "MATERIAL_P2",
+      "resolution": "The current guarded provider records only a whitelisted credential code after successful route preflight. Unknown code and raw text cannot cross the safe sidecar."
+    },
+    {
+      "id": "CURRENT-C03",
+      "issue": "A rate limit response was initially mapped to authenticated credit exhaustion.",
+      "priority": "DIAGNOSTIC_CORRECTNESS",
+      "resolution": "HTTP429 remains a distinct rate limit reason and action. Qualified quota exhaustion remains separate; no provider credit fact is inferred."
+    },
+    {
+      "id": "CURRENT-C04",
+      "issue": "A valid general claim did not prove exact unspent route permission before key lookup.",
+      "priority": "MATERIAL_P2",
+      "resolution": "Read-only preflight_attempt shares the exact claimed-route policy used by attempt. FPL and Odds invoke it immediately before resolving their credential; only actual before-send records an attempt."
+    },
+    {
+      "id": "CURRENT-C05",
+      "issue": "FPL token expiry could pass during a blocking send-control transaction and still reach the delegate.",
+      "priority": "MATERIAL_P2",
+      "resolution": "The guarded authenticated FPL transport checks immutable expiry metadata after control returns and immediately before delegate I/O, with no second credential lookup. Public FPL resources do not need a token."
+    },
+    {
+      "id": "CURRENT-C06",
+      "issue": "A blocking control read or write could cross the grant or acquisition cutoff after the caller sampled time.",
+      "priority": "MATERIAL_P2",
+      "resolution": "The shared pure window check repeats existing grant policy with fresh time after the read and after the write. All three provider wrappers fence the delegate; late write refusals retain exactly the already spent attempt."
+    }
+  ],
+  "schema_version": "independent-frozen-current-boundary-review-v1",
+  "shared_policy_author_commits": [
+    "0975f1a90542cc6b03e036c1144c09f757be88cf",
+    "8b5d0fe2d4267ef02604551823af3c59b6b07538"
+  ],
+  "source_sha256": {
+    "src/dmf_pulse/authorization_errors.py": "c893c56ed518a3845e9d7069ae82210ebd14a9cdd755fd35488ac6bb8777bc73",
+    "src/dmf_pulse/cli/pulse.py": "d9a77e0a2b2ce6afe4fc643abea8bc738cc1988b1cb1fd2b033eeb990e5a09b0",
+    "src/dmf_pulse/credentials/providers.py": "993c08146a29b7581f757f99972a58a07ae366a54785f42d4788a5f7da19bf3f",
+    "src/dmf_pulse/current_failures.py": "d4cbf75fd17df14477ebbcd23893d2901c0572d5875d0fa63063bc61c47c0597",
+    "src/dmf_pulse/dashboard/authorization.py": "5c68e86eea96c8a59070f636454c86c4dec6f287fdcf7654a6ecaebef39c8116",
+    "src/dmf_pulse/dashboard/current.py": "8cad4feee6746e463f18aa9f7df213aeb72c3575a230a29c7e292d8252e7d02e",
+    "src/dmf_pulse/dashboard/current_sources.py": "b7339695e01fb9f296d6ac37cee3c75ff4245a2c3705f1bb1ac5b1a4d40743e5",
+    "src/dmf_pulse/dashboard/postgres_authorization.py": "3ec2d42571fa2efba20fed52f1681532221d6728622203e763b07821975dc7bb",
+    "src/dmf_pulse/dashboard/resources/desk.js": "a7698dc6792ca25bb6e45a3f2b65335e533cdc5156c6ff7b0284be8e68446546",
+    "src/dmf_pulse/dashboard/runtime.py": "b3c96c296e461cd4b6643dcac0df323af662172437e4b3dba99b5ef300c0c24f",
+    "src/dmf_pulse/ingestion/fpl/direct.py": "3c7ef45f78b6f6ef2ba9d8cdd95ba0bb1452602417b676e7501ed299182b9d12",
+    "src/dmf_pulse/ingestion/odds/credentials.py": "3f1beb0b6a22395d9e4f76eb89ce32fd5b1555fec580e48009e881ce5e05952c"
+  },
+  "status": "PASS_FROZEN_BOUNDARIES_NUMERICAL_AND_PUBLICATION_GATES_PENDING",
+  "vault_reads": 0,
+  "verified": [
+    "Preflight observations append no control events, create no grant, spend no attempts and reset no quota. The final transactional attempt repeats the same policy and remains the sole route consumption point.",
+    "Actual current FPL and Odds source adapters reject spent, closed, expired or mismatched requests before credential lookup. Strict Odds scope validation rejects malformed routes even earlier.",
+    "A control read wait crossing cutoff produces zero key lookups and zero attempt writes. A control write wait crossing cutoff produces zero delegate calls for FPL, Odds and OpenFootball, preserving exactly one spent attempt.",
+    "A token expiring during an otherwise valid control window produces one resolution and zero authenticated delegate calls. No token is fetched again merely to check expiry.",
+    "The first guard refusal wins over any later credential failure. An accepted service cannot swallow it and publish an apparent success.",
+    "Known operator codes survive the current worker, runtime and console disclosure maps with fixed actions. Unknown values cannot expose raw text. Browser guidance reads constants only and performs no vault query.",
+    "Production approval loading, exact source and code binding, PostgreSQL selection, durable one shot and append-only history remain accepted gates. No real source enrollment or permission was created."
+  ]
+}

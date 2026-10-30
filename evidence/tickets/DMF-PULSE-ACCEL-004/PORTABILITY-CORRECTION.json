@@ -1,0 +1,28 @@
+{
+  "schema_version": "accel004-portability-correction-v1",
+  "superseded_source_checkpoint": "235fd69cd7d79d4d3fe6374b46333941213d98b6",
+  "superseded_source_implementation_sha": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+  "source_implementation_sha": "2504368f3170f2cbe7a83ae8710f137d461ed6c8",
+  "status": "TYPED_ADAPTER_CORRECTION_FINAL_PACKAGE_ACCEPTANCE_REQUIRED",
+  "packaged_change": "Only credentials/windows.py: structurally type the lazy msvcrt facade and exact native OS flags without fallback or Windows behavior change.",
+  "tests": {
+    "mypy_linux": "PASS all396sourcefiles",
+    "mypy_win32": "PASS all396sourcefiles",
+    "credential_and_platform_root_tests": "PASS59tests5.51seconds",
+    "independent_credential_cli_lock_tests": "PASS74tests12.43seconds",
+    "wheel_platform_root_and_retained_tests": "PASS46tests4.52seconds"
+  },
+  "nonpackaged_changes": [
+    "Wheel installation expectations honor authenticated root markers as well as transitive markers; all applicable package/version checks remain exact.",
+    "Installed private console probe resets its cleanup flag before the expiry case.",
+    "Final native probe emits the actual installed implementation fingerprint separately from source-tree custody."
+  ],
+  "independent_typing_review_sha256": "f0b361ded2597f366615cbaf9586ccec07d2a37fa196d0eef089b55b23e38370",
+  "prior_receipts_preserved": true,
+  "numerical_source_files_unchanged": 157,
+  "protected_paths_unchanged": 11,
+  "provider_requests": 0,
+  "production_targets_read": 0,
+  "model_or_rules_changed": false,
+  "final_native_and_installed_comparison_repetition_required": true
+}

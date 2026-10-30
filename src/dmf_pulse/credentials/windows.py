@@ -22,6 +22,18 @@ class _WinCred(Protocol):
     def CredDelete(self, TargetName: str, Type: int, Flags: int = 0) -> None: ...
 
 
+class _ByteLock(Protocol):
+    LK_NBLCK: int
+    LK_UNLCK: int
+
+    def locking(self, descriptor: int, mode: int, nbytes: int) -> None: ...
+
+
+class _WindowsOpenFlags(Protocol):
+    O_BINARY: int
+    O_NOINHERIT: int
+
+
 def _native() -> _WinCred:
     if os.name != "nt":
         raise CredentialError("CREDENTIAL_BACKEND_UNSUPPORTED")
@@ -100,7 +112,10 @@ class WindowsCredentialBackend:
         """
         if os.name != "nt":
             raise CredentialError("CREDENTIAL_BACKEND_UNSUPPORTED")
-        import msvcrt
+        # Structural typing keeps Linux checks independent of Windows-only
+        # stubs. Import and flag resolution remain lazy and have no fallback.
+        byte_lock = cast(_ByteLock, importlib.import_module("msvcrt"))
+        native_flags = cast(_WindowsOpenFlags, os)
 
         location = os.environ.get("LOCALAPPDATA")
         if not location or not Path(location).is_absolute():
@@ -108,7 +123,8 @@ class WindowsCredentialBackend:
         directory = Path(location) / "dmf-pulse" / "control"
         directory.mkdir(parents=True, exist_ok=True)
         path = directory / "credential-mutations.lock"
-        descriptor = os.open(path, os.O_CREAT | os.O_RDWR | os.O_BINARY | os.O_NOINHERIT, 0o600)
+        flags = os.O_CREAT | os.O_RDWR | native_flags.O_BINARY | native_flags.O_NOINHERIT
+        descriptor = os.open(path, flags, 0o600)
         locked = False
         try:
             if os.fstat(descriptor).st_size == 0:
@@ -117,7 +133,7 @@ class WindowsCredentialBackend:
             while not locked:
                 os.lseek(descriptor, 0, os.SEEK_SET)
                 try:
-                    msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+                    byte_lock.locking(descriptor, byte_lock.LK_NBLCK, 1)
                     locked = True
                 except OSError:
                     if time.monotonic() >= until:
@@ -128,6 +144,6 @@ class WindowsCredentialBackend:
             try:
                 if locked:
                     os.lseek(descriptor, 0, os.SEEK_SET)
-                    msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+                    byte_lock.locking(descriptor, byte_lock.LK_UNLCK, 1)
             finally:
                 os.close(descriptor)

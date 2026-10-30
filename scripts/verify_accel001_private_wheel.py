@@ -66,6 +66,7 @@ args = ['pulse','--entry-id','42','--no-progress','--refresh-approval','OWNED-TE
 valid = CliRunner().invoke(app,args)
 assert valid.exit_code == 0 and report in valid.stdout, valid.output
 state['now'] = deadline
+state['closed'] = False
 expired = CliRunner().invoke(app,args)
 assert expired.exit_code == 2 and expired.stdout == '', expired.output
 assert report not in expired.output and 'REFRESH_GRANT_EXPIRED' in expired.stderr

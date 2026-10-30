@@ -34,6 +34,7 @@ def main() -> None:
     from dmf_pulse.credentials.providers import AutomaticOddsCredentialProvider
     from dmf_pulse.credentials.service import CredentialService
     from dmf_pulse.credentials.windows import WindowsCredentialBackend
+    from dmf_pulse.dashboard.current import implementation_fingerprint
 
     package = Path(dmf_pulse.__file__).resolve()
     if "site-packages" not in package.parts:
@@ -77,6 +78,7 @@ def main() -> None:
                 "pid": os.getpid(),
                 "observed_at": datetime.now(UTC).isoformat(),
                 "installed_package": str(package),
+                "implementation_sha": implementation_fingerprint(),
                 "provider_requests": 0,
                 "production_targets_read": 0,
                 "secret_values_recorded": False,

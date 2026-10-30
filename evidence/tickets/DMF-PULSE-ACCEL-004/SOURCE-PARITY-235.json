@@ -1,0 +1,64 @@
+{
+  "cached_prior_numerical_outputs_loaded": false,
+  "classification": "OWNED_SYNTHETIC_ONLY",
+  "comparator": "Existing exact path comparator with explicit custody-only exclusions. Separate raw numeric and Decimal string walk excludes nothing; the only numeric difference must be declared response quota98 versus compiled demo100.",
+  "comparator_sha256": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539",
+  "finished_at": "2026-10-30T04:28:43.850210+00:00",
+  "implementation_fingerprint": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+  "provider_requests": 0,
+  "results": [
+    {
+      "accepted_seconds": 68.27586269995663,
+      "accepted_type": "PrivateV1Decision",
+      "checked_fields": 84053,
+      "code_matches_frozen_source": true,
+      "current_code_identity": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+      "current_seconds": 76.70898080000188,
+      "current_type": "PrivateV1Decision",
+      "exact_custody_exclusion_count": 512,
+      "horizon": 1,
+      "mismatches": [],
+      "numeric_fields": 67750,
+      "raw_numeric_walk": {
+        "differences": [
+          {
+            "accepted": 100,
+            "current": 98,
+            "path": "/presentation/market_quota_remaining"
+          }
+        ],
+        "numeric_and_decimal_string_leaves": 79585,
+        "structural_differences": []
+      }
+    },
+    {
+      "accepted_seconds": 427.04555229994,
+      "accepted_type": "PrivateV1RollingDecision",
+      "checked_fields": 249449,
+      "code_matches_frozen_source": true,
+      "current_code_identity": "67c82c2aebf6c6c8ee6dacccd0c71a3a27742512",
+      "current_seconds": 235.3157937999349,
+      "current_type": "PrivateV1RollingDecision",
+      "exact_custody_exclusion_count": 1007,
+      "horizon": 3,
+      "mismatches": [],
+      "numeric_fields": 200409,
+      "raw_numeric_walk": {
+        "differences": [
+          {
+            "accepted": 100,
+            "current": 98,
+            "path": "/presentation/market_quota_remaining"
+          }
+        ],
+        "numeric_and_decimal_string_leaves": 235824,
+        "structural_differences": []
+      }
+    }
+  ],
+  "schema_version": "accel004-independent-fresh-current-parity-v1",
+  "secret_environment_reads": 0,
+  "started_at": "2026-10-30T04:15:10.216884+00:00",
+  "status": "PASS_FRESH_ONE_AND_THREE_GAMEWEEK_PARITY",
+  "vault_reads": 0
+}
