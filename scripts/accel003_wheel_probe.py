@@ -76,6 +76,68 @@ def _matches(path: str, pattern: str) -> bool:
 
 def compare_exact(left: object, right: object) -> dict[str, Any]:
     """No tolerance and no broad suffix/lineage dropping; retain every mismatch."""
+    # This additive audit contract admits only the two complete, fixed owned
+    # quota datasets. All fields outside the two documented differing leaves
+    # remain exact. A partial, mistyped or mutually drifted pair cannot qualify.
+    quota_common = {
+        "source": "PROVIDER_RESPONSE_HEADERS",
+        "used_credits": 2,
+        "last_request_cost": 2,
+        "observed_at": "2026-09-01T12:00:00Z",
+        "received_at": "2026-09-01T12:00:00Z",
+        "transport_call_count": 1,
+    }
+    current_request_fingerprints = {
+        # Exact owned requests from the authenticated next-GW2 catalogue:
+        # DEMO_TIME through GW2/GW4's last kickoff plus one second.
+        (2,): "e44a3042e37d2f2cc1f755cf88e754da8466bfbbfbf75ec33e6269a421b99a48",
+        (2, 3, 4): "2517f66b813c2c5346c2cdb365647f55da77bf40dc9d3568b77a60da452df6ee",
+    }
+
+    def known_receipt(value: object, remaining: int, fingerprints: set[str]) -> bool:
+        if type(value) is not dict or set(value) != {
+            *quota_common,
+            "remaining_credits",
+            "request_fingerprint",
+        }:
+            return False
+        return (
+            all(
+                type(value[key]) is type(expected) and value[key] == expected
+                for key, expected in quota_common.items()
+            )
+            and type(value["remaining_credits"]) is int
+            and value["remaining_credits"] == remaining
+            and type(value["request_fingerprint"]) is str
+            and re.fullmatch(r"[0-9a-f]{64}", value["request_fingerprint"]) is not None
+            and value["request_fingerprint"] in fingerprints
+        )
+
+    def owned_gameweeks(presentation: object) -> tuple[int, ...] | None:
+        if type(presentation) is not dict or type(presentation.get("gameweeks")) is not list:
+            return None
+        rows = presentation["gameweeks"]
+        if any(type(row) is not dict or type(row.get("gameweek")) is not int for row in rows):
+            return None
+        return tuple(row["gameweek"] for row in rows)
+
+    left_presentation = left.get("presentation") if type(left) is dict else None
+    right_presentation = right.get("presentation") if type(right) is dict else None
+    left_gameweeks = owned_gameweeks(left_presentation)
+    right_gameweeks = owned_gameweeks(right_presentation)
+    current_fingerprint = current_request_fingerprints.get(left_gameweeks)
+    known_quota_pair = (
+        type(left_presentation) is dict
+        and type(right_presentation) is dict
+        and left_gameweeks == right_gameweeks
+        and current_fingerprint is not None
+        and type(left_presentation.get("market_quota_remaining")) is int
+        and left_presentation["market_quota_remaining"] == 98
+        and type(right_presentation.get("market_quota_remaining")) is int
+        and right_presentation["market_quota_remaining"] == 100
+        and known_receipt(left_presentation.get("market_quota_receipt"), 98, {current_fingerprint})
+        and known_receipt(right_presentation.get("market_quota_receipt"), 100, {"1" * 64})
+    )
     excluded: list[dict[str, Any]] = []
     mismatches: list[dict[str, Any]] = []
     numeric_fields = 0
@@ -123,6 +185,19 @@ def compare_exact(left: object, right: object) -> dict[str, Any]:
                     "left": a,
                     "right": b,
                     "reason": "owned current response headers98; accepted compiled demo100",
+                }
+            )
+            return
+        if known_quota_pair and path in {
+            "/presentation/market_quota_receipt/remaining_credits",
+            "/presentation/market_quota_receipt/request_fingerprint",
+        }:
+            excluded.append(
+                {
+                    "path": path,
+                    "left": a,
+                    "right": b,
+                    "reason": "exact complete owned current-header and compiled-demo quota pair",
                 }
             )
             return

@@ -3126,3 +3126,12 @@ and horizon markets, preserves response quota provenance, validates actual sourc
 chronology against the acquisition window, and checks the acquired FPL deadline
 before the paid Odds request. These corrections change no numerical kernel.
 Owned one-/three-Gameweek tests remain engineering evidence, not a real pilot.
+
+The first full correction run retained 898 test outcomes: 896 pass and two
+inherited quota-only whole-module freeze expectations fail. The revised finite
+freeze contract preserves the immutable Wave 005 guarantee and checks the entire
+live AST with only the literal reviewed additions. The installed probe separately
+exposed two new quota metadata differences; its finite complete-receipt/horizon
+comparison extension preserves all football numerical comparisons. Both failed
+attempts and independent compatibility reviews remain immutable. Final corrected
+acceptance, exact-source CI and installation are recorded in detached receipts.

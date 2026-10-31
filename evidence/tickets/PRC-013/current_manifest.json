@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 223766,
+      "bytes": 224404,
       "path": "PLANS.md",
-      "sha256": "159cd001770106e8984a5e47e08f5065df2bb5d8a85ab6384dc20be731015cf5"
+      "sha256": "de41656f72346b3e940117c77538c522ad79130c2f98c5be4679c163ae8e9983"
     },
     {
       "bytes": 2761,
@@ -511,9 +511,9 @@
       "sha256": "e623dec1186c98ab3e81349922305c497e7f02a778f4a3d8d3d2a5b85944f95d"
     },
     {
-      "bytes": 8734,
+      "bytes": 9748,
       "path": "docs/operations/GW10_REAL_LAUNCH.md",
-      "sha256": "5d1f5c55919317404aaf2cb75f8c8d548868b3afad93ef9b4c8677bbaa0f8187"
+      "sha256": "39a4842955e381761e252a8a0f254092d650b3fe3807420d8684f34d0deab81c"
     },
     {
       "bytes": 971,
@@ -2156,9 +2156,9 @@
       "sha256": "00be151414342e6a74f74ee76f14fec9f084493d447d6d98e6df8ccac4cf86b9"
     },
     {
-      "bytes": 26159,
+      "bytes": 29710,
       "path": "scripts/accel003_wheel_probe.py",
-      "sha256": "5b073e637b01554a789847fc91d287de7f39179b39b9fde55347514c3b4b8539"
+      "sha256": "3b31b25eed2a3479ce0b7b1ec1916c7ef9e9e9aa7967c519cd98f8e0caebd181"
     },
     {
       "bytes": 3642,
@@ -7471,9 +7471,9 @@
       "sha256": "4359dca6bd4a8dea649d912cfe03d18e6352160c37a331cedf16cefc2d1a8019"
     },
     {
-      "bytes": 3559,
+      "bytes": 12992,
       "path": "tests/unit/operation/test_accel005_frozen_boundaries.py",
-      "sha256": "dc98c77987db71ad88d629d3b9cf552d45e715b7ca70f5031560e9d5b73ba1b2"
+      "sha256": "80dab2251f350acddeb362b54c109e5770b2ea1160f35f5b6195179cf2f8317b"
     },
     {
       "bytes": 6989,
@@ -8139,6 +8139,11 @@
       "bytes": 6126,
       "path": "tests/unit/scripts/test_accel003_parity_archive.py",
       "sha256": "f0fa7ddf0a2f1426bdadbe06b5a4ba4547a268d107e52798a26b8db705d9e032"
+    },
+    {
+      "bytes": 9620,
+      "path": "tests/unit/scripts/test_accel003_quota_parity.py",
+      "sha256": "dee542421b573c981fee915d159ddc721b0e748ba34dbed75dfde8285f31ee18"
     },
     {
       "bytes": 8790,

@@ -132,6 +132,21 @@ combined/global/component coverage gates, performance and wheel verifiers.
 Preserve failed and superseded attempts with their actual outcomes. Independent
 review must have no unresolved P0/P1 before any real private installation.
 
+The current-mode installed parity probe checks every football projection and
+decision field exactly. Its two controlled source paths have different quota
+headers and request identities. The additive quota-receipt audit contract checks
+the complete typed receipt and its exact one-/three-Gameweek fixture scope before
+allowing the known remaining-credit pair (98, 100) and corresponding request
+fingerprints to differ. Costs, used credits, timestamps, counts, other receipt
+facts and all model outputs retain exact comparison. The failed earlier installed
+attempt and its complete comparison inventory remain retained.
+
+The Wave 005 quota-only freeze check remains against that immutable release.
+Current client modules must match the full immutable module AST plus the literal,
+position-bound reviewed new-purpose additions. Extra, moved or altered statements
+fail this comparison. These are reviewed acceptance compatibility extensions;
+they do not change the numerical engines or broaden the live source grant.
+
 Private evidence, source bodies, manager identifiers and credentials stay outside
 Git and public review output. The final capped packet binds its actual inputs,
 wheel, source, tests and independent decisions; no fabricated proof is emitted
