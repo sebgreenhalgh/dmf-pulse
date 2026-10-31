@@ -21,6 +21,7 @@ from dmf_pulse.ingestion.odds.horizon_probe import (
     horizon_window,
     verify_observation,
 )
+from tests.gw10_reviewed_source_freeze_support import is_exact_gw10_reviewed_source
 from tests.unit.ingestion.current_manager_test_support import (
     _synthetic_bootstrap,
     _synthetic_fixtures,
@@ -588,9 +589,16 @@ def test_provider_sources_parent_identical_or_exact_reviewed_quota_annotation():
     import hashlib
 
     # Parent bytes, independent of Git availability or CI clone depth.
+    # The GW10 private source-policy state is a separate exact reviewed exception;
+    # the inherited quota-only map and its historical guarantee remain unchanged.
     for name, digest in _R8A_UNMODIFIED_SOURCE_HASHES.items():
-        actual = hashlib.sha256((ROOT / "src/dmf_pulse" / name).read_bytes()).hexdigest()
-        assert actual == digest or actual == _ACCEL005_QUOTA_ANNOTATION.get(name)
+        body = (ROOT / "src/dmf_pulse" / name).read_bytes()
+        actual = hashlib.sha256(body).hexdigest()
+        assert (
+            actual == digest
+            or actual == _ACCEL005_QUOTA_ANNOTATION.get(name)
+            or is_exact_gw10_reviewed_source(name, body)
+        )
     assert set(_ACCEL005_QUOTA_ANNOTATION) == {"ingestion/odds/client.py"}
 
 

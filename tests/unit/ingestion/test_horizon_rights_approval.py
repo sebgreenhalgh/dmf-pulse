@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from dmf_pulse.ingestion.models import CapabilityValue, RightsCapability, RightsProfile
 from dmf_pulse.ingestion.odds.config import load_rights_profiles
 from tests.accel002_legacy_freeze_support import original_fpl_registry_bytes
+from tests.gw10_reviewed_source_freeze_support import is_exact_gw10_reviewed_source
 from tests.unit.ingestion.test_horizon_probe import _script
 
 pytestmark = pytest.mark.unit
@@ -200,9 +201,8 @@ def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_reviewed_s
     import hashlib
 
     for relative, digest in _R8B_UNMODIFIED_EXECUTABLE_HASHES.items():
-        actual = hashlib.sha256(
-            (repository_root / "src/dmf_pulse" / relative).read_bytes()
-        ).hexdigest()
+        body = (repository_root / "src/dmf_pulse" / relative).read_bytes()
+        actual = hashlib.sha256(body).hexdigest()
         assert (
             actual == digest
             or (
@@ -217,6 +217,7 @@ def test_r8b_provider_and_a2_boundaries_are_parent_identical_or_exact_reviewed_s
                 relative in _ACCEL005_REVIEWED_EXECUTABLE_EXCEPTIONS
                 and actual == _ACCEL005_REVIEWED_EXECUTABLE_EXCEPTIONS[relative]
             )
+            or is_exact_gw10_reviewed_source(relative, body)
         )
     assert (
         hashlib.sha1(

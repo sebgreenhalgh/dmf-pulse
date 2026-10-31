@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 224404,
+      "bytes": 225096,
       "path": "PLANS.md",
-      "sha256": "de41656f72346b3e940117c77538c522ad79130c2f98c5be4679c163ae8e9983"
+      "sha256": "b88791fa6d107e95b925458bc0286295e385d7a8acf4b50de3756416916a7760"
     },
     {
       "bytes": 2761,
@@ -5716,6 +5716,11 @@
       "sha256": "797bb1a9da8a62089bc7e4c3997fa84f3e01af71dc6baa6b05e9bab43ed85c97"
     },
     {
+      "bytes": 1419,
+      "path": "tests/gw10_reviewed_source_freeze_support.py",
+      "sha256": "c7c03a96563e2806815295c72b90707c35e016e69e8f23dac665437c9528a428"
+    },
+    {
       "bytes": 6293,
       "path": "tests/integration/availability/conftest.py",
       "sha256": "e6b838a5d95cc9bd158beafc8aa4ef3432a3530cf884951b38193430b7871cd6"
@@ -7321,14 +7326,19 @@
       "sha256": "813f70322008d6460965c0e71b870f4c0a976d141c25db0207f9dc5af39e37eb"
     },
     {
-      "bytes": 28351,
-      "path": "tests/unit/ingestion/test_horizon_probe.py",
-      "sha256": "23c5556efb91303f3f547d3e71c07f6327bd9b29053552a20b33cf22cb8671a2"
+      "bytes": 9570,
+      "path": "tests/unit/ingestion/test_gw10_reviewed_source_freeze.py",
+      "sha256": "8d5ae12d01dd7281e2740ed7e24ec70f87fea1749ed68895e6c59a756985b53d"
     },
     {
-      "bytes": 10627,
+      "bytes": 28713,
+      "path": "tests/unit/ingestion/test_horizon_probe.py",
+      "sha256": "0060b23b00ee91a73365b174f067604b702dbf506845a8078b9603f7fcd0b772"
+    },
+    {
+      "bytes": 10770,
       "path": "tests/unit/ingestion/test_horizon_rights_approval.py",
-      "sha256": "b0f5c1d4bd15a46f37116c86401b7dad3a3239276838639c64d6e47b902fc24f"
+      "sha256": "694229b84993d7d285a1c5a7cc71eaaab8587e22c8ff8ad36eface997948f6ec"
     },
     {
       "bytes": 11477,

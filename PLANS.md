@@ -3135,3 +3135,13 @@ exposed two new quota metadata differences; its finite complete-receipt/horizon
 comparison extension preserves all football numerical comparisons. Both failed
 attempts and independent compatibility reviews remain immutable. Final corrected
 acceptance, exact-source CI and installation are recorded in detached receipts.
+
+The subsequent CI run exposed two older R8A/R8B module-hash guards that had not
+recorded the reviewed source-purpose changes. A repository-wide freeze audit
+identified exactly these two additional guards. Their finite six-file reviewed
+hash map preserves every historical map and purpose assertion; independent AST
+checks preserve 199 legacy function bodies and pin the 12 reviewed policy
+functions. All 302 related tests pass after adoption. Package code, wheel bytes,
+verifier scripts and consumed fixtures remain unchanged; a detached source bridge
+retains the actual seven-verifier evidence under its original tested commit.
+The final source still requires fresh complete twenty-job CI.
