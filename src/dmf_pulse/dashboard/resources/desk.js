@@ -26,6 +26,7 @@ function showEligibility(parent) {
 }
 const requests = new Set();
 const fmt = (x, n = 2) => x === null || x === undefined ? 'Unavailable' : Number(x).toFixed(n);
+const moneyTenths = value => value === null || value === undefined ? 'Unavailable' : fmt(value / 10);
 const text = (tag, value, cls) => { const e = document.createElement(tag); e.textContent = String(value); if (cls) e.className = cls; return e; };
 const add = (parent, ...children) => { children.forEach(c => parent.append(c)); return parent; };
 const card = (title, parent = $('content')) => { const e = text('section', '', 'card'); add(e, text('h2', title)); parent.append(e); return e; };
@@ -72,12 +73,14 @@ function showTeam() {
   const d=view.team.decision, root=d.do_now || d, comparison=d.horizon_comparison || d.paired_comparison, area=$('content');
   const grid=text('div','','grid'); area.append(grid);
   metric(grid,'GAMEWEEK',root.gameweek || d.target_gameweek);
+  metric(grid,'CURRENT BANK · £',moneyTenths(view.team.current_bank_tenths));
+  metric(grid,'FPL TEAM VALUE · £',moneyTenths(view.team.current_team_value_tenths));
   metric(grid,d.do_now ? '3GW EXPECTED UTILITY' : 'EXPECTED POINTS AFTER HITS',fmt(comparison.plan_expected_horizon_utility ?? comparison.recommended_expected_points_after_hit));
   metric(grid,'GAIN VS HOLD',fmt(comparison.expected_uplift ?? comparison.net_expected_uplift));
   metric(grid,'HIT POINTS',root.hit_points ?? comparison.transfer_hit_points);
   const selected=d.transfer_frontier?.points.find(p=>p.transfer_count===root.transfers.length),ft=root.free_transfer_state || selected?.free_transfer_state;
   metric(grid,'FREE TRANSFERS NOW',ft?.effective_before_action ?? 'Unavailable');
-  metric(grid,'BANK AFTER · £',fmt((root.bank_after_tenths ?? selected?.bank_after_tenths)/10));
+  metric(grid,'BANK AFTER · £',moneyTenths(root.bank_after_tenths ?? selected?.bank_after_tenths));
   metric(grid,d.do_now?'HOLD · 3GW UTILITY':'HOLD · CURRENT GW xPTS',fmt(comparison.baseline_expected_horizon_utility ?? comparison.no_transfer_expected_points));
   if(d.do_now){metric(grid,'CURRENT GW xPTS',fmt(root.expected_manager_points_after_hit));metric(grid,'CURRENT GW GAIN',fmt(selected?.immediate_uplift_vs_hold));}
 
@@ -90,6 +93,7 @@ function showTeam() {
   const positions=tactics.starting_xi.map(id=>view.players.find(p=>p.catalogue.player_id===id)?.catalogue.position);
   bench.append(text('p',`Formation: ${['DEF','MID','FWD'].map(p=>positions.filter(x=>x===p).length).join('–')}`));
   squad(area,'Current squad · 15',view.team.current_squad); squad(area,'Resulting squad · 15',recommended,tactics);
+  area.append(text('p',`${demo || syntheticSources ? 'These current values are synthetic demonstration inputs.' : 'Current bank and team value are reported by FPL for this snapshot.'} Team value is not recomputed from selling prices; bank after describes the evaluated transfer plan.`));
   const quality=card('Range, confidence & scope');
   quality.append(text('p',`Paired gain p10 / median / p90: ${comparison.gain_p10} / ${comparison.gain_median} / ${comparison.gain_p90}. Probability of improvement: ${fmt(100*(comparison.probability_plan_beats_baseline ?? comparison.probability_recommended_beats_baseline))}%.`));
   quality.append(text('p',d.action_space_disclosure));

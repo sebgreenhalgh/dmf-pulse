@@ -69,10 +69,15 @@ class SourceScope(_Contract):
     profile_id: Ref
     profile_sha256: Sha
     source_kind: Literal["REPOSITORY_OWNED_SYNTHETIC", "RIGHTS_QUALIFIED_PRIVATE"]
-    routes: Annotated[tuple[RouteBudget, ...], Field(min_length=1, max_length=16)]
+    # Current FPL acquisition uses six fixed paths, one picks path and up to
+    # twelve distinct finished-event paths. Match its existing hard transport
+    # ceiling, keeping exact installed route identities mandatory.
+    routes: Annotated[tuple[RouteBudget, ...], Field(min_length=1, max_length=24)]
 
     @model_validator(mode="after")
     def exact_routes(self) -> Self:
+        if self.provider != "FPL" and len(self.routes) > 16:
+            raise ValueError("non-FPL source route bound is sixteen")
         identities = [(row.method, row.host, row.path) for row in self.routes]
         if len(set(identities)) != len(identities):
             raise ValueError("duplicate source route")

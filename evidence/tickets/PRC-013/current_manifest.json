@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 220401,
+      "bytes": 223167,
       "path": "PLANS.md",
-      "sha256": "02410c0de6aa4e4c521152bce903f852316de7af4046b01606471c372bfe101b"
+      "sha256": "0296170a3aae4b1f444a38a452df12d5d225c2bc3086795fd74fd18abc2cdce5"
     },
     {
       "bytes": 2761,
@@ -509,6 +509,11 @@
       "bytes": 5783,
       "path": "docs/operations/CURRENT_AVAILABILITY_001B.md",
       "sha256": "e623dec1186c98ab3e81349922305c497e7f02a778f4a3d8d3d2a5b85944f95d"
+    },
+    {
+      "bytes": 7461,
+      "path": "docs/operations/GW10_REAL_LAUNCH.md",
+      "sha256": "2199f8dc8f5cbb207f73179a2cae64a2c7448d7562e020247208c9dbc499da89"
     },
     {
       "bytes": 971,
@@ -3461,19 +3466,19 @@
       "sha256": "49d5a18b12ec8dd0bc7b9b9f51cf96c12aedebfc8f3acc07de2ec48233d2dcab"
     },
     {
-      "bytes": 38052,
+      "bytes": 38405,
       "path": "src/dmf_pulse/dashboard/authorization.py",
-      "sha256": "49a57537c7e09bade67a7a035ded47eb7755ded8c361a6ca9ad416e3f7882edb"
+      "sha256": "d7cb22c35bb0c11d6c4988188206cccc41b464ada97d8f930fcac8bbb6df92f7"
     },
     {
-      "bytes": 31724,
+      "bytes": 32006,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "e1bbad7b28426f49a5a5368c76fd3701fa08520924c47e830bb70da1adb02655"
+      "sha256": "804c3ba28689c9698417c7bb1b87388cac5f8fe43dbaae5623f83b021fdd36a1"
     },
     {
-      "bytes": 13842,
+      "bytes": 14092,
       "path": "src/dmf_pulse/dashboard/current_sources.py",
-      "sha256": "b5cdf03705d2cca4fb8da5eac77c0f691f68a26437f80946636b3eab9f9f329b"
+      "sha256": "c59e43ea944c5824f0bf60306e1c3c31b7aff3142152170907cfbb65b197c907"
     },
     {
       "bytes": 12833,
@@ -3566,9 +3571,9 @@
       "sha256": "36ecd7e7df58dcf92351e61014df3a30360685dd8d5eeed225be47eb32669328"
     },
     {
-      "bytes": 28870,
+      "bytes": 29431,
       "path": "src/dmf_pulse/dashboard/resources/desk.js",
-      "sha256": "a7698dc6792ca25bb6e45a3f2b65335e533cdc5156c6ff7b0284be8e68446546"
+      "sha256": "6e314bd8275390dcf010b032d796a48e822ea24ce0c83a1b810de86c898e120d"
     },
     {
       "bytes": 1983,
@@ -3591,9 +3596,9 @@
       "sha256": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73"
     },
     {
-      "bytes": 8673,
+      "bytes": 9021,
       "path": "src/dmf_pulse/dashboard/views.py",
-      "sha256": "5314fedc1e9c95f1fd983471cc80c48ceea6ca113b59fdc2989e01055df0f779"
+      "sha256": "67c5ee861f0ba21d56aadd8831b3b29955b72469a29c4fac2a259a07d78baec5"
     },
     {
       "bytes": 644,
@@ -4326,9 +4331,9 @@
       "sha256": "776dba26f023c82e4da70dafd70c78efedef464e99f27121f673d0c655963d7d"
     },
     {
-      "bytes": 30052,
+      "bytes": 34959,
       "path": "src/dmf_pulse/ingestion/openfootball/service.py",
-      "sha256": "a2b723970a081d70ab3b9e37a6da85e26241cac5b1d02af8f6622a95bc6e4463"
+      "sha256": "c7668f9bb9dcd261414743cedcbf3ec59bd2ed56a47f3e4fa70d2d42eaa4ccb9"
     },
     {
       "bytes": 5350,
@@ -4486,9 +4491,9 @@
       "sha256": "c096bbda5cf71a9989d70b9170147de523041eefcfea18491b7de95e17bed006"
     },
     {
-      "bytes": 16553,
+      "bytes": 18101,
       "path": "src/dmf_pulse/operation/cli.py",
-      "sha256": "7ed566bfb01ab6ec0177e48448a1dceb30c3b5cae8be833c6572b8f8c07d66dc"
+      "sha256": "8d1028852402add0a14503f5ac50b7e1a93047f014dda68f98670491916495f4"
     },
     {
       "bytes": 4622,
@@ -4511,9 +4516,9 @@
       "sha256": "e475538cde6b9331997a3de4172484953c56682aded511bc830bdbd73cce9d53"
     },
     {
-      "bytes": 9331,
+      "bytes": 15000,
       "path": "src/dmf_pulse/operation/packages.py",
-      "sha256": "ad9f98591dba622290aa7a68b0e25d0abda5acaf818aa44510550069140fbccf"
+      "sha256": "d9aaf4fb671d089e44da28232004d17b3ea9eaf9f48851a6523c05b70c0a2781"
     },
     {
       "bytes": 6221,
@@ -4526,9 +4531,9 @@
       "sha256": "e2bda543858af30fc77399f4b2d7bd02b71908916d779e36af8e922781b821d9"
     },
     {
-      "bytes": 14113,
+      "bytes": 15655,
       "path": "src/dmf_pulse/operation/wheel.py",
-      "sha256": "83de49044d15a880512109b9e4254dc2f25d381c9e4224e6ed5a9086e0577b59"
+      "sha256": "5b84557b76d8fe438070d66f4957b548801be76ad47b7aab4c385b692d777f4f"
     },
     {
       "bytes": 56,
@@ -5046,9 +5051,9 @@
       "sha256": "ba7c9b940910ecc28bd70a2c79393f5549f5b05de43a35f2e5af852f18fd2465"
     },
     {
-      "bytes": 46120,
+      "bytes": 46606,
       "path": "src/dmf_pulse/private_v1/one_command.py",
-      "sha256": "e30716fc2653cd8a1210db7d5486a933b6c1ffeb14db942dc4ca030fdbecc102"
+      "sha256": "1c789d934fd0b3fcd4f2e8fdcfa31274475a6cf86356193343e888e9bc8b6827"
     },
     {
       "bytes": 405,
@@ -5056,9 +5061,9 @@
       "sha256": "16471e9dcb8609c243f26cb03a047db421afac21ef73169da8061d8ab7174f2d"
     },
     {
-      "bytes": 8764,
+      "bytes": 9145,
       "path": "src/dmf_pulse/private_v1/presentation.py",
-      "sha256": "79853618a05a028c9c9b54a4a70df60f99ef02df4fb9f988eff0119b0dbb9722"
+      "sha256": "3fd878987315c6d1d9ee649b9d524dce37510e75c11ca5ea9b351f3df498d2cf"
     },
     {
       "bytes": 7710,
@@ -6711,14 +6716,24 @@
       "sha256": "0814de54965990615f0a267223357a28732d8d3f57280a5b1a564595704ee4a6"
     },
     {
-      "bytes": 25055,
+      "bytes": 25427,
       "path": "tests/unit/dashboard/test_current_mode.py",
-      "sha256": "79116365bdf56b5d9b3d6382f567fd0ccd4d429b401fc7c892a13e1ce3a86584"
+      "sha256": "ca7335933a3c6e9d3bdd0abc8e476518fb7495404cb53183318d0bfdf4df7982"
+    },
+    {
+      "bytes": 3638,
+      "path": "tests/unit/dashboard/test_current_team_value.py",
+      "sha256": "74aaddd94b7fe28bc684cbec579fdac90b1d2d17e21319a75986c745000e9875"
     },
     {
       "bytes": 15400,
       "path": "tests/unit/dashboard/test_dashboard.py",
       "sha256": "47b9a065589aa2845dcc3ae3c0c6ef535835d1b73a136f0b77d586c45e91e92f"
+    },
+    {
+      "bytes": 3059,
+      "path": "tests/unit/dashboard/test_fpl_route_capacity.py",
+      "sha256": "73dfe49c9a2d537b5959e2ac906fb9185980b2d0250f3de3b0d578464e6ffa89"
     },
     {
       "bytes": 22746,
@@ -7126,6 +7141,11 @@
       "sha256": "a2014f9fda38544c9e9a2c493144aac510dfcc0ce8db6b1f599af278b481b07f"
     },
     {
+      "bytes": 12639,
+      "path": "tests/unit/ingestion/openfootball/test_private_operator_profile.py",
+      "sha256": "3dac4180eecc812a2948e72ca2968e33bad4687cc15a760b400ae8d62835405b"
+    },
+    {
       "bytes": 5520,
       "path": "tests/unit/ingestion/openfootball/test_service.py",
       "sha256": "4d1671962c9e38fa2a3b32212dfc79b066cbe057b7b560307080606a239c0af6"
@@ -7454,6 +7474,11 @@
       "bytes": 13370,
       "path": "tests/unit/operation/test_operator_metadata.py",
       "sha256": "1425470dbbcce0122cc8246e070a1e6a8309ac8fbfb84f94901780926b9c1444"
+    },
+    {
+      "bytes": 12392,
+      "path": "tests/unit/operation/test_recurring_review.py",
+      "sha256": "d30b5e1de771b15e43b8f6535b7e9ccc4133361dda1ff2cbbaff962c4cce391d"
     },
     {
       "bytes": 8319,
@@ -7804,6 +7829,11 @@
       "bytes": 3652,
       "path": "tests/unit/private_v1/test_progress.py",
       "sha256": "29573bf738fd34702230fbb8ce588a3ff50510ecf7b25fd3e5dd9645397a094d"
+    },
+    {
+      "bytes": 2755,
+      "path": "tests/unit/private_v1/test_reviewed_score_prior_routing.py",
+      "sha256": "f5036ae4a783cb9008442815d3d5d34f0bee381906f944994ff96317592d7232"
     },
     {
       "bytes": 10499,

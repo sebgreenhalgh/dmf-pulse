@@ -14,7 +14,7 @@ from importlib.resources import files
 from multiprocessing.connection import Connection
 from pathlib import Path
 from secrets import token_hex
-from typing import Literal
+from typing import Literal, cast
 
 from sqlalchemy import Connection as SqlConnection
 
@@ -40,6 +40,7 @@ from dmf_pulse.dashboard.synthetic import DEMO_TIME, demo_inputs
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsProfile
 from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaSource, QuotaState
+from dmf_pulse.ingestion.openfootball.service import ScorePriorProfileId
 from dmf_pulse.private_v1.actionability import checked_report
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import PrivateV1Decision
@@ -422,6 +423,7 @@ def run_current_recommendation(
         owned=owned,
         fpl_profile=profiles["FPL"],
         odds_profile=profiles["ODDS"],
+        score_profile=profiles["OPENFOOTBALL"],
         quota=launch.quota,
         clock=active_clock,
     )
@@ -435,6 +437,9 @@ def run_current_recommendation(
                 progress=progress,
                 collect_presentation=True,
                 clock=active_clock,
+                score_prior_rights_profile_id=cast(
+                    ScorePriorProfileId, profiles["OPENFOOTBALL"].rights_profile_id
+                ),
             ),
             OneCommandRequest(
                 entry_id=launch.entry_id,

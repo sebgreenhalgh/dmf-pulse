@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
+
+from pydantic import Field
 
 from dmf_pulse.fpl_points.models import GameweekPlayerProjectionSummary
 from dmf_pulse.private_v1.models import PrivateV1Decision
@@ -38,6 +40,8 @@ class TeamView(PresentationModel):
     current_squad: tuple[str, ...]
     decision: PrivateV1Decision | PrivateV1RollingDecision
     report: str
+    current_bank_tenths: Annotated[int, Field(ge=0)] | None = None
+    current_team_value_tenths: Annotated[int, Field(gt=0)] | None = None
 
 
 class DeskView(PresentationModel):
@@ -168,7 +172,11 @@ def desk_view(
         blocked_count=len(rows) - projected,
         players=tuple(rows),
         team=TeamView(
-            current_squad=presentation.current_squad, decision=result.decision, report=result.report
+            current_squad=presentation.current_squad,
+            decision=result.decision,
+            report=result.report,
+            current_bank_tenths=presentation.current_bank_tenths,
+            current_team_value_tenths=presentation.current_team_value_tenths,
         ),
         source_vintages=presentation.source_vintages,
         market_quota_remaining=presentation.market_quota_remaining,

@@ -277,9 +277,11 @@ class CurrentSourceFactories:
         odds_profile: RightsProfile,
         quota: QuotaState | QualifiedOperatorQuota,
         clock: Callable[[], datetime],
+        score_profile: RightsProfile | None = None,
     ) -> None:
         self._guard, self._owned, self._clock = guard, owned, clock
         self._fpl_profile, self._odds_profile, self._quota = fpl_profile, odds_profile, quota
+        self._score_profile = score_profile
         if owned:
             from dmf_pulse.dashboard.synthetic import demo_inputs
 
@@ -360,9 +362,12 @@ class CurrentSourceFactories:
 
             config = load_provider_config()
             delegate = HttpClientOpenFootballTransport()
+        profiles = load_rights_profiles()
+        if self._score_profile is not None:
+            profiles[self._score_profile.rights_profile_id] = self._score_profile
         service = _ClosingScoreService(
             provider_config=config,
-            rights_profiles=load_rights_profiles(),
+            rights_profiles=profiles,
             transport=GuardedScoreTransport(self._guard, delegate),
             clock=clock,
             provider_config_identity="a" * 64 if self._owned else None,

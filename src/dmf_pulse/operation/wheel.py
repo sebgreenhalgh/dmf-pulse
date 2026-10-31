@@ -10,21 +10,30 @@ import os
 import re
 import stat
 import zipfile
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path, PurePosixPath
-from typing import Literal
+from typing import Annotated, Literal
+
+from pydantic import Field
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes
 from dmf_pulse.operation.enrollment import InstalledEnrollment, ReleasePermit, installed_enrollment
 from dmf_pulse.operation.models import Metadata, MetadataTime, OperationError, Sha
-from dmf_pulse.operation.packages import OwnerPackage
+from dmf_pulse.operation.packages import (
+    OwnerPackage,
+    RecurringOwnerPackage,
+    prepare_pilot,
+    prepare_recurring,
+)
 
 RESOURCE = "dmf_pulse/dashboard/resources/production_refresh_enrollments.json"
 MAX_WHEEL_BYTES = 64 * 1024 * 1024
 
 
 class EnrollmentInput(Metadata):
-    owner_package: OwnerPackage
+    owner_package: Annotated[
+        OwnerPackage | RecurringOwnerPackage, Field(discriminator="schema_version")
+    ]
     candidate: InstalledEnrollment
 
 
@@ -174,6 +183,31 @@ def _record_hash(body: bytes) -> str:
     )
 
 
+def _reviewed_limits_match(
+    package: OwnerPackage | RecurringOwnerPackage, registry: InstalledEnrollment
+) -> bool:
+    approval = registry.approvals[0]
+    if isinstance(package, OwnerPackage):
+        return (
+            approval.usage == "ONE_SHOT"
+            and approval.horizons == (1,)
+            and approval.daily_request_limit == 1
+            and approval.monthly_request_limit == 1
+            and approval.daily_credit_limit == 2
+            and approval.monthly_credit_limit == 2
+        )
+    proposal = package.proposal
+    return (
+        approval.usage == "MANUAL_RECURRING"
+        and approval.horizons == proposal.horizons == (1, 3)
+        and proposal.recurring_budget_acceptance_evidence_sha256 is not None
+        and approval.daily_request_limit == proposal.daily_request_limit
+        and approval.monthly_request_limit == proposal.monthly_request_limit
+        and approval.daily_credit_limit == proposal.daily_credit_limit
+        and approval.monthly_credit_limit == proposal.monthly_credit_limit
+    )
+
+
 def prepare_enrollment(
     base: Path, request: EnrollmentInput, *, now: datetime
 ) -> EnrollmentWheelReview:
@@ -187,12 +221,18 @@ def prepare_enrollment(
         or registry.release_permits
     ):
         raise OperationError("ENROLLMENT_COMPLETE_REVIEW_PACKAGE_REQUIRED")
+    current_package = (
+        prepare_pilot(package.proposal, now=now)
+        if isinstance(package, OwnerPackage)
+        else prepare_recurring(package.proposal, now=now)
+    )
+    if current_package.state != "READY_FOR_INDEPENDENT_OWNER_REVIEW":
+        raise OperationError("ENROLLMENT_COMPLETE_REVIEW_PACKAGE_REQUIRED")
     approval = registry.approvals[0]
     if (
         approval.authorization_id != proposal.authorization_id
         or approval.status != "APPROVED_REVIEWED"
-        or approval.usage != "ONE_SHOT"
-        or approval.horizons != (1,)
+        or not _reviewed_limits_match(package, registry)
         or approval.ledger_backend != "POSTGRES"
         or approval.qualified_deadline_at != proposal.qualified_deadline_at
         or approval.source_scopes != proposal.source_scopes
@@ -203,11 +243,10 @@ def prepare_enrollment(
         or approval.review_sha256 != proposal.project_rights_review_sha256
         or approval.operator_ref != proposal.operator_ref
         or approval.purpose != "PRIVATE_OPERATOR_FPL_RECOMMENDATIONS"
-        or approval.daily_request_limit != 1
-        or approval.monthly_request_limit != 1
-        or approval.daily_credit_limit != 2
-        or approval.monthly_credit_limit != 2
         or not approval.not_before <= now < approval.expires_at
+        or not approval.plan_quota.observed_at
+        <= now
+        <= approval.plan_quota.observed_at + timedelta(seconds=approval.quota_max_age_seconds)
         or proposal.qualified_deadline_at is None
         or proposal.qualified_deadline_at <= now
     ):

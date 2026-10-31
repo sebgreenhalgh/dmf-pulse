@@ -211,6 +211,50 @@ def prepare_pilot_command(
     )
 
 
+@operation_app.command("prepare-recurring")
+def prepare_recurring_command(
+    authorization_id: Annotated[
+        str, typer.Option(help="Separate ACCEL005-RECURRING- scope; never reuse pilot acceptance.")
+    ],
+    input_path: Annotated[
+        Path,
+        typer.Option(
+            "--input",
+            help="Private nonexecuting proposal with explicit recurring limits and budget decision.",
+        ),
+    ],
+    output: Annotated[Path, typer.Option(help="New immutable recurring owner-review package.")],
+) -> None:
+    """Prepare manual 1-/3-GW reuse for one exact deadline; no future scope is inferred."""
+    from dmf_pulse.operation.packages import (
+        RecurringProposal,
+        prepare_recurring,
+        read_nonexecuting_input,
+    )
+
+    try:
+        proposal = read_nonexecuting_input(input_path, RecurringProposal)
+        if proposal.authorization_id != authorization_id:
+            raise OperationError("RECURRING_IDENTITY_MISMATCH")
+        package = prepare_recurring(proposal, now=datetime.now(UTC))
+        digest = write_metadata(output, package)
+    except (OperationError, AuthorizationError, ValidationError) as error:
+        _fail(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "state": package.state,
+                "blockers": package.blockers,
+                "artifact_sha256": digest,
+                "semantic_sha256": package.semantic_sha256,
+                "runtime_authority": "NOT_GRANTED",
+            },
+            sort_keys=True,
+        )
+    )
+
+
 @operation_app.command("init-control")
 def init_control_command(
     request: Annotated[

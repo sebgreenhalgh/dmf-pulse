@@ -40,6 +40,7 @@ from dmf_pulse.ingestion.openfootball.service import (
     CurrentScorePriorBuildRequest,
     CurrentScorePriorResult,
     CurrentScorePriorService,
+    ScorePriorProfileId,
     build_current_score_prior_bundle,
 )
 from dmf_pulse.markets.current import (
@@ -500,7 +501,15 @@ class PrivateV1OneCommandService:
         progress: ProgressSink | None = None,
         collect_presentation: bool = False,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        score_prior_rights_profile_id: ScorePriorProfileId = (
+            "openfootball_football_json_score_prior_v1"
+        ),
     ) -> None:
+        if score_prior_rights_profile_id not in {
+            "openfootball_football_json_score_prior_v1",
+            "openfootball_football_json_private_operator_score_prior_v1",
+        }:
+            raise ValueError("unsupported score-prior source profile")
         self._direct_client_factory = direct_client_factory or (
             lambda attestation: DirectFplClient(attestation)
         )
@@ -519,6 +528,7 @@ class PrivateV1OneCommandService:
         self._progress = progress or NullProgress()
         self._clock = clock
         self._collect_presentation = collect_presentation
+        self._score_prior_rights_profile_id = score_prior_rights_profile_id
 
     def run(self, request: OneCommandRequest) -> OneCommandResult:
         self._progress.message("DMF Pulse starting")
@@ -656,7 +666,7 @@ class PrivateV1OneCommandService:
                 source_prior = self._score_service_factory(observed_now).build(
                     CurrentScorePriorBuildRequest(
                         information_cutoff=run_at,
-                        rights_profile_id="openfootball_football_json_score_prior_v1",
+                        rights_profile_id=self._score_prior_rights_profile_id,
                     )
                 )
             with self._progress.stage(

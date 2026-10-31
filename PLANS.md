@@ -3077,3 +3077,43 @@ zero-skips gate rejected it. Both isolated branches now create the source copy
 and real hard link on one temporary filesystem, preserving inode identity and
 every admission assertion. Each branch passes all 66 current-input tests with
 zero network attempts; independent portability review and fresh full CI follow.
+# GW10 real pilot and operational launch
+
+Baseline: `1e2e9d4dbf5c6af39e0c02cbd12ea487fee9e7b8`. Worktree:
+`review_pack/GW10-LAUNCH`, branch `launch/GW10-real-pilot`. This is one continuous
+launch programme, not a new ACCEL ticket. The supplied launch request governs
+the programme subject to the unchanged authority manifest and provider terms.
+
+- [x] Read the request, Wave 005 contract/checkpoints/runbook and runtime schemas;
+  preserve the original dirty worktree and clean Wave 005 release.
+- [x] Preserve the owner's permission text privately with its actual chat origin;
+  independently examine supplier/account evidence and exact route/purpose closure.
+- [ ] Verify a future official deadline; refresh quota only after the actual reset
+  and through a permitted method, never by inventing balance or timestamps.
+- [x] Authenticate the existing base wheel/implementation and installed runtime;
+  inspect canonical PostgreSQL configuration/history without resetting consumption.
+- [x] Complete the smallest supported recurring review preparation and any material
+  source/custody/decision integration defects, reusing existing numerical engines.
+- [ ] Run targeted checks and independent review, build the exact wheel and complete
+  literal release gates/CI required by changed scope.
+- [ ] Prepare the actual source/account/control/owner enrollment package. Missing
+  external facts remain missing; no fabricated evidence hashes or decisions.
+- [ ] Obtain immutable owner acceptance only after the concrete package is reviewable;
+  install the exact independently reviewed private carrier/enrolled wheel.
+- [ ] Run installed shared preflight, manual pairing and exactly one authorized
+  Refresh after durable PostgreSQL reservation; capture safe genuine evidence.
+- [ ] Enable repeatable manual use only under separately reviewed scope/budget;
+  seal a success or exact-blocker handoff and a capped review archive.
+
+P01 remains immutable and unscored. No FPL account writes, purchases, automatic
+retries, credential disclosure, legacy FPL slot access, self-granted enrollment,
+synthetic-as-real outputs, tuning or claims of validated predictive skill.
+
+The owner's later instruction removes original supplier correspondence as a
+procedural prerequisite. Saved permission text remains OWNER_ATTESTED; issuer
+authentication is not claimed. The owner also confirms no PostgreSQL database
+exists, authorizing first canonical initialization without resetting older
+consumed purposes. Actual control, installation and execution receipts remain
+detached from the source commit. Independent review clears the bounded recurring,
+team-value, literal route-capacity and replacement OpenFootball-profile changes;
+it grants no provider authority or full-model activation.

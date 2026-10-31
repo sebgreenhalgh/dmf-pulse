@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime
 from math import isclose
-from typing import Literal, Self
+from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from dmf_pulse.availability.current_model import CurrentModelFixtureMinutesInput
 from dmf_pulse.availability.projection import PlayerMinutesProjection
@@ -94,6 +94,9 @@ class PrivatePresentation(PresentationModel):
     source_captured_at: datetime
     source_vintages: tuple[SourceVintage, ...]
     market_quota_remaining: int | None
+    current_bank_tenths: Annotated[int, Field(ge=0)] | None = None
+    # Preserve transfers.value exactly; neither add bank nor recompute from prices.
+    current_team_value_tenths: Annotated[int, Field(gt=0)] | None = None
 
     @model_validator(mode="after")
     def coverage_is_exact(self) -> Self:
@@ -220,4 +223,6 @@ def build_presentation(
         source_captured_at=snapshot.captured_at,
         source_vintages=source_vintages,
         market_quota_remaining=market_quota_remaining,
+        current_bank_tenths=snapshot.current_team.transfers.bank,
+        current_team_value_tenths=snapshot.current_team.transfers.value,
     )

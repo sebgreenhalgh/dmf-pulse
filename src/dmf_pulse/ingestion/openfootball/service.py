@@ -54,6 +54,16 @@ _RETENTION_REASON = (
     "CC0-1.0 imposes no source retention limit; immutable retention is permitted for "
     "reproducibility."
 )
+PRIVATE_OPERATOR_PROFILE_ID = "openfootball_football_json_private_operator_score_prior_v1"
+PRIVATE_OPERATOR_GEOGRAPHY = (
+    "private DMF Pulse analytical use from Italy and the United Kingdom (IT, GB)"
+)
+_PRIVATE_OPERATOR_PURPOSE = "PRIVATE_OPERATOR_FPL_RECOMMENDATIONS"
+_PINNED_LICENCE_SHA256 = "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
+ScorePriorProfileId = Literal[
+    "openfootball_football_json_score_prior_v1",
+    "openfootball_football_json_private_operator_score_prior_v1",
+]
 _REQUIRED_CAPABILITIES = (
     RightsCapability.AUTOMATED_ACCESS,
     RightsCapability.TRANSIENT_PROCESSING,
@@ -108,7 +118,7 @@ class CurrentScorePriorProvenance(_FrozenModel):
     source_commit_sha: Literal["f27dcbef681db2c3195f9def62316ce497278781"]
     source_commit_timestamp: datetime
     source_mode: Literal["RECONSTRUCTED"]
-    rights_profile_id: Literal["openfootball_football_json_score_prior_v1"]
+    rights_profile_id: ScorePriorProfileId
     rights_profile_version: Literal["1.0.0"]
     human_approval_id: str
     approved_by: str
@@ -181,7 +191,7 @@ class _CurrentScorePriorSummaryBody(_FrozenModel):
     home_goal_total: Literal[1839]
     away_goal_total: Literal[1567]
     source_commit_sha: Literal["f27dcbef681db2c3195f9def62316ce497278781"]
-    rights_profile_id: Literal["openfootball_football_json_score_prior_v1"]
+    rights_profile_id: ScorePriorProfileId
     source_mode: Literal["RECONSTRUCTED"]
     usable_at: datetime
     information_cutoff: datetime
@@ -421,6 +431,15 @@ def _utc_now() -> datetime:
     return datetime.now(UTC)
 
 
+def _profile_json(profile: RightsProfile) -> dict[str, object]:
+    """Serialize the immutable capability mapping without replacing its identity."""
+    value = profile.model_dump(mode="json", exclude={"capabilities"})
+    value["capabilities"] = {
+        capability.value: decision.value for capability, decision in profile.capabilities.items()
+    }
+    return value
+
+
 def _sample_clock(clock: Callable[[], datetime]) -> datetime:
     value = clock()
     if value.tzinfo is None or value.utcoffset() is None:
@@ -498,6 +517,76 @@ def _require_exact_profile(profile: RightsProfile, *, checked_at: datetime) -> N
         require_rights(profile, capability, checked_at=checked_at)
 
 
+def _require_private_operator_profile(
+    profile: RightsProfile, *, config: OpenFootballProviderConfig, checked_at: datetime
+) -> None:
+    """Only the exact installed current qualification can extend the legacy source scope."""
+    from dmf_pulse.operation.enrollment import installed_enrollment, rights_fingerprint
+    from dmf_pulse.operation.models import OperationError
+
+    exact = (
+        profile.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID
+        and profile.provider_key == "openfootball_football_json"
+        and profile.profile_version == "1.0.0"
+        and profile.status is RightsProfileStatus.HUMAN_APPROVED
+        and profile.approved_purpose == _PRIVATE_OPERATOR_PURPOSE
+        and profile.account_scope == _APPROVED_ACCOUNT_SCOPE
+        and profile.geography_scope == PRIVATE_OPERATOR_GEOGRAPHY
+        and profile.terms_source == _TERMS_SOURCE
+        and profile.terms_version == _TERMS_VERSION
+        and profile.retention_seconds is None
+        and profile.retention_reason == _RETENTION_REASON
+        and not profile.unresolved_rights
+        and not profile.termination_deletion_required
+        and not profile.attribution_required
+        and profile.attribution_text is None
+        and profile.capabilities[RightsCapability.PUBLIC_DISPLAY] is CapabilityValue.DENY
+        and profile.capabilities[RightsCapability.REDISTRIBUTION] is CapabilityValue.DENY
+        and all(
+            profile.capabilities[capability] is CapabilityValue.ALLOW
+            for capability in RightsCapability
+            if capability not in {RightsCapability.PUBLIC_DISPLAY, RightsCapability.REDISTRIBUTION}
+        )
+    )
+    try:
+        qualifications = installed_enrollment().qualifications if exact else ()
+    except OperationError:
+        qualifications = ()
+    rows = [
+        row
+        for row in qualifications
+        if row.scope.provider == "OPENFOOTBALL"
+        and row.scope.source_kind == "RIGHTS_QUALIFIED_PRIVATE"
+        and row.scope.profile_id == PRIVATE_OPERATOR_PROFILE_ID
+        and row.scope.profile_sha256 == rights_fingerprint(profile)
+        and row.profile == profile
+    ]
+    expected_routes = {
+        ("GET", config.host, config.raw_path(resource.path), 1)
+        for resource in (config.licence, *config.seasons)
+    }
+    if len(rows) != 1 or not (
+        rows[0].purpose == _PRIVATE_OPERATOR_PURPOSE
+        and rows[0].operator_country in {"IT", "GB"}
+        and rows[0].permission_evidence_sha256 == _PINNED_LICENCE_SHA256
+        and profile.approved_at <= profile.checked_at <= rows[0].qualified_at <= checked_at
+        and checked_at < rows[0].valid_until
+        and rows[0].control_metadata_retention_approved
+        and {
+            (route.method, route.host, route.path, route.maximum_calls)
+            for route in rows[0].scope.routes
+        }
+        == expected_routes
+    ):
+        raise IngestionError(
+            "RIGHTS_BLOCKED",
+            "selected private OpenFootball source requires exact current installed qualification",
+            details={"transport_call_count": 0},
+        )
+    for capability in _REQUIRED_CAPABILITIES:
+        require_rights(profile, capability, checked_at=checked_at)
+
+
 def _response_body(response: OpenFootballHttpResponse, *, maximum: int) -> bytes:
     if response.status_code != 200 or response.content_type not in {
         "application/json",
@@ -568,7 +657,7 @@ class CurrentScorePriorService:
             else canonical_sha256(
                 {
                     "profiles": [
-                        profile.model_dump(mode="json")
+                        _profile_json(profile)
                         for profile in sorted(
                             self._profiles.values(), key=lambda item: item.rights_profile_id
                         )
@@ -587,7 +676,11 @@ class CurrentScorePriorService:
                 "selected OpenFootball rights profile is unavailable",
                 details={"transport_call_count": 0},
             )
-        _require_exact_profile(profile, checked_at=started_at)
+        private_operator = profile.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID
+        if private_operator:
+            _require_private_operator_profile(profile, config=self._config, checked_at=started_at)
+        else:
+            _require_exact_profile(profile, checked_at=started_at)
         if profile.approved_at > started_at or started_at > request.information_cutoff:
             raise IngestionError(
                 "POST_CUTOFF",
@@ -603,6 +696,10 @@ class CurrentScorePriorService:
             for index, resource in enumerate(configured_resources):
                 if self._before_request is not None:
                     self._before_request()
+                if private_operator:
+                    _require_private_operator_profile(
+                        profile, config=self._config, checked_at=_sample_clock(self._clock)
+                    )
                 call_count += 1
                 response = _fetch_resource_without_disclosure(
                     config=self._config,
@@ -614,6 +711,10 @@ class CurrentScorePriorService:
                         "SOURCE_UNAVAILABLE", "OpenFootball transport failed unexpectedly"
                     )
                 received_at = _sample_clock(self._clock)
+                if private_operator:
+                    _require_private_operator_profile(
+                        profile, config=self._config, checked_at=received_at
+                    )
                 if received_at > request.information_cutoff:
                     raise IngestionError(
                         "POST_CUTOFF", "OpenFootball resource arrived after the information cutoff"
@@ -640,6 +741,10 @@ class CurrentScorePriorService:
                 )
             validation_completed_at = _sample_clock(self._clock)
             usable_at = _sample_clock(self._clock)
+            if private_operator:
+                _require_private_operator_profile(
+                    profile, config=self._config, checked_at=usable_at
+                )
             if usable_at > request.information_cutoff:
                 raise IngestionError(
                     "POST_CUTOFF", "OpenFootball prior became usable after the information cutoff"
@@ -711,12 +816,15 @@ class CurrentScorePriorService:
 
 
 __all__ = [
+    "PRIVATE_OPERATOR_GEOGRAPHY",
+    "PRIVATE_OPERATOR_PROFILE_ID",
     "CurrentScorePriorBuildRequest",
     "CurrentScorePriorBundle",
     "CurrentScorePriorProvenance",
     "CurrentScorePriorResult",
     "CurrentScorePriorService",
     "CurrentScorePriorSummary",
+    "ScorePriorProfileId",
     "SourceResourceLineage",
     "build_current_score_prior_bundle",
     "score_prior_request_from_bundle",

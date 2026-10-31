@@ -253,7 +253,16 @@ def test_current_reload_does_not_reserve_or_acquire(complete_current):
 
 @pytest.mark.parametrize(
     "attack",
-    ["deadline", "capture", "gameweek", "gameweek_hash", "fixture_hash", "resealed_deadline"],
+    [
+        "deadline",
+        "capture",
+        "gameweek",
+        "gameweek_hash",
+        "fixture_hash",
+        "resealed_deadline",
+        "current_bank_tenths",
+        "current_team_value_tenths",
+    ],
 )
 def test_current_presentation_cannot_be_replaced_or_resealed(complete_current, attack):
     _, _, _, _, launch, _, result, _ = complete_current
@@ -274,6 +283,10 @@ def test_current_presentation_cannot_be_replaced_or_resealed(complete_current, a
         altered = presentation.model_copy(
             update={"source_captured_at": DEMO_TIME - timedelta(seconds=1)}
         )
+    elif attack in {"current_bank_tenths", "current_team_value_tenths"}:
+        original_value = getattr(presentation, attack)
+        assert original_value is not None
+        altered = presentation.model_copy(update={attack: original_value + 1})
     elif attack in {"gameweek", "gameweek_hash"}:
         row = presentation.gameweeks[0].model_copy(
             update={"gameweek": 999} if attack == "gameweek" else {"result_sha256": "0" * 64}

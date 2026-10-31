@@ -10,16 +10,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Literal, Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, ValidationInfo, field_validator, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.dashboard.authorization import QualifiedPlanQuota, SourceScope
 from dmf_pulse.operation.models import Metadata, MetadataTime, OperationError, Ref, Sha
 
 
-class PilotProposal(Metadata):
-    schema_version: Literal["operator-pilot-proposal-v1"] = "operator-pilot-proposal-v1"
-    authorization_id: Annotated[str, Field(pattern=r"^ACCEL00[45]-PILOT-[A-Za-z0-9_.:-]{1,80}$")]
+class _OperationProposal(Metadata):
     classification: Literal["PRIVATE_CURRENT"] = "PRIVATE_CURRENT"
     operator_ref: Ref | None = None
     entry_id: Annotated[int, Field(ge=1)] | None = None
@@ -48,6 +46,53 @@ class PilotProposal(Metadata):
             odds = next(row for row in self.source_scopes if row.provider == "ODDS")
             if odds.account_ref != self.plan_quota.account_ref:
                 raise ValueError("proposal account identity differs")
+        return self
+
+
+class PilotProposal(_OperationProposal):
+    schema_version: Literal["operator-pilot-proposal-v1"] = "operator-pilot-proposal-v1"
+    authorization_id: Annotated[str, Field(pattern=r"^ACCEL00[45]-PILOT-[A-Za-z0-9_.:-]{1,80}$")]
+
+
+class RecurringProposal(_OperationProposal):
+    """A separate manual scope; pilot acceptance never supplies its budget decision."""
+
+    schema_version: Literal["operator-recurring-proposal-v1"] = "operator-recurring-proposal-v1"
+    authorization_id: Annotated[str, Field(pattern=r"^ACCEL005-RECURRING-[A-Za-z0-9_.:-]{1,80}$")]
+    horizons: tuple[Literal[1], Literal[3]] = (1, 3)
+    daily_request_limit: Annotated[int, Field(ge=1)] | None = None
+    daily_credit_limit: Annotated[int, Field(ge=2)] | None = None
+    monthly_request_limit: Annotated[int, Field(ge=1)] | None = None
+    monthly_credit_limit: Annotated[int, Field(ge=2)] | None = None
+    recurring_budget_acceptance_evidence_sha256: Sha | None = None
+
+    @field_validator("horizons", mode="before")
+    @classmethod
+    def exact_integer_horizons(cls, value: object, info: ValidationInfo) -> object:
+        if isinstance(value, (list, tuple)) and any(type(item) is not int for item in value):
+            raise ValueError("recurring horizons require exact integers")
+        if info.mode == "json" and isinstance(value, list):
+            return tuple(value)
+        return value
+
+    @model_validator(mode="after")
+    def coherent_explicit_budget(self) -> Self:
+        if (
+            self.daily_request_limit is not None
+            and self.monthly_request_limit is not None
+            and self.daily_request_limit > self.monthly_request_limit
+        ) or (
+            self.daily_credit_limit is not None
+            and self.monthly_credit_limit is not None
+            and self.daily_credit_limit > self.monthly_credit_limit
+        ):
+            raise ValueError("recurring daily budget exceeds monthly budget")
+        for requests, credits in (
+            (self.daily_request_limit, self.daily_credit_limit),
+            (self.monthly_request_limit, self.monthly_credit_limit),
+        ):
+            if requests is not None and credits is not None and requests * 2 > credits:
+                raise ValueError("recurring requests require two-credit reservations")
         return self
 
 
@@ -85,7 +130,56 @@ class OwnerPackage(Metadata):
         return self
 
 
-def _blockers(proposal: PilotProposal, now: datetime) -> tuple[str, ...]:
+class RecurringOwnerPackage(Metadata):
+    """Review preparation only, bound to one exact deadline and an explicit budget."""
+
+    schema_version: Literal["operator-recurring-owner-package-v1"] = (
+        "operator-recurring-owner-package-v1"
+    )
+    prepared_at: datetime
+    proposal: RecurringProposal
+    state: Literal["INCOMPLETE", "READY_FOR_INDEPENDENT_OWNER_REVIEW"]
+    blockers: tuple[Ref, ...]
+    usage: Literal["MANUAL_RECURRING"] = "MANUAL_RECURRING"
+    horizons: tuple[Literal[1], Literal[3]] = (1, 3)
+    mode: Literal["MARKET_PRIMARY"] = "MARKET_PRIMARY"
+    sport: Literal["soccer_epl"] = "soccer_epl"
+    regions: Literal["uk"] = "uk"
+    markets: tuple[Literal["h2h"], Literal["totals"]] = ("h2h", "totals")
+    odds_gets_per_refresh: Literal[1] = 1
+    reserved_odds_credits_per_refresh: Literal[2] = 2
+    automatic_retries: Literal[0] = 0
+    runtime_authority: Literal["NOT_GRANTED"] = "NOT_GRANTED"
+    installation: Literal["REVIEWED_FIXED_RESOURCE_IN_NEW_WHEEL_REQUIRED"] = (
+        "REVIEWED_FIXED_RESOURCE_IN_NEW_WHEEL_REQUIRED"
+    )
+
+    @field_validator("horizons", mode="before")
+    @classmethod
+    def exact_integer_horizons(cls, value: object, info: ValidationInfo) -> object:
+        return RecurringProposal.exact_integer_horizons(value, info)
+
+    @field_validator(
+        "odds_gets_per_refresh",
+        "reserved_odds_credits_per_refresh",
+        "automatic_retries",
+        mode="before",
+    )
+    @classmethod
+    def exact_integer_bounds(cls, value: object) -> object:
+        if type(value) is not int:
+            raise ValueError("recurring per-refresh bounds require exact integers")
+        return value
+
+    @model_validator(mode="after")
+    def genuine_pending_state(self) -> Self:
+        expected = _recurring_blockers(self.proposal, self.prepared_at)
+        if self.blockers != expected or (self.state == "INCOMPLETE") != bool(expected):
+            raise ValueError("recurring package status differs from actual missing metadata")
+        return self
+
+
+def _blockers(proposal: _OperationProposal, now: datetime) -> tuple[str, ...]:
     required = {
         "operator_ref": "OPERATOR_IDENTITY_REQUIRED",
         "entry_id": "MANAGER_SCOPE_REQUIRED",
@@ -113,12 +207,45 @@ def _blockers(proposal: PilotProposal, now: datetime) -> tuple[str, ...]:
     return tuple(result)
 
 
+def _recurring_blockers(proposal: RecurringProposal, now: datetime) -> tuple[str, ...]:
+    result = list(_blockers(proposal, now))
+    for field, reason in {
+        "daily_request_limit": "RECURRING_DAILY_REQUEST_LIMIT_REQUIRED",
+        "daily_credit_limit": "RECURRING_DAILY_CREDIT_LIMIT_REQUIRED",
+        "monthly_request_limit": "RECURRING_MONTHLY_REQUEST_LIMIT_REQUIRED",
+        "monthly_credit_limit": "RECURRING_MONTHLY_CREDIT_LIMIT_REQUIRED",
+        "recurring_budget_acceptance_evidence_sha256": "RECURRING_BUDGET_ACCEPTANCE_REQUIRED",
+    }.items():
+        if getattr(proposal, field) is None:
+            result.append(reason)
+    if (
+        proposal.plan_quota is not None
+        and proposal.monthly_credit_limit is not None
+        and proposal.monthly_credit_limit > proposal.plan_quota.allocated_monthly_credits
+    ):
+        result.append("RECURRING_BUDGET_EXCEEDS_QUALIFIED_ALLOCATION")
+    return tuple(result)
+
+
 def prepare_pilot(proposal: PilotProposal, *, now: datetime) -> OwnerPackage:
     proposal = PilotProposal.model_validate(proposal)
     # Validate the clock before comparing any dates.
     now = MetadataTime(checked_at=now).checked_at
     blockers = _blockers(proposal, now)
     return OwnerPackage(
+        prepared_at=now,
+        proposal=proposal,
+        blockers=blockers,
+        state="INCOMPLETE" if blockers else "READY_FOR_INDEPENDENT_OWNER_REVIEW",
+    )
+
+
+def prepare_recurring(proposal: RecurringProposal, *, now: datetime) -> RecurringOwnerPackage:
+    """Prepare independently accepted manual reuse, never advance the pinned deadline."""
+    proposal = RecurringProposal.model_validate(proposal)
+    now = MetadataTime(checked_at=now).checked_at
+    blockers = _recurring_blockers(proposal, now)
+    return RecurringOwnerPackage(
         prepared_at=now,
         proposal=proposal,
         blockers=blockers,
