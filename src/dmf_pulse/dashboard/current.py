@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from importlib.resources import files
+from itertools import pairwise
 from multiprocessing.connection import Connection
 from pathlib import Path
 from secrets import token_hex
@@ -49,7 +50,7 @@ from dmf_pulse.private_v1.one_command import (
     OneCommandResult,
     PrivateV1OneCommandService,
 )
-from dmf_pulse.private_v1.presentation import PresentationModel
+from dmf_pulse.private_v1.presentation import PresentationModel, SourceVintage
 from dmf_pulse.private_v1.progress import ProgressSink
 
 ExecutionState = Literal[
@@ -212,6 +213,59 @@ def _result_authentication(
     return hmac.new(bytes.fromhex(launch.worker_id), payload, hashlib.sha256).hexdigest()
 
 
+def _source_chronology_is_bound(result: OneCommandResult, launch: CurrentLaunch) -> bool:
+    """Keep actual source observations separate from a future acquisition ceiling."""
+    presentation = result.presentation
+    if (
+        presentation is None
+        or type(presentation.source_vintages) is not tuple
+        or any(type(row) is not SourceVintage for row in presentation.source_vintages)
+    ):
+        return False
+    if tuple(row.source for row in presentation.source_vintages) != (
+        "FPL",
+        "MARKETS",
+        "TEAM_SCORE_PRIOR",
+    ):
+        return False
+    fpl, markets, prior = presentation.source_vintages
+    if (
+        (fpl.source_mode, markets.source_mode, prior.source_mode)
+        != ("CURRENT_TRANSIENT", "CURRENT_TRANSIENT", "HISTORICAL_RECONSTRUCTED")
+        or type(result.fpl_request_count) is not int
+        or not 1 <= result.fpl_request_count <= 24
+        or any(type(row.requests) is not int for row in (fpl, markets, prior))
+        or fpl.requests != result.fpl_request_count
+        or markets.requests != 1
+        or prior.requests != 4
+    ):
+        return False
+    times = (
+        launch.grant.issued_at,
+        presentation.source_captured_at,
+        fpl.received_at,
+        fpl.usable_at,
+        markets.received_at,
+        markets.usable_at,
+        prior.received_at,
+        prior.usable_at,
+        launch.grant.request.information_cutoff,
+        result.actionability.checked_at,
+        launch.grant.expires_at,
+        result.publication_not_before,
+    )
+    if any(
+        not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None
+        for value in times
+    ):
+        return False
+    return (
+        all(left <= right for left, right in pairwise(times[:9]))
+        and prior.usable_at <= result.actionability.checked_at < launch.grant.expires_at
+        and result.publication_not_before >= result.actionability.checked_at
+    )
+
+
 def validate_current_result(envelope: CurrentWorkerResult, launch: CurrentLaunch) -> None:
     result = envelope.result
     presentation = result.presentation
@@ -228,7 +282,7 @@ def validate_current_result(envelope: CurrentWorkerResult, launch: CurrentLaunch
         or result.decision.information_cutoff != grant.request.information_cutoff
         or result.actionability.deadline_at != grant.request.deadline_at
         or presentation.deadline_at != grant.request.deadline_at
-        or presentation.source_captured_at != grant.request.information_cutoff
+        or not _source_chronology_is_bound(result, launch)
     ):
         raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
     decision = result.decision
@@ -440,6 +494,7 @@ def run_current_recommendation(
                 score_prior_rights_profile_id=cast(
                     ScorePriorProfileId, profiles["OPENFOOTBALL"].rights_profile_id
                 ),
+                _expected_deadline_at=launch.grant.request.deadline_at,
             ),
             OneCommandRequest(
                 entry_id=launch.entry_id,
@@ -533,8 +588,13 @@ class CurrentRefreshSession:
         _scope_is_bound(self._entry_id, approval.source_scopes)
         now = self._clock()
         cutoff = (
-            now if self.owned_sources else now + timedelta(seconds=approval.max_acquisition_seconds)
+            now
+            if self.owned_sources
+            else (now + timedelta(seconds=approval.max_acquisition_seconds)).replace(microsecond=0)
         )
+        # The shared semantic cutoff is also the Odds API's lower fixture filter,
+        # which accepts whole seconds. Shorten only this future acquisition bound;
+        # retain exact observed timestamps throughout the result and its custody.
         # The exact official deadline must come from the separately qualified
         # pilot scope, not a browser timestamp or a stale previous-GW squad.
         deadline = self._deadline

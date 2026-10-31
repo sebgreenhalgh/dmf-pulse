@@ -16,6 +16,10 @@ from dmf_pulse.ingestion.odds.credentials import CredentialProvider
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput, build_current_odds_input
 from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaState
 from dmf_pulse.ingestion.odds.parser import parse_odds_payload
+from dmf_pulse.ingestion.odds.private_operator import (
+    PRIVATE_OPERATOR_PROFILE_ID,
+    require_private_operator_quota,
+)
 from dmf_pulse.ingestion.rights import require_rights
 
 ODDS_PRIVATE_PROFILE_ID = "the_odds_api_private_analytics_v1"
@@ -67,6 +71,14 @@ class CurrentOddsTransientService:
         if self._quota is not None and self._quota.remaining < 2:
             raise IngestionError("QUOTA_EXHAUSTED", "Odds quota is insufficient")
         profile = self._profile or load_rights_profiles()[ODDS_PRIVATE_PROFILE_ID]
+        if profile.rights_profile_id not in {ODDS_PRIVATE_PROFILE_ID, PRIVATE_OPERATOR_PROFILE_ID}:
+            raise IngestionError("RIGHTS_BLOCKED", "unsupported current Odds source profile")
+        if profile.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID:
+            if self._maximum_attempts != 1 or not self._require_known_quota:
+                raise IngestionError(
+                    "RIGHTS_BLOCKED", "new-purpose Odds requires bounded account use"
+                )
+            require_private_operator_quota(profile, self._quota, checked_at=self._clock())
         require_rights(profile, RightsCapability.AUTOMATED_ACCESS, checked_at=self._clock())
         require_rights(profile, RightsCapability.TRANSIENT_PROCESSING, checked_at=self._clock())
         client_options: dict[str, object] = {}

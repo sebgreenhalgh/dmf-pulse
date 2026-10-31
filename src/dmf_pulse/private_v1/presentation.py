@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import UTC, datetime
 from math import isclose
-from typing import Annotated, Literal, Self
+from typing import TYPE_CHECKING, Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from dmf_pulse.availability.current_model import CurrentModelFixtureMinutesInput
 from dmf_pulse.availability.projection import PlayerMinutesProjection
@@ -21,6 +21,9 @@ from dmf_pulse.fpl_points.models import (
 )
 from dmf_pulse.ingestion.fpl.direct_payloads import DirectFplSnapshot
 from dmf_pulse.private_v1.models import PrivateCanonicalPlayerIdentityMap
+
+if TYPE_CHECKING:
+    from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput
 
 
 class PresentationModel(BaseModel):
@@ -45,6 +48,58 @@ class SourceVintage(PresentationModel):
     source_mode: Literal["CURRENT_TRANSIENT", "HISTORICAL_RECONSTRUCTED"]
     source_commit_at: datetime | None = None
     requests: int
+
+
+class MarketQuotaReceipt(PresentationModel):
+    """Complete parsed response-header facts; no reservation or inferred charge."""
+
+    model_config = ConfigDict(revalidate_instances="always")
+
+    source: Literal["PROVIDER_RESPONSE_HEADERS"] = "PROVIDER_RESPONSE_HEADERS"
+    remaining_credits: Annotated[int, Field(ge=0)]
+    used_credits: Annotated[int, Field(ge=0)]
+    last_request_cost: Annotated[int, Field(ge=0)]
+    observed_at: datetime
+    received_at: datetime
+    request_fingerprint: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    transport_call_count: Annotated[int, Field(ge=1)]
+
+    @field_validator("observed_at", "received_at")
+    @classmethod
+    def aware_utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("provider quota timestamps require a UTC offset")
+        return value.astimezone(UTC)
+
+    @model_validator(mode="after")
+    def coherent_headers(self) -> Self:
+        if self.observed_at != self.received_at or self.last_request_cost > self.used_credits:
+            raise ValueError("provider quota facts do not reconcile at receipt")
+        return self
+
+    def require_market_vintage(self, vintages: tuple[SourceVintage, ...]) -> None:
+        markets = tuple(row for row in vintages if row.source == "MARKETS")
+        if (
+            len(markets) != 1
+            or markets[0].source_mode != "CURRENT_TRANSIENT"
+            or markets[0].received_at != self.received_at
+            or markets[0].requests != self.transport_call_count
+        ):
+            raise ValueError("provider quota receipt differs from its market source vintage")
+
+    @classmethod
+    def from_odds(cls, odds: OddsProviderCurrentInput) -> Self:
+        if odds.quota.source != "RESPONSE_HEADERS":
+            raise ValueError("provider quota receipt requires actual response-header provenance")
+        return cls(
+            remaining_credits=odds.quota.remaining,
+            used_credits=odds.quota.used,
+            last_request_cost=odds.quota.provider_last_request_cost,
+            observed_at=odds.quota.observed_at,
+            received_at=odds.temporal.received_at,
+            request_fingerprint=odds.provenance.request_fingerprint,
+            transport_call_count=odds.provenance.transport_call_count,
+        )
 
 
 class FixturePresentation(PresentationModel):
@@ -97,9 +152,18 @@ class PrivatePresentation(PresentationModel):
     current_bank_tenths: Annotated[int, Field(ge=0)] | None = None
     # Preserve transfers.value exactly; neither add bank nor recompute from prices.
     current_team_value_tenths: Annotated[int, Field(gt=0)] | None = None
+    market_quota_receipt: MarketQuotaReceipt | None = None
 
     @model_validator(mode="after")
     def coverage_is_exact(self) -> Self:
+        if self.market_quota_receipt is not None:
+            self.market_quota_receipt.require_market_vintage(self.source_vintages)
+        if (
+            self.market_quota_receipt is not None
+            and self.market_quota_remaining is not None
+            and self.market_quota_receipt.remaining_credits != self.market_quota_remaining
+        ):
+            raise ValueError("legacy remaining quota differs from the complete provider receipt")
         ids = tuple(item.official_id for item in self.catalogue)
         mapped = {item.player_id for item in self.catalogue if item.player_id is not None}
         if len(set(ids)) != len(ids) or not self.gameweeks:
@@ -123,6 +187,7 @@ def build_presentation(
     fixture_mapping: Mapping[str, int],
     source_vintages: tuple[SourceVintage, ...],
     market_quota_remaining: int | None,
+    market_quota_receipt: MarketQuotaReceipt | None = None,
 ) -> PrivatePresentation:
     """Copy completed summaries only; exclude bodies, transports and scenario matrices."""
     player_ids = {
@@ -225,4 +290,5 @@ def build_presentation(
         market_quota_remaining=market_quota_remaining,
         current_bank_tenths=snapshot.current_team.transfers.bank,
         current_team_value_tenths=snapshot.current_team.transfers.value,
+        market_quota_receipt=market_quota_receipt,
     )

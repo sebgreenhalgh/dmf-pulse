@@ -33,6 +33,10 @@ from dmf_pulse.ingestion.odds.models import (
     QuotaSource,
     QuotaState,
 )
+from dmf_pulse.ingestion.odds.private_operator import (
+    PRIVATE_OPERATOR_PROFILE_ID,
+    require_private_operator_quota,
+)
 from dmf_pulse.ingestion.rights import require_rights
 
 __all__ = [
@@ -1345,6 +1349,13 @@ class OddsClient:
     ) -> OddsFetchResult:
         config = load_provider_config()
         require_rights(self._profile, RightsCapability.AUTOMATED_ACCESS, checked_at=self._clock())
+        private_operator = self._profile.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID
+        if private_operator:
+            if self._maximum_attempts != 1:
+                raise IngestionError(
+                    "RIGHTS_BLOCKED", "new-purpose Odds acquisition is single-attempt"
+                )
+            require_private_operator_quota(self._profile, quota, checked_at=self._clock())
         if quota is not None and quota.remaining < config.request_cost:
             raise IngestionError(
                 "QUOTA_EXHAUSTED",
@@ -1405,6 +1416,8 @@ class OddsClient:
                 raise IngestionError(
                     "INTERNAL_INVARIANT", "odds client clock must be timezone-aware"
                 )
+            if private_operator:
+                require_private_operator_quota(self._profile, quota, checked_at=started_at)
             self.transport_call_count += 1
             response, safe_error = _send_transport(transport, attempt_request, credential)
             transport_finished_monotonic = self._monotonic()

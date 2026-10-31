@@ -4,7 +4,8 @@ This programme starts from the accepted Wave 005 engineering commit
 `1e2e9d4dbf5c6af39e0c02cbd12ea487fee9e7b8`. The owner's retained GW10 request
 authorizes preparation, necessary corrections, independent review, and the real
 bounded pilot after its authority and budget are established. It does not replace
-supplier evidence, exact owner acceptance or installed trusted release custody.
+exact owner acceptance or installed trusted release custody. The owner's later
+instruction removes original supplier correspondence as a procedural prerequisite.
 There is no additional ACCEL ticket. The original Availability checkout and Wave
 005 release remain separate and unchanged.
 
@@ -25,17 +26,19 @@ Bind exact required FPL routes in the concrete review/owner acceptance package.
 Supplier expiry and numerical retention duration remain not stated, without
 inventing either. The provider terms and all installed source checks still apply.
 
-Account review 002 is structurally complete. Its referenced redacted account
-evidence must be available for independent entitlement review. A stale October
-observation is not a November quota observation. Refresh the observation after
+The saved account facts and public plan/terms have been independently reviewed
+on an owner-attested basis. Provider-account authentication is not claimed. A stale
+October observation is not a November quota observation. Refresh the observation after
 the actual reset through a permitted account method, keeping operator evidence
 distinct from genuine response quota headers. Never infer a reset balance or
 observed request cost from the 500-credit advertised plan.
 
-The official GW10 deadline candidate is 6 November 2026 at 18:30 UTC. It must be
-verified from an approved official source before enrollment. Search results and
-third-party calendars cannot supply execution authority. No provider API call
-is allowed merely to resolve an otherwise unqualified permission or quota.
+Independent documentary review derives the GW10 deadline of 6 November 2026 at
+18:30 UTC from official Premier League fixtures and the official FPL deadline
+rule. This is not a bootstrap observation. The acquired FPL event must match the
+accepted deadline before the paid Odds acquisition. Search results and third-party
+calendars cannot supply execution authority. No provider API call is allowed merely
+to resolve an otherwise unqualified permission or quota.
 
 ## Engineering corrections
 
@@ -66,13 +69,28 @@ existing pinned score-prior service and provenance. A new project territory does
 not change the CC0 supplier licence, historical source commit or numerical prior.
 The legacy exact processing branch and all numerical kernels remain protected.
 
+The replacement Odds recommendation qualification also passes through the current
+and horizon market paths. Its exact installed profile, account, territory, route,
+quota and one-attempt limit are checked before credential resolution and transport.
+Its source identity stays distinct from the consumed legacy purpose. The private
+profile's transient retention does not authorize persistent market ingestion.
+
+Acquisition timestamps describe actual capture, receipt and usability times within
+the authorized window. The future acquisition cutoff is a bound, not a fabricated
+capture timestamp. The signed current result checks the ordered source chronology
+and actual actionability time. The dashboard reports genuine response remaining,
+used and last-request-cost fields separately from the two-credit reservation.
+
 ## Execution and acceptance
 
-The owner confirmed that no PostgreSQL database has yet been created. Prepare
-the first canonical operator database, explicitly bind that fact and preserve
-older consumed-purpose markers. After initialization, recover that same ledger
-and retained spend; never initialize a replacement to reset consumption. Control
-metadata retention evidence must be bound in the setup/recovery request.
+The owner confirmed there was no existing PostgreSQL database. The first canonical
+operator database has now been initialized with owner-only Windows authentication
+and independently recovered without provider acquisition or reservations. The
+original ledger identity and older consumed-purpose markers are preserved. Recover
+that same ledger and retained spend; never initialize a replacement to reset
+consumption. Control metadata retention evidence is bound in the setup/recovery
+request. The stopped partial initialization and its reviewed same-cluster recovery
+remain separate immutable evidence.
 
 Build the base wheel, authenticate all RECORD entries and exact implementation,
 prepare the complete private pilot/source/account/control/deadline package, and

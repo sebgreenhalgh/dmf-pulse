@@ -22,6 +22,10 @@ from dmf_pulse.ingestion.odds.config import (
 )
 from dmf_pulse.ingestion.odds.models import QuotaState
 from dmf_pulse.ingestion.odds.parser import OddsEvent, OddsMarket, ParsedOddsPayload
+from dmf_pulse.ingestion.odds.private_operator import (
+    PRIVATE_OPERATOR_PROFILE_ID,
+    require_private_operator_profile,
+)
 from dmf_pulse.ingestion.rights import decide_rights, require_rights
 
 _SECRET_FIELD_FRAGMENTS = (
@@ -876,6 +880,20 @@ def build_current_odds_input(
         provider_last_request_cost=quota.last_cost,
         observed_at=quota.observed_at,
     )
+    selected_rights_config = rights_config_sha256()
+    selected_effective_config = effective_config_sha256()
+    if profile.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID:
+        selected_rights_config = require_private_operator_profile(profile, checked_at=received)
+        if require_private_operator_profile(profile, checked_at=usable) != selected_rights_config:
+            raise IngestionError(
+                "RIGHTS_BLOCKED", "new-purpose Odds authority changed during input build"
+            )
+        selected_effective_config = canonical_sha256(
+            {
+                "provider_config_sha256": provider_config_sha256(),
+                "rights_config_sha256": selected_rights_config,
+            }
+        )
     rights = _rights_state(profile, received)
     provenance = CurrentOddsProvenance(
         source_snapshot_id=source_snapshot_id,
@@ -884,8 +902,8 @@ def build_current_odds_input(
         transport_call_count=transport_call_count,
         transport_id=transport_id,
         provider_config_sha256=provider_config_sha256(),
-        rights_config_sha256=rights_config_sha256(),
-        effective_config_sha256=effective_config_sha256(),
+        rights_config_sha256=selected_rights_config,
+        effective_config_sha256=selected_effective_config,
         request_fingerprint=request_fingerprint,
         provider_request_id_sha256=provider_request_id_sha256,
         response_body_sha256=parsed.body_sha256,

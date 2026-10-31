@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from dmf_pulse.fpl_points.models import GameweekPlayerProjectionSummary
 from dmf_pulse.private_v1.models import PrivateV1Decision
@@ -13,6 +13,7 @@ from dmf_pulse.private_v1.one_command import OneCommandResult
 from dmf_pulse.private_v1.presentation import (
     CataloguePlayer,
     FixturePresentation,
+    MarketQuotaReceipt,
     PresentationModel,
     SourceVintage,
 )
@@ -65,10 +66,24 @@ class DeskView(PresentationModel):
         "POINTS_MODE_ONLY",
         "NOT_PRODUCTION_ACTIVE",
         "TRANSIENT_SESSION_NO_RETENTION",
+        "UNVALIDATED_FORECASTS_NO_OUT_OF_SAMPLE_SKILL_CLAIM",
         "Component decomposition is not causal sensitivity; component uncertainty is correlated.",
     )
     source_vintages: tuple[SourceVintage, ...]
     market_quota_remaining: int | None
+    market_quota_receipt: MarketQuotaReceipt | None = None
+
+    @model_validator(mode="after")
+    def quota_receipt_matches_legacy_balance(self) -> Self:
+        if self.market_quota_receipt is not None:
+            self.market_quota_receipt.require_market_vintage(self.source_vintages)
+        if (
+            self.market_quota_receipt is not None
+            and self.market_quota_remaining is not None
+            and self.market_quota_receipt.remaining_credits != self.market_quota_remaining
+        ):
+            raise ValueError("legacy remaining quota differs from the complete provider receipt")
+        return self
 
 
 class PlayerDetail(PresentationModel):
@@ -180,6 +195,7 @@ def desk_view(
         ),
         source_vintages=presentation.source_vintages,
         market_quota_remaining=presentation.market_quota_remaining,
+        market_quota_receipt=presentation.market_quota_receipt,
     )
 
 

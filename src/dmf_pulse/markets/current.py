@@ -66,6 +66,11 @@ from dmf_pulse.ingestion.odds.current import (
     CurrentOddsTotalsMarket,
 )
 from dmf_pulse.ingestion.odds.identity import ResolvedCurrentFixture
+from dmf_pulse.ingestion.odds.private_operator import (
+    PRIVATE_OPERATOR_PROFILE_ID,
+    PrivateCurrentOddsProfileId,
+    require_private_operator_input,
+)
 from dmf_pulse.markets.consensus import evaluate_market_consensus
 from dmf_pulse.markets.models import (
     ExcludedBook,
@@ -195,9 +200,7 @@ class CurrentMarketCanonicalIdentityView(_FrozenModel):
     database_write_performed: Literal[False] = False
     provider_id: UUID
     provider_key: Literal["the_odds_api"] = "the_odds_api"
-    provider_rights_profile_key: Literal["the_odds_api_private_analytics_v1"] = (
-        "the_odds_api_private_analytics_v1"
-    )
+    provider_rights_profile_key: PrivateCurrentOddsProfileId = "the_odds_api_private_analytics_v1"
     fixtures: tuple[CurrentMarketCanonicalFixture, ...] = Field(min_length=1)
     operators: tuple[CurrentMarketCanonicalOperator, ...] = Field(min_length=1)
     semantic_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -210,6 +213,10 @@ class CurrentMarketCanonicalIdentityView(_FrozenModel):
             raise ValueError("canonical identity view cannot perform writes")
         if self.database_read_performed != (self.authority == "DAT_003_READ_ONLY"):
             raise ValueError("canonical identity authority contradicts database-read evidence")
+        if self.provider_rights_profile_key == PRIVATE_OPERATOR_PROFILE_ID and (
+            self.authority != "OPERATOR_INITIATED_DETERMINISTIC" or self.database_read_performed
+        ):
+            raise ValueError("new-purpose Odds identity is restricted to the transient path")
         fixture_keys = [item.official_fpl_fixture_id for item in self.fixtures]
         event_keys = [item.provider_event_id for item in self.fixtures]
         if len(fixture_keys) != len(set(fixture_keys)) or len(event_keys) != len(set(event_keys)):
@@ -362,9 +369,14 @@ def build_transient_current_market_identity_view(
         )
         for key in sorted(bookmaker_by_key)
     )
+    selected_profile = source.odds_input.rights.rights_profile_id
+    if selected_profile == PRIVATE_OPERATOR_PROFILE_ID:
+        require_private_operator_input(source.odds_input)
+    elif selected_profile != _ACCEPTED_ODDS_RIGHTS_PROFILE_ID:
+        raise CurrentMarketConstraintError("RIGHTS_BLOCKED")
     provider_id = uuid5(
         _TRANSIENT_NAMESPACE,
-        "one-command:provider:the_odds_api:the_odds_api_private_analytics_v1",
+        "one-command:provider:the_odds_api:" + selected_profile,
     )
     provisional = CurrentMarketCanonicalIdentityView.model_construct(
         authority="OPERATOR_INITIATED_DETERMINISTIC",
@@ -372,6 +384,7 @@ def build_transient_current_market_identity_view(
         resolution_cutoff=source.information_cutoff,
         database_read_performed=False,
         provider_id=provider_id,
+        provider_rights_profile_key=selected_profile,
         fixtures=fixtures,
         operators=operators,
         semantic_sha256="0" * 64,
@@ -862,7 +875,11 @@ def _accepted_odds_rights_authority() -> tuple[RightsProfile, str]:
 def current_odds_rights_sha256(value: CurrentUnifiedStateBundle) -> str:
     """Bind the complete supplied rights state to the packaged approved authority."""
 
-    profile, accepted_config_sha256 = _accepted_odds_rights_authority()
+    profile, accepted_config_sha256 = (
+        require_private_operator_input(value.odds_input)
+        if value.odds_input.rights.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID
+        else _accepted_odds_rights_authority()
+    )
     return canonical_sha256(
         {
             "accepted_profile": {
@@ -881,6 +898,9 @@ def current_odds_rights_sha256(value: CurrentUnifiedStateBundle) -> str:
 
 
 def _require_accepted_odds_rights(value: CurrentUnifiedStateBundle) -> None:
+    if value.odds_input.rights.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID:
+        require_private_operator_input(value.odds_input)
+        return
     profile, accepted_config_sha256 = _accepted_odds_rights_authority()
     if (
         value.odds_input.provenance.rights_config_sha256 != accepted_config_sha256
@@ -1486,6 +1506,19 @@ def _identity_sets_are_exact(
     source: CurrentUnifiedStateBundle,
     identity_view: CurrentMarketCanonicalIdentityView,
 ) -> bool:
+    if source.odds_input.rights.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID:
+        if (
+            identity_view.provider_rights_profile_key != PRIVATE_OPERATOR_PROFILE_ID
+            or identity_view.authority != "OPERATOR_INITIATED_DETERMINISTIC"
+            or identity_view.provider_id
+            != uuid5(
+                _TRANSIENT_NAMESPACE,
+                "one-command:provider:the_odds_api:" + PRIVATE_OPERATOR_PROFILE_ID,
+            )
+        ):
+            return False
+    elif identity_view.provider_rights_profile_key != _ACCEPTED_ODDS_RIGHTS_PROFILE_ID:
+        return False
     mapped = source.identity_map.fixture_mappings
     expected_fixtures = {
         (
@@ -1926,6 +1959,8 @@ class CurrentMarketCanonicalIdentityRepository:
         *,
         resolved_at: datetime,
     ) -> CurrentMarketCanonicalIdentityView:
+        if source.odds_input.rights.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID:
+            raise CurrentMarketConstraintError("CANONICAL_IDENTITY_UNAVAILABLE")
         try:
             cutoff = require_utc(source.information_cutoff)
             resolution_time = require_utc(resolved_at)

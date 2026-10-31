@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 223167,
+      "bytes": 223766,
       "path": "PLANS.md",
-      "sha256": "0296170a3aae4b1f444a38a452df12d5d225c2bc3086795fd74fd18abc2cdce5"
+      "sha256": "159cd001770106e8984a5e47e08f5065df2bb5d8a85ab6384dc20be731015cf5"
     },
     {
       "bytes": 2761,
@@ -511,9 +511,9 @@
       "sha256": "e623dec1186c98ab3e81349922305c497e7f02a778f4a3d8d3d2a5b85944f95d"
     },
     {
-      "bytes": 7461,
+      "bytes": 8734,
       "path": "docs/operations/GW10_REAL_LAUNCH.md",
-      "sha256": "2199f8dc8f5cbb207f73179a2cae64a2c7448d7562e020247208c9dbc499da89"
+      "sha256": "5d1f5c55919317404aaf2cb75f8c8d548868b3afad93ef9b4c8677bbaa0f8187"
     },
     {
       "bytes": 971,
@@ -3471,9 +3471,9 @@
       "sha256": "d7cb22c35bb0c11d6c4988188206cccc41b464ada97d8f930fcac8bbb6df92f7"
     },
     {
-      "bytes": 32006,
+      "bytes": 34350,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "804c3ba28689c9698417c7bb1b87388cac5f8fe43dbaae5623f83b021fdd36a1"
+      "sha256": "47df7e7ac77c21975188aa2de834348dda696cf729cdcbc3bbd3349a6f0aa78e"
     },
     {
       "bytes": 14092,
@@ -3571,9 +3571,9 @@
       "sha256": "36ecd7e7df58dcf92351e61014df3a30360685dd8d5eeed225be47eb32669328"
     },
     {
-      "bytes": 29431,
+      "bytes": 30309,
       "path": "src/dmf_pulse/dashboard/resources/desk.js",
-      "sha256": "6e314bd8275390dcf010b032d796a48e822ea24ce0c83a1b810de86c898e120d"
+      "sha256": "93b1301fb70d504b456a0468088e3b049419faee103aba11dc2ed9d8ca4f551d"
     },
     {
       "bytes": 1983,
@@ -3596,9 +3596,9 @@
       "sha256": "009dec8cf746f5f6653bd12670396b38ba6b3bf9c770ff784252563dfb43fe73"
     },
     {
-      "bytes": 9021,
+      "bytes": 9821,
       "path": "src/dmf_pulse/dashboard/views.py",
-      "sha256": "67c5ee861f0ba21d56aadd8831b3b29955b72469a29c4fac2a259a07d78baec5"
+      "sha256": "2cedafb1de378c314c6f3ae7b1a3f83e6d6b443aef434040ef432ae26a8ee1bf"
     },
     {
       "bytes": 644,
@@ -4251,9 +4251,9 @@
       "sha256": "e45e09e5c6aef2b4b7693a132a26571a5fe38d47b6fc9ff65b55d4187b13d182"
     },
     {
-      "bytes": 64102,
+      "bytes": 64751,
       "path": "src/dmf_pulse/ingestion/odds/client.py",
-      "sha256": "996f134785a8f70a369688aa977cae764cadc632131f1750a4b222130efca803"
+      "sha256": "507f6dd571732ae2e25fd4997be714a6ddc2f8874cfcc5dcc8561d69406c3430"
     },
     {
       "bytes": 7070,
@@ -4266,9 +4266,9 @@
       "sha256": "3f1beb0b6a22395d9e4f76eb89ce32fd5b1555fec580e48009e881ce5e05952c"
     },
     {
-      "bytes": 39381,
+      "bytes": 40242,
       "path": "src/dmf_pulse/ingestion/odds/current.py",
-      "sha256": "f8e131d2413bcccc2b78959779f0dae0618800f188b524fd2ea5b5299c47e5a9"
+      "sha256": "d04a5e0db9e0f90b60e8306797cdfd224e7b5d88738b6669cb724ccca38e4180"
     },
     {
       "bytes": 24515,
@@ -4276,9 +4276,9 @@
       "sha256": "a8ce492ca29a608f772c5d6c59a331a809e825383eea78bcdc7e352fdf764ed3"
     },
     {
-      "bytes": 75819,
+      "bytes": 76071,
       "path": "src/dmf_pulse/ingestion/odds/identity.py",
-      "sha256": "0c4fd04c32bade5a447d151208d464727854cdc717b81170c94c0cbcaaa5ae2b"
+      "sha256": "8bbef66b1e34f03d0435913f42b669a0dd25335ac1efe82ae2df27c6835b2907"
     },
     {
       "bytes": 18870,
@@ -4301,14 +4301,19 @@
       "sha256": "4353e4012cf464018a1f840e676535784fbd03dff4adcddc966dd7f863b48007"
     },
     {
+      "bytes": 8006,
+      "path": "src/dmf_pulse/ingestion/odds/private_operator.py",
+      "sha256": "8e61f0c1ea12dbe0d82e403b061aca4c5d003beba953442a01c9fb9413a00f17"
+    },
+    {
       "bytes": 56147,
       "path": "src/dmf_pulse/ingestion/odds/service.py",
       "sha256": "6377565a1a679c4cad9f63542d9eae88bf05d05166d783af114659ef5d83bac0"
     },
     {
-      "bytes": 5625,
+      "bytes": 6325,
       "path": "src/dmf_pulse/ingestion/odds/transient.py",
-      "sha256": "e73d0b95d9f11ec47ec81e2ee05448002db2c2a276a21b1a7a2e369a04347086"
+      "sha256": "e217f3b4b535ed2a63a556a0f78e49a8d411a623ebc6afa38815b9610787fce2"
     },
     {
       "bytes": 617,
@@ -4431,9 +4436,9 @@
       "sha256": "5b7b5f41d87b0837cfc5e2e2201b87a2f86589cca6b8bd2f604f7eddf7823b3f"
     },
     {
-      "bytes": 95192,
+      "bytes": 97029,
       "path": "src/dmf_pulse/markets/current.py",
-      "sha256": "5e018a571ebf0bf0a33da7b8e87894f7bb31eb14b93b5b31102d586ba9924b17"
+      "sha256": "849b8b74df6a27f9283c4f94db9f05a8f30e86343d7ade05a2bba8d1341c1231"
     },
     {
       "bytes": 14873,
@@ -5031,9 +5036,9 @@
       "sha256": "5881e39c00fa0d0b1c69ba8ff473f9589be9fe6c7a242d7bc62a2e8e4d889437"
     },
     {
-      "bytes": 20432,
+      "bytes": 21103,
       "path": "src/dmf_pulse/private_v1/horizon_markets.py",
-      "sha256": "0696abaf10f73f24d56db6e18fc52fe473b046a00708244d5fd0342e5ada6554"
+      "sha256": "3138365e7a866da75b2729f5e748cfe91605eef0516d01a08079d638a1f10603"
     },
     {
       "bytes": 16732,
@@ -5051,9 +5056,9 @@
       "sha256": "ba7c9b940910ecc28bd70a2c79393f5549f5b05de43a35f2e5af852f18fd2465"
     },
     {
-      "bytes": 46606,
+      "bytes": 47699,
       "path": "src/dmf_pulse/private_v1/one_command.py",
-      "sha256": "1c789d934fd0b3fcd4f2e8fdcfa31274475a6cf86356193343e888e9bc8b6827"
+      "sha256": "b44bdca1013864fd4b40a07a032bc04f76d9c9b9e576f86ca93d1ff5a7d254c8"
     },
     {
       "bytes": 405,
@@ -5061,9 +5066,9 @@
       "sha256": "16471e9dcb8609c243f26cb03a047db421afac21ef73169da8061d8ab7174f2d"
     },
     {
-      "bytes": 9145,
+      "bytes": 12225,
       "path": "src/dmf_pulse/private_v1/presentation.py",
-      "sha256": "3fd878987315c6d1d9ee649b9d524dce37510e75c11ca5ea9b351f3df498d2cf"
+      "sha256": "4a2b674006403aa2b9890d346b15c22b0304aaf5429958fc4383b39d391a0c8b"
     },
     {
       "bytes": 7710,
@@ -6716,9 +6721,14 @@
       "sha256": "0814de54965990615f0a267223357a28732d8d3f57280a5b1a564595704ee4a6"
     },
     {
-      "bytes": 25427,
+      "bytes": 27902,
       "path": "tests/unit/dashboard/test_current_mode.py",
-      "sha256": "ca7335933a3c6e9d3bdd0abc8e476518fb7495404cb53183318d0bfdf4df7982"
+      "sha256": "a3c7442cb5a88ae08787650cd9fd0e7610518babced15b365bd3e5feea04c4cb"
+    },
+    {
+      "bytes": 12557,
+      "path": "tests/unit/dashboard/test_current_observation_clock.py",
+      "sha256": "a32523fd1193d20e49a38373e4254d1cb1752e7ebe0fbcb94ac75cd5041a0925"
     },
     {
       "bytes": 3638,
@@ -6739,6 +6749,11 @@
       "bytes": 22746,
       "path": "tests/unit/dashboard/test_live_authorization.py",
       "sha256": "753cfb59f9c9b54b797c21bd6619d65f62f821a996ca4df0803a93174a17c482"
+    },
+    {
+      "bytes": 5634,
+      "path": "tests/unit/dashboard/test_market_quota_receipt.py",
+      "sha256": "b3fbdc139ee57755b94d995ad194c786ac4bc98bf8e53afe79a661ae9f8d039b"
     },
     {
       "bytes": 4399,
@@ -7106,6 +7121,11 @@
       "sha256": "2af6115334cdd1a22bee6bc9346449f0976e6df5007e363ade70a41b05aa7606"
     },
     {
+      "bytes": 7575,
+      "path": "tests/unit/ingestion/odds_private_test_support.py",
+      "sha256": "95b28f1b828bb365574c688f08fe0a05c8711519b7adac562f46972576f0bd6b"
+    },
+    {
       "bytes": 4433,
       "path": "tests/unit/ingestion/openfootball/conftest.py",
       "sha256": "52b5767f213bbcf4e88e86118c2e01bab28efae23dd9cab37a264bc0ad4826aa"
@@ -7381,6 +7401,11 @@
       "sha256": "474795e023a4b37e458090cb3441f481e959664fead40a0396739015b59a0c56"
     },
     {
+      "bytes": 9184,
+      "path": "tests/unit/ingestion/test_private_operator_odds.py",
+      "sha256": "aeaf7b7eac2cd24ecadb6fbe7306f05d69ce1d0be28936626d39bd52b93d9d34"
+    },
+    {
       "bytes": 16990,
       "path": "tests/unit/ingestion/test_rights_and_fixtures.py",
       "sha256": "ed74a70fc17840a606043c7858a253e152e904c01fe1dc2a72fd8cdbf124a511"
@@ -7424,6 +7449,11 @@
       "bytes": 4609,
       "path": "tests/unit/markets/test_policy_boundaries.py",
       "sha256": "b38c9674a5f1e7698049ebb715ba9037828ec0c57988baa272368fc152f97d3f"
+    },
+    {
+      "bytes": 4796,
+      "path": "tests/unit/markets/test_private_operator_odds_source.py",
+      "sha256": "9dba8ba81197154d8be3b5a6780ef0b4f3a6a2acee3ec31e713600ce91ba743f"
     },
     {
       "bytes": 21446,
@@ -7814,6 +7844,11 @@
       "bytes": 15062,
       "path": "tests/unit/private_v1/test_live_transient.py",
       "sha256": "4ec2bfcd299e129225d79a8e0696d878dfcc932d037884fc2b445e52f02179e8"
+    },
+    {
+      "bytes": 6783,
+      "path": "tests/unit/private_v1/test_new_purpose_odds_decision.py",
+      "sha256": "3c03031bd54c6c3a68bd5f3551df4f4f55b2348231d66f301b79e6b08e63f7ef"
     },
     {
       "bytes": 28877,

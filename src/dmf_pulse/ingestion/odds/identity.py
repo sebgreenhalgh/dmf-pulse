@@ -448,6 +448,11 @@ def _require_source_rights(
     ):
         raise IngestionError("RIGHTS_BLOCKED", "current FPL identity use violates source rights")
     odds_rights = odds_input.rights
+    if odds_rights.rights_profile_id == "the_odds_api_private_operator_recommendations_v1":
+        from dmf_pulse.ingestion.odds.private_operator import require_private_operator_input
+
+        require_private_operator_input(odds_input)
+        return
     if (
         odds_rights.rights_profile_id != "the_odds_api_private_analytics_v1"
         or odds_rights.rights_profile_version != "1.0.0"

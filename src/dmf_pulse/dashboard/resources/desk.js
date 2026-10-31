@@ -182,7 +182,23 @@ async function showPerformance() {
     }
   } catch(e) {fail(e);}
 }
-function showHealth(){const c=card('Information set & publication');table(c,['Control','Observed value'],[['Source captured (UTC)',view.source_captured_at],['Information cutoff (UTC)',view.information_cutoff],['Official deadline (UTC)',view.deadline_at],['Presentation expires (UTC)',view.expires_at],['Horizon',view.gameweeks.join(', ')],['Decision identity',view.team.decision.semantic_sha256],['Dataset',view.dataset_mode],['Catalogue / valid / unavailable',`${view.catalogue_count} / ${view.projected_count} / ${view.blocked_count}`],['Retention','Memory only; cleared on supersession, failure, cancellation, expiry and shutdown']]);table(c,['Source','Mode','Received UTC','Usable UTC','Requests'],view.source_vintages.map(v=>[v.source,v.source_mode,v.received_at,v.usable_at,v.requests]));c.append(text('p',`Observed market quota remaining: ${view.market_quota_remaining ?? 'Unavailable'}. Historical score priors remain reconstructed; commit time is not a claim of current match evidence.`));details(c,'Exact source identities and commit times',view.source_vintages);details(c,'Source/rules/model lineage',view.team.decision.lineage);details(c,'Quality and exact engine report',view.team.report);}
+function showHealth(){
+  const c=card('Information set & publication'), quota=view.market_quota_receipt;
+  table(c,['Control','Observed value'],[['Source captured (UTC)',view.source_captured_at],['Information cutoff (UTC)',view.information_cutoff],['Official deadline (UTC)',view.deadline_at],['Presentation expires (UTC)',view.expires_at],['Horizon',view.gameweeks.join(', ')],['Decision identity',view.team.decision.semantic_sha256],['Dataset',view.dataset_mode],['Catalogue / valid / unavailable',`${view.catalogue_count} / ${view.projected_count} / ${view.blocked_count}`],['Retention','Memory only; cleared on supersession, failure, cancellation, expiry and shutdown']]);
+  table(c,['Source','Mode','Received UTC','Usable UTC','Requests'],view.source_vintages.map(v=>[v.source,v.source_mode,v.received_at,v.usable_at,v.requests]));
+  table(c,['Market quota','Observed value'],[
+    ['Remaining credits',quota?.remaining_credits ?? view.market_quota_remaining ?? 'Unavailable'],
+    ['Account period used credits',quota?.used_credits ?? 'Unavailable'],
+    ['Actual last request cost (credits)',quota?.last_request_cost ?? 'Unavailable'],
+    ['Transport calls',quota?.transport_call_count ?? 'Unavailable'],
+    ['Received (UTC)',quota?.received_at ?? 'Unavailable'],
+    ['Evidence source',quota?.source ?? 'Unavailable']
+  ]);
+  c.append(text('p',view.dataset_mode === 'PRIVATE_TRANSIENT' ? 'Last request cost comes from the provider response header. Reserved credits are a separate budget, and account period usage includes other requests.' : 'Quota facts in this demonstration come from owned synthetic inputs. They are not a real provider charge.'));
+  c.append(text('p','Historical score priors remain reconstructed; commit time is not a claim of current match evidence.'));
+  if(quota) details(c,'Complete market quota receipt',quota);
+  details(c,'Exact source identities and commit times',view.source_vintages);details(c,'Source/rules/model lineage',view.team.decision.lineage);details(c,'Quality and exact engine report',view.team.report);
+}
 function render(){
   if (view && performance.now() >= expiresPerf) clearPresentation();
   $('content').replaceChildren();
@@ -203,7 +219,7 @@ async function current(expectedJob){
   const remaining=Math.max(0,value.expires_in_seconds*1000-(performance.now()-started));
   if (remaining<=0) {clearPresentation();return;}
   view=value;expiresPerf=performance.now()+remaining;
-  $('mode').textContent=value.dataset_mode;$('notice').textContent=`Ready · GW ${value.gameweeks.join(' / ')} · Expires ${value.expires_at}`;
+  $('mode').textContent=value.dataset_mode;$('notice').textContent=`Ready · Unvalidated forecasts · GW ${value.gameweeks.join(' / ')} · Expires ${value.expires_at}`;
   if(expiry)clearTimeout(expiry);expiry=setTimeout(()=>{clearPresentation();$('notice').textContent='Presentation lifetime ended. Refresh again.';},remaining);render();
 }
 async function poll(){

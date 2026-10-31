@@ -10,6 +10,7 @@ from dataclasses import replace
 from datetime import timedelta
 
 import pytest
+from pydantic import ValidationError
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.dashboard import current as current_module
@@ -200,6 +201,11 @@ def test_current_browser_full_stack_same_run_projections_components_and_optimize
         1,
     )
     assert len(view["gameweeks"]) == horizon
+    quota = result.presentation.market_quota_receipt
+    assert quota is not None
+    assert view["market_quota_receipt"] == quota.model_dump(mode="json")
+    assert (quota.remaining_credits, quota.used_credits, quota.last_request_cost) == (98, 2, 2)
+    assert quota.source == "PROVIDER_RESPONSE_HEADERS" and quota.transport_call_count == 1
     assert view["team"]["decision"] == result.decision.model_dump(mode="json")
     decision = view["team"]["decision"]
     tactics = decision.get("do_now", decision)["tactics"]
@@ -227,6 +233,35 @@ def test_current_browser_full_stack_same_run_projections_components_and_optimize
     assert eligibility["state"] == "ENGINEERING_READY"
     assert eligibility["source_classification"] == "OWNED_SYNTHETIC"
     assert eligibility["qualified_quota_snapshot_remaining"] == 100
+
+
+def test_complete_quota_cannot_disagree_with_legacy_balance_and_legacy_stays_unknown(
+    complete_current,
+):
+    from dmf_pulse.dashboard.views import DeskView, desk_view
+
+    app, cookie, _, _, _, _, result, _ = complete_current
+    presentation = result.presentation
+    payload = presentation.model_dump(mode="json")
+    payload["market_quota_remaining"] += 1
+    with pytest.raises(ValidationError, match="legacy remaining quota"):
+        type(presentation).model_validate_json(json.dumps(payload))
+    _, _, view = request(app, "/api/desk", cookie=cookie)
+    view["market_quota_remaining"] += 1
+    with pytest.raises(ValidationError, match="legacy remaining quota"):
+        DeskView.model_validate_json(json.dumps(view))
+    older_payload = presentation.model_dump(mode="json")
+    del older_payload["market_quota_receipt"]
+    older = type(presentation).model_validate_json(json.dumps(older_payload))
+    assert older.market_quota_receipt is None and older.market_quota_remaining == 98
+    older_view = desk_view(
+        replace(result, presentation=older),
+        job_id="owned-legacy-quota",
+        mode="SYNTHETIC_CURRENT_MODE",
+        generated_at=DEMO_TIME,
+        expires_at=DEMO_TIME + timedelta(minutes=1),
+    )
+    assert older_view.market_quota_receipt is None and older_view.market_quota_remaining == 98
 
 
 def test_current_performance_is_complete_owned_cohort_and_never_real_accuracy(complete_current):
@@ -262,6 +297,9 @@ def test_current_reload_does_not_reserve_or_acquire(complete_current):
         "resealed_deadline",
         "current_bank_tenths",
         "current_team_value_tenths",
+        "quota_used",
+        "quota_last_cost",
+        "quota_request_fingerprint",
     ],
 )
 def test_current_presentation_cannot_be_replaced_or_resealed(complete_current, attack):
@@ -287,6 +325,22 @@ def test_current_presentation_cannot_be_replaced_or_resealed(complete_current, a
         original_value = getattr(presentation, attack)
         assert original_value is not None
         altered = presentation.model_copy(update={attack: original_value + 1})
+    elif attack in {"quota_used", "quota_last_cost", "quota_request_fingerprint"}:
+        quota = presentation.market_quota_receipt
+        assert quota is not None
+        update = (
+            {"used_credits": quota.used_credits + 1}
+            if attack == "quota_used"
+            else {"last_request_cost": 0}
+            if attack == "quota_last_cost"
+            else {
+                "request_fingerprint": ("0" if quota.request_fingerprint[0] != "0" else "1")
+                + quota.request_fingerprint[1:]
+            }
+        )
+        altered = presentation.model_copy(
+            update={"market_quota_receipt": quota.model_copy(update=update)}
+        )
     elif attack in {"gameweek", "gameweek_hash"}:
         row = presentation.gameweeks[0].model_copy(
             update={"gameweek": 999} if attack == "gameweek" else {"result_sha256": "0" * 64}

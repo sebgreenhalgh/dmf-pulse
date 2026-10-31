@@ -26,6 +26,10 @@ from dmf_pulse.ingestion.fpl.current import CurrentFplFixture, CurrentFplTeam
 from dmf_pulse.ingestion.odds.automatic_mapping import _resolve_team
 from dmf_pulse.ingestion.odds.current import CurrentOddsEvent
 from dmf_pulse.ingestion.odds.identity import current_odds_identity_semantic_sha256
+from dmf_pulse.ingestion.odds.private_operator import (
+    PRIVATE_OPERATOR_PROFILE_ID,
+    require_private_operator_input,
+)
 from dmf_pulse.markets.current import (
     CurrentMarketCanonicalFixture,
     CurrentMarketCanonicalIdentityView,
@@ -313,12 +317,22 @@ def _identity_view(
         )
         for book in event.bookmakers
     )
+    selected_profile = source.odds_input.rights.rights_profile_id
+    private_operator = selected_profile == PRIVATE_OPERATOR_PROFILE_ID
+    if private_operator:
+        require_private_operator_input(source.odds_input)
     provisional = CurrentMarketCanonicalIdentityView.model_construct(
         authority="OPERATOR_INITIATED_DETERMINISTIC",
         resolved_at=source.identity_map.mapping_decided_at,
         resolution_cutoff=source.information_cutoff,
         database_read_performed=False,
-        provider_id=uuid5(_NAMESPACE, "provider:the-odds-api"),
+        provider_id=uuid5(
+            _NAMESPACE,
+            "provider:the-odds-api:" + selected_profile
+            if private_operator
+            else "provider:the-odds-api",
+        ),
+        provider_rights_profile_key=selected_profile,
         fixtures=(fixture_view,),
         operators=operators,
         semantic_sha256="0" * 64,
@@ -347,6 +361,8 @@ def build_future_market_evidence(
         raise IngestionError(
             "ROLLING_FUTURE_MARKET_SOURCE_INVALID", "future market source hash invalid"
         )
+    if checked.odds_input.rights.rights_profile_id == PRIVATE_OPERATOR_PROFILE_ID:
+        require_private_operator_input(checked.odds_input)
     source_fixtures = tuple(
         item
         for item in checked.fpl_input.fixtures

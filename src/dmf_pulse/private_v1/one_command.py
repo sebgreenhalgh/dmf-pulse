@@ -71,7 +71,12 @@ from dmf_pulse.private_v1.models import (
     seal_fixture_score_prior,
 )
 from dmf_pulse.private_v1.prepared_control import PreparedRollingControlFlow
-from dmf_pulse.private_v1.presentation import PrivatePresentation, SourceVintage, build_presentation
+from dmf_pulse.private_v1.presentation import (
+    MarketQuotaReceipt,
+    PrivatePresentation,
+    SourceVintage,
+    build_presentation,
+)
 from dmf_pulse.private_v1.progress import NullProgress, ProgressSink
 from dmf_pulse.private_v1.reporting import render_transfer_frontier
 from dmf_pulse.private_v1.rolling import (
@@ -504,7 +509,16 @@ class PrivateV1OneCommandService:
         score_prior_rights_profile_id: ScorePriorProfileId = (
             "openfootball_football_json_score_prior_v1"
         ),
+        _expected_deadline_at: datetime | None = None,
     ) -> None:
+        if _expected_deadline_at is not None and (
+            not isinstance(_expected_deadline_at, datetime)
+            or _expected_deadline_at.tzinfo is None
+            or _expected_deadline_at.utcoffset() is None
+        ):
+            raise PrivateV1Error(
+                "USAGE_INVALID", "expected official deadline must have a UTC offset"
+            )
         if score_prior_rights_profile_id not in {
             "openfootball_football_json_score_prior_v1",
             "openfootball_football_json_private_operator_score_prior_v1",
@@ -529,6 +543,9 @@ class PrivateV1OneCommandService:
         self._clock = clock
         self._collect_presentation = collect_presentation
         self._score_prior_rights_profile_id = score_prior_rights_profile_id
+        self._expected_deadline_at = (
+            None if _expected_deadline_at is None else _expected_deadline_at.astimezone(UTC)
+        )
 
     def run(self, request: OneCommandRequest) -> OneCommandResult:
         self._progress.message("DMF Pulse starting")
@@ -580,6 +597,14 @@ class PrivateV1OneCommandService:
                     captured_at=run_at,
                     clock=observed_now,
                 )
+                if (
+                    self._expected_deadline_at is not None
+                    and snapshot.fpl_input.target_event.deadline_at != self._expected_deadline_at
+                ):
+                    raise PrivateV1Error(
+                        "OFFICIAL_DEADLINE_SCOPE_MISMATCH",
+                        "official target deadline differs from the exact approved deadline",
+                    )
                 deadline_guard.check(snapshot.fpl_input.target_event.deadline_at)
                 ruleset, capability, rules_authority = _rules_authority(approved_at)
                 manager = CurrentManagerStateService(clock=observed_now).compile_provider_snapshot(
@@ -979,6 +1004,7 @@ class PrivateV1OneCommandService:
                         ),
                     ),
                     market_quota_remaining=odds.quota.remaining,
+                    market_quota_receipt=MarketQuotaReceipt.from_odds(odds),
                 )
             report += deadline_notice(snapshot.fpl_input.target_event.deadline_at)
             actionability = deadline_guard.bind(

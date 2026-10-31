@@ -3088,10 +3088,13 @@ the programme subject to the unchanged authority manifest and provider terms.
   preserve the original dirty worktree and clean Wave 005 release.
 - [x] Preserve the owner's permission text privately with its actual chat origin;
   independently examine supplier/account evidence and exact route/purpose closure.
-- [ ] Verify a future official deadline; refresh quota only after the actual reset
-  and through a permitted method, never by inventing balance or timestamps.
+- [x] Independently derive the future GW10 deadline from official documentary
+  sources; require the acquired event to match before paid Odds transport.
+- [ ] Refresh quota only after the actual reset and through a permitted method,
+  never by inventing balance or timestamps.
 - [x] Authenticate the existing base wheel/implementation and installed runtime;
-  inspect canonical PostgreSQL configuration/history without resetting consumption.
+  create and independently recover the first canonical PostgreSQL ledger, preserving
+  older consumed-purpose markers and the stopped partial-initialization evidence.
 - [x] Complete the smallest supported recurring review preparation and any material
   source/custody/decision integration defects, reusing existing numerical engines.
 - [ ] Run targeted checks and independent review, build the exact wheel and complete
@@ -3117,3 +3120,9 @@ consumed purposes. Actual control, installation and execution receipts remain
 detached from the source commit. Independent review clears the bounded recurring,
 team-value, literal route-capacity and replacement OpenFootball-profile changes;
 it grants no provider authority or full-model activation.
+
+The final correction set carries the new Odds purpose through transient current
+and horizon markets, preserves response quota provenance, validates actual source
+chronology against the acquisition window, and checks the acquired FPL deadline
+before the paid Odds request. These corrections change no numerical kernel.
+Owned one-/three-Gameweek tests remain engineering evidence, not a real pilot.
