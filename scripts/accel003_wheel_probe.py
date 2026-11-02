@@ -566,7 +566,7 @@ def _cli(root: Path) -> dict[str, Any]:
     }
 
 
-def _paused_current_worker(pipe: Any, horizon: int, launch: Any, phase: str) -> None:
+def _paused_current_worker(pipe: Any, horizon: int, launch: Any, phase: str, paused: Any) -> None:
     """Owned-only process harness; no product pause flag or alternate engine."""
     from dmf_pulse.dashboard.current import current_worker
     from dmf_pulse.dashboard.current_sources import OwnedFplTransport
@@ -576,7 +576,8 @@ def _paused_current_worker(pipe: Any, horizon: int, launch: Any, phase: str) -> 
 
     def pause(*args: object, **kwargs: object) -> None:
         del args, kwargs
-        pipe.send(("progress", f"OWNED_TEST_{phase.upper()}_PAUSED"))
+        # Test synchronization is separate from the application's closed display channel.
+        paused.set()
         multiprocessing.Event().wait(90)
         raise AssertionError("owned cancellation probe was not terminated")
 
@@ -596,9 +597,10 @@ def _cancellation(phase: str, root: Path) -> dict[str, Any]:
     from dmf_pulse.dashboard.synthetic import DEMO_TIME
 
     started = monotonic()
+    paused = multiprocessing.get_context("spawn").Event()
 
     def factory(launch: Any) -> ProcessWorker:
-        return ProcessWorker(1, _target=_paused_current_worker, _arguments=(launch, phase))
+        return ProcessWorker(1, _target=_paused_current_worker, _arguments=(launch, phase, paused))
 
     runtime = DeskRuntime(
         current_session=CurrentRefreshSession.owned(root / f"cancel-{phase}"),
@@ -621,14 +623,13 @@ def _cancellation(phase: str, root: Path) -> dict[str, Any]:
         worker = runtime._worker
         assert isinstance(worker, ProcessWorker)
         child_pid = worker._process.pid
-        marker = f"OWNED_TEST_{phase.upper()}_PAUSED"
         while monotonic() - started < 90:
             _, _, body = request(app, "/api/status", cookie=cookie)
             state = json.loads(body)
-            if marker in state["stages"] or state["status"] != "RUNNING":
+            if paused.is_set() or state["status"] != "RUNNING":
                 break
             sleep(0.05)
-        assert state["status"] == "RUNNING" and marker in state["stages"], state
+        assert state["status"] == "RUNNING" and paused.is_set(), state
         code, _, body = request(app, "/api/cancel", method="POST", body={}, cookie=cookie)
         assert code == 200 and json.loads(body)["status"] == "CANCELLED"
         assert runtime._worker is None and runtime._result is None and runtime.view() is None
@@ -646,6 +647,7 @@ def _cancellation(phase: str, root: Path) -> dict[str, Any]:
             "phase": phase,
             "actual_spawn_child_pid": child_pid,
             "pause_marker_observed": True,
+            "pause_signal": "OWNED_MULTIPROCESS_EVENT",
             "terminated_and_handle_closed": True,
             "result_withheld": True,
             "reservation_still_spent": True,

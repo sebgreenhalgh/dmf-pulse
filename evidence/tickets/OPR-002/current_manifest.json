@@ -2161,9 +2161,9 @@
       "sha256": "00be151414342e6a74f74ee76f14fec9f084493d447d6d98e6df8ccac4cf86b9"
     },
     {
-      "bytes": 29710,
+      "bytes": 29812,
       "path": "scripts/accel003_wheel_probe.py",
-      "sha256": "3b31b25eed2a3479ce0b7b1ec1916c7ef9e9e9aa7967c519cd98f8e0caebd181"
+      "sha256": "020b50a8a9c2a5bb16f2e355987397e4144a209c306d69666ab98cf87b5d5b95"
     },
     {
       "bytes": 3642,
