@@ -48,7 +48,12 @@ class TeamView(PresentationModel):
 class DeskView(PresentationModel):
     schema_version: Literal["sebs-desk-v1"] = "sebs-desk-v1"
     job_id: str
-    dataset_mode: Literal["SYNTHETIC_DEMONSTRATION", "SYNTHETIC_CURRENT_MODE", "PRIVATE_TRANSIENT"]
+    dataset_mode: Literal[
+        "SYNTHETIC_DEMONSTRATION",
+        "SYNTHETIC_CURRENT_MODE",
+        "PRIVATE_TRANSIENT",
+        "PRIVATE_RETAINED_AS_OF",
+    ]
     generated_at: datetime
     deadline_at: datetime
     expires_at: datetime

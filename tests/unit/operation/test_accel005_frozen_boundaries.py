@@ -122,6 +122,43 @@ def expected_overlay(name):
         )
         loop.body[3:3] = nodes(CLIENT_SEND)
         target.body[2:2] = nodes(CLIENT_HEAD)
+        # OPR-001 adds only a safe response-header receipt hook. Preserve the
+        # entire retained transport, including request, retry and parsing code.
+        transport = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.ClassDef) and node.name == "HttpClientOddsTransport"
+        )
+        initializer = next(
+            node
+            for node in transport.body
+            if isinstance(node, ast.FunctionDef) and node.name == "__init__"
+        )
+        assert [arg.arg for arg in initializer.args.kwonlyargs] == [
+            "connection_factory",
+            "ssl_context_factory",
+            "monotonic",
+        ]
+        parameter = ast.parse(
+            "def owned(*, on_response_headers: Callable[[int, Mapping[str, str]], None] | None = None):\n    return None\n"
+        ).body[0]
+        initializer.args.kwonlyargs.append(parameter.args.kwonlyargs[0])
+        initializer.args.kw_defaults.append(ast.Constant(value=None))
+        initializer.body.extend(nodes("self._on_response_headers = on_response_headers"))
+        sender = next(
+            node
+            for node in transport.body
+            if isinstance(node, ast.FunctionDef) and node.name == "_unsafe_send"
+        )
+        block = next(node for node in sender.body if isinstance(node, ast.Try))
+        anchor = nodes(
+            "headers = _safe_header_pairs([(name, value) for name, value in raw_headers])"
+        )[0]
+        positions = [i for i, node in enumerate(block.body) if dump(node) == dump(anchor)]
+        assert len(positions) == 1
+        block.body[positions[0] + 1 : positions[0] + 1] = nodes(
+            "if self._on_response_headers is not None:\n    self._on_response_headers(response.status, headers)"
+        )
     else:
         assert dump(target.body[7]) == dump(
             nodes("profile = self._profile or load_rights_profiles()[ODDS_PRIVATE_PROFILE_ID]")[0]

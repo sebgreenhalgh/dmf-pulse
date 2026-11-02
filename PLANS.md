@@ -3145,3 +3145,39 @@ functions. All 302 related tests pass after adoption. Package code, wheel bytes,
 verifier scripts and consumed fixtures remain unchanged; a detached source bridge
 retains the actual seven-verifier evidence under its original tested commit.
 The final source still requires fresh complete twenty-job CI.
+
+## Permanent operator workflow (active, 2026-11-01)
+
+The owner's permanent-operation request supersedes the expired per-pilot time
+windows. Existing permissions retain their OWNER_ATTESTED provenance. No old
+acceptance is relabelled as standing approval, and no provider acquisition is
+authorized by engineering tests. Contract: tickets/OPR-001/CONTRACT.md.
+
+- [x] Add one-prompt fresh-JWT expiry handling without reading the legacy slot;
+  credential rotation and metadata reuse pass owned tests.
+- [ ] Qualify the separate zero-credit sports quota route and reconcile actual
+  headers and calendar periods against the original PostgreSQL control history.
+- [ ] Install a fixed standing policy, derive bounded official-Gameweek grants,
+  and prevent duplicate paid acquisition across launches and browser reloads.
+- [x] Expose `dmf start`, private browser startup, immutable private publication,
+  actionable failures, and reviewed maintenance with rollback.
+- [ ] Run targeted and literal acceptance, Windows installation/browser checks,
+  independent review, and preserve exact numerical and P01 identities.
+- [ ] Present the complete standing policy and reviewed installation for one
+  fresh owner decision; then run one genuine bounded acquisition and record
+  actual calls, reserved versus consumed credits, recommendations and errors.
+
+No provider retries, FPL writes, new numerical models, P01 scoring/refitting,
+invented quota periods or synthetic-as-real pilot results are permitted.
+
+Engineering checkpoint 2026-11-02: 697 targeted credential, operation, dashboard
+admission and migration-plan tests pass. Strict typing covers 423 source files.
+The isolated owner-bound test cluster passes the additive migration matrix and
+23 independent journal/concurrency/quiescence tests. Native immutable file leases
+close the earlier root-replacement and buffered-write cache failures; independent
+closure remains required. Initial native clean offline installation succeeded.
+The corrected controller uses the pinned existing base CPython and removes site
+paths from spawn preparation before runpy imports. The final carrier, native
+browser/spawn checks, exact-source CI and one-time standing decision remain open.
+No actual operator standing root, canonical migration, provider request or credit
+reservation has been created by these engineering checks.

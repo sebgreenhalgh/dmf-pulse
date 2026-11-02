@@ -17,6 +17,70 @@ from dmf_pulse.operation.packages import PilotProposal, prepare_pilot, read_meta
 operation_app = typer.Typer(help="Prepare owner review and recover canonical control metadata.")
 
 
+@operation_app.command("install-reviewed-update")
+def install_reviewed_update_command(carrier: Path) -> None:
+    """Install an engineering-signed update inside the existing accepted scope."""
+    from dmf_pulse.operation.installation import activate_reviewed_release
+
+    try:
+        release = activate_reviewed_release(carrier)
+    except (OperationError, ValueError, OSError):
+        typer.echo(
+            "REVIEWED_UPDATE_REFUSED: retain the current release and inspect its technical review.",
+            err=True,
+        )
+        raise typer.Exit(2) from None
+    typer.echo(f"REVIEWED_UPDATE_ACTIVATED: {release.name}; original ledger retained.")
+
+
+@operation_app.command("rollback-reviewed-update")
+def rollback_reviewed_update_command(release_id: str) -> None:
+    """Reactivate a retained signed release without downgrading control history."""
+    from dmf_pulse.operation.installation import rollback_reviewed_release
+
+    try:
+        release = rollback_reviewed_release(release_id)
+    except (OperationError, ValueError, OSError):
+        typer.echo(
+            "REVIEWED_ROLLBACK_REFUSED: inspect the retained release and original control history.",
+            err=True,
+        )
+        raise typer.Exit(2) from None
+    typer.echo(f"REVIEWED_RELEASE_RESTORED: {release.name}; original ledger retained.")
+
+
+@operation_app.command("withdraw-standing")
+def withdraw_standing_command() -> None:
+    """Withdraw the installed standing authority; this command cannot reenroll it."""
+    from dmf_pulse.assurance.canonical import canonical_json_bytes
+    from dmf_pulse.operation.maintenance import RootTrust, _read, operator_root
+
+    try:
+        root = operator_root()
+        trust = RootTrust.model_validate_json(json.dumps(_read(root / "root-trust.json")))
+        marker = root / "withdrawn.json"
+        if not marker.exists():
+            with marker.open("xb") as stream:
+                stream.write(
+                    canonical_json_bytes(
+                        {
+                            "schema_version": "operator-standing-withdrawal-v1",
+                            "owner_acceptance_sha256": trust.owner_acceptance_sha256,
+                            "withdrawn_at": datetime.now(UTC).isoformat(),
+                            "reason": "OWNER_WITHDRAWAL",
+                        }
+                    )
+                    + b"\n"
+                )
+    except (OperationError, ValueError, OSError):
+        typer.echo(
+            "STANDING_WITHDRAWAL_FAILED: close the application and restore access to its installed trust root.",
+            err=True,
+        )
+        raise typer.Exit(2) from None
+    typer.echo("STANDING_AUTHORITY_WITHDRAWN: future source acquisition is blocked.")
+
+
 @operation_app.command("readiness")
 def readiness_command(
     check_credentials: Annotated[

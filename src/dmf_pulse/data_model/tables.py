@@ -4129,3 +4129,62 @@ refresh_control_event = Table(
     ),
     schema="core",
 )
+
+# OPR-001: additive, append-only standing-operation observations and derived
+# private publications. The original refresh ledger remains the spending truth.
+operator_journal = Table(
+    "operator_journal",
+    metadata,
+    Column(
+        "ledger_id",
+        CHAR(64),
+        ForeignKey("core.refresh_control_ledger.ledger_id", ondelete="RESTRICT"),
+        primary_key=True,
+    ),
+    Column("sequence", Integer, primary_key=True),
+    Column("sha256", CHAR(64), nullable=False, unique=True),
+    Column("previous_sha256", CHAR(64), nullable=False),
+    Column("at", DateTime(timezone=True), nullable=False),
+    Column("kind", Text, nullable=False),
+    Column("execution_key", CHAR(64), nullable=True),
+    Column("payload", JSONB, nullable=False),
+    CheckConstraint("sequence >= 0 AND sequence < 100000", name="ck_operator_journal_sequence"),
+    CheckConstraint(
+        "sha256 ~ '^[0-9a-f]{64}$' AND previous_sha256 ~ '^[0-9a-f]{64}$'",
+        name="ck_operator_journal_hashes",
+    ),
+    CheckConstraint(
+        "execution_key IS NULL OR execution_key ~ '^[0-9a-f]{64}$'",
+        name="ck_operator_journal_execution",
+    ),
+    CheckConstraint(
+        "kind IN ('LAUNCH','CLOSE','QUOTA','DISCOVERY','ENROLL','SETTLEMENT','PUBLICATION','FAILURE')",
+        name="ck_operator_journal_kind",
+    ),
+    CheckConstraint(
+        "jsonb_typeof(payload) = 'object' AND octet_length(payload::text) <= 8388608",
+        name="ck_operator_journal_payload",
+    ),
+    schema="core",
+)
+Index(
+    "uq_operator_event_enrollment",
+    operator_journal.c.ledger_id,
+    operator_journal.c.execution_key,
+    unique=True,
+    postgresql_where=text("kind = 'ENROLL'"),
+)
+Index(
+    "uq_operator_event_settlement",
+    operator_journal.c.ledger_id,
+    operator_journal.c.execution_key,
+    unique=True,
+    postgresql_where=text("kind = 'SETTLEMENT'"),
+)
+Index(
+    "uq_operator_event_publication",
+    operator_journal.c.ledger_id,
+    operator_journal.c.execution_key,
+    unique=True,
+    postgresql_where=text("kind = 'PUBLICATION'"),
+)

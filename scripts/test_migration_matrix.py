@@ -136,7 +136,27 @@ def _revision_plan(baseline: str, requested_target: str) -> RevisionPlan:
         "20261029_0008",
         "20261030_0009",
     )
-    if not revisions or (len(revisions) > 3 and not inherited_wave005):
+    permanent_operation = (
+        baseline_script.revision == "20260803_0005"
+        and tuple(revisions)
+        == (
+            "20260807_0006",
+            "20261029_0007",
+            "20261029_0008",
+            "20261030_0009",
+            "20261101_0010",
+        )
+    ) or (
+        baseline_script.revision == "20260807_0006"
+        and tuple(revisions)
+        == (
+            "20261029_0007",
+            "20261029_0008",
+            "20261030_0009",
+            "20261101_0010",
+        )
+    )
+    if not revisions or (len(revisions) > 3 and not (inherited_wave005 or permanent_operation)):
         raise MatrixError("migration matrix requires a reviewed ordered revision path")
     if baseline_script.revision == "20260724_0002" and tuple(revisions) != (
         "20260725_0003",
@@ -790,7 +810,7 @@ def run_matrix(
             "CREATE TABLE football.team_season",
             "CREATE TABLE fpl.player_season",
         ]
-        if plan.target in {"20261029_0007", "20261029_0008", "20261030_0009"}:
+        if plan.target in {"20261029_0007", "20261029_0008", "20261030_0009", "20261101_0010"}:
             required_sql.extend(
                 (
                     "CREATE TABLE evaluation.qualified_source",
@@ -800,7 +820,7 @@ def run_matrix(
                     "PLAYER_SOURCE_RIGHTS_BLOCKED",
                 )
             )
-        if plan.target == "20261030_0009":
+        if plan.target in {"20261030_0009", "20261101_0010"}:
             required_sql.extend(
                 (
                     "CREATE FUNCTION evaluation.real_authority()",
@@ -967,7 +987,9 @@ def run_matrix(
         "status": "PASS",
         "target_revision": plan.target,
         "ticket_id": (
-            "DMF-PULSE-ACCEL-005"
+            "OPR-001"
+            if plan.target == "20261101_0010"
+            else "DMF-PULSE-ACCEL-005"
             if plan.target == "20261030_0009"
             else "DMF-PULSE-ACCEL-003"
             if plan.target == "20261029_0008"

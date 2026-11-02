@@ -23,6 +23,8 @@ function showEligibility(parent) {
     ['Qualified quota snapshot', providerEligibility.qualified_quota_snapshot_remaining ?? 'Unavailable']
   ]);
   c.append(text('p', 'Quota above is a qualified snapshot. A completed run shows its separately observed response quota. Refresh is operator-triggered; reloading this page makes no provider acquisition.'));
+  const actual=providerEligibility.actual_market_quota;
+  if(actual){table(c,['Latest charged response','Actual provider header'],[['Remaining credits',actual.remaining_credits],['Used credits',actual.used_credits],['Last request cost',actual.last_request_cost],['Reserved credits',actual.reserved_credits],['Received UTC',actual.received_at],['Reconciles with ledger',actual.consistent_with_ledger?'Yes':'No - further acquisition blocked']]);c.append(text('p','Actual response quota is retained even if the forecast later fails. Reserved credits are a separate budget.'));}
 }
 const requests = new Set();
 const fmt = (x, n = 2) => x === null || x === undefined ? 'Unavailable' : Number(x).toFixed(n);
@@ -117,10 +119,11 @@ function showPlayers() {
   view.players.filter(p=>p.expected_points!==null).forEach(p=>{[selectA,selectB].forEach(s=>{const o=text('option',p.catalogue.name);o.value=p.catalogue.official_id;s.append(o);});}); selectB.selectedIndex=1;
   const compare=text('button','Compare players'); compare.onclick=async()=>{try{const result=await api(`/api/compare/${selectA.value}/${selectB.value}`);$('content').replaceChildren();renderDetail(result.left);renderDetail(result.right);}catch(e){fail(e);}};add(controls,selectA,selectB,compare);
   const region=text('div','');c.append(region);
+  if(view.dataset_mode === 'PRIVATE_RETAINED_AS_OF') {compare.disabled=true;selectA.disabled=true;selectB.disabled=true;c.append(text('p','Saved player means are available below. Detailed distributions belonged to the original live session.'))}
   function render() {region.replaceChildren();const query=search.value.toLowerCase();const rows=view.players.filter(p=>`${p.catalogue.name} ${p.catalogue.team} ${p.catalogue.position}`.toLowerCase().includes(query)); rows.sort((a,b)=>{if(sort.value==='name')return a.catalogue.name.localeCompare(b.catalogue.name);const av=sort.value==='price'?a.catalogue.price_tenths:a[sort.value],bv=sort.value==='price'?b.catalogue.price_tenths:b[sort.value];return (bv===null?-Infinity:Number(bv))-(av===null?-Infinity:Number(av));});table(region,['Player','Team / position','Price £','GW xPts','3GW xPts','xPts/£','Minutes','Start %','60+ %','Goal xPts','Assist xPts','Clean-sheet xPts','Bonus xPts','Modelled fixtures','Confidence','Availability'],rows.map(p=>{const b=text('button',p.catalogue.name);b.onclick=()=>openPlayer(p.catalogue.official_id);return[b,`${p.catalogue.team} / ${p.catalogue.position}`,fmt(p.catalogue.price_tenths/10),fmt(p.expected_points),fmt(p.three_gameweek_expected_points),fmt(p.points_per_price),fmt(p.expected_minutes,1),p.p_start===null?'Per fixture':fmt(Number(p.p_start)*100),p.p_60_plus===null?'Per fixture':fmt(Number(p.p_60_plus)*100),fmt(p.goals_contribution),fmt(p.assists_contribution),fmt(p.clean_sheet_contribution),fmt(p.bonus_contribution),p.fixtures.join('; '),p.confidence || 'Unavailable',p.catalogue.unavailable_reason || (p.fallback?'Historical fallback':'Projected')];}));}
   search.oninput=render;sort.onchange=render;render();
 }
-async function openPlayer(id) {try{const player=await api(`/api/players/${id}`);$('content').replaceChildren();renderDetail(player);}catch(e){fail(e);}}
+async function openPlayer(id) {if(view?.dataset_mode === 'PRIVATE_RETAINED_AS_OF') {$('notice').textContent='Saved as-of player means are shown in the table. Detailed distributions are unavailable in this retained snapshot.';return;}try{const player=await api(`/api/players/${id}`);$('content').replaceChildren();renderDetail(player);}catch(e){fail(e);}}
 function renderDetail(player) {
   if (!paired || document.hidden || !view || player.job_id !== view.job_id || performance.now() >= expiresPerf) return;
   const back=text('button','← Player catalogue','back');back.onclick=()=>render();$('content').append(back);
@@ -184,7 +187,8 @@ async function showPerformance() {
 }
 function showHealth(){
   const c=card('Information set & publication'), quota=view.market_quota_receipt;
-  table(c,['Control','Observed value'],[['Source captured (UTC)',view.source_captured_at],['Information cutoff (UTC)',view.information_cutoff],['Official deadline (UTC)',view.deadline_at],['Presentation expires (UTC)',view.expires_at],['Horizon',view.gameweeks.join(', ')],['Decision identity',view.team.decision.semantic_sha256],['Dataset',view.dataset_mode],['Catalogue / valid / unavailable',`${view.catalogue_count} / ${view.projected_count} / ${view.blocked_count}`],['Retention','Memory only; cleared on supersession, failure, cancellation, expiry and shutdown']]);
+  const retention=view.restrictions.includes('PRIVATE_DERIVED_RECEIPT_RETAINED_SOURCE_BODIES_TRANSIENT')?'Source inputs are transient. Derived recommendations and audit receipts are retained privately.':'Memory-only presentation; cleared when the session ends.';
+  table(c,['Control','Observed value'],[['Source captured (UTC)',view.source_captured_at],['Information cutoff (UTC)',view.information_cutoff],['Official deadline (UTC)',view.deadline_at],['Presentation expires (UTC)',view.expires_at],['Horizon',view.gameweeks.join(', ')],['Decision identity',view.team.decision.semantic_sha256],['Dataset',view.dataset_mode],['Catalogue / valid / unavailable',`${view.catalogue_count} / ${view.projected_count} / ${view.blocked_count}`],['Retention',retention]]);
   table(c,['Source','Mode','Received UTC','Usable UTC','Requests'],view.source_vintages.map(v=>[v.source,v.source_mode,v.received_at,v.usable_at,v.requests]));
   table(c,['Market quota','Observed value'],[
     ['Remaining credits',quota?.remaining_credits ?? view.market_quota_remaining ?? 'Unavailable'],
@@ -220,6 +224,7 @@ async function current(expectedJob){
   if (remaining<=0) {clearPresentation();return;}
   view=value;expiresPerf=performance.now()+remaining;
   $('mode').textContent=value.dataset_mode;$('notice').textContent=`Ready · Unvalidated forecasts · GW ${value.gameweeks.join(' / ')} · Expires ${value.expires_at}`;
+  if(value.dataset_mode === 'PRIVATE_RETAINED_AS_OF') $('notice').textContent=`Saved as-of ${value.generated_at}. Unvalidated GW ${value.gameweeks.join(' / ')} snapshot; no new paid acquisition. This is not current data.`;
   if(expiry)clearTimeout(expiry);expiry=setTimeout(()=>{clearPresentation();$('notice').textContent='Presentation lifetime ended. Refresh again.';},remaining);render();
 }
 async function poll(){
@@ -249,6 +254,9 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){clearPrese
 window.addEventListener('pagehide',()=>{clearPresentation();providerEligibility=null;});window.addEventListener('pageshow',()=>{if(paired)poll();});
 
 // A reload resumes only a server-authenticated session; no private view is restored locally.
+// A deferred script installs both handlers before session bootstrap. Browser
+// controllers must wait for document completion and this readiness marker.
+document.documentElement.dataset.dmfReady = 'true';
 api('/api/context').then(context=>{
   if(document.hidden||paired)return;
   applyContext(context);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;

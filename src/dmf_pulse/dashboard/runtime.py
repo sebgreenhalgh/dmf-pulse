@@ -46,7 +46,13 @@ class JobState(PresentationModel):
     @computed_field
     def error_action(self) -> str | None:
         """Fixed operator guidance only; no provider or credential observation."""
-        return CURRENT_FAILURE_ACTIONS.get(self.error_code) if self.error_code is not None else None
+        if self.error_code is None:
+            return None
+        from dmf_pulse.operation.failures import OPERATOR_FAILURE_ACTIONS
+
+        return CURRENT_FAILURE_ACTIONS.get(self.error_code) or OPERATOR_FAILURE_ACTIONS.get(
+            self.error_code
+        )
 
 
 class Worker(Protocol):
@@ -165,6 +171,7 @@ class DeskRuntime:
         elapsed_clock: Callable[[], float] = monotonic,
         lifetime_seconds: int = 900,
         run_timeout_seconds: int = 900,
+        on_publication: Callable[[DeskView], None] | None = None,
     ) -> None:
         if not 1 <= lifetime_seconds <= 900 or not 1 <= run_timeout_seconds <= 900:
             raise ValueError("runtime bounds exceed private lifetime")
@@ -190,6 +197,7 @@ class DeskRuntime:
         self._last_wall: datetime | None = None
         self._publication_floor: datetime | None = None
         self._closed = False
+        self._on_publication = on_publication
 
     def _now(self) -> datetime:
         value = self._clock()
@@ -371,6 +379,8 @@ class DeskRuntime:
             generated_at=now,
             expires_at=expires,
         )
+        if self._on_publication is not None:
+            self._on_publication(self._view)
         self._result = value
         self._current_result = envelope
         self._publication_floor = now

@@ -3,6 +3,8 @@
 These constants disclose reasons; they grant no authority and change no budgets.
 """
 
+from dmf_pulse.operation.failures import OPERATOR_FAILURE_ACTIONS
+
 CURRENT_FAILURE_ACTIONS = {
     "FPL_SUPPLIER_PERMISSION_REQUIRED": "Qualify supplier permission or an applicable exception for the exact FPL routes; owner risk acceptance is insufficient.",
     "NEW_ODDS_PURPOSE_QUALIFICATION_REQUIRED": "Review current account evidence and approve the new Odds purpose; the consumed historical profile cannot authorize this pilot.",
@@ -31,7 +33,7 @@ CURRENT_FAILURE_ACTIONS = {
     "AUTHORIZATION_HORIZON_NOT_APPROVED": "Use an approved one- or three-GW horizon.",
     "AUTHORIZATION_DEADLINE_SCOPE_MISMATCH": "Qualify the exact official deadline in the installed approval.",
     "RUN_TIMEOUT": "The worker timed out; inspect control usage before any authorized retry.",
-    "QUALIFIED_QUOTA_EVIDENCE_STALE": "Qualify fresh dated remaining-credit evidence; no live quota probe is authorized.",
+    "QUALIFIED_QUOTA_EVIDENCE_STALE": "Quota evidence expired before the charged request. The standing launcher requires a fresh authorized zero-credit check; no automatic charged retry is allowed.",
     "AUTHORIZATION_DEADLINE_INVALID": "Replace invalid or expired official deadline evidence in a reviewed approval.",
     "USAGE_LEDGER_SCHEMA_NOT_READY": "Install and run the accepted canonical control migration before recovery.",
     "SOURCE_PROFILE_CHANGED": "Review the changed provider terms/profile and enroll its exact current hash.",
@@ -82,6 +84,7 @@ CURRENT_FAILURE_ACTIONS.update(
     }
 )
 
+CURRENT_FAILURE_ACTIONS.update(OPERATOR_FAILURE_ACTIONS)
 CURRENT_FAILURE_CODES = frozenset(CURRENT_FAILURE_ACTIONS)
 CREDENTIAL_FAILURE_CODES = frozenset(
     code for code in CURRENT_FAILURE_CODES if code.startswith("CREDENTIAL_")

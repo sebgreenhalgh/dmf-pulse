@@ -26,6 +26,12 @@ _MESSAGES = {
     "CREDENTIAL_LOCK_TIMEOUT": "Another credential mutation is in progress. Retry the explicit setup operation later.",
     "CREDENTIAL_SECURE_INPUT_REQUIRED": "Secure terminal input is unavailable. Run this setup command in an interactive PowerShell terminal.",
     "CREDENTIAL_FRESH_ISSUANCE_REQUIRED": "A freshly issued FPL replacement is required. Use --fresh-issued with its actual expiry; never reuse the exposed token.",
+    "CREDENTIAL_JWT_INVALID": "The new FPL token has invalid JWT syntax or expiry claims. Supply a freshly issued JWT through secure input.",
+    "CREDENTIAL_LIFETIME_INSUFFICIENT": "The FPL token has too little time remaining for this run. Issue a fresh token and use secure input again.",
+    "CREDENTIAL_LIFETIME_EXCESSIVE": "The token expiry exceeds the accepted local lifetime limit. Supply the intended freshly issued FPL token.",
+    "CREDENTIAL_NOT_YET_VALID": "The token time claims are not yet valid. Supply a current freshly issued FPL token.",
+    "CREDENTIAL_POLICY_INVALID": "The configured FPL token lifetime policy is invalid.",
+    "CREDENTIAL_INPUT_CANCELLED": "Secure FPL token entry was cancelled; no new token was stored.",
 }
 
 
@@ -207,6 +213,8 @@ def _write_scope(
     clock: Callable[[], datetime],
     replace: bool,
     fresh_issuance_attested: bool,
+    minimum_remaining_seconds: int = 0,
+    maximum_remaining_seconds: int | None = None,
 ) -> _Outcome:
     try:
         _validate(value, provider)
@@ -222,7 +230,17 @@ def _write_scope(
         with backend.mutation_lock():
             now = _utc(clock())
             if expires_at is not None and expires_at <= now:
-                return _Outcome(code="CREDENTIAL_EXPIRY_REQUIRED")
+                return _Outcome(
+                    code="CREDENTIAL_EXPIRED"
+                    if minimum_remaining_seconds > 0
+                    else "CREDENTIAL_EXPIRY_REQUIRED"
+                )
+            if expires_at is not None:
+                remaining = (expires_at - now).total_seconds()
+                if remaining < minimum_remaining_seconds:
+                    return _Outcome(code="CREDENTIAL_LIFETIME_INSUFFICIENT")
+                if maximum_remaining_seconds is not None and remaining > maximum_remaining_seconds:
+                    return _Outcome(code="CREDENTIAL_LIFETIME_EXCESSIVE")
             metadata: dict[str, object] = {
                 "schema_version": f"credential-metadata-v{2 if provider == 'fpl' else 1}",
                 "provider": provider,
@@ -239,6 +257,13 @@ def _write_scope(
             if expires_at is not None and expires_at <= _utc(clock()):
                 backend.delete(provider)
                 return _Outcome(code="CREDENTIAL_EXPIRED")
+            if (
+                expires_at is not None
+                and minimum_remaining_seconds > 0
+                and (expires_at - _utc(clock())).total_seconds() < minimum_remaining_seconds
+            ):
+                backend.delete(provider)
+                return _Outcome(code="CREDENTIAL_LIFETIME_INSUFFICIENT")
         return _Outcome()
     except CredentialError as exc:
         code = exc.code
@@ -321,6 +346,56 @@ class CredentialService:
         del self, secret
         if outcome.code is not None:
             raise CredentialError(outcome.code) from None
+
+    def set_fpl_jwt(
+        self,
+        secret: SecretStr,
+        *,
+        minimum_remaining_seconds: int,
+        maximum_remaining_seconds: int | None = None,
+    ) -> datetime:
+        """Blind-write new FPL v2 input using its unverified in-memory JWT expiry."""
+        code, expires_at = self._set_fpl_jwt(
+            secret, minimum_remaining_seconds, maximum_remaining_seconds
+        )
+        del self, secret
+        if code is not None:
+            raise CredentialError(code) from None
+        if expires_at is None:
+            raise CredentialError("CREDENTIAL_JWT_INVALID") from None
+        return expires_at
+
+    def _set_fpl_jwt(
+        self,
+        secret: SecretStr,
+        minimum_remaining_seconds: int,
+        maximum_remaining_seconds: int | None,
+    ) -> tuple[str | None, datetime | None]:
+        try:
+            from dmf_pulse.credentials.jwt import fpl_jwt_expiry
+
+            expires_at = fpl_jwt_expiry(
+                secret,
+                now=self._clock(),
+                minimum_remaining_seconds=minimum_remaining_seconds,
+                maximum_remaining_seconds=maximum_remaining_seconds,
+            )
+            outcome = _write_scope(
+                self._factory(),
+                "fpl",
+                secret.get_secret_value(),
+                expires_at,
+                self._clock,
+                True,
+                True,
+                minimum_remaining_seconds,
+                maximum_remaining_seconds,
+            )
+            return outcome.code, expires_at if outcome.code is None else None
+        except CredentialError as error:
+            return error.code, None
+        except Exception:
+            return "CREDENTIAL_BACKEND_UNAVAILABLE", None
 
     def _set(
         self,

@@ -72,6 +72,20 @@ class MetadataTime(Metadata):
     checked_at: datetime
 
 
+class ChargedQuotaStatus(Metadata):
+    """Committed response headers, available even if forecasting later fails."""
+
+    source: Literal["ACTUAL_CHARGED_RESPONSE_HEADERS"] = "ACTUAL_CHARGED_RESPONSE_HEADERS"
+    remaining_credits: Annotated[int, Field(ge=0)]
+    used_credits: Annotated[int, Field(ge=0)]
+    last_request_cost: Annotated[int, Field(ge=0)]
+    reserved_credits: Literal[2] = 2
+    received_at: datetime
+    provider_status: Annotated[int, Field(ge=100, le=599)]
+    consistent_with_ledger: bool
+    receipt_sha256: Sha
+
+
 class StageCheck(Metadata):
     stage: Stage
     state: Literal["NOT_CHECKED", "VERIFIED", "BLOCKED", "EXPIRED"] = "NOT_CHECKED"

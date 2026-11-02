@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import json
 import os
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -42,6 +42,7 @@ from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsProfile
 from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaSource, QuotaState
 from dmf_pulse.ingestion.openfootball.service import ScorePriorProfileId
+from dmf_pulse.operation.models import ChargedQuotaStatus
 from dmf_pulse.private_v1.actionability import checked_report
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import PrivateV1Decision
@@ -74,14 +75,21 @@ class CurrentEligibility(PresentationModel):
     error_code: str | None = None
     deadline_at: datetime | None = None
     qualified_quota_snapshot_remaining: int | None = None
-    retention: Literal["TRANSIENT_INPUTS_CONTROL_METADATA_ONLY"] = (
-        "TRANSIENT_INPUTS_CONTROL_METADATA_ONLY"
-    )
+    actual_market_quota: ChargedQuotaStatus | None = None
+    retention: Literal[
+        "TRANSIENT_INPUTS_CONTROL_METADATA_ONLY",
+        "TRANSIENT_INPUTS_PRIVATE_DERIVED_RECEIPT_RETAINED",
+    ] = "TRANSIENT_INPUTS_CONTROL_METADATA_ONLY"
 
 
 def implementation_fingerprint() -> str:
     """160-bit SHA-256 package-content pin, independent of caller/env Git assertions."""
     root = Path(str(files("dmf_pulse")))
+    from dmf_pulse.operation.maintenance import cached_implementation_fingerprint
+
+    verified = cached_implementation_fingerprint(root)
+    if verified is not None:
+        return verified
     digest = hashlib.sha256()
     for path in sorted(root.rglob("*")):
         if not path.is_file() or "__pycache__" in path.parts or path.suffix == ".pyc":
@@ -340,6 +348,8 @@ class CurrentAcquisitionGuard:
                 launch.grant.ledger_id, launch.control_account_ref, launch.database_ref
             )
         self._closed = False
+        self._odds_headers_observed = False
+        self._next_transport_provider: Provider | None = None
         self.failure: _GuardFailure | None = None
         self._ledger.claim(launch.grant, launch.worker_id, now=clock())
 
@@ -369,6 +379,8 @@ class CurrentAcquisitionGuard:
             self._ledger.check_transport_window(
                 self._launch.grant, self._launch.worker_id, now=self._clock()
             )
+            if self._next_transport_provider == "ODDS":
+                self._require_standing_quota_current()
         except AuthorizationError as error:
             if self.failure is None:
                 self.failure = _GuardFailure(*safe_authorization_fields(error))
@@ -378,6 +390,9 @@ class CurrentAcquisitionGuard:
         try:
             if self._closed:
                 raise AuthorizationError("ACQUISITION_CLOSED")
+            self._next_transport_provider = provider
+            if provider == "ODDS":
+                self._require_standing_quota_current()
             self._ledger.attempt(
                 self._launch.grant,
                 self._launch.worker_id,
@@ -408,6 +423,8 @@ class CurrentAcquisitionGuard:
             # The read-only transaction can wait too. Do not resolve a key if
             # that wait crossed the same grant/cutoff boundary.
             self.before_transport()
+            if provider == "ODDS":
+                self._require_standing_quota_current()
         except AuthorizationError as error:
             if self.failure is None:
                 self.failure = _GuardFailure(*safe_authorization_fields(error))
@@ -415,6 +432,58 @@ class CurrentAcquisitionGuard:
 
     def finish_acquisition(self) -> None:
         self._closed = True
+
+    def _require_standing_quota_current(self) -> None:
+        if not self._launch.grant.request.authorization_id.startswith("OPR001-"):
+            return
+        from dmf_pulse.operation.models import OperationError
+        from dmf_pulse.operation.standing import require_policy
+
+        try:
+            policy = require_policy()
+            observed = self._launch.quota.observed_at
+            if (
+                not observed
+                <= self._clock()
+                <= observed + timedelta(seconds=policy.limits.quota_max_age_seconds)
+            ):
+                raise AuthorizationError("QUALIFIED_QUOTA_EVIDENCE_STALE")
+        except OperationError as error:
+            raise AuthorizationError(error.code) from None
+
+    def observe_odds_response(self, response: object) -> None:
+        """Persist actual standing-run headers before response/model parsing."""
+        if (
+            self._odds_headers_observed
+            or not self._launch.grant.request.authorization_id.startswith("OPR001-")
+        ):
+            return
+        from dmf_pulse.ingestion.odds.client import OddsHttpResponse
+
+        if not isinstance(response, OddsHttpResponse):
+            raise AuthorizationError("CHARGED_QUOTA_RESPONSE_INVALID")
+        self.observe_odds_headers(response.status_code, response.headers)
+
+    def observe_odds_headers(self, status: int, headers: Mapping[str, str]) -> None:
+        """Commit safe counters as soon as headers arrive, including body timeouts."""
+        if (
+            self._odds_headers_observed
+            or not self._launch.grant.request.authorization_id.startswith("OPR001-")
+        ):
+            return
+        from dmf_pulse.operation.journal import OperationJournal
+        from dmf_pulse.operation.models import OperationError
+        from dmf_pulse.operation.standing import require_policy
+
+        try:
+            OperationJournal.production(require_policy()).settle_response(
+                self._launch.grant, headers, status, now=self._clock()
+            )
+            self._odds_headers_observed = True
+        except OperationError as error:
+            if self.failure is None:
+                self.failure = _GuardFailure(error.code, "BLOCKED")
+            raise AuthorizationError(error.code) from None
 
 
 def _current_service_scope(
@@ -478,6 +547,7 @@ def run_current_recommendation(
         fpl_profile=profiles["FPL"],
         odds_profile=profiles["ODDS"],
         score_profile=profiles["OPENFOOTBALL"],
+        protected_odds_only=launch.grant.request.authorization_id.startswith("OPR001-"),
         quota=launch.quota,
         clock=active_clock,
     )

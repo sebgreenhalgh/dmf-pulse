@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from collections.abc import Callable
 from datetime import datetime
@@ -119,7 +120,11 @@ class GuardedOddsTransport:
     def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
         self._guard.before_send("ODDS", request.method, request.host, request.path)
         self._guard.before_transport()
-        return self._delegate.send(request, credential)
+        response = self._delegate.send(request, credential)
+        observe = getattr(self._guard, "observe_odds_response", None)
+        if observe is not None:
+            observe(response)
+        return response
 
 
 class GuardedScoreTransport:
@@ -278,10 +283,12 @@ class CurrentSourceFactories:
         quota: QuotaState | QualifiedOperatorQuota,
         clock: Callable[[], datetime],
         score_profile: RightsProfile | None = None,
+        protected_odds_only: bool = False,
     ) -> None:
         self._guard, self._owned, self._clock = guard, owned, clock
         self._fpl_profile, self._odds_profile, self._quota = fpl_profile, odds_profile, quota
         self._score_profile = score_profile
+        self._protected_odds_only = protected_odds_only
         if owned:
             from dmf_pulse.dashboard.synthetic import demo_inputs
 
@@ -323,6 +330,17 @@ class CurrentSourceFactories:
                 environment={"THE_ODDS_API_KEY": "placeholder" + "-placeholder"}
             )
             if self._owned
+            else AutomaticOddsCredentialProvider(
+                environment={
+                    "DMF_ODDS_CREDENTIAL_SOURCE": "auto",
+                    **(
+                        {"CREDENTIALS_DIRECTORY": os.environ["CREDENTIALS_DIRECTORY"]}
+                        if "CREDENTIALS_DIRECTORY" in os.environ
+                        else {}
+                    ),
+                }
+            )
+            if self._protected_odds_only
             else AutomaticOddsCredentialProvider()
         )
         credentials = _GuardedOddsCredentialProvider(self._guard, delegate_credentials)
@@ -330,7 +348,13 @@ class CurrentSourceFactories:
         def client(profile: RightsProfile, **kwargs: object) -> OddsClient:
             del kwargs
             delegate: OddsTransport = (
-                OwnedOddsTransport() if self._owned else HttpClientOddsTransport()
+                OwnedOddsTransport()
+                if self._owned
+                else HttpClientOddsTransport(
+                    on_response_headers=getattr(self._guard, "observe_odds_headers", None)
+                    if self._protected_odds_only
+                    else None
+                )
             )
             return OddsClient(
                 profile,

@@ -73,6 +73,7 @@ def create_app(
     pairing_code: str,
     port: int,
     elapsed_clock: Callable[[], float] = monotonic,
+    trusted_local_navigation: bool = False,
 ) -> FastAPI:
     """No listener, browser, environment or filesystem mutation until the CLI starts it."""
     if not 1024 <= port <= 65535 or len(pairing_code) < 20:
@@ -192,12 +193,30 @@ def create_app(
         return response
 
     @app.get("/")
-    async def index() -> Response:
-        return Response(
+    async def index(request: Request) -> Response:
+        nonlocal session, session_started, paired, pairing_code
+        response = Response(
             files("dmf_pulse.dashboard.resources").joinpath("index.html").read_bytes(),
             media_type="text/html",
             headers=_HEADERS,
         )
+        if trusted_local_navigation and not paired:
+            # Explicit `dmf start` owns this loopback listener. Only a top-level
+            # direct browser navigation can bootstrap its one local session;
+            # cross-site requests, frames, scripts and API calls cannot pair it.
+            if (
+                request.headers.get("sec-fetch-site") != "none"
+                or request.headers.get("sec-fetch-mode") != "navigate"
+                or request.headers.get("sec-fetch-dest") != "document"
+                or request.headers.get("origin") is not None
+            ):
+                return _error("DIRECT_LOCAL_NAVIGATION_REQUIRED", 403)
+            paired, pairing_code = True, ""
+            session, session_started = token_urlsafe(32), elapsed_clock()
+            response.set_cookie(
+                "dmf_session", session, httponly=True, samesite="strict", max_age=3600, path="/"
+            )
+        return response
 
     @app.get("/assets/{name}")
     async def asset(name: str) -> Response:

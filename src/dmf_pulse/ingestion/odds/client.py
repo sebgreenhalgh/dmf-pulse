@@ -553,10 +553,12 @@ class HttpClientOddsTransport:
         ] = _default_http_client_connection,
         ssl_context_factory: Callable[[], ssl.SSLContext] = ssl.create_default_context,
         monotonic: Callable[[], float] = time.monotonic,
+        on_response_headers: Callable[[int, Mapping[str, str]], None] | None = None,
     ) -> None:
         self._connection_factory = connection_factory
         self._ssl_context_factory = ssl_context_factory
         self._monotonic = monotonic
+        self._on_response_headers = on_response_headers
 
     def _remaining(self, request: OddsHttpRequest, *, started_at: float) -> float:
         observed = self._monotonic()
@@ -731,6 +733,8 @@ class HttpClientOddsTransport:
             self._remaining(request, started_at=started_at)
             raw_headers = response.getheaders()
             headers = _safe_header_pairs([(name, value) for name, value in raw_headers])
+            if self._on_response_headers is not None:
+                self._on_response_headers(response.status, headers)
             redirect_present = any(str(name).casefold() == "location" for name, _ in raw_headers)
             body = self._read_body(
                 response,

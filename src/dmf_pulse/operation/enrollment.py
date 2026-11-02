@@ -31,7 +31,10 @@ class SourceQualification(Metadata):
     profile: RightsProfile
     purpose: Literal["PRIVATE_OPERATOR_FPL_RECOMMENDATIONS"]
     permission_basis: Literal[
-        "SUPPLIER_WRITTEN_PERMISSION", "APPLICABLE_EXCEPTION", "VENDOR_TERMS_AND_ACCOUNT"
+        "SUPPLIER_WRITTEN_PERMISSION",
+        "APPLICABLE_EXCEPTION",
+        "VENDOR_TERMS_AND_ACCOUNT",
+        "OWNER_ATTESTED_PERMISSION",
     ]
     permission_evidence_sha256: Sha
     account_review_sha256: Sha | None = None
@@ -156,8 +159,22 @@ def _installed_enrollment_or_none() -> InstalledEnrollment | None:
         ):
             if set(value) != {"schema_version", "approvals"}:
                 raise ValueError("historical registry fields differ")
-            value = {**value, "schema_version": "trusted-refresh-enrollments-v2"}
-        elif not isinstance(value, dict) or set(value) != {
+            value = {
+                **value,
+                "schema_version": "trusted-refresh-enrollments-v2",
+                "qualifications": [],
+                "release_permits": [],
+                "default_authorization_id": None,
+            }
+        if (
+            isinstance(value, dict)
+            and value.get("schema_version") == "trusted-refresh-enrollments-v3"
+        ):
+            if "standing_policy" not in value:
+                raise ValueError("standing policy missing")
+            value = {key: item for key, item in value.items() if key != "standing_policy"}
+            value["schema_version"] = "trusted-refresh-enrollments-v2"
+        if not isinstance(value, dict) or set(value) != {
             "schema_version",
             "approvals",
             "qualifications",
@@ -174,7 +191,9 @@ def installed_enrollment() -> InstalledEnrollment:
     result = _installed_enrollment_or_none()
     if result is None:
         raise OperationError("TRUSTED_APPROVAL_REGISTRY_INVALID")
-    return result
+    from dmf_pulse.operation.standing import runtime_enrollment
+
+    return runtime_enrollment(result)
 
 
 def require_source_closure(scopes: tuple[SourceScope, ...], *, now: datetime) -> datetime:

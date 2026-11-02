@@ -33,6 +33,7 @@ from dmf_pulse.cli.recovery import recovery_app
 from dmf_pulse.cli.review_pack_cmd import review_pack_app
 from dmf_pulse.cli.rules_cmd import rules_app
 from dmf_pulse.cli.specs_cmd import specs_app
+from dmf_pulse.cli.start import start_command
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.operation.cli import operation_app
 
@@ -67,6 +68,7 @@ app.add_typer(recovery_app, name="forecasts")
 app.add_typer(specs_app, name="specs")
 app.command("pulse")(pulse_command)
 app.command("dashboard")(dashboard_command)
+app.command("start")(start_command)
 
 DOCTOR_BLOCKING_EXIT = 40
 

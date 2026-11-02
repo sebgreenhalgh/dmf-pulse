@@ -25,6 +25,56 @@ def _service() -> CredentialService:
     return CredentialService()
 
 
+def _prompt_fpl_jwt_scope(
+    minimum_remaining_seconds: int,
+    maximum_remaining_seconds: int | None,
+    service: CredentialService | None,
+) -> tuple[str | None, datetime | None]:
+    """Keep the single hidden input and all secret-bearing frames private."""
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", getpass.GetPassWarning)
+            text = typer.prompt("Freshly issued FPL JWT", hide_input=True)
+        value = SecretStr(text)
+        del text
+        expiry = (service or _service()).set_fpl_jwt(
+            value,
+            minimum_remaining_seconds=minimum_remaining_seconds,
+            maximum_remaining_seconds=maximum_remaining_seconds,
+        )
+        del value
+        return None, expiry
+    except getpass.GetPassWarning:
+        return "CREDENTIAL_SECURE_INPUT_REQUIRED", None
+    except (KeyboardInterrupt, EOFError, typer.Abort):
+        return "CREDENTIAL_INPUT_CANCELLED", None
+    except CredentialError as error:
+        return error.code, None
+    except Exception:
+        return "CREDENTIAL_BACKEND_UNAVAILABLE", None
+
+
+def prompt_fpl_jwt(
+    *,
+    minimum_remaining_seconds: int,
+    maximum_remaining_seconds: int | None = None,
+    service: CredentialService | None = None,
+) -> datetime:
+    """One new hidden paste; expiry decoding does not verify FPL authentication."""
+    from dmf_pulse.credentials.jwt import validate_fpl_jwt_lifetime_bounds
+
+    validate_fpl_jwt_lifetime_bounds(minimum_remaining_seconds, maximum_remaining_seconds)
+    code, expiry = _prompt_fpl_jwt_scope(
+        minimum_remaining_seconds, maximum_remaining_seconds, service
+    )
+    del service
+    if code is not None:
+        raise CredentialError(code) from None
+    if expiry is None:
+        raise CredentialError("CREDENTIAL_JWT_INVALID") from None
+    return expiry
+
+
 def _failure(error: CredentialError) -> None:
     typer.echo(
         json.dumps(

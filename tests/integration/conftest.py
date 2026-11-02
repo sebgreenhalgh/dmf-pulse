@@ -51,6 +51,7 @@ def _truncate(engine: Engine) -> None:
             "evaluation.qualified_source",
             "core.refresh_control_ledger",
             "core.refresh_control_event",
+            "core.operator_journal",
         }
     )
     with engine.begin() as connection:
