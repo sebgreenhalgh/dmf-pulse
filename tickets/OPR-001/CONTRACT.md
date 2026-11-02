@@ -13,6 +13,9 @@ Allowed implementation: credentials, operation, dashboard, CLI, additive control
 schema/migration, installation/maintenance automation, policy resources and
 corresponding tests/evidence. Existing provider ingestion may receive a bounded
 guard/response-metadata hook; its numerical input history remains unchanged.
+The existing FPL replay and real research-custody schema checks may additionally
+recognize exactly additive revision 20261101_0010, retaining all prior compatible
+revisions and every existing source, registry, function and trigger check.
 
 Public command: `dmf start`. Reuse protected fresh-v2 FPL metadata or prompt once
 with hidden input; parse only the newly supplied JWT expiry. Use the protected

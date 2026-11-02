@@ -22,7 +22,10 @@ ORIGINAL_CONTROL_PROOF_SHA256 = "162da9a511f35cadfe09080d107cb4ee866223ffc4b56b6
 def original_installation_root() -> Path:
     if os.name != "nt":
         raise OperationError("ORIGINAL_CONTROL_REQUIRES_OWNER_WINDOWS_SSPI_SESSION")
-    function = ctypes.WinDLL("shell32").SHGetFolderPathW
+    loader = getattr(ctypes, "WinDLL", None)
+    if loader is None:
+        raise OperationError("OWNER_LOCAL_APPLICATION_FOLDER_UNAVAILABLE")
+    function = loader("shell32").SHGetFolderPathW
     function.argtypes = [
         ctypes.c_void_p,
         ctypes.c_int,

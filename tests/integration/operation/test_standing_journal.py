@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import re
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from threading import Barrier
@@ -10,12 +12,17 @@ from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import insert, select, text
+from sqlalchemy import Engine, create_engine, insert, select, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.exc import DBAPIError
 
 from dmf_pulse.dashboard.authorization import RefreshAuthorizer, RefreshRequest
 from dmf_pulse.dashboard.postgres_authorization import PostgresUsageLedger
 from dmf_pulse.data_model.tables import operator_journal
+from dmf_pulse.database.engine import create_database_engine
+from dmf_pulse.database.migrate import upgrade_database
+from dmf_pulse.database.models import DatabaseSettings
+from dmf_pulse.database.schema import inspect_schema
 from dmf_pulse.ingestion.models import RightsProfile
 from dmf_pulse.operation import enrollment, standing
 from dmf_pulse.operation.enrollment import rights_fingerprint
@@ -30,18 +37,94 @@ WORKER = "a" * 64
 
 @pytest.fixture(autouse=True)
 def clean_postgres_test():
-    """Override broad cleanup: every test owns a fresh immutable account/ledger."""
+    """Override broad cleanup: this module owns its entire disposable database."""
     return None
 
 
+@pytest.fixture(scope="module")
+def journal_engine(postgres_url, record_testsuite_property) -> Iterator[Engine]:
+    """Keep append-only rows out of the shared migration-shard database."""
+    base = make_url(postgres_url)
+    if (
+        base.drivername not in {"postgresql", "postgresql+psycopg"}
+        or base.host not in {"127.0.0.1", "localhost", "::1"}
+        or base.database != "dmf_pulse_test"
+        or base.port == 55437
+        or {key.casefold() for key in base.query}
+        & {"host", "hostaddr", "port", "dbname", "service", "servicefile"}
+    ):
+        pytest.fail("journal fixture requires the local disposable test database")
+    # Bind libpq's actual address/port too; ambient PGHOSTADDR/PGPORT cannot
+    # redirect administrative test DDL away from the checked loopback server.
+    base = base.set(
+        port=base.port or 5432,
+        query={
+            **base.query,
+            "hostaddr": "::1" if base.host == "::1" else "127.0.0.1",
+        },
+    )
+    name = "dmf_opr001_journal_" + uuid4().hex
+
+    def require_owned_name():
+        if re.fullmatch(r"dmf_opr001_journal_[0-9a-f]{32}", name) is None or name in {
+            base.database,
+            "postgres",
+        }:
+            pytest.fail("journal fixture database ownership guard failed")
+
+    admin = create_engine(
+        base.set(database="postgres", drivername="postgresql+psycopg"),
+        isolation_level="AUTOCOMMIT",
+        hide_parameters=True,
+        connect_args={"connect_timeout": 10, "options": "-c timezone=UTC"},
+    )
+    created = False
+    engine = None
+    try:
+        require_owned_name()
+        with admin.connect() as connection:
+            connection.execute(text(f'CREATE DATABASE "{name}" TEMPLATE template0'))
+        created = True
+        record_testsuite_property("opr001_journal_owned_database", name)
+        isolated = base.set(database=name, drivername="postgresql+psycopg")
+        url = isolated.render_as_string(hide_password=False)
+        upgrade_database(url)
+        engine = create_database_engine(
+            url,
+            DatabaseSettings(
+                url_secret_ref="env:DMF_TEST_DATABASE_URL",
+                application_name="dmf-opr001-isolated-journal-tests",
+            ),
+        )
+        with engine.connect() as connection:
+            schema = inspect_schema(connection)
+        record_testsuite_property("opr001_journal_schema_revision", schema.alembic_revision)
+        record_testsuite_property("opr001_journal_schema_sha256", schema.schema_sha256)
+        yield engine
+    finally:
+        if engine is not None:
+            engine.dispose()
+        try:
+            if created:
+                require_owned_name()
+                with admin.connect() as connection:
+                    connection.execute(text(f'DROP DATABASE "{name}" WITH (FORCE)'))
+                    remaining = connection.execute(
+                        text("SELECT count(*) FROM pg_database WHERE datname=:name"),
+                        {"name": name},
+                    ).scalar_one()
+                    if remaining != 0:
+                        pytest.fail("owned journal database cleanup failed")
+                    record_testsuite_property("opr001_journal_owned_database_removed", True)
+        finally:
+            admin.dispose()
+
+
 @pytest.fixture
-def case(postgres_engine, tmp_path):
-    # Refuse an operator database even if the test environment is misconfigured.
-    if postgres_engine.url.database != "dmf_pulse_test":
-        pytest.fail("standing journal tests require the explicitly owned test database")
+def case(journal_engine, tmp_path):
     account = "owned_standing_" + uuid4().hex
     original = PostgresUsageLedger.initialize(
-        postgres_engine.connect,
+        journal_engine.connect,
         account_ref=account,
         database_ref="SYNTHETIC_TEST_DATABASE",
     )
@@ -63,8 +146,8 @@ def case(postgres_engine, tmp_path):
     return SimpleNamespace(
         policy=policy,
         original=original,
-        engine=postgres_engine,
-        journal=OperationJournal(policy, postgres_engine.connect),
+        engine=journal_engine,
+        journal=OperationJournal(policy, journal_engine.connect),
     )
 
 

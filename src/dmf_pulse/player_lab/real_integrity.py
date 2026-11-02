@@ -20,7 +20,7 @@ def require_real_database(connection: Connection) -> None:
 
     if connection.execute(text("SHOW session_replication_role")).scalar_one() != "origin":
         raise OperationError("REAL_PLAYER_DATABASE_GUARD_REQUIRED")
-    if current_alembic_revision(connection) != "20261030_0009":
+    if current_alembic_revision(connection) not in {"20261030_0009", "20261101_0010"}:
         raise OperationError("REAL_PLAYER_DATABASE_REVISION_REQUIRED")
     installed = real_source_registry().model_dump(mode="json")
     if connection.execute(text("SELECT evaluation.real_authority()")).scalar_one() != installed:

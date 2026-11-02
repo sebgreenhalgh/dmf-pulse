@@ -171,8 +171,11 @@ def _new_watch(root: Path) -> DirectoryWatch | None:
     identity = _directory_identity(root)
     if identity is None:
         return None
+    loader = getattr(ctypes, "WinDLL", None)
+    if loader is None:
+        return None
     try:
-        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel = loader("kernel32", use_last_error=True)
     except (AttributeError, OSError):
         return None
     kernel.FindFirstChangeNotificationW.argtypes = [ctypes.c_wchar_p, ctypes.c_int, ctypes.c_uint32]

@@ -171,7 +171,10 @@ def protected_package_sha256(package_root: Path) -> str:
 def operator_root_path() -> Path:
     """No caller policy, environment override or JSON path selects the trust root."""
     if os.name == "nt":
-        function = ctypes.WinDLL("shell32").SHGetFolderPathW
+        loader = getattr(ctypes, "WinDLL", None)
+        if loader is None:
+            raise OperationError("OWNER_LOCAL_APPLICATION_FOLDER_UNAVAILABLE")
+        function = loader("shell32").SHGetFolderPathW
         function.argtypes = [
             ctypes.c_void_p,
             ctypes.c_int,
