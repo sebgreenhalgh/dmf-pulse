@@ -111,7 +111,7 @@ def test_injected_authorization_error_cannot_echo_raw_message(monkeypatch):
         ("USAGE_LEDGER_SCHEMA_NOT_READY", "control migration"),
         ("SOURCE_PROFILE_CHANGED", "provider terms/profile"),
         ("OFFICIAL_DEADLINE_SCOPE_MISMATCH", "target Gameweek"),
-        ("CREDENTIAL_EXPIRED", "set-fpl-token --replace"),
+        ("CREDENTIAL_EXPIRED", "dmf start"),
     ],
 )
 def test_known_operational_blocker_keeps_typed_reason_and_required_action(
