@@ -163,6 +163,29 @@ def rows(case):
         ]
 
 
+def test_safe_failure_diagnostics_survive_recovery_without_changing_spend(case):
+    from dmf_pulse.operation.diagnostics import DiagnosticLog
+
+    key, _ = admit(case)
+    before = case.original.audit()
+    log = DiagnosticLog(clock=lambda: NOW + timedelta(seconds=3))
+    log.enter("FPL_ACQUISITION")
+    log.admitted("FPL", "GET", "fantasy.premierleague.com", f"/api/my-team/{case.policy.entry_id}/")
+    log.transport_started()
+    log.failed(TimeoutError("owned-secret-message-never-retain"))
+    report = log.report()
+    case.journal.fail(key, report.failure.code, now=NOW + timedelta(seconds=4), diagnostics=report)
+    recovered = OperationJournal(case.policy, case.engine.connect)
+    assert recovered.recover()["standing_event_count"] == 2
+    assert case.original.audit() == before
+    failure = rows(case)[-1]["payload"]["value"]
+    assert failure["diagnostics"] == report.model_dump(mode="json")
+    assert failure["error_code"] == "CURRENT_TRANSPORT_FAILED"
+    assert "owned-secret-message" not in json.dumps(failure)
+    with pytest.raises(OperationError, match="GAMEWEEK_ACQUISITION_ALREADY_RECORDED"):
+        recovered.enroll(owned_event(), owned_quota(case.policy), now=NOW + timedelta(seconds=5))
+
+
 def admit(case, *, now=NOW, gameweek=10, used=0):
     event = owned_event(now=now, gameweek=gameweek)
     quota = owned_quota(case.policy, now=now, used=used)

@@ -18,6 +18,7 @@ from dmf_pulse.dashboard.postgres_authorization import ConnectionFactory, Postgr
 from dmf_pulse.dashboard.views import DeskView
 from dmf_pulse.data_model.tables import operator_journal, refresh_control_event
 from dmf_pulse.database.schema import current_alembic_revision
+from dmf_pulse.operation.diagnostics import DiagnosticReport
 from dmf_pulse.operation.enrollment import InstalledEnrollment
 from dmf_pulse.operation.models import ChargedQuotaStatus, MetadataTime, OperationError
 from dmf_pulse.operation.standing import (
@@ -382,7 +383,14 @@ class OperationJournal:
                 receipt_sha256=row["sha256"],
             )
 
-    def publish(self, key: str, view: DeskView, *, now: datetime) -> None:
+    def publish(
+        self,
+        key: str,
+        view: DeskView,
+        *,
+        now: datetime,
+        diagnostics: DiagnosticReport | None = None,
+    ) -> None:
         if view.dataset_mode != "PRIVATE_TRANSIENT" or view.market_quota_receipt is None:
             raise OperationError("REAL_PRIVATE_PUBLICATION_REQUIRED")
         with self._transaction() as (connection, rows):
@@ -401,6 +409,11 @@ class OperationJournal:
                     "view": view.model_dump(mode="json"),
                     "retention": "PRIVATE_DERIVED_AS_OF",
                     "unvalidated": True,
+                    **(
+                        {"diagnostics": diagnostics.model_dump(mode="json")}
+                        if diagnostics is not None
+                        else {}
+                    ),
                 },
                 now=now,
                 key=key,
@@ -413,9 +426,12 @@ class OperationJournal:
         *,
         now: datetime,
         quota_evidence: QuotaFailureEvidence | None = None,
+        diagnostics: DiagnosticReport | None = None,
     ) -> None:
-        if not code.isascii() or not code.replace("_", "").isalnum() or len(code) > 120:
-            code = "OPERATOR_RUN_FAILED"
+        from dmf_pulse.current_failures import CURRENT_FAILURE_CODES
+
+        if type(code) is not str or code not in CURRENT_FAILURE_CODES:
+            code = "CURRENT_TYPED_FAILURE_UNRECOGNIZED"
         with self._transaction() as (connection, rows):
             self._append(
                 connection,
@@ -423,6 +439,11 @@ class OperationJournal:
                 "FAILURE",
                 {
                     "error_code": code,
+                    **(
+                        {"diagnostics": diagnostics.model_dump(mode="json")}
+                        if diagnostics is not None
+                        else {}
+                    ),
                     "quota_evidence": None
                     if quota_evidence is None
                     else quota_evidence.model_dump(mode="json"),

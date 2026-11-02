@@ -59,6 +59,13 @@ from dmf_pulse.ingestion.openfootball.service import (
 Provider = Literal["FPL", "ODDS", "OPENFOOTBALL"]
 
 
+def _observe(guard: AcquisitionGuard, method: str, *args: object) -> None:
+    """Optional metadata seam; observers never perform admission or transport."""
+    callback = getattr(guard, method, None)
+    if callback is not None:
+        callback(*args)
+
+
 class AcquisitionGuard(Protocol):
     def credential_failed(self, code: object) -> None: ...
     def before_transport(self) -> None: ...
@@ -102,13 +109,19 @@ class GuardedFplTransport:
         )
 
     def send(self, request: DirectHttpRequest) -> DirectHttpResponse:
-        self._guard.before_send("FPL", request.method, request.host, request.path)
-        self._guard.before_transport()
-        if self._check_expiry is not None and request.path.startswith("/api/my-team/"):
-            # The control transaction can wait. Recheck metadata after it, with
-            # no second credential read, immediately before authenticated I/O.
-            self._check_expiry()
-        return self._delegate.send(request)
+        try:
+            self._guard.before_send("FPL", request.method, request.host, request.path)
+            self._guard.before_transport()
+            if self._check_expiry is not None and request.path.startswith("/api/my-team/"):
+                # Recheck metadata after the potentially blocking control write.
+                self._check_expiry()
+            _observe(self._guard, "transport_started")
+            response = self._delegate.send(request)
+            _observe(self._guard, "response_completed", response.status_code)
+            return response
+        except Exception as error:
+            _observe(self._guard, "transport_failed", error)
+            raise
 
 
 class GuardedOddsTransport:
@@ -118,13 +131,19 @@ class GuardedOddsTransport:
         self._guard, self._delegate = guard, delegate
 
     def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
-        self._guard.before_send("ODDS", request.method, request.host, request.path)
-        self._guard.before_transport()
-        response = self._delegate.send(request, credential)
-        observe = getattr(self._guard, "observe_odds_response", None)
-        if observe is not None:
-            observe(response)
-        return response
+        try:
+            self._guard.before_send("ODDS", request.method, request.host, request.path)
+            self._guard.before_transport()
+            _observe(self._guard, "transport_started")
+            response = self._delegate.send(request, credential)
+            _observe(self._guard, "response_completed", response.status_code)
+            observe = getattr(self._guard, "observe_odds_response", None)
+            if observe is not None:
+                observe(response)
+            return response
+        except Exception as error:
+            _observe(self._guard, "transport_failed", error)
+            raise
 
 
 class GuardedScoreTransport:
@@ -134,9 +153,16 @@ class GuardedScoreTransport:
         self._guard, self._delegate = guard, delegate
 
     def send(self, request: OpenFootballHttpRequest) -> OpenFootballHttpResponse:
-        self._guard.before_send("OPENFOOTBALL", request.method, request.host, request.path)
-        self._guard.before_transport()
-        return self._delegate.send(request)
+        try:
+            self._guard.before_send("OPENFOOTBALL", request.method, request.host, request.path)
+            self._guard.before_transport()
+            _observe(self._guard, "transport_started")
+            response = self._delegate.send(request)
+            _observe(self._guard, "response_completed", response.status_code)
+            return response
+        except Exception as error:
+            _observe(self._guard, "transport_failed", error)
+            raise
 
 
 class _ClosingScoreService(CurrentScorePriorService):

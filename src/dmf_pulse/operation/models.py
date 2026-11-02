@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.operation.runtime_integrity import INTEGRITY_REASONS, IntegrityReason
 
 Sha = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 Ref = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,119}$")]
@@ -36,9 +37,14 @@ STAGES: tuple[Stage, ...] = (
 class OperationError(ValueError):
     """A bounded code; never expose source bodies, paths, secrets or driver errors."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, *, integrity_reason: object = None) -> None:
         super().__init__(code)
         self.code = code
+        self.integrity_reason: IntegrityReason | None = (
+            cast(IntegrityReason, integrity_reason)
+            if type(integrity_reason) is str and integrity_reason in INTEGRITY_REASONS
+            else None
+        )
 
 
 class Metadata(BaseModel):

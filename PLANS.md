@@ -3181,3 +3181,28 @@ paths from spawn preparation before runpy imports. The final carrier, native
 browser/spawn checks, exact-source CI and one-time standing decision remain open.
 No actual operator standing root, canonical migration, provider request or credit
 reservation has been created by these engineering checks.
+
+## Post-GW10 recovery (active, 2026-11-02)
+
+The standing scope is now accepted and installed. The immutable actual audit
+records a consumed GW10 enrollment, one two-credit reservation, no paid Odds
+attempt, and no publication. Source request admissions do not prove completed
+responses. The two initial integrity refusals remain unexplained. The new owner
+request authorizes one consolidated offline correction and signed maintenance
+release; it does not authorize retrying GW10 or changing the material policy.
+Execution contract: tickets/OPR-002/CONTRACT.md.
+
+- [x] Authenticate original receipts and trace the actual acquisition/manager/
+  model paths; distinguish proven defects from unprovable historical causes.
+- [x] Add bounded stages, typed failure categories and transport completion
+  metadata without response bodies, credentials or exception messages.
+- [x] Characterize integrity failures with owned native stress/fault tests;
+  preserve every validation and fix only demonstrated defects.
+- [x] Exercise full owned provider-shaped FPL-to-Stage-8/9/12 execution,
+  including chronology, history, manager authentication and failure injections.
+- [ ] Complete literal release gates, installed-wheel verification and
+  independent review; install a signed compatible maintenance carrier under
+  the existing key/scope without another routine owner decision.
+- [ ] Reauthenticate the original ledger and consumption preservation; report
+  exact ordinary launch instructions and next eligible Gameweek readiness.
+  No live acquisition while GW10 remains the consumed upcoming event.

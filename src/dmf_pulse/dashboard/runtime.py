@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import multiprocessing
 import re
+import sys
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
@@ -15,6 +16,7 @@ from typing import Literal, Protocol
 
 from pydantic import computed_field
 
+from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.current_failures import (
     CURRENT_FAILURE_ACTIONS,
     CURRENT_FAILURE_CODES,
@@ -30,10 +32,23 @@ from dmf_pulse.dashboard.current import (
     validate_current_result,
 )
 from dmf_pulse.dashboard.views import DeskView, PlayerDetail, desk_view, player_detail
+from dmf_pulse.operation.diagnostics import (
+    MAX_EVENT_BYTES,
+    STAGE_LABELS,
+    STARTED_STAGES,
+    DiagnosticEvent,
+    DiagnosticLog,
+    DiagnosticReport,
+    Stage,
+)
 from dmf_pulse.private_v1.actionability import checked_report
 from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.one_command import OneCommandResult
 from dmf_pulse.private_v1.presentation import PresentationModel
+
+_CURRENT_PROGRESS = frozenset(
+    {"DMF Pulse starting", "Recommendation ready", "Completed", *STAGE_LABELS.values()}
+)
 
 
 class JobState(PresentationModel):
@@ -42,6 +57,7 @@ class JobState(PresentationModel):
     job_id: str | None = None
     stages: tuple[str, ...] = ()
     error_code: str | None = None
+    diagnostics: DiagnosticReport | None = None
 
     @computed_field
     def error_action(self) -> str | None:
@@ -66,10 +82,18 @@ class PipeProgress:
 
     failure_reported = False
 
-    def __init__(self, send: Callable[[tuple[str, object]], None]) -> None:
+    def __init__(
+        self,
+        send: Callable[[tuple[str, object]], None],
+        *,
+        diagnostics: DiagnosticLog | None = None,
+    ) -> None:
         self._send = send
+        self.diagnostics = diagnostics
 
     def message(self, value: str) -> None:
+        if self.diagnostics is not None and value not in _CURRENT_PROGRESS:
+            return
         self._send(("progress", value[:200]))
 
     @contextmanager
@@ -82,19 +106,45 @@ class PipeProgress:
         heartbeat: str | None = None,
         long_warning: str | None = None,
     ) -> Iterator[None]:
-        del failed, heartbeat, long_warning
-        if started:
-            self.message(started)
-        yield
-        if completed:
-            self.message(completed)
+        del heartbeat, long_warning
+        stage: Stage | None = STARTED_STAGES.get(started or "")
+        if stage is None and failed == "Stage 8/9 fixture projection":
+            stage = "STAGE8_EVENTS"
+        elif stage is None and re.fullmatch(r"Stage 9 fixture [1-9][0-9]*/[1-9][0-9]*", failed):
+            stage = "STAGE9_POINTS"
+        if self.diagnostics is None:
+            if started:
+                self.message(started)
+        elif stage is not None:
+            self.diagnostics.enter(stage)
+            self.message(STAGE_LABELS[stage])
+        try:
+            yield
+        except Exception as error:
+            if self.diagnostics is not None:
+                self.diagnostics.failed(error)
+            raise
+        else:
+            if self.diagnostics is None:
+                if completed:
+                    self.message(completed)
+            elif stage is not None:
+                self.diagnostics.stage = stage
+                self.diagnostics.emit("STAGE_COMPLETED")
 
     def finish(self) -> None:
         self.message("Completed")
 
     def failure(self, stage: str, code: str) -> None:
-        del stage, code
+        del stage
         self.failure_reported = True
+        if self.diagnostics is not None and self.diagnostics.failure is None:
+            active = sys.exception()
+            self.diagnostics.failed(
+                active
+                if isinstance(active, Exception)
+                else PrivateV1Error(code, "Closed failure boundary")
+            )
 
 
 def _demo_worker(pipe: Connection, horizon: Literal[1, 3]) -> None:
@@ -198,6 +248,8 @@ class DeskRuntime:
         self._publication_floor: datetime | None = None
         self._closed = False
         self._on_publication = on_publication
+        self._diagnostics = DiagnosticLog()
+        self._diagnostic_started_at = datetime.now(UTC)
 
     def _now(self) -> datetime:
         value = self._clock()
@@ -210,6 +262,8 @@ class DeskRuntime:
         return value
 
     def _discard(self, status: Literal["BLOCKED", "CANCELLED", "EXPIRED"], code: str) -> None:
+        if status in {"BLOCKED", "EXPIRED"} and self._diagnostics.failure is None:
+            self._diagnostics.failed(AuthorizationError(code))
         self._result = None
         self._view = None
         self._publication_floor = None
@@ -219,18 +273,31 @@ class DeskRuntime:
             self._current.record_failure(
                 AuthorizationError(code, "EXPIRED" if status == "EXPIRED" else "BLOCKED")
             )
-        self._state = JobState(status=status, job_id=self._state.job_id, error_code=code)
+        self._state = JobState(
+            status=status,
+            job_id=self._state.job_id,
+            error_code=code,
+            stages=self._state.stages,
+            diagnostics=self.diagnostics(),
+        )
         self._stop_worker()
 
     def _stop_worker(self) -> bool:
         if self._worker is not None:
             try:
                 self._worker.close()
-            except Exception:
+            except Exception as error:
                 # Preserve the handle and permanently close this runtime. Never overlap
                 # a replacement with a worker whose termination was not confirmed.
                 self._closed = True
-                self._state = JobState(status="BLOCKED", error_code="WORKER_CLEANUP_FAILED")
+                self._diagnostics.failed(error)
+                self._state = JobState(
+                    status="BLOCKED",
+                    error_code="WORKER_CLEANUP_FAILED",
+                    job_id=self._state.job_id,
+                    stages=self._state.stages,
+                    diagnostics=self.diagnostics(),
+                )
                 if self._current is not None:
                     self._current.record_failure(AuthorizationError("WORKER_CLEANUP_FAILED"))
                 return False
@@ -248,6 +315,8 @@ class DeskRuntime:
             if self._state.error_code == "WORKER_CLEANUP_FAILED":
                 return self._state
             self._state = JobState(status="RUNNING", job_id=token_hex(16))
+            self._diagnostics = DiagnosticLog()
+            self._diagnostic_started_at = datetime.now(UTC)
             self._started = self._elapsed()
             try:
                 if self.demo:
@@ -262,7 +331,8 @@ class DeskRuntime:
                 self._discard("EXPIRED" if error.state == "EXPIRED" else "BLOCKED", error.code)
                 if self._current is not None:
                     self._current.record_failure(error)
-            except Exception:
+            except Exception as error:
+                self._diagnostics.failed(error)
                 self._discard("BLOCKED", "WORKER_START_FAILED")
             return self._state
 
@@ -271,13 +341,16 @@ class DeskRuntime:
             try:
                 self._tick()
             except AuthorizationError as error:
+                self._diagnostics.failed(error)
                 self._discard("EXPIRED" if error.state == "EXPIRED" else "BLOCKED", error.code)
             except PrivateV1Error as error:
+                self._diagnostics.failed(error)
                 if error.code == "DECISION_DEADLINE_PASSED":
                     self._discard("EXPIRED", "DECISION_DEADLINE_PASSED")
                 else:
                     self._discard("BLOCKED", "RUN_OR_PUBLICATION_INVALID")
-            except Exception:
+            except Exception as error:
+                self._diagnostics.failed(error)
                 self._discard("BLOCKED", "RUN_OR_PUBLICATION_INVALID")
             return self._state
 
@@ -304,11 +377,15 @@ class DeskRuntime:
                     break
                 kind, value = message
                 if kind == "progress" and isinstance(value, str):
-                    # Strip controls; this channel accepts service stage strings only.
+                    if not self.demo and value not in _CURRENT_PROGRESS:
+                        continue
+                    # The demonstration has no provider inputs; current progress is closed.
                     safe = re.sub(r"[^A-Za-z0-9 _.,:()/+\-]", "", value)[:200]
                     self._state = self._state.model_copy(
                         update={"stages": (*self._state.stages[-31:], safe)}
                     )
+                elif kind == "diagnostic" and not self.demo and type(value) is str:
+                    self._accept_diagnostic(value)
                 elif kind == "result" and self.demo and isinstance(value, OneCommandResult):
                     self._accept(value)
                     break
@@ -320,6 +397,14 @@ class DeskRuntime:
                     self._accept(value.result, envelope=value)
                     break
                 elif kind == "error" and type(value) is str and value in CURRENT_FAILURE_CODES:
+                    if (
+                        not self.demo
+                        and self._diagnostics.failure is not None
+                        and self._diagnostics.failure.code != value
+                    ):
+                        self._discard("BLOCKED", "DIAGNOSTIC_PROTOCOL_INVALID")
+                        return
+                    self._diagnostics.worker_terminal_received = True
                     self._discard("EXPIRED" if value in EXPIRED_FAILURE_CODES else "BLOCKED", value)
                     if value == "SOURCE_NOT_AVAILABLE" and self._current is not None:
                         self._current.record_failure(
@@ -379,15 +464,62 @@ class DeskRuntime:
             generated_at=now,
             expires_at=expires,
         )
+        self._diagnostics.worker_terminal_received = True
         if self._on_publication is not None:
-            self._on_publication(self._view)
+            self._diagnostics.enter("PUBLICATION")
+            try:
+                self._on_publication(self._view)
+            except Exception as error:
+                self._diagnostics.failed(error)
+                raise
         self._result = value
         self._current_result = envelope
         self._publication_floor = now
         self._completed = self._elapsed()
-        self._state = self._state.model_copy(update={"status": "COMPLETE"})
+        self._state = self._state.model_copy(
+            update={"status": "COMPLETE", "diagnostics": self.diagnostics()}
+        )
         if self._current is not None:
             self._current.completed()
+
+    def _accept_diagnostic(self, value: str) -> None:
+        if len(value) > MAX_EVENT_BYTES or self._active_launch is None:
+            raise AuthorizationError("DIAGNOSTIC_PROTOCOL_INVALID")
+        try:
+            event = DiagnosticEvent.model_validate_json(value)
+            if not self._diagnostic_started_at <= event.at <= datetime.now(UTC):
+                raise ValueError("diagnostic time is outside the observed worker lifetime")
+            if event.request is not None:
+                expected = {
+                    (
+                        scope.provider,
+                        canonical_sha256([scope.provider, route.method, route.host, route.path]),
+                    ): route.maximum_calls
+                    for scope in self._active_launch.grant.request.source_scopes
+                    for route in scope.routes
+                }
+                identity = event.request.provider, event.request.route_sha256
+                if identity not in expected:
+                    raise ValueError("diagnostic route differs from enrolled scope")
+                if (
+                    event.kind == "ADMITTED"
+                    and sum(
+                        row.identity.provider == event.request.provider
+                        and row.identity.route_sha256 == event.request.route_sha256
+                        for row in self._diagnostics.requests.values()
+                    )
+                    >= expected[identity]
+                ):
+                    raise ValueError("diagnostic admission exceeds enrolled route budget")
+            self._diagnostics.accept(event)
+        except (ValueError, TypeError):
+            raise AuthorizationError("DIAGNOSTIC_PROTOCOL_INVALID") from None
+        self._state = self._state.model_copy(update={"diagnostics": self._diagnostics.report()})
+
+    def diagnostics(self) -> DiagnosticReport | None:
+        """Read only; metadata cannot initiate or authorize a provider request."""
+        with self._lock:
+            return self._diagnostics.report() if self._diagnostics.events else None
 
     @property
     def synthetic_sources(self) -> bool:

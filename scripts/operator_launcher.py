@@ -31,6 +31,22 @@ from pathlib import Path, PurePosixPath
 
 RESOURCE = "dmf_pulse/dashboard/resources/production_refresh_enrollments.json"
 DOMAIN = b"DMF-PULSE-OPERATOR-RELEASE-V1\0"
+_APPLICATION_ENTERED = False
+INTEGRITY_REASON_CODES = frozenset(
+    {
+        "CONTENT_OR_METADATA_MISMATCH",
+        "WATCH_ALREADY_INVALID",
+        "ROOT_IDENTITY_CHANGED",
+        "DIRECTORY_MEMBERSHIP_CHANGED",
+        "DIRECTORY_OBSERVATION_FAILED",
+        "NATIVE_NOTIFICATION",
+        "NATIVE_WAIT_FAILED",
+        "LEASE_OPEN_FAILED",
+        "LEASE_IDENTITY_CHANGED",
+        "DIRECTORY_SCAN_LIMIT",
+        "ROOT_CHANGED_DURING_PREPARATION",
+    }
+)
 
 
 def canonical(value: object) -> bytes:
@@ -361,6 +377,7 @@ def protect_worker_preparation() -> None:
 
 
 def main() -> int:
+    global _APPLICATION_ENTERED
     require(sys.flags.isolated and sys.flags.no_site and sys.flags.dont_write_bytecode)
     arguments = approved_arguments(sys.argv[1:])
     root = installation_root()
@@ -393,22 +410,41 @@ def main() -> int:
     sys.argv = ["dmf", *arguments]
     from dmf_pulse.cli.app import main as application
 
+    _APPLICATION_ENTERED = True
     application()
     return 0
+
+
+def report_verification_failure(error: Exception, *, worker: bool = False) -> None:
+    reason = getattr(error, "reason", None)
+    if type(reason) is not str or reason not in INTEGRITY_REASON_CODES:
+        reason = getattr(error, "integrity_reason", None)
+    detail = reason if type(reason) is str and reason in INTEGRITY_REASON_CODES else "UNSPECIFIED"
+    stage = "WORKER_BOOTSTRAP" if worker else "APPLICATION" if _APPLICATION_ENTERED else "BOOTSTRAP"
+    prefix = (
+        "OPERATOR_EXECUTION_BLOCKED"
+        if _APPLICATION_ENTERED
+        else "OPERATOR_RELEASE_VERIFICATION_FAILED"
+    )
+    print(
+        f"{prefix}: {stage} [{detail}]; preserve the canonical request audit. No automatic retry is authorized.",
+        file=sys.stderr,
+    )
 
 
 if __name__ == "__mp_main__":
     # Complete the independent child check before spawn unpickles application
     # dataclasses or imports its worker/Pydantic modules.
-    child_release = verified_release(installation_root())
-    sys.path.insert(0, str(child_release / "venv/Lib/site-packages"))
+    try:
+        child_release = verified_release(installation_root())
+        sys.path.insert(0, str(child_release / "venv/Lib/site-packages"))
+    except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as error:
+        report_verification_failure(error, worker=True)
+        raise SystemExit(2) from None
 
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile):
-        print(
-            "OPERATOR_RELEASE_VERIFICATION_FAILED: restore the reviewed installation; no provider request was admitted.",
-            file=sys.stderr,
-        )
+    except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as error:
+        report_verification_failure(error)
         raise SystemExit(2) from None

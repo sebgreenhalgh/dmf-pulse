@@ -331,7 +331,9 @@ def prepare_runtime(
         session.preflight(1)
 
         def publish(view: DeskView) -> None:
-            journal.publish(key, retained_receipt_view(view), now=clock())
+            journal.publish(
+                key, retained_receipt_view(view), now=clock(), diagnostics=runtime.diagnostics()
+            )
             receipt = view.market_quota_receipt
             progress(
                 f"Real recommendations recorded. Odds reserved 2; actual cost {receipt.last_request_cost if receipt else 'unknown'}; remaining {receipt.remaining_credits if receipt else 'unknown'}."
@@ -340,7 +342,9 @@ def prepare_runtime(
         runtime = SingleAcquisitionRuntime(
             current_session=session,
             on_publication=publish,
-            on_failure=lambda code: journal.fail(key, code, now=clock()),
+            on_failure=lambda code: journal.fail(
+                key, code, now=clock(), diagnostics=runtime.diagnostics()
+            ),
             quota_status=lambda: journal.charged_quota_status(key),
         )
         runtime.refresh(1)

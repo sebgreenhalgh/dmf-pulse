@@ -3,6 +3,7 @@
 These constants disclose reasons; they grant no authority and change no budgets.
 """
 
+from dmf_pulse.credentials.service import _MESSAGES as _CREDENTIAL_MESSAGES
 from dmf_pulse.operation.failures import OPERATOR_FAILURE_ACTIONS
 
 CURRENT_FAILURE_ACTIONS = {
@@ -13,7 +14,7 @@ CURRENT_FAILURE_ACTIONS = {
     "PRODUCTION_APPROVAL_NOT_ENROLLED": "Install the reviewed enrollment wheel; run dmf operation status.",
     "CREDENTIAL_UNAVAILABLE": "Configure the required credentials with dmf credentials; check dmf credentials status.",
     "CREDENTIAL_NOT_CONFIGURED": "Configure the required credentials with dmf credentials; check dmf credentials status.",
-    "CREDENTIAL_EXPIRED": "Supply a freshly issued replacement locally with dmf credentials set-fpl-token --replace --fresh-issued --expires-at <actual-expiry>.",
+    "CREDENTIAL_EXPIRED": "At the next eligible Gameweek, run dmf start and use its hidden fresh-FPL prompt. Expiry is read automatically. A consumed Gameweek cannot be retried.",
     "CREDENTIAL_CORRUPT": "Explicitly replace the invalid entry through dmf credentials.",
     "CREDENTIAL_BACKEND_UNAVAILABLE": "Use the correct Windows user session and check Windows Credential Manager.",
     "FPL_AUTH_REQUIRED": "Obtain an authorized current FPL token and replace it through dmf credentials.",
@@ -80,11 +81,31 @@ CURRENT_FAILURE_ACTIONS.update(
         "SOURCE_AUTHENTICATION_OR_REQUEST_REJECTED": "Verify the approved route and credential without exposing source responses.",
         "SOURCE_RESPONSE_INVALID": "The source response failed its contract; inspect sanitized evidence before any authorized retry.",
         "CURRENT_SOURCE_OR_RUN_BLOCKED": "Inspect dmf operation status and sanitized control evidence before a new authorized attempt.",
+        "ONE_COMMAND_INPUT_INVALID": "Automatic input assembly failed in the reported stage. Inspect the private diagnostic receipt; do not retry a consumed Gameweek.",
+        "CURRENT_INPUT_CONTRACT_FAILED": "Input validation failed in the reported stage. Inspect bounded diagnostics; source bodies and field values are not retained.",
+        "CURRENT_TYPED_FAILURE_UNRECOGNIZED": "A typed failure has no public code mapping. Inspect its reported stage and failure family; do not retry a consumed Gameweek.",
+        "CURRENT_INTERNAL_EXCEPTION": "An internal exception blocked the reported stage. Inspect bounded diagnostics; do not retry a consumed Gameweek.",
+        "CURRENT_TRANSPORT_FAILED": "The reported provider transport did not complete. Inspect admitted and completed request counts; no automatic retry is allowed.",
+        "CURRENT_INTEGRITY_FAILURE": "Executable integrity verification refused the release. Preserve the audit and restore an independently reviewed signed installation.",
+        "DIAGNOSTIC_ROUTE_IDENTITY_INVALID": "Request metadata did not match a fixed safe route identity. Acquisition stopped before transport.",
+        "DIAGNOSTIC_PROTOCOL_INVALID": "Worker diagnostic metadata failed its bounded contract or source binding. The worker was stopped; do not retry a consumed Gameweek.",
+        "OFFICIAL_EVENT_SELECTION_FAILED": "Official event data could not identify the required upcoming and completed Gameweeks. No deadline is inferred.",
+        "SOURCE_TRANSPORT_TLS_FAILED": "The approved provider transport failed TLS verification. No automatic retry is allowed.",
+        "SOURCE_REDIRECT_BLOCKED": "The approved provider returned a redirect. The request was not redirected or retried.",
+        "WORKER_STOPPED": "The worker exited before a terminal result. Request-completion evidence is partial; inspect the canonical audit without retrying a consumed Gameweek.",
+        "WORKER_START_FAILED": "The reviewed worker could not start. Inspect its reported stage and failure family; do not reset its enrollment.",
+        "RUN_OR_PUBLICATION_INVALID": "The run or publication failed its reported contract. Inspect the safe diagnostic receipt; do not retry a consumed Gameweek.",
+        "RECOMMENDATION_BLOCKED": "The worker message failed its reviewed protocol. Preserve the audit and check the exact signed release.",
+        "OPERATOR_CANCELLED": "The operator cancelled this run. Its enrolled Gameweek and consumption markers remain recorded.",
+        "OPERATOR_RUN_CANCELLED": "The operator cancelled this run. Its enrolled Gameweek and consumption markers remain recorded.",
         "HTTP_429": "The provider rate limited this request; respect retry guidance and audit spent usage before any authorized retry. Remaining credits are unproven.",
     }
 )
 
 CURRENT_FAILURE_ACTIONS.update(OPERATOR_FAILURE_ACTIONS)
+# Reuse the existing closed credential catalogue; never display exception text.
+for _credential_code, _credential_action in _CREDENTIAL_MESSAGES.items():
+    CURRENT_FAILURE_ACTIONS.setdefault(_credential_code, _credential_action)
 CURRENT_FAILURE_CODES = frozenset(CURRENT_FAILURE_ACTIONS)
 CREDENTIAL_FAILURE_CODES = frozenset(
     code for code in CURRENT_FAILURE_CODES if code.startswith("CREDENTIAL_")
@@ -111,6 +132,12 @@ _LEGACY_SOURCE_CATEGORIES = {
     "SCHEMA_INVALID": "SOURCE_RESPONSE_INVALID",
     "PAYLOAD_TOO_LARGE": "SOURCE_RESPONSE_INVALID",
     "POST_CUTOFF": "ACQUISITION_CUTOFF_PASSED",
+    "VALIDATION_FAILED": "SOURCE_RESPONSE_INVALID",
+    "TARGET_GAMEWEEK_UNRESOLVED": "OFFICIAL_EVENT_SELECTION_FAILED",
+    "TARGET_DEADLINE_PASSED": "DECISION_DEADLINE_PASSED",
+    "REQUEST_BUDGET_EXHAUSTED": "SOURCE_REQUEST_BUDGET_EXHAUSTED",
+    "TLS_ERROR": "SOURCE_TRANSPORT_TLS_FAILED",
+    "REDIRECT_BLOCKED": "SOURCE_REDIRECT_BLOCKED",
 }
 
 

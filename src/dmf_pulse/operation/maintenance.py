@@ -269,8 +269,10 @@ def _verify_installation_inventory(
     try:
         verifier = verify_dependency_tree_for_execution if for_execution else verify_dependency_tree
         verifier(release_package_path(root, manifest.wheel_sha256).parent, tree)
-    except RuntimeIntegrityError:
-        raise OperationError("STANDING_DEPENDENCY_TREE_CHANGED") from None
+    except RuntimeIntegrityError as error:
+        raise OperationError(
+            "STANDING_DEPENDENCY_TREE_CHANGED", integrity_reason=error.reason
+        ) from None
     python = release / "venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     if _file_sha(python) != inventory.host_python_sha256:
         raise OperationError("STANDING_RELEASE_PYTHON_CHANGED")
@@ -585,6 +587,10 @@ def verify_active_release(policy: Metadata) -> ReleaseManifest:
             raise
     except OperationError:
         raise
+    except RuntimeIntegrityError as error:
+        raise OperationError(
+            "STANDING_RELEASE_RESTART_REQUIRED", integrity_reason=error.reason
+        ) from None
     except (
         OSError,
         ValueError,
@@ -649,8 +655,10 @@ def _check_cached_release(cached: _ReleaseCache, policy: Metadata) -> None:
             or not accepted <= now < expires
         ):
             raise OperationError("STANDING_PERMISSION_REVIEW_EXPIRED")
-    except RuntimeIntegrityError:
-        raise OperationError("STANDING_RELEASE_RESTART_REQUIRED") from None
+    except RuntimeIntegrityError as error:
+        raise OperationError(
+            "STANDING_RELEASE_RESTART_REQUIRED", integrity_reason=error.reason
+        ) from None
 
 
 def cached_implementation_fingerprint(package_root: Path) -> str | None:

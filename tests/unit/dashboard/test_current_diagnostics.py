@@ -17,6 +17,7 @@ from dmf_pulse.dashboard.runtime import DeskRuntime, JobState
 from dmf_pulse.dashboard.synthetic import DEMO_TIME
 from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.operation.console import publish_runtime
+from dmf_pulse.operation.diagnostics import DiagnosticEvent
 from tests.unit.dashboard.test_current_mode import _Pipe, _Worker
 
 CANARY = "owned-private-error-canary-never-publish"
@@ -48,7 +49,11 @@ def test_worker_runtime_console_keep_exact_actionable_reason(tmp_path, monkeypat
     def factory(launch):
         pipe = _Pipe()
         current_worker(pipe, 1, launch)
-        assert pipe.closed and pipe.messages == [("error", code)]
+        assert pipe.closed and pipe.messages[-1] == ("error", code)
+        diagnostic = DiagnosticEvent.model_validate_json(pipe.messages[0][1])
+        assert diagnostic.failure.code == code
+        assert diagnostic.failure.typed_code_recognized
+        assert CANARY not in str(pipe.messages)
         messages.extend(pipe.messages)
         worker = _Worker(pipe.messages)
         workers.append(worker)
@@ -100,7 +105,10 @@ def test_actual_odds_guard_failure_survives_accepted_client_and_controller_wrapp
     launch = CurrentRefreshSession.owned(tmp_path / "usage").prepare(1)
     pipe = _Pipe()
     current_worker(pipe, 1, launch)
-    assert pipe.closed and pipe.messages == [("error", "ACQUISITION_CUTOFF_PASSED")]
+    assert pipe.closed and pipe.messages[-1] == ("error", "ACQUISITION_CUTOFF_PASSED")
+    diagnostic = DiagnosticEvent.model_validate_json(pipe.messages[0][1])
+    assert diagnostic.failure.category == "AUTHORIZATION"
+    assert diagnostic.failure.code == "ACQUISITION_CUTOFF_PASSED"
 
 
 def test_raw_sidecar_scope_discards_client_exception_graph():
@@ -127,5 +135,7 @@ def test_unrelated_controller_errors_are_not_masked():
 
 def test_browser_state_exposes_fixed_expiry_remedy_without_any_lookup():
     value = JobState(status="BLOCKED", error_code="CREDENTIAL_EXPIRED").model_dump(mode="json")
-    assert "set-fpl-token --replace" in value["error_action"]
+    assert "dmf start" in value["error_action"]
+    assert "Expiry is read automatically" in value["error_action"]
+    assert "--expires-at" not in value["error_action"]
     assert JobState(status="PENDING").model_dump(mode="json")["error_action"] is None

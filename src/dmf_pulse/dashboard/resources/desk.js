@@ -4,6 +4,18 @@ const $ = id => document.getElementById(id);
 let view = null, page = 'team', polling = null, expiry = null, paired = false, demo = false;
 let epoch = 0, expiresPerf = 0;
 let syntheticSources = false, providerEligibility = null;
+let diagnosticReport = null;
+const diagnosticExport = document.createElement('button');
+diagnosticExport.textContent='Download safe diagnostics';
+diagnosticExport.hidden=true;
+$('progress').append(diagnosticExport);
+diagnosticExport.onclick=()=>{
+  if(!diagnosticReport)return;
+  const body=new Blob([JSON.stringify(diagnosticReport,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(body), link=document.createElement('a');
+  link.href=url;link.download='dmf-safe-diagnostics.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
 function applyContext(context) {
   demo = context.demo;
   syntheticSources = context.synthetic_sources;
@@ -231,10 +243,24 @@ async function poll(){
   if(!paired||document.hidden)return;
   try{
     const state=await api('/api/status');
+    diagnosticReport=state.diagnostics || null;
+    diagnosticExport.hidden=diagnosticReport===null;
     providerEligibility=await api('/api/eligibility');
     $('stages').replaceChildren(...state.stages.map(s=>text('li',s)));
     const reason=state.error_code || providerEligibility?.error_code;
     if(state.status!=='COMPLETE'||!view)$('notice').textContent=({'RIGHTS_BLOCKED_MARKET_REFRESH_NOT_APPROVED':'Live refresh requires a separately eligible source approval. No provider acquisition occurred.','RUN_TIMEOUT':'Refresh timed out and the worker was cleared.','WORKER_CLEANUP_FAILED':'Worker cleanup failed. This runtime is closed; restart the application.','PRESENTATION_LIFETIME_ENDED':'Presentation expired and was cleared.','DECISION_DEADLINE_PASSED':'The official deadline has passed. This recommendation is withheld.','AUTHORIZATION_REVOKED':'Refresh authorization was revoked. The recommendation was cleared.'})[reason] || state.error_action || reason || state.status;
+    if(state.diagnostics?.failure && state.status!=='COMPLETE') {
+      const failure=state.diagnostics.failure;
+      const stage=failure.stage.replaceAll('_',' ').toLowerCase();
+      const category=failure.category.replaceAll('_',' ').toLowerCase();
+      const counts=['FPL','ODDS','OPENFOOTBALL'].map(provider=>{
+        const rows=state.diagnostics.requests.filter(row=>row.identity.provider===provider);
+        return `${provider} ${rows.filter(row=>row.response_completed_at!==null).length}/${rows.length}`;
+      }).join('; ');
+      const partial=state.diagnostics.worker_terminal_received && state.diagnostics.chronology_complete?'':' Partial worker record.';
+      const integrity=failure.integrity_reason?` Integrity reason: ${failure.integrity_reason}.`:'';
+      $('notice').textContent=`${reason}: blocked during ${stage} (${category}).${integrity} Observed completed responses / admissions: ${counts}.${partial} ${state.error_action||''}`;
+    }
     $('refresh').disabled=state.status==='RUNNING';
     if(state.status==='COMPLETE'){
       if(!view||view.job_id!==state.job_id)await current(state.job_id);

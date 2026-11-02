@@ -18,7 +18,7 @@ import os
 import re
 import stat
 from pathlib import Path, PurePosixPath
-from typing import Any
+from typing import Any, Literal, cast
 from urllib.parse import urlsplit
 
 _OWN = frozenset({"dmf_pulse", "dmf_pulse-0.2.0.dist-info"})
@@ -30,6 +30,35 @@ _EXECUTION_CACHE: dict[tuple[str, str], DirectoryWatch] = {}
 _WATCHES: list[DirectoryWatch] = []
 _CLOSE_REGISTERED = False
 _TECHNICAL_PROCESS_ONLY = False
+
+IntegrityReason = Literal[
+    "CONTENT_OR_METADATA_MISMATCH",
+    "WATCH_ALREADY_INVALID",
+    "ROOT_IDENTITY_CHANGED",
+    "DIRECTORY_MEMBERSHIP_CHANGED",
+    "DIRECTORY_OBSERVATION_FAILED",
+    "NATIVE_NOTIFICATION",
+    "NATIVE_WAIT_FAILED",
+    "LEASE_OPEN_FAILED",
+    "LEASE_IDENTITY_CHANGED",
+    "DIRECTORY_SCAN_LIMIT",
+    "ROOT_CHANGED_DURING_PREPARATION",
+]
+INTEGRITY_REASONS = frozenset(
+    {
+        "CONTENT_OR_METADATA_MISMATCH",
+        "WATCH_ALREADY_INVALID",
+        "ROOT_IDENTITY_CHANGED",
+        "DIRECTORY_MEMBERSHIP_CHANGED",
+        "DIRECTORY_OBSERVATION_FAILED",
+        "NATIVE_NOTIFICATION",
+        "NATIVE_WAIT_FAILED",
+        "LEASE_OPEN_FAILED",
+        "LEASE_IDENTITY_CHANGED",
+        "DIRECTORY_SCAN_LIMIT",
+        "ROOT_CHANGED_DURING_PREPARATION",
+    }
+)
 
 
 class _FileId(ctypes.Structure):
@@ -43,7 +72,12 @@ class _FileAttributes(ctypes.Structure):
 class RuntimeIntegrityError(ValueError):
     """A closed diagnostic without file contents, paths or native exceptions."""
 
-    def __init__(self) -> None:
+    def __init__(self, reason: object = "CONTENT_OR_METADATA_MISMATCH") -> None:
+        self.reason: IntegrityReason = (
+            cast(IntegrityReason, reason)
+            if type(reason) is str and reason in INTEGRITY_REASONS
+            else "CONTENT_OR_METADATA_MISMATCH"
+        )
         super().__init__("DEPENDENCY_TREE_INTEGRITY_FAILED")
 
 
@@ -67,22 +101,37 @@ class DirectoryWatch:
 
     def require_unchanged(self) -> None:
         if self._closed or self._failed:
-            raise RuntimeIntegrityError()
+            raise RuntimeIntegrityError("WATCH_ALREADY_INVALID")
         try:
-            if self._root is not None and _directory_identity(self._root) != self._identity:
-                self._failed = True
-                raise RuntimeIntegrityError()
-            if any(
-                _directory_snapshot(path) != state for path, state in self._directory_states.items()
-            ):
-                self._failed = True
-                raise RuntimeIntegrityError()
-            unchanged = self._kernel.WaitForSingleObject(self._handle, 0) == 258
+            root_changed = (
+                self._root is not None and _directory_identity(self._root) != self._identity
+            )
         except (OSError, ValueError, TypeError):
-            unchanged = False
-        if not unchanged:
             self._failed = True
-            raise RuntimeIntegrityError()
+            raise RuntimeIntegrityError("DIRECTORY_OBSERVATION_FAILED") from None
+        if root_changed:
+            self._failed = True
+            raise RuntimeIntegrityError("ROOT_IDENTITY_CHANGED")
+        try:
+            membership_changed = any(
+                _directory_snapshot(path) != state for path, state in self._directory_states.items()
+            )
+        except (OSError, ValueError, TypeError):
+            self._failed = True
+            raise RuntimeIntegrityError("DIRECTORY_OBSERVATION_FAILED") from None
+        if membership_changed:
+            self._failed = True
+            raise RuntimeIntegrityError("DIRECTORY_MEMBERSHIP_CHANGED")
+        try:
+            status = self._kernel.WaitForSingleObject(self._handle, 0)
+        except (OSError, ValueError, TypeError):
+            self._failed = True
+            raise RuntimeIntegrityError("NATIVE_WAIT_FAILED") from None
+        if status != 258:
+            self._failed = True
+            raise RuntimeIntegrityError(
+                "NATIVE_NOTIFICATION" if status == 0 else "NATIVE_WAIT_FAILED"
+            )
 
     def close(self) -> None:
         if not self._closed:
@@ -102,7 +151,7 @@ class DirectoryWatch:
         handle = self._kernel.CreateFileW(str(path), 0x80000080, 1, None, 3, flags, None)
         if handle is None or handle == ctypes.c_void_p(-1).value:
             self._failed = True
-            raise RuntimeIntegrityError()
+            raise RuntimeIntegrityError("LEASE_OPEN_FAILED")
         self._leases[path] = handle
         identity = _FileId()
         attributes = _FileAttributes()
@@ -112,7 +161,7 @@ class DirectoryWatch:
             handle, 9, ctypes.byref(attributes), ctypes.sizeof(attributes)
         ):
             self._failed = True
-            raise RuntimeIntegrityError()
+            raise RuntimeIntegrityError("LEASE_IDENTITY_CHANGED")
         info = path.lstat()
         actual = (identity.volume, int.from_bytes(bytes(identity.identity), "little"))
         if (
@@ -123,7 +172,7 @@ class DirectoryWatch:
             or actual[1] <= 0
         ):
             self._failed = True
-            raise RuntimeIntegrityError()
+            raise RuntimeIntegrityError("LEASE_IDENTITY_CHANGED")
 
     def _protect_directory(self, path: Path) -> None:
         path = path.absolute()
@@ -203,6 +252,13 @@ def _new_watch(root: Path) -> DirectoryWatch | None:
         ctypes.c_uint32,
     ]
     kernel.GetFileInformationByHandleEx.restype = ctypes.c_int
+    # A first Windows directory enumeration can itself produce a LAST_WRITE
+    # notification without changing bytes/membership. Discover directories before
+    # the FIRST watch only. No content is read/accepted here. All existing leases,
+    # fresh snapshots, full signed hashes and latched checks still follow.
+    _prepare_directory_observations(root)
+    if _directory_identity(root) != identity:
+        raise RuntimeIntegrityError("ROOT_CHANGED_DURING_PREPARATION")
     # Names, directories, attributes, sizes, writes and security changes all
     # latch invalidation across the complete operator tree, including controls.
     handle = kernel.FindFirstChangeNotificationW(str(root), 1, 0x11F)
@@ -219,6 +275,20 @@ def _new_watch(root: Path) -> DirectoryWatch | None:
         watch.close()
         raise
     return watch
+
+
+def _prepare_directory_observations(root: Path) -> None:
+    pending = [root]
+    count = 0
+    while pending:
+        directory = _safe(pending.pop())
+        _, entries = _directory_snapshot(directory)
+        for name, kind in entries:
+            count += 1
+            if count > 100000:
+                raise RuntimeIntegrityError("DIRECTORY_SCAN_LIMIT")
+            if kind == "D":
+                pending.append(directory / name)
 
 
 def _directory_identity(root: Path) -> tuple[int, int] | None:

@@ -21,7 +21,7 @@ from sqlalchemy import Connection as SqlConnection
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.authorization_errors import AuthorizationState, safe_authorization_fields
-from dmf_pulse.current_failures import CREDENTIAL_FAILURE_CODES, safe_current_failure_code
+from dmf_pulse.current_failures import CREDENTIAL_FAILURE_CODES
 from dmf_pulse.dashboard.authorization import (
     AuthorizationError,
     AuthorizationPreview,
@@ -38,13 +38,12 @@ from dmf_pulse.dashboard.authorization import (
 )
 from dmf_pulse.dashboard.current_sources import CurrentSourceFactories, Provider
 from dmf_pulse.dashboard.synthetic import DEMO_TIME, demo_inputs
-from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.models import RightsProfile
 from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaSource, QuotaState
 from dmf_pulse.ingestion.openfootball.service import ScorePriorProfileId
+from dmf_pulse.operation.diagnostics import DiagnosticLog
 from dmf_pulse.operation.models import ChargedQuotaStatus
 from dmf_pulse.private_v1.actionability import checked_report
-from dmf_pulse.private_v1.errors import PrivateV1Error
 from dmf_pulse.private_v1.models import PrivateV1Decision
 from dmf_pulse.private_v1.one_command import (
     OneCommandRequest,
@@ -330,8 +329,14 @@ class _GuardFailure:
 
 
 class CurrentAcquisitionGuard:
-    def __init__(self, launch: CurrentLaunch, clock: Callable[[], datetime]) -> None:
+    def __init__(
+        self,
+        launch: CurrentLaunch,
+        clock: Callable[[], datetime],
+        diagnostics: DiagnosticLog | None = None,
+    ) -> None:
         self._launch, self._clock = launch, clock
+        self._diagnostics = diagnostics
         if launch.grant.ledger_backend == "OWNED_JSON":
             if launch.grant.classification != "OWNED_SYNTHETIC" or launch.ledger_path is None:
                 raise AuthorizationError("PRODUCTION_CONTROL_STORE_NOT_ACCEPTED")
@@ -402,6 +407,8 @@ class CurrentAcquisitionGuard:
                 path=path,
                 now=self._clock(),
             )
+            if self._diagnostics is not None:
+                self._diagnostics.admitted(provider, method, host, path)
         except AuthorizationError as error:
             if self.failure is None:
                 self.failure = _GuardFailure(*safe_authorization_fields(error))
@@ -432,6 +439,18 @@ class CurrentAcquisitionGuard:
 
     def finish_acquisition(self) -> None:
         self._closed = True
+
+    def transport_started(self) -> None:
+        if self._diagnostics is not None:
+            self._diagnostics.transport_started()
+
+    def response_completed(self, status: int) -> None:
+        if self._diagnostics is not None:
+            self._diagnostics.response_completed(status)
+
+    def transport_failed(self, error: Exception) -> None:
+        if self._diagnostics is not None:
+            self._diagnostics.failed(error)
 
     def _require_standing_quota_current(self) -> None:
         if not self._launch.grant.request.authorization_id.startswith("OPR001-"):
@@ -539,7 +558,9 @@ def run_current_recommendation(
     owned = launch.grant.classification == "OWNED_SYNTHETIC"
     active_clock = clock or ((lambda: DEMO_TIME) if owned else lambda: datetime.now(UTC))
     _launch_is_bound(launch)
-    guard = CurrentAcquisitionGuard(launch, active_clock)
+    observed = getattr(progress, "diagnostics", None)
+    diagnostics = observed if isinstance(observed, DiagnosticLog) else None
+    guard = CurrentAcquisitionGuard(launch, active_clock, diagnostics)
     profiles = resolved_profiles(launch.grant.request.source_scopes)
     sources = CurrentSourceFactories(
         guard=guard,
@@ -596,10 +617,16 @@ def run_current_recommendation(
 def current_worker(pipe: Connection, horizon: Literal[1, 3], launch: CurrentLaunch) -> None:
     from dmf_pulse.dashboard.runtime import PipeProgress
 
+    diagnostics = DiagnosticLog(
+        send=lambda event: pipe.send(("diagnostic", event.model_dump_json()))
+    )
     try:
         if horizon != launch.grant.request.horizon:
             raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
-        result = run_current_recommendation(launch, PipeProgress(pipe.send))
+        result = run_current_recommendation(
+            launch, PipeProgress(pipe.send, diagnostics=diagnostics)
+        )
+        diagnostics.enter("RESULT_VALIDATION")
         if result.presentation is None:
             raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
         envelope = CurrentWorkerResult(
@@ -612,10 +639,9 @@ def current_worker(pipe: Connection, horizon: Literal[1, 3], launch: CurrentLaun
         )
         validate_current_result(envelope, launch)
         pipe.send(("current_result", envelope))
-    except (AuthorizationError, IngestionError, PrivateV1Error) as error:
-        pipe.send(("error", safe_current_failure_code(error.code)))
-    except Exception:
-        pipe.send(("error", "CURRENT_SOURCE_OR_RUN_BLOCKED"))
+    except Exception as error:
+        failure = diagnostics.failed(error)
+        pipe.send(("error", failure.code))
     finally:
         pipe.close()
 
