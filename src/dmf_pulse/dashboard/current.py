@@ -621,29 +621,37 @@ def current_worker(pipe: Connection, horizon: Literal[1, 3], launch: CurrentLaun
         send=lambda event: pipe.send(("diagnostic", event.model_dump_json()))
     )
     try:
-        if horizon != launch.grant.request.horizon:
-            raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
-        result = run_current_recommendation(
-            launch, PipeProgress(pipe.send, diagnostics=diagnostics)
-        )
-        diagnostics.enter("RESULT_VALIDATION")
-        if result.presentation is None:
-            raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
-        envelope = CurrentWorkerResult(
-            result=result,
-            grant_sha256=launch.grant.semantic_sha256,
-            presentation_sha256=canonical_sha256(result.presentation.model_dump(mode="json")),
-            authentication_sha256=_result_authentication(
-                launch, result, canonical_sha256(result.presentation.model_dump(mode="json"))
-            ),
-        )
-        validate_current_result(envelope, launch)
-        pipe.send(("current_result", envelope))
-    except Exception as error:
-        failure = diagnostics.failed(error)
-        pipe.send(("error", failure.code))
+        try:
+            if horizon != launch.grant.request.horizon:
+                raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
+            result = run_current_recommendation(
+                launch, PipeProgress(pipe.send, diagnostics=diagnostics)
+            )
+            diagnostics.enter("RESULT_VALIDATION")
+            if result.presentation is None:
+                raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
+            envelope = CurrentWorkerResult(
+                result=result,
+                grant_sha256=launch.grant.semantic_sha256,
+                presentation_sha256=canonical_sha256(result.presentation.model_dump(mode="json")),
+                authentication_sha256=_result_authentication(
+                    launch, result, canonical_sha256(result.presentation.model_dump(mode="json"))
+                ),
+            )
+            validate_current_result(envelope, launch)
+            pipe.send(("current_result", envelope))
+        except Exception as error:
+            failure = diagnostics.failed(error)
+            pipe.send(("error", failure.code))
+    except BaseException:
+        # A disposable child must not let multiprocessing format an implicit
+        # source-exception chain when its diagnostic/terminal channel fails.
+        raise SystemExit(2) from None
     finally:
-        pipe.close()
+        try:
+            pipe.close()
+        except BaseException:
+            raise SystemExit(2) from None
 
 
 class CurrentRefreshSession:

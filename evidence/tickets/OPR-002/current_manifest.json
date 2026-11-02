@@ -3501,9 +3501,9 @@
       "sha256": "d7cb22c35bb0c11d6c4988188206cccc41b464ada97d8f930fcac8bbb6df92f7"
     },
     {
-      "bytes": 38389,
+      "bytes": 38793,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "c44e4b283fecd36edcd565feceb4979be44c3d2131fba9b1a9106279a54e7399"
+      "sha256": "37af17097e055854381879966b2ebb50d87abf8cceda1752b2820fdac0b5f2d0"
     },
     {
       "bytes": 16104,
@@ -6894,6 +6894,11 @@
       "bytes": 5829,
       "path": "tests/unit/dashboard/test_worker_diagnostic_protocol.py",
       "sha256": "f5b6954b2ded3f4ee0dbffc1689c3658103658692dc9641ff4db31519c816e19"
+    },
+    {
+      "bytes": 4858,
+      "path": "tests/unit/dashboard/test_worker_pipe_privacy.py",
+      "sha256": "4f648e1a1420994870cae91aa6ce708202a04a4fcb3bb3ffe0d06de7946d19ed"
     },
     {
       "bytes": 14770,
