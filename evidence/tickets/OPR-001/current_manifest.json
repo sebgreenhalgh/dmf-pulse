@@ -5806,9 +5806,9 @@
       "sha256": "797bb1a9da8a62089bc7e4c3997fa84f3e01af71dc6baa6b05e9bab43ed85c97"
     },
     {
-      "bytes": 1419,
+      "bytes": 3568,
       "path": "tests/gw10_reviewed_source_freeze_support.py",
-      "sha256": "c7c03a96563e2806815295c72b90707c35e016e69e8f23dac665437c9528a428"
+      "sha256": "388cf9e5872cd245f07a531b8716c833c39946a53b28065605b39811a976a9b0"
     },
     {
       "bytes": 6293,
@@ -6331,9 +6331,9 @@
       "sha256": "e087bb7037c1b13f11bf57760a28ea29bb42aff81646f70234ab632cced26ed4"
     },
     {
-      "bytes": 22051,
+      "bytes": 22088,
       "path": "tests/security/test_fpl_rights_raw_retention.py",
-      "sha256": "15d1367a9473fe3c852fa52a29de4d74cc459e625c52ff6612f75dfe943c12df"
+      "sha256": "0aa75d83e93c861451f56697bf72b09b3c3cab077ef5699ec7e1ad0dec2ceb1c"
     },
     {
       "bytes": 1834,
@@ -6351,9 +6351,9 @@
       "sha256": "2b36b60c5833da6ed9e21e1729c5519d3f17de80cd0c86201d2a643477a40145"
     },
     {
-      "bytes": 18226,
+      "bytes": 18263,
       "path": "tests/security/test_odds_credentials_quota_retention.py",
-      "sha256": "cd2988e1ce2e3e0c88b15135b33dfd3e2d945d8a1f9a6b2c1f70d1d26fe12768"
+      "sha256": "c115d34cd9f51dda6f63efa0144b3969fc529b288fc72c1249be125b433e0c9f"
     },
     {
       "bytes": 60,
@@ -6761,9 +6761,9 @@
       "sha256": "08dda00ff7c979dbfb2bbc281c7f58aebd920c3b71fc37926ac44a55dd2e3d76"
     },
     {
-      "bytes": 4884,
+      "bytes": 4893,
       "path": "tests/unit/cli/test_pulse.py",
-      "sha256": "52e8a6118d0543f9d5d143f48002645c920b45a777c74cbb1dccf4bf49a92889"
+      "sha256": "8339a17371bdc1bd0ef52f109fb97dd972a6081761175ac7d524b3f39e681b7d"
     },
     {
       "bytes": 11125,
@@ -7426,9 +7426,9 @@
       "sha256": "813f70322008d6460965c0e71b870f4c0a976d141c25db0207f9dc5af39e37eb"
     },
     {
-      "bytes": 9570,
+      "bytes": 15534,
       "path": "tests/unit/ingestion/test_gw10_reviewed_source_freeze.py",
-      "sha256": "8d5ae12d01dd7281e2740ed7e24ec70f87fea1749ed68895e6c59a756985b53d"
+      "sha256": "69b76ee993879b0652129dfb834e5e929a2e68e2875475eead69db6d962f7ce1"
     },
     {
       "bytes": 28713,

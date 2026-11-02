@@ -106,7 +106,7 @@ def test_injected_authorization_error_cannot_echo_raw_message(monkeypatch):
 @pytest.mark.parametrize(
     "code,action",
     [
-        ("QUALIFIED_QUOTA_EVIDENCE_STALE", "remaining-credit evidence"),
+        ("QUALIFIED_QUOTA_EVIDENCE_STALE", "fresh authorized zero-credit check"),
         ("AUTHORIZATION_DEADLINE_INVALID", "official deadline evidence"),
         ("USAGE_LEDGER_SCHEMA_NOT_READY", "control migration"),
         ("SOURCE_PROFILE_CHANGED", "provider terms/profile"),

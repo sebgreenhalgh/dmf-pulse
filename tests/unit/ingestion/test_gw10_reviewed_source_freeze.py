@@ -10,6 +10,8 @@ import pytest
 
 from tests.gw10_reviewed_source_freeze_support import (
     GW10_REVIEWED_SOURCE_SHA256,
+    OPR_REVIEWED_SOURCE_SHA256,
+    historical_gw10_source_bytes,
     is_exact_gw10_reviewed_source,
 )
 
@@ -151,8 +153,10 @@ def test_exact_reviewed_bytes_only_and_all_legacy_function_bodies_preserved(
 ):
     current = (repository_root / "src/dmf_pulse" / relative).read_bytes()
     assert is_exact_gw10_reviewed_source(relative, current)
+    historical = historical_gw10_source_bytes(relative, current)
+    assert historical is not None
     before = _functions(ast.parse(_parent_bytes(repository_root, relative)))
-    after = _functions(ast.parse(current))
+    after = _functions(ast.parse(historical))
     assert set(before) == set(after)
     assert len(before) == FUNCTION_COUNTS[relative]
     changed = {name for name in before if before[name] != after[name]}
@@ -242,3 +246,127 @@ def test_exact_extension_never_covers_unchanged_or_intentionally_evolving_other_
     assert not is_exact_gw10_reviewed_source(
         relative, (repository_root / "src/dmf_pulse" / relative).read_bytes()
     )
+
+
+def test_opr_extension_has_one_fixed_path_and_exact_four_line_inverse(repository_root):
+    assert OPR_REVIEWED_SOURCE_SHA256 == {
+        "ingestion/odds/client.py": "8b3d3193ffb142bc678f4730299eebd82d3134efdf92dcfe761fa788d7c44a76"
+    }
+    assert (
+        hashlib.sha256(
+            json.dumps(OPR_REVIEWED_SOURCE_SHA256, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == "37d2e81184e17a1582458d2864ae7a3d434e845f35dd66095dede718355edda0"
+    )
+    current = (repository_root / "src/dmf_pulse/ingestion/odds/client.py").read_bytes()
+    additions = (
+        b"        on_response_headers: Callable[[int, Mapping[str, str]], None] | None = None,\n",
+        b"        self._on_response_headers = on_response_headers\n",
+        b"            if self._on_response_headers is not None:\n",
+        b"                self._on_response_headers(response.status, headers)\n",
+    )
+    expected = current
+    for line in additions:
+        assert expected.count(line) == 1
+        expected = expected.replace(line, b"", 1)
+    assert (
+        hashlib.sha256(expected).hexdigest()
+        == GW10_REVIEWED_SOURCE_SHA256["ingestion/odds/client.py"]
+    )
+    assert historical_gw10_source_bytes("ingestion/odds/client.py", current) == expected
+    assert historical_gw10_source_bytes("ingestion/odds/client.py", expected) == expected
+    before, after = _functions(ast.parse(expected)), _functions(ast.parse(current))
+    assert set(before) == set(after)
+    assert {name for name in before if before[name] != after[name]} == {
+        "HttpClientOddsTransport.__init__",
+        "HttpClientOddsTransport._unsafe_send",
+    }
+
+
+@pytest.mark.parametrize(
+    "digest", ["0" * 64, "8b3d3193ffb142bc678f4730299eebd82d3134efdf92dcfe761fa788d7c44a76"]
+)
+def test_historical_map_cannot_be_relabelled_to_authorize_opr(repository_root, monkeypatch, digest):
+    current = (repository_root / "src/dmf_pulse/ingestion/odds/client.py").read_bytes()
+    monkeypatch.setitem(GW10_REVIEWED_SOURCE_SHA256, "ingestion/odds/client.py", digest)
+    assert not is_exact_gw10_reviewed_source("ingestion/odds/client.py", current)
+    assert historical_gw10_source_bytes("ingestion/odds/client.py", current) is None
+
+
+@pytest.mark.parametrize(
+    "attack",
+    [
+        "removed",
+        "duplicate",
+        "argument_order",
+        "always_call",
+        "changed_default",
+        "moved_after_body",
+        "other_method",
+        "extra_import",
+        "extra_call",
+    ],
+)
+def test_opr_exact_inverse_rejects_every_unreviewed_hook_change(
+    repository_root, monkeypatch, attack
+):
+    relative = "ingestion/odds/client.py"
+    current = (repository_root / "src/dmf_pulse" / relative).read_bytes()
+    condition = b"            if self._on_response_headers is not None:\n"
+    call = b"                self._on_response_headers(response.status, headers)\n"
+    guard = condition + call
+    assert current.count(guard) == 1
+    if attack == "removed":
+        altered = current.replace(guard, b"", 1)
+    elif attack == "duplicate":
+        altered = current.replace(guard, guard + guard, 1)
+    elif attack == "argument_order":
+        altered = current.replace(
+            call, b"                self._on_response_headers(headers, response.status)\n", 1
+        )
+    elif attack == "always_call":
+        altered = current.replace(condition, b"            if True:\n", 1)
+    elif attack == "changed_default":
+        altered = current.replace(b"None] | None = None,", b"None] | None = True,", 1)
+    elif attack == "moved_after_body":
+        altered = current.replace(guard, b"", 1)
+        anchor = b"            result = OddsHttpResponse(\n"
+        assert altered.count(anchor) == 1
+        altered = altered.replace(anchor, guard + anchor, 1)
+    elif attack == "other_method":
+        altered = current.replace(guard, b"", 1)
+        anchor = b"        limit = load_provider_config().max_response_bytes\n"
+        method = altered.index(
+            b"    def _read_body(\n", altered.index(b"class HttpClientOddsTransport:")
+        )
+        position = altered.index(anchor, method) + len(anchor)
+        moved = (
+            b"        if self._on_response_headers is not None:\n"
+            b"            self._on_response_headers(response.status, headers)\n"
+        )
+        altered = altered[:position] + moved + altered[position:]
+    elif attack == "extra_import":
+        altered = current + b"\nimport unreviewed_response_adapter\n"
+    else:
+        altered = current + b"\nunreviewed_response_call()\n"
+    assert altered != current
+    assert not is_exact_gw10_reviewed_source(relative, altered)
+    assert historical_gw10_source_bytes(relative, altered) is None
+    # Even a mistakenly updated extension-map digest cannot turn an unreviewed
+    # hook position/body into the frozen historical GW10 state.
+    monkeypatch.setitem(OPR_REVIEWED_SOURCE_SHA256, relative, hashlib.sha256(altered).hexdigest())
+    assert not is_exact_gw10_reviewed_source(relative, altered)
+    assert historical_gw10_source_bytes(relative, altered) is None
+
+
+def test_opr_map_cannot_expand_to_another_path_or_digest(repository_root, monkeypatch):
+    relative = "ingestion/odds/client.py"
+    current = (repository_root / "src/dmf_pulse" / relative).read_bytes()
+    monkeypatch.setitem(OPR_REVIEWED_SOURCE_SHA256, relative, "0" * 64)
+    assert not is_exact_gw10_reviewed_source(relative, current)
+    monkeypatch.setitem(OPR_REVIEWED_SOURCE_SHA256, relative, hashlib.sha256(current).hexdigest())
+    monkeypatch.setitem(
+        OPR_REVIEWED_SOURCE_SHA256, "unreviewed/client.py", hashlib.sha256(current).hexdigest()
+    )
+    assert not is_exact_gw10_reviewed_source(relative, current)
+    assert not is_exact_gw10_reviewed_source("unreviewed/client.py", current)
