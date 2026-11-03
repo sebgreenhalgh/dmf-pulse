@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.chips.compiler import compile_optimisation_chip_rules
 from dmf_pulse.football_events.service import load_score_baseline_policy
 from dmf_pulse.fpl_points.models import MonteCarloPolicy, ProjectionMode
 from dmf_pulse.fpl_points.player_prior import (
@@ -28,6 +29,7 @@ from dmf_pulse.ingestion.fpl.manager_current import (
     CurrentManagerStateBundle,
     CurrentManagerStateService,
 )
+from dmf_pulse.ingestion.fpl.manager_provider import provider_current_manager_declaration
 from dmf_pulse.ingestion.odds.automatic_mapping import build_automatic_current_identity_map
 from dmf_pulse.ingestion.odds.current import OddsProviderCurrentInput
 from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorResult
@@ -36,6 +38,7 @@ from dmf_pulse.markets.current import (
     bind_current_market_constraint_request,
     build_transient_current_market_identity_view,
 )
+from dmf_pulse.operation.chip_schema_compat import ChipSchemaProof, adapt_chip_source
 from dmf_pulse.operation.models import OperationError
 from dmf_pulse.private_v1 import one_command as accepted
 from dmf_pulse.private_v1.automatic_inputs import (
@@ -51,6 +54,7 @@ from dmf_pulse.private_v1.service import (
     PrivateV1RunResult,
     load_packaged_event_allocation_config,
 )
+from dmf_pulse.rules.chips import build_chip_rules_view
 from dmf_pulse.rules.models import CapabilityArtifact, CompiledRuleset
 from dmf_pulse.rules.private_transient import PrivateTransientRulesAuthority
 
@@ -62,6 +66,7 @@ class PreparedDiagnosticFpl:
     ruleset: CompiledRuleset
     capability: CapabilityArtifact
     rules_authority: PrivateTransientRulesAuthority
+    chip_schema_proof: ChipSchemaProof | None = None
 
     @property
     def validation_sha256(self) -> str:
@@ -71,6 +76,11 @@ class PreparedDiagnosticFpl:
                 "manager": self.manager.semantic_sha256,
                 "rules": self.ruleset.ruleset_hash,
                 "capability": self.capability.capability_hash,
+                "chip_schema_proof": (
+                    None
+                    if self.chip_schema_proof is None
+                    else self.chip_schema_proof.model_dump(mode="json")
+                ),
             }
         )
 
@@ -80,17 +90,26 @@ def prepare_diagnostic_fpl(
 ) -> PreparedDiagnosticFpl:
     """Validate the already acquired manager under the original rules authority."""
     ruleset, capability, authority = accepted._rules_authority(approved_at)
-    manager = CurrentManagerStateService(clock=lambda: observed_at).compile_provider_snapshot(
-        snapshot.current_team,
-        fpl_input=snapshot.fpl_input,
-        ruleset=ruleset,
-        capability=capability,
+    chips = compile_optimisation_chip_rules(build_chip_rules_view(ruleset))
+    adapted = adapt_chip_source(
+        snapshot.current_team, chips, target_gameweek=snapshot.target_gameweek
+    )
+    declaration = provider_current_manager_declaration(
+        adapted.compiler_source,
+        snapshot.fpl_input,
+        chips,
         observed_at=observed_at,
         overall_points=snapshot.entry.summary_overall_points,
         overall_rank=snapshot.entry.summary_overall_rank,
+    )
+    manager = CurrentManagerStateService(clock=lambda: observed_at).compile_provider_observed(
+        declaration,
+        fpl_input=snapshot.fpl_input,
+        ruleset=ruleset,
+        capability=capability,
         private_rules_authority=authority,
     )
-    return PreparedDiagnosticFpl(snapshot, manager, ruleset, capability, authority)
+    return PreparedDiagnosticFpl(snapshot, manager, ruleset, capability, authority, adapted.proof)
 
 
 def inherited_monte_carlo_policy() -> MonteCarloPolicy:

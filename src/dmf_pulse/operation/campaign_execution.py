@@ -169,7 +169,11 @@ def execute_active_session(
             )
             validated_at = clock()
             journal.record_stage(
-                key, "FPL_VALIDATION", prepared.validation_sha256, now=validated_at
+                key,
+                "FPL_VALIDATION",
+                prepared.validation_sha256,
+                now=validated_at,
+                source_schema_proof=prepared.chip_schema_proof,
             )
             log.enter("SCORE_SOURCE_ACQUISITION")
             prior = factories.score(input_clock).build(

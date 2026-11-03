@@ -96,3 +96,13 @@ the signed attribution, both consumed sessions, original reservation and every
 budget. Use a separately admitted READ_ONLY diagnostic after signed release gates
 to identify any remaining real contract failure before spending another paid-
 eligible slot. No automatic retry or new personal approval within this scope.
+
+Session3 compatibility slice: preserve the actual fixed unsupported-status
+failure and129-row custody. Independently witnessed played-status and future-copy
+schema gaps may be adapted only in operation/, with unique governed assignment,
+exact original typed snapshot preservation, explicit derived proof and canonical
+parity to the unchanged manager compiler on supported equivalent inputs. Unknown
+statuses, ambiguous copies, invalid history and rule contradictions remain
+rejections. No new source routes/requests, model/rules changes or normal-standing
+repair are implied. A subsequent separately admitted READ_ONLY session requires
+the complete reviewed signed release and current preflight.

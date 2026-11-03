@@ -3296,3 +3296,19 @@ rights rule and numerical byte. Sign the reviewed compatibility release before
 the next bounded READ_ONLY session; preserve the two remaining paid-eligible
 slots until the real FPL/controlled pipeline is proven. No raw bodies, extra
 routes, account writes, model tuning, counter resets or material scope changes.
+
+2026-11-03 session3: READ_ONLY completed16FPL and1free quota HTTP200,
+498remaining/2used/last0, then correctly reported the fixed manager-chip status
+boundary. Terminal/close, separate installed inspection and owned dashboard
+cleanup are preserved; original18rows/24markers and all129operator rows remain.
+The erased response does not establish which unsupported status occurred.
+Independent owned witnesses prove two supported schema gaps: documented played
+status and explicit future unavailable copies. Add only a diagnostic operation
+adapter with unique governed-window assignment, original snapshot preservation,
+closed derived audit proof and unchanged manager compiler/model/rules. Unknown,
+contradictory or ambiguous records still fail closed. Prove known-contract parity
+and negative privacy/mapping cases before a reviewed signed release and another
+separate READ_ONLY session. Ordinary standing wiring is not repaired by this
+diagnostic-only change; assess it after genuine diagnostic success. No fresh token
+request until installation/preflight/readiness are complete. Remaining campaign:
+five sessions, two paid-eligible sessions; no campaign paid requests/reservations.

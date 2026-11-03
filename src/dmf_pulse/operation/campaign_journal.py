@@ -28,6 +28,7 @@ from dmf_pulse.operation.campaign_authority import (
     load_verified_campaign,
 )
 from dmf_pulse.operation.campaign_publication import LABEL, DiagnosticPublication
+from dmf_pulse.operation.chip_schema_compat import ChipSchemaProof
 from dmf_pulse.operation.diagnostics import DiagnosticReport
 from dmf_pulse.operation.discovery import EventDiscovery
 from dmf_pulse.operation.journal import OperationJournal
@@ -477,9 +478,17 @@ class DiagnosticJournal:
         value_sha256: str,
         *,
         now: datetime,
+        source_schema_proof: ChipSchemaProof | None = None,
     ) -> None:
         if len(value_sha256) != 64 or any(c not in "0123456789abcdef" for c in value_sha256):
             raise OperationError("DIAGNOSTIC_STAGE_PROOF_INVALID")
+        proof_value: dict[str, object] = {"proof_sha256": value_sha256}
+        if source_schema_proof is not None:
+            if stage != "FPL_VALIDATION":
+                raise OperationError("DIAGNOSTIC_STAGE_PROOF_INVALID")
+            proof_value["source_schema_proof"] = ChipSchemaProof.model_validate(
+                source_schema_proof
+            ).model_dump(mode="json")
         with self._transaction() as (authority, connection, rows):
             selected = self._tagged(rows, authority.proposal)
             session = self._active(authority, selected, key, now)
@@ -497,7 +506,7 @@ class DiagnosticJournal:
                 session,
                 "LAUNCH",
                 stage,
-                {"proof_sha256": value_sha256},
+                proof_value,
                 now=now,
             )
 

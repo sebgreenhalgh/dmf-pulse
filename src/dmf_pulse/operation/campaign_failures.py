@@ -14,6 +14,9 @@ DIAGNOSTIC_FAILURE_ACTIONS.update(
         "CURRENT_MANAGER_FREE_HIT_RESTORATION_UNAVAILABLE": "Active or pending Free Hit requires restoration state that this supported manager contract does not provide. Keep the rejection; do not substitute ordinary squad state.",
         "CURRENT_MANAGER_CLOCK_NAIVE": "The manager compilation clock was not timezone-aware. Correct the operational clock without backdating source captures.",
         "CURRENT_MANAGER_CLOCK_REGRESSED": "The manager compilation clock moved backwards. Inspect operation chronology without changing captured source times.",
+        "DIAGNOSTIC_MANAGER_CHIP_HISTORY_INVALID": "The diagnostic chip schema adapter rejected empty, repeated, contradictory or future use history. Preserve the rejection; no chip state is inferred.",
+        "DIAGNOSTIC_MANAGER_CHIP_SCHEMA_INVALID": "The diagnostic manager chip source failed strict typed revalidation. Keep the rejection; no source fields or serializer diagnostics are exported.",
+        "DIAGNOSTIC_MANAGER_CHIP_MAPPING_AMBIGUOUS": "The diagnostic chip schema adapter could not map every source record uniquely to governed copies. Source numbers do not override rule windows or remove ambiguity.",
     }
 )
 DIAGNOSTIC_FAILURE_ACTIONS.update(

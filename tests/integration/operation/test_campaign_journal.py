@@ -12,6 +12,7 @@ from dmf_pulse.operation.campaign_runtime import (
     campaign_runtime_enrollment,
     diagnostic_source_context,
 )
+from dmf_pulse.operation.chip_schema_compat import ChipSchemaProof
 from dmf_pulse.operation.diagnostics import DiagnosticLog
 from dmf_pulse.operation.models import OperationError
 from dmf_pulse.operation.quota import QUOTA_HOST, QUOTA_PATH
@@ -108,6 +109,47 @@ def gate(c, key, event):
         official_deadline_at=event.deadline_at,
     )
     return proof, observed
+
+
+def test_source_schema_proof_is_retained_with_validation_without_paid_authority(campaign_case):
+    c = campaign_case
+    session = c.journal.begin_session("READ_ONLY", now=NOW)
+    proof = ChipSchemaProof(
+        source_manager_sha256="1" * 64,
+        compiler_argument_sha256="2" * 64,
+        governed_chip_bundle_sha256="3" * 64,
+        assignment_sha256="4" * 64,
+        translated_played_records=1,
+        omitted_inactive_records=4,
+    )
+    before = c.original.original.audit()
+    with diagnostic_source_context(c.journal, session.session_key):
+        c.journal.record_stage(
+            session.session_key,
+            "FPL_VALIDATION",
+            "5" * 64,
+            now=NOW,
+            source_schema_proof=proof,
+        )
+        with pytest.raises(OperationError, match="DIAGNOSTIC_STAGE_PROOF_INVALID"):
+            c.journal.record_stage(
+                session.session_key,
+                "CONTROLLED_GATE",
+                "6" * 64,
+                now=NOW,
+                source_schema_proof=proof,
+            )
+    rows = support.rows(c.original)
+    stages = [
+        row["payload"]["value"]
+        for row in rows
+        if row["payload"]["value"].get("subtype") == "FPL_VALIDATION"
+    ]
+    assert len(stages) == 1
+    assert stages[0]["source_schema_proof"] == proof.model_dump(mode="json")
+    assert stages[0]["proof_sha256"] == "5" * 64
+    assert c.original.original.audit() == before
+    assert not any(row["kind"] == "ENROLL" for row in rows)
 
 
 def test_context_default_is_absent_and_reset_after_exception(campaign_case):
