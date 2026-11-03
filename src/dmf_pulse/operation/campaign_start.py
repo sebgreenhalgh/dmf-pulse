@@ -20,6 +20,7 @@ from dmf_pulse.operation.campaign import SessionMode
 from dmf_pulse.operation.campaign_authority import load_verified_campaign
 from dmf_pulse.operation.campaign_execution import diagnostic_worker
 from dmf_pulse.operation.campaign_journal import DiagnosticJournal
+from dmf_pulse.operation.diagnostic_compute import DiagnosticComputePool, stop_owned_process
 from dmf_pulse.operation.diagnostics import STAGE_LABELS, DiagnosticLog, Stage
 from dmf_pulse.operation.maintenance import _safe_path, operator_root
 from dmf_pulse.operation.models import OperationError
@@ -31,26 +32,48 @@ class DiagnosticWorker(ProcessWorker):
 
     def __init__(self, key: str, credential_expires_at: datetime) -> None:
         context = multiprocessing.get_context("spawn")
-        self._reader, self._sender = context.Pipe(duplex=False)
-        self._process = context.Process(
-            target=diagnostic_worker,
-            args=(self._sender, 1, key, credential_expires_at),
-            daemon=True,
-        )
+        self._compute = DiagnosticComputePool()
+        try:
+            self._reader, self._sender = context.Pipe(duplex=False)
+            try:
+                self._process = context.Process(
+                    target=diagnostic_worker,
+                    args=(self._sender, 1, key, credential_expires_at, self._compute.connections),
+                    daemon=True,
+                )
+            except BaseException:
+                self._reader.close()
+                self._sender.close()
+                raise
+        except BaseException:
+            self._compute.close()
+            raise
 
     def start(self) -> None:
         try:
+            self._compute.start()
             self._process.start()
         finally:
             self._sender.close()
+            self._compute.release_clients()
 
     def close(self) -> None:
-        self._sender.close()
-        if self._process.pid is None:
-            self._reader.close()
-            self._process.close()
-        else:
-            super().close()
+        failed = False
+        for handle in (self._sender, self._reader):
+            try:
+                handle.close()
+            except BaseException:
+                failed = True
+        try:
+            stop_owned_process(self._process)
+        except BaseException:
+            failed = True
+        try:
+            self._compute.close()
+        except BaseException:
+            failed = True
+        if failed:
+            raise OperationError("WORKER_CLEANUP_FAILED")
 
 
 def ensure_campaign_credential() -> datetime:

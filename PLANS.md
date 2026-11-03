@@ -3312,3 +3312,36 @@ separate READ_ONLY session. Ordinary standing wiring is not repaired by this
 diagnostic-only change; assess it after genuine diagnostic success. No fresh token
 request until installation/preflight/readiness are complete. Remaining campaign:
 five sessions, two paid-eligible sessions; no campaign paid requests/reservations.
+
+2026-11-03 session4: the unchanged controlled kernel completed after 17 actual
+FPL, four OpenFootball and one free quota HTTP200 responses. No paid request or
+reservation occurred. Its 1333.20s elapsed time exceeds the immutable 1200s
+pre-paid bound. Terminal, quiescent close and separate installed inspection are
+retained in the 203-row operator chain; original18 rows remain unchanged. Four
+sessions and two paid-eligible slots remain. Do not repeat paid-eligible execution
+until preparation and second-kernel runtime fit are established.
+
+- [ ] Prove owned exact numerical parity and actual-size timing for bounded
+  supervisor-owned daemon compute siblings calling unchanged protected minutes
+  functions. Preserve the outer daemon, signed child bootstrap, dedicated owner
+  lifelines, transient typed IPC, no-network workers and all-child cleanup before
+  custody close. No grandchildren, numerical substitutions or policy changes.
+- [ ] Reuse minutes only inside the same session on exact full snapshot, player
+  identity and fixture-target keys; keep both full controlled and real kernels.
+- [ ] Test partial spawn, parent/outer death, cancellation, failure disclosure,
+  worker isolation and byte-identical results before independent source review,
+  complete release/installation checks and separately admitted live validation.
+
+Runtime source checkpoint: 48 focused compute/supervisor/disclosure tests, eight
+adopted independent native-child privacy regressions and two accepted-orchestrator
+numerical parity tests pass. Independent scoped review095 found no unresolved
+P0/P1 and authenticated all493 unchanged protected members. An exact owned
+400-player/ten-fixture split matched every minutes value (145.57s serial assembly,
+49.02s parallel minutes). A separate760-player/ten-fixture/256-scenario benchmark
+has completed its first full kernel (150.23s assembly,326.19s kernel); rebuilding
+with different owned market data reused only identical minutes (6.21s). Its
+second full kernel, final CI, clean installed bootstrap/timing, signed release,
+current canonical203 preflight and genuine recommendations remain open. These
+are owned engineering results, not live acceptance. An abrupt held-handle
+supervisor-death test authenticated exit2 of all four active numerical siblings;
+it used individual bounded waits and does not assert a common five-second bound.

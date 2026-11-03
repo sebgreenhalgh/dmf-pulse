@@ -53,6 +53,9 @@ DIAGNOSTIC_FAILURE_ACTIONS.update(
             "DIAGNOSTIC_MARKET_PROVENANCE_CLASS_MISMATCH",
             "DIAGNOSTIC_ONE_GAMEWEEK_REQUIRED",
             "DIAGNOSTIC_SNAPSHOT_CUTOFF_MISMATCH",
+            "DIAGNOSTIC_COMPUTE_EXTERNAL_IO_FORBIDDEN",
+            "DIAGNOSTIC_COMPUTE_PROTOCOL_INVALID",
+            "DIAGNOSTIC_COMPUTE_WORKER_STOPPED",
         ),
         "Inspect the recorded typed-input or controlled-kernel contract before another separately admitted diagnostic session. These engineering inputs cannot be published as real recommendations.",
     )

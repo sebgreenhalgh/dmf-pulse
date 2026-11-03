@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
+from multiprocessing.connection import _ConnectionBase
 from typing import Literal, cast
 
 from dmf_pulse.assurance.canonical import canonical_sha256
@@ -30,6 +31,7 @@ from dmf_pulse.operation.campaign_runtime import (
     require_runtime,
 )
 from dmf_pulse.operation.campaign_sources import DiagnosticGuard, DiagnosticQuotaTransport
+from dmf_pulse.operation.diagnostic_compute import diagnostic_compute_scope
 from dmf_pulse.operation.diagnostic_market import controlled_market_for_snapshot
 from dmf_pulse.operation.diagnostic_pipeline import (
     assemble_diagnostic_execution,
@@ -83,12 +85,16 @@ def execute_active_session(
     *,
     clock: Callable[[], datetime],
     send: Callable[[tuple[str, object]], None],
+    compute_connections: tuple[_ConnectionBase, ...] = (),
 ) -> None:
     """Internal verified-worker entry; inputs contain no credential or source body."""
     log = DiagnosticLog(clock=clock)
     progress = PipeProgress(send, diagnostics=log)
     try:
-        with diagnostic_source_context(journal, key) as canonical_journal:
+        with (
+            diagnostic_source_context(journal, key) as canonical_journal,
+            diagnostic_compute_scope(compute_connections),
+        ):
             journal = canonical_journal
             runtime = require_runtime(key)
             authority = runtime.authority
@@ -285,11 +291,13 @@ def execute_active_session(
 
 
 def diagnostic_worker(
-    pipe: object, horizon: int, key: str, credential_expires_at: datetime
+    pipe: object,
+    horizon: int,
+    key: str,
+    credential_expires_at: datetime,
+    compute_connections: tuple[_ConnectionBase, ...] = (),
 ) -> None:
     """Spawn target imported only after the signed stdlib child bootstrap check."""
-    from multiprocessing.connection import _ConnectionBase
-
     try:
         if not isinstance(pipe, _ConnectionBase) or type(horizon) is not int or horizon != 1:
             raise OperationError("DIAGNOSTIC_INTERNAL_PIPE_REQUIRED")
@@ -299,6 +307,7 @@ def diagnostic_worker(
             credential_expires_at,
             clock=lambda: datetime.now(UTC),
             send=pipe.send,
+            compute_connections=compute_connections,
         )
     except BaseException:
         # A disposable child must never let multiprocessing format an implicit

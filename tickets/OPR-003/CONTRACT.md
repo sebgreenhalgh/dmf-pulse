@@ -106,3 +106,17 @@ statuses, ambiguous copies, invalid history and rule contradictions remain
 rejections. No new source routes/requests, model/rules changes or normal-standing
 repair are implied. A subsequent separately admitted READ_ONLY session requires
 the complete reviewed signed release and current preflight.
+
+Session4 runtime slice: the real FPL/controlled-market pipeline completed but
+exceeded the existing pre-paid window. Keep its successful controlled gate,
+terminal, separate inspection and 203-row custody; it is not paid clearance or
+real publication. Operation-only bounded supervisor-owned daemon CPU siblings
+may schedule unchanged protected minutes functions, with exact input/output
+parity, signed child bootstrap, dedicated owner-death lifelines, transient typed
+IPC and no-network fences. All sibling and outer handles must be stopped/joined
+before canonical close; failed cleanup preserves the lease. No grandchildren,
+generic callable work, raw retention, model-byte changes, shorter scenarios or
+longer limits. Same-session reuse requires exact full-snapshot, player-identity
+and fixture-target equality. Both complete kernels and all paid/publication gates
+remain mandatory. Prove actual-size owned runtime and cleanup/privacy faults,
+then independently review and sign before a further separately admitted session.

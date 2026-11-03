@@ -39,10 +39,10 @@ from dmf_pulse.markets.current import (
     build_transient_current_market_identity_view,
 )
 from dmf_pulse.operation.chip_schema_compat import ChipSchemaProof, adapt_chip_source
+from dmf_pulse.operation.diagnostic_compute import build_diagnostic_model_minutes
 from dmf_pulse.operation.models import OperationError
 from dmf_pulse.private_v1 import one_command as accepted
 from dmf_pulse.private_v1.automatic_inputs import (
-    build_automatic_model_minutes,
     build_automatic_ownership,
     build_automatic_player_identity_map,
     build_full_candidate_policy,
@@ -201,9 +201,14 @@ def assemble_diagnostic_execution(
         identity_view=market_view,
     )
     player_map = build_automatic_player_identity_map(snapshot, prepared.manager)
-    minutes = build_automatic_model_minutes(
-        snapshot, player_map, market_view, progress=active_progress
-    )
+    with active_progress.stage(
+        started="Building Stage-7 minutes...",
+        completed="Stage-7 minutes ready",
+        failed="Stage-7 minutes",
+    ):
+        minutes = build_diagnostic_model_minutes(
+            snapshot, player_map, market_view, progress=active_progress
+        )
     ownership = build_automatic_ownership(snapshot, prepared.manager)
     candidates = build_full_candidate_policy(snapshot, prepared.manager, prepared.ruleset)
     score_priors = accepted._score_priors(

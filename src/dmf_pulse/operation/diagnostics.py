@@ -221,6 +221,14 @@ class SafeFailure(Metadata):
         return self
 
 
+class SafeFailureError(Exception):
+    """Carry an already sanitized internal worker failure without reclassifying it."""
+
+    def __init__(self, failure: SafeFailure) -> None:
+        self.failure = SafeFailure.model_validate(failure.model_dump(mode="json"))
+        super().__init__(self.failure.code)
+
+
 class RequestIdentity(Metadata):
     provider: Provider
     route_sha256: Sha
@@ -327,6 +335,9 @@ def route_identity(
 
 def safe_failure(error: Exception, stage: Stage) -> SafeFailure:
     """Classify by code-owned types/constants. Never format an exception."""
+    if isinstance(error, SafeFailureError):
+        return SafeFailure.model_validate(error.failure.model_dump(mode="json"))
+
     from pydantic import ValidationError
 
     from dmf_pulse.authorization_errors import AuthorizationError, safe_authorization_fields
