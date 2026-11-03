@@ -347,6 +347,14 @@ def approved_arguments(arguments: list[str]) -> list[str]:
         return ["start"]
     if arguments == ["operation", "withdraw-standing"]:
         return arguments
+    if arguments in (
+        ["operation", "gw10-diagnostic-paid"],
+        ["operation", "gw10-diagnostic-read-only"],
+    ):
+        return arguments
+    if len(arguments) == 3 and arguments[:2] == ["operation", "inspect-gw10-diagnostic"]:
+        require(re.fullmatch(r"[0-9a-f]{64}", arguments[2]) is not None)
+        return arguments
     if len(arguments) == 3 and arguments[:2] == ["operation", "install-reviewed-update"]:
         require(Path(arguments[2]).is_absolute())
         return arguments

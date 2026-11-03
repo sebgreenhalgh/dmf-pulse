@@ -15,6 +15,7 @@ from dmf_pulse.operation.runtime_integrity import IntegrityReason
 
 Stage = Literal[
     "WORKER_START",
+    "QUOTA_VERIFICATION",
     "FPL_ACQUISITION",
     "FPL_PARSING",
     "MANAGER_STATE",
@@ -84,6 +85,7 @@ MAX_EVENT_BYTES = 4096
 
 STAGE_LABELS: dict[Stage, str] = {
     "WORKER_START": "Starting reviewed worker",
+    "QUOTA_VERIFICATION": "Checking account quota",
     "FPL_ACQUISITION": "Acquiring current FPL state",
     "FPL_PARSING": "Validating FPL snapshot",
     "MANAGER_STATE": "Compiling authenticated manager state",
@@ -236,7 +238,7 @@ def route_identity(
         or (
             provider == "ODDS"
             and host == "api.the-odds-api.com"
-            and path == "/v4/sports/soccer_epl/odds"
+            and path in {"/v4/sports/", "/v4/sports/soccer_epl/odds"}
         )
         or (
             provider == "OPENFOOTBALL"

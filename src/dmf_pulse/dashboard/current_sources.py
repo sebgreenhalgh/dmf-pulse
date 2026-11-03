@@ -125,10 +125,15 @@ class GuardedFplTransport:
 
 
 class GuardedOddsTransport:
-    transport_id: Literal["injected"] = "injected"
-
     def __init__(self, guard: AcquisitionGuard, delegate: OddsTransport) -> None:
         self._guard, self._delegate = guard, delegate
+
+    @property
+    def transport_id(self) -> str:
+        # A guard adds custody, not a different source. Preserve the concrete
+        # standard-library transport; owned/custom delegates remain injected.
+        identity = getattr(self._delegate, "transport_id", "injected")
+        return identity if identity in {"stdlib_http_client", "stdlib_urllib"} else "injected"
 
     def send(self, request: OddsHttpRequest, credential: str) -> OddsHttpResponse:
         try:

@@ -17,6 +17,49 @@ from dmf_pulse.operation.packages import PilotProposal, prepare_pilot, read_meta
 operation_app = typer.Typer(help="Prepare owner review and recover canonical control metadata.")
 
 
+def _diagnostic_start(mode: Literal["READ_ONLY", "PAID_ELIGIBLE"]) -> None:
+    from dmf_pulse.credentials.service import CredentialError
+    from dmf_pulse.operation.campaign_start import run_diagnostic_start
+
+    try:
+        run_diagnostic_start(mode, progress=typer.echo)
+    except CredentialError as error:
+        from dmf_pulse.operation.diagnostics import safe_failure
+
+        failure = safe_failure(error, "WORKER_START")
+        typer.echo(f"{failure.code}: {failure.stage} ({failure.category})", err=True)
+        raise typer.Exit(2) from None
+    except (OperationError, AuthorizationError) as error:
+        _fail(error)
+    except KeyboardInterrupt:
+        typer.echo("Diagnostic window closed; canonical request and credit records retained.")
+
+
+@operation_app.command("gw10-diagnostic-paid")
+def diagnostic_paid_command() -> None:
+    """One accepted paid-eligible session; no charge before the full controlled gate."""
+    _diagnostic_start("PAID_ELIGIBLE")
+
+
+@operation_app.command("gw10-diagnostic-read-only")
+def diagnostic_read_only_command() -> None:
+    """One separate read-only diagnostic session; no paid reservation or request."""
+    _diagnostic_start("READ_ONLY")
+
+
+@operation_app.command("inspect-gw10-diagnostic")
+def inspect_diagnostic_command(session_key: str) -> None:
+    """Record separate inspection of the preceding canonical terminal receipt."""
+    from dmf_pulse.operation.campaign_start import inspect_session
+
+    try:
+        result = inspect_session(session_key)
+    except (OperationError, AuthorizationError) as error:
+        _fail(error)
+        return
+    typer.echo(json.dumps(result, sort_keys=True))
+
+
 @operation_app.command("install-reviewed-update")
 def install_reviewed_update_command(carrier: Path) -> None:
     """Install an engineering-signed update inside the existing accepted scope."""

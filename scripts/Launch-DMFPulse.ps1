@@ -1,11 +1,13 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('start','install-reviewed-update','rollback-reviewed-update','withdraw-standing')][string]$Action = 'start',
+    [ValidateSet('start','install-reviewed-update','rollback-reviewed-update','withdraw-standing','gw10-diagnostic-paid','gw10-diagnostic-read-only','inspect-gw10-diagnostic')][string]$Action = 'start',
     [string]$Carrier,
-    [string]$ReleaseId
+    [string]$ReleaseId,
+    [string]$SessionKey
 )
 $ErrorActionPreference = 'Stop'
 if ($args.Count -ne 0) { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' }
+if ($SessionKey -and $Action -ne 'inspect-gw10-diagnostic') { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' }
 $operatorArguments = @('start')
 switch ($Action) {
     'start' { if ($Carrier -or $ReleaseId) { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' } }
@@ -20,6 +22,18 @@ switch ($Action) {
     'withdraw-standing' {
         if ($Carrier -or $ReleaseId) { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' }
         $operatorArguments = @('operation','withdraw-standing')
+    }
+    'gw10-diagnostic-paid' {
+        if ($Carrier -or $ReleaseId) { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' }
+        $operatorArguments = @('operation','gw10-diagnostic-paid')
+    }
+    'gw10-diagnostic-read-only' {
+        if ($Carrier -or $ReleaseId) { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' }
+        $operatorArguments = @('operation','gw10-diagnostic-read-only')
+    }
+    'inspect-gw10-diagnostic' {
+        if ($Carrier -or $ReleaseId -or $SessionKey -cnotmatch '^[0-9a-f]{64}$') { throw 'EXACT_DIAGNOSTIC_SESSION_REQUIRED' }
+        $operatorArguments = @('operation','inspect-gw10-diagnostic',$SessionKey)
     }
 }
 $operatorLocal = [Environment]::GetFolderPath('LocalApplicationData')

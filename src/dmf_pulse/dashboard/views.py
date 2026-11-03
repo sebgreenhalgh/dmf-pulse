@@ -35,6 +35,11 @@ class PlayerRow(PresentationModel):
     assists_contribution: float | None
     clean_sheet_contribution: float | None
     bonus_contribution: float | None
+    points_standard_deviation: float | None = None
+    points_p10: int | None = None
+    median_points: int | None = None
+    points_p90: int | None = None
+    monte_carlo_mean_se: float | None = None
 
 
 class TeamView(PresentationModel):
@@ -174,6 +179,13 @@ def desk_view(
                 bonus_contribution=None
                 if summary is None
                 else summary.component_breakdown["bonus"].expected_points,
+                points_standard_deviation=None
+                if summary is None
+                else summary.points_standard_deviation,
+                points_p10=None if summary is None else summary.selected_percentiles.get("p10"),
+                median_points=None if summary is None else summary.median_points,
+                points_p90=None if summary is None else summary.selected_percentiles.get("p90"),
+                monte_carlo_mean_se=None if summary is None else summary.monte_carlo_mean_se,
             )
         )
     projected = sum(item.expected_points is not None for item in rows)

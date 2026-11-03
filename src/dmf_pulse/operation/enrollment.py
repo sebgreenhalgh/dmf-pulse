@@ -188,6 +188,11 @@ def _installed_enrollment_or_none() -> InstalledEnrollment | None:
 
 
 def installed_enrollment() -> InstalledEnrollment:
+    from dmf_pulse.operation.campaign_runtime import campaign_runtime_enrollment
+
+    diagnostic = campaign_runtime_enrollment()
+    if diagnostic is not None:
+        return diagnostic
     result = _installed_enrollment_or_none()
     if result is None:
         raise OperationError("TRUSTED_APPROVAL_REGISTRY_INVALID")

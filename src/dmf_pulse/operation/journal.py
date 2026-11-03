@@ -245,18 +245,22 @@ class OperationJournal:
             for row in original
             if row["kind"] == "ATTEMPT" and row["payload"]["route_sha256"] == PAID_ROUTE_SHA
         }
+        from dmf_pulse.operation.campaign_journal import is_diagnostic_settlement
+
         settlements = [
             row["payload"]["value"]
             for row in rows
-            if row["kind"] == "SETTLEMENT" and row["at"] >= start
+            if (row["kind"] == "SETTLEMENT" or is_diagnostic_settlement(row)) and row["at"] >= start
         ]
         settled = {
             item["reservation_id"]
             for item in settlements
             if item["consistent"] is True and item["period_started_at"] == start.isoformat()
         }
-        if settled - paid or len(settled) != len(
-            [s for s in settlements if s["consistent"] is True]
+        if (
+            len({item["reservation_id"] for item in settlements}) != len(settlements)
+            or settled - paid
+            or len(settled) != len([s for s in settlements if s["consistent"] is True])
         ):
             raise OperationError("QUOTA_SETTLEMENT_LEDGER_CONTRADICTION")
         return sum(

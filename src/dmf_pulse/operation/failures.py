@@ -1,6 +1,9 @@
 """Fixed operator actions; never include provider inputs, paths or secrets."""
 
+from dmf_pulse.operation.campaign_failures import DIAGNOSTIC_FAILURE_ACTIONS
+
 OPERATOR_FAILURE_ACTIONS = {
+    **DIAGNOSTIC_FAILURE_ACTIONS,
     "STANDING_OWNER_ACCEPTANCE_REQUIRED": "Complete the one-time standing policy installation before starting live operation.",
     "STANDING_PERMISSION_REVIEW_EXPIRED": "The accepted season or permission review has ended. Review the changed scope before further acquisition.",
     "ORIGINAL_SSPI_CONTROL_RECOVERY_FAILED": "Run the installed launcher as the original Windows owner and restore the original control installation. No replacement ledger is permitted.",

@@ -205,70 +205,96 @@ class PostgresUsageLedger(UsageLedger):
             # Authenticate the complete existing history rather than silently reset it.
             return result
 
+    def _read_records(self, connection: Connection) -> list[dict[str, Any]]:
+        binding = (
+            connection.execute(
+                select(refresh_control_ledger)
+                .where(refresh_control_ledger.c.account_sha256 == self.account_sha256)
+                .with_for_update()
+            )
+            .mappings()
+            .one_or_none()
+        )
+        expected = {
+            "ledger_id": self.ledger_id,
+            "account_sha256": self.account_sha256,
+            "schema_version": CONTROL_VERSION,
+        }
+        if binding is None or dict(binding) != {
+            **expected,
+            "binding_sha256": canonical_sha256(expected),
+        }:
+            raise AuthorizationError("USAGE_LEDGER_IDENTITY_MISMATCH")
+        rows = (
+            connection.execute(
+                select(refresh_control_event)
+                .where(refresh_control_event.c.ledger_id == self.ledger_id)
+                .order_by(refresh_control_event.c.sequence)
+                .limit(100001)
+            )
+            .mappings()
+            .all()
+        )
+        if len(rows) > 100000:
+            raise AuthorizationError("USAGE_LEDGER_CAPACITY_REACHED")
+        records: list[dict[str, Any]] = []
+        previous = "0" * 64
+        last_at: datetime | None = None
+        for row in rows:
+            value = dict(row["payload"])
+            _validated_record(value, ledger_id=self.ledger_id, account_sha256=self.account_sha256)
+            when = _aware(value["at"])
+            if (
+                value["sequence"] != len(records)
+                or value["previous_sha256"] != previous
+                or any(
+                    row[name] != value[name]
+                    for name in (
+                        "ledger_id",
+                        "sequence",
+                        "sha256",
+                        "previous_sha256",
+                        "kind",
+                    )
+                )
+                or row["at"] != when
+                or (last_at is not None and when < last_at)
+            ):
+                raise AuthorizationError("USAGE_LEDGER_INVALID")
+            records.append(value)
+            previous, last_at = value["sha256"], when
+        return records
+
+    @contextmanager
+    def participate_in_transaction(self, connection: Connection) -> Iterator[None]:
+        """Join original operator custody atomically; never commit its transaction.
+
+        Account locking, schema, immutable binding and full history are checked
+        before binding. Nested ledger calls re-read this same transaction, so
+        they see their own uncommitted appends without another connection/lock.
+        """
+        if not connection.in_transaction() or self._active.get() is not None:
+            raise AuthorizationError("USAGE_LEDGER_TRANSACTION_REQUIRED")
+        self._prepare(connection, self.account_sha256)
+        self._read_records(connection)
+        token = self._active.set(connection)
+        try:
+            yield
+        finally:
+            self._active.reset(token)
+
     @contextmanager
     def _sql_transaction(self) -> Iterator[list[dict[str, Any]]]:
+        existing = self._active.get()
+        if existing is not None:
+            if not existing.in_transaction():
+                raise AuthorizationError("USAGE_LEDGER_TRANSACTION_REQUIRED")
+            yield self._read_records(existing)
+            return
         try:
             with self._connection_factory() as connection, connection.begin():
                 self._prepare(connection, self.account_sha256)
-                binding = (
-                    connection.execute(
-                        select(refresh_control_ledger)
-                        .where(refresh_control_ledger.c.account_sha256 == self.account_sha256)
-                        .with_for_update()
-                    )
-                    .mappings()
-                    .one_or_none()
-                )
-                expected = {
-                    "ledger_id": self.ledger_id,
-                    "account_sha256": self.account_sha256,
-                    "schema_version": CONTROL_VERSION,
-                }
-                if binding is None or dict(binding) != {
-                    **expected,
-                    "binding_sha256": canonical_sha256(expected),
-                }:
-                    raise AuthorizationError("USAGE_LEDGER_IDENTITY_MISMATCH")
-                rows = (
-                    connection.execute(
-                        select(refresh_control_event)
-                        .where(refresh_control_event.c.ledger_id == self.ledger_id)
-                        .order_by(refresh_control_event.c.sequence)
-                        .limit(100001)
-                    )
-                    .mappings()
-                    .all()
-                )
-                if len(rows) > 100000:
-                    raise AuthorizationError("USAGE_LEDGER_CAPACITY_REACHED")
-                records: list[dict[str, Any]] = []
-                previous = "0" * 64
-                last_at: datetime | None = None
-                for row in rows:
-                    value = dict(row["payload"])
-                    _validated_record(
-                        value, ledger_id=self.ledger_id, account_sha256=self.account_sha256
-                    )
-                    when = _aware(value["at"])
-                    if (
-                        value["sequence"] != len(records)
-                        or value["previous_sha256"] != previous
-                        or any(
-                            row[name] != value[name]
-                            for name in (
-                                "ledger_id",
-                                "sequence",
-                                "sha256",
-                                "previous_sha256",
-                                "kind",
-                            )
-                        )
-                        or row["at"] != when
-                        or (last_at is not None and when < last_at)
-                    ):
-                        raise AuthorizationError("USAGE_LEDGER_INVALID")
-                    records.append(value)
-                    previous, last_at = value["sha256"], when
+                records = self._read_records(connection)
                 token = self._active.set(connection)
                 try:
                     yield records

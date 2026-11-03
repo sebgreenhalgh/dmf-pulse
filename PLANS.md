@@ -3182,7 +3182,63 @@ browser/spawn checks, exact-source CI and one-time standing decision remain open
 No actual operator standing root, canonical migration, provider request or credit
 reservation has been created by these engineering checks.
 
-## Post-GW10 recovery (active, 2026-11-02)
+## GW10 diagnostic campaign (active, 2026-11-02)
+
+Owner request: attachment 95a006cd-978a-4c8b-adb3-3d05b28d4a30.
+Contract: tickets/OPR-003/CONTRACT.md. The OPR002 recovery is signed/installed;
+its successful AFTER audit preserves both original chains and all24 markers.
+One post-install integrity refusal remains an explicit unproven availability risk.
+
+- [x] Verify repeated-access permission coverage and independently characterize
+  reproducible signed-installation refusals before any provider acquisition.
+- [ ] Implement and test a separate bounded GW10 diagnostic authorization/custody,
+  phased real-FPL validation and controlled-market pre-charge gate; preserve the
+  complete original standing material policy and consumed GW10 enrollment.
+- [x] Present one exact material campaign for explicit owner acceptance and retain
+  the actual owner reply with independent binding review.
+- [ ] Complete exact frozen-source/release/installed checks and independent review;
+  routine in-scope corrections do not require a new personal decision.
+- [ ] After acceptance only, run separately recorded controlled sessions through
+  genuine real-data recommendations or the accepted limit/deadline; inspect each
+  failure before another session, reconcile unknown paid consumption, sign fixes.
+- [ ] Record recommendations and actual requests/credits, test ordinary standing
+  operation offline, and report retained original consumption and remaining risks.
+
+2026-11-03 checkpoint: the actual owner accepted exact campaign proposal
+210720717eb84414417cb971ee5b379c3cecbc35cf2afbf3e82f913caa4a158c;
+actual-reply acceptance receipt semantic SHA
+c99fb8afe7851590429b9dade340e3c1ad169527caa9c7031faf6cb786581269.
+Independent review 007 authenticates this decision. The fixed single acceptance
+covers eight separately audited sessions, four paid-eligible sessions and reviewed
+signed in-scope fixes; it does not itself clear software or source execution.
+
+Owned numerical evidence: exact same-snapshot parity with the accepted orchestrator;
+twenty-club/ten-fixture controlled Stage8/9/12 calculation (193.49s); real-setting
+256-scenario/seed42 publication/chronology checks (6 cases,61.72s); complete owned
+FPL/quota/OpenFootball/Odds/controlled-and-real-kernel/controller publication,
+settlement and success-stop with actual owned PostgreSQL (17 cases combined,
+131.09s). All such outputs are engineering evidence, not live acceptance.
+Owned financial tests retain reservations, reject zero/partial unknown-spend
+counter deltas and contradictory headers, and count diagnostic actual cost in
+ordinary standing reconciliation. Original schema0010 and standing policy remain
+unchanged. No new production migration is required.
+
+Independent review caught Windows PipeConnection handling and public test-loader/
+clock substitution gaps. The production source context now resolves only fixed
+signed authority and the canonical production journal using real UTC; owned tests
+use explicit monkeypatches. Guard/reservation/admission require that same journal.
+Native privacy tests assert fault reach, terminal/close behavior and stderr0;
+intermediate/insufficient witnesses are retained with explicit corrections.
+
+Production source is being frozen for final CI/carrier/installed verification.
+The unchanged numerical package identity will be checked from the clean wheel;
+source-checkout bytecode is not accepted as an installed package. Three earlier
+read-only installed integrity probes pass without explaining historical refusals.
+Real campaign provider requests and new campaign reservations remain zero. The
+original consumed GW10 enrollment, original two-credit reservation, ledger identity
+and all24 original markers remain retained. Genuine recommendations remain open.
+
+## Post-GW10 recovery (completed installed correction, 2026-11-02)
 
 The standing scope is now accepted and installed. The immutable actual audit
 records a consumed GW10 enrollment, one two-credit reservation, no paid Odds
