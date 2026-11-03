@@ -133,6 +133,76 @@ _LOCATIONS: dict[tuple[str, str], Stage] = {
     ("dmf_pulse.private_v1.one_command", "_rules_authority"): "RULES_BINDING",
 }
 
+# Exact code-owned raise sites in the unchanged, hash-protected manager compiler.
+# These refine reporting only: no error messages, frame locals or source values.
+# A changed location fails closed to the ordinary generic typed-error category.
+_MANAGER_FAILURE_SITES: dict[tuple[str, str, int, str], tuple[str, Category]] = {
+    ("dmf_pulse.ingestion.fpl.manager_provider", "_chip_declarations", 114, "SCHEMA_DRIFT"): (
+        "CURRENT_MANAGER_CHIP_IDENTITY_UNSUPPORTED",
+        "RESPONSE_CONTRACT",
+    ),
+    ("dmf_pulse.ingestion.fpl.manager_provider", "_chip_declarations", 138, "SCHEMA_DRIFT"): (
+        "CURRENT_MANAGER_CHIP_STATUS_UNSUPPORTED",
+        "RESPONSE_CONTRACT",
+    ),
+    (
+        "dmf_pulse.ingestion.fpl.manager_provider",
+        "provider_current_manager_declaration",
+        226,
+        "CURRENT_MANAGER_TRANSFER_LIMIT_UNRESOLVED",
+    ): ("CURRENT_MANAGER_TRANSFER_LIMIT_UNRESOLVED", "RESPONSE_CONTRACT"),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "_compile_active_rules",
+        863,
+        "CONFIGURATION_INVALID",
+    ): ("CURRENT_MANAGER_PRIVATE_RULES_STATUS_INVALID", "INPUT_CONTRACT"),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "_compile_active_rules",
+        883,
+        "CONFIGURATION_INVALID",
+    ): ("CURRENT_MANAGER_RULES_AUTHORITY_INVALID", "INPUT_CONTRACT"),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "_compile_active_rules",
+        903,
+        "CONFIGURATION_INVALID",
+    ): ("CURRENT_MANAGER_RULES_COMPILATION_FAILED", "INPUT_CONTRACT"),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "_require_rules_match_catalogue",
+        964,
+        "CONFIGURATION_INVALID",
+    ): ("CURRENT_MANAGER_RULE_VIEWS_INCONSISTENT", "INPUT_CONTRACT"),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "_resolve_squad",
+        1001,
+        "CONFIGURATION_INVALID",
+    ): ("CURRENT_MANAGER_PRICE_UNIT_UNRESOLVED", "INPUT_CONTRACT"),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "_resolve_chip_inventory",
+        1126,
+        "USAGE_INVALID",
+    ): ("CURRENT_MANAGER_FREE_HIT_RESTORATION_UNAVAILABLE", "MODEL_CONTRACT"),
+    ("dmf_pulse.ingestion.fpl.manager_current", "_clock_utc", 1315, "INTERNAL_INVARIANT"): (
+        "CURRENT_MANAGER_CLOCK_NAIVE",
+        "INTERNAL_EXCEPTION",
+    ),
+    ("dmf_pulse.ingestion.fpl.manager_current", "compile", 1341, "INTERNAL_INVARIANT"): (
+        "CURRENT_MANAGER_CLOCK_REGRESSED",
+        "INTERNAL_EXCEPTION",
+    ),
+    (
+        "dmf_pulse.ingestion.fpl.manager_current",
+        "compile_provider_observed",
+        1379,
+        "INTERNAL_INVARIANT",
+    ): ("CURRENT_MANAGER_CLOCK_REGRESSED", "INTERNAL_EXCEPTION"),
+}
+
 
 class SafeFailure(Metadata):
     stage: Stage
@@ -375,6 +445,14 @@ def safe_failure(error: Exception, stage: Stage) -> SafeFailure:
         module_name = frame.f_globals.get("__name__")
         if isinstance(module_name, str) and category != "INTEGRITY":
             stage = _LOCATIONS.get((module_name, frame.f_code.co_name), stage)
+            if isinstance(error, IngestionError) and type(raw_code) is str:
+                specific = _MANAGER_FAILURE_SITES.get(
+                    (module_name, frame.f_code.co_name, traceback.tb_lineno, raw_code)
+                )
+                if specific is not None:
+                    code, category = specific
+                    recognized = True
+                    stage = "MANAGER_STATE"
         traceback = traceback.tb_next
     return SafeFailure(
         stage=stage,

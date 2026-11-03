@@ -86,3 +86,13 @@ of unrelated unresolved spend. Correct cold inspection control recovery and
 prove fixed-loader/signature, duplicate/overlap/wrong-identity refusals and
 future fresh-quota accounting. Reviewed signed compatibility is required; this
 owner attribution does not require another routine personal hash decision.
+
+Session2 reporting correction: after16 actual FPL HTTP200 responses, the manager
+compiler returned an unrecognized typed ingestion failure. Add only fixed owned
+manager raise-site/category labels to the existing bounded diagnostics and prove
+privacy and actual supported-contract failures with owned inputs. Do not infer
+the erased historical cause or modify manager/rules/model rejections. Preserve
+the signed attribution, both consumed sessions, original reservation and every
+budget. Use a separately admitted READ_ONLY diagnostic after signed release gates
+to identify any remaining real contract failure before spending another paid-
+eligible slot. No automatic retry or new personal approval within this scope.

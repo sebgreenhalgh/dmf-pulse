@@ -3284,3 +3284,15 @@ sign and install the correction before the next accepted bounded session. Also
 fix the observed cold inspect command missing original SSPI recovery. Preserve
 session1 failure/close and mandatory separate inspection. Protected modelc4,
 original policy8b, original18/6 prefixes and24marker bytes remain unchanged.
+
+2026-11-03 session2: the reconciled signed release completed one free quota GET
+(498remaining/2used/last0) and16FPL GETs/HTTP200, then failed at MANAGER_STATE
+with an INGESTION code not in the safe catalogue. No OpenFootball or paid call,
+new reservation or real publication occurred. Terminal/close and separate actual
+inspection are retained. The underlying provider value/code was not retained,
+so the historical cause remains unknown. Add closed code-owned manager raise-site
+reporting and meaningful owned privacy/contract cases, preserving every rejection,
+rights rule and numerical byte. Sign the reviewed compatibility release before
+the next bounded READ_ONLY session; preserve the two remaining paid-eligible
+slots until the real FPL/controlled pipeline is proven. No raw bodies, extra
+routes, account writes, model tuning, counter resets or material scope changes.

@@ -2,6 +2,21 @@
 
 DIAGNOSTIC_FAILURE_ACTIONS: dict[str, str] = {}
 DIAGNOSTIC_FAILURE_ACTIONS.update(
+    {
+        "CURRENT_MANAGER_TRANSFER_LIMIT_UNRESOLVED": "The authenticated current-team input has no finite transfer limit. Keep paid access blocked; inspect this supported-contract boundary without inventing a free-transfer count.",
+        "CURRENT_MANAGER_CHIP_IDENTITY_UNSUPPORTED": "The current-team chip identity is outside the supported contract. Keep the source rejection and review the supported chip schema before another session.",
+        "CURRENT_MANAGER_CHIP_STATUS_UNSUPPORTED": "The current-team chip status is outside the supported contract. Keep the source rejection and review the supported chip schema before another session.",
+        "CURRENT_MANAGER_PRIVATE_RULES_STATUS_INVALID": "The private manager compiler rejected the rules status. Verify the exact existing rules authority; do not activate or infer a ruleset.",
+        "CURRENT_MANAGER_RULES_AUTHORITY_INVALID": "The manager compiler rejected target-season FULL_SEASON authority. Verify the bound existing rules and capability without changing model policy.",
+        "CURRENT_MANAGER_RULES_COMPILATION_FAILED": "The manager compiler could not compile the existing target rules. Inspect the owned rules boundary offline before another session.",
+        "CURRENT_MANAGER_RULE_VIEWS_INCONSISTENT": "The compiled manager rule views disagree. Inspect their existing bindings offline; retain the rejection.",
+        "CURRENT_MANAGER_PRICE_UNIT_UNRESOLVED": "The existing manager rule view has no usable FPL price unit. Do not infer a monetary policy value.",
+        "CURRENT_MANAGER_FREE_HIT_RESTORATION_UNAVAILABLE": "Active or pending Free Hit requires restoration state that this supported manager contract does not provide. Keep the rejection; do not substitute ordinary squad state.",
+        "CURRENT_MANAGER_CLOCK_NAIVE": "The manager compilation clock was not timezone-aware. Correct the operational clock without backdating source captures.",
+        "CURRENT_MANAGER_CLOCK_REGRESSED": "The manager compilation clock moved backwards. Inspect operation chronology without changing captured source times.",
+    }
+)
+DIAGNOSTIC_FAILURE_ACTIONS.update(
     dict.fromkeys(
         (
             "PRIOR_USAGE_ORIGINAL_ACCOUNT_BINDING_INVALID",
