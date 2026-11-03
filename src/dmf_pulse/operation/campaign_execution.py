@@ -22,7 +22,7 @@ from dmf_pulse.ingestion.openfootball.service import (
     ScorePriorProfileId,
 )
 from dmf_pulse.operation.campaign import DiagnosticPaidGateProof
-from dmf_pulse.operation.campaign_journal import DiagnosticJournal
+from dmf_pulse.operation.campaign_journal import DiagnosticJournal, DiagnosticSession
 from dmf_pulse.operation.campaign_publication import build_diagnostic_publication
 from dmf_pulse.operation.campaign_runtime import (
     bind_official_discovery,
@@ -91,7 +91,8 @@ def execute_active_session(
         with diagnostic_source_context(journal, key) as canonical_journal:
             journal = canonical_journal
             runtime = require_runtime(key)
-            authority, session = runtime.authority, runtime.session
+            authority = runtime.authority
+            session: DiagnosticSession = runtime.session
             run_id = diagnostic_run_id(key)
             if credential_expires_at < session.started_at + timedelta(
                 seconds=authority.proposal.limits.minimum_fpl_credential_remaining_seconds

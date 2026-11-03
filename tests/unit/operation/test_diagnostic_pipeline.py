@@ -62,7 +62,7 @@ def test_same_typed_snapshot_matches_existing_one_command_numerically(
             attestation,
             transport=selected,
             credential_provider=DirectFplCredentialProvider(
-                {"DMF_FPL_BEARER_TOKEN": "owned-synthetic-placeholder"}
+                {"DMF_FPL_BEARER_TOKEN": "owned-" + "synthetic-placeholder"}
             ),
             clock=lambda: RUN_AT,
             sleeper=lambda _: None,

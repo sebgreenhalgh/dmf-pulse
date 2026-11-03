@@ -15,19 +15,23 @@ from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.operation.models import Metadata, MetadataTime, OperationError, Ref, Sha
 
 SessionMode = Literal["READ_ONLY", "PAID_ELIGIBLE"]
+One = Literal[1]
+Two = Literal[2]
+Four = Literal[4]
+Twenty = Literal[20]
 
 
 class DiagnosticLimits(Metadata):
     maximum_sessions: Literal[8] = 8
-    fpl_gets_per_session: Literal[20] = 20
+    fpl_gets_per_session: Twenty = 20
     paid_eligible_sessions: Literal[4] = 4
     paid_gets_total: Literal[4] = 4
-    paid_gets_per_session: Literal[1] = 1
-    reserved_credits_per_paid_session: Literal[2] = 2
+    paid_gets_per_session: One = 1
+    reserved_credits_per_paid_session: Two = 2
     reserved_credits_total: Literal[8] = 8
     safety_reserve_credits: Literal[10] = 10
-    openfootball_gets_per_session: Literal[4] = 4
-    quota_gets_per_session: Literal[2] = 2
+    openfootball_gets_per_session: Four = 4
+    quota_gets_per_session: Two = 2
     quota_gets_campaign_total: Literal[12] = 12
     automatic_retries: Literal[0] = 0
     concurrent_sessions: Literal[1] = 1

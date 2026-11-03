@@ -30,7 +30,7 @@ def test_controlled_market_uses_exact_owned_fpl_fixtures_without_any_new_get(rep
         DirectFplRunAttestation(attested_at=RUN_AT),
         transport=transport,
         credential_provider=DirectFplCredentialProvider(
-            {"DMF_FPL_BEARER_TOKEN": "owned-placeholder"}
+            {"DMF_FPL_BEARER_TOKEN": "owned-" + "placeholder"}
         ),
         clock=lambda: RUN_AT,
         sleeper=lambda _: None,

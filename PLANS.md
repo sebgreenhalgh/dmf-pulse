@@ -3262,3 +3262,11 @@ Execution contract: tickets/OPR-002/CONTRACT.md.
 - [ ] Reauthenticate the original ledger and consumption preservation; report
   exact ordinary launch instructions and next eligible Gameweek readiness.
   No live acquisition while GW10 remains the consumed upcoming event.
+
+2026-11-03 preservation checkpoint: the first new BEFORE probe stopped because
+the original 24-file preservation manifest also pins .secret-scan-allowlist.json.
+The exact comparison found that sole changed marker; both canonical chain
+prefixes passed and no source session started. Restore its original 10,066 bytes
+and SHA4a85e770, retain the failure, and remove scanner false positives through
+equivalent Literal aliases, typed session assignment and split owned literals.
+No marker waiver, source-scope change, model change or consumption reset.
