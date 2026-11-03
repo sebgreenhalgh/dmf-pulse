@@ -120,3 +120,17 @@ longer limits. Same-session reuse requires exact full-snapshot, player-identity
 and fixture-target equality. Both complete kernels and all paid/publication gates
 remain mandatory. Prove actual-size owned runtime and cleanup/privacy faults,
 then independently review and sign before a further separately admitted session.
+
+Session5 diagnostic slice: preserve the actual286/21 terminal custody, original
+203/18 prefixes, one2-credit reservation and one actual HTTP200 paid response
+charging2credits (496remaining,4period-used,unknown0). The controlled pipeline
+passed inside1200s; MARKET_ACQUISITION then returned an unrecognized ingestion
+failure. The erased historical subtype is unknown. Add only closed operation
+diagnostics for unchanged Odds parser/compiler raise sites and fixed quality
+reasons, with owned contract/privacy tests and historical receipt compatibility.
+No provider value, error text, raw body or arbitrary details may escape. Preserve
+all quality rejections, numerical bytes, sources, budgets and time bounds.
+Investigate supported contracts offline before the final paid-eligible slot;
+another live attempt requires independently reviewed signed maintenance and
+exact current custody/accounting. No slot restoration, silent quality relaxation
+or new owner hash decision is authorized or required.

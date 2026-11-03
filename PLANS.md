@@ -3345,3 +3345,27 @@ current canonical203 preflight and genuine recommendations remain open. These
 are owned engineering results, not live acceptance. An abrupt held-handle
 supervisor-death test authenticated exit2 of all four active numerical siblings;
 it used individual bounded waits and does not assert a common five-second bound.
+
+2026-11-03 session5: signed runtime release003f049 and20/20CI were reused.
+The separately admitted PAID_ELIGIBLE session completed17FPL,4OpenFootball,
+2free quota checks and1paid Odds GET, allHTTP200. The complete controlled gate
+passed994.851933s after admission, inside the unchanged1200s bound. Actual paid
+headers prove2charged/496remaining/4period-used, unknown spend0. Real market
+ingestion then failed CURRENT_TYPED_FAILURE_UNRECOGNIZED; its exact historical
+cause was erased and remains unknown. Quiescent close, separate installed
+inspection and independent117 preserve full203operator/18financial prefixes;
+current custody is286operator/21financial rows. No genuine publication exists.
+Three sessions and one paid-eligible slot remain; none is restored or refunded.
+
+- [ ] Add operation-only, closed Odds ingestion raise-site and quality-gate
+  reporting. Prove actual owned parser/compiler refusals, fixed-code privacy and
+  unchanged historical receipt compatibility. Preserve every rejection, source
+  scope, model byte, scenario count, deadline and request/credit cap.
+- [ ] Investigate supported current Odds contracts offline before spending the
+  final paid-eligible slot. Do not infer the erased session5 cause or remove a
+  quality gate merely to accept a response.
+- [ ] Complete required source, installed-wheel, CI and independent signed
+  maintenance checks for changed executable bytes, then recover exact286/21
+  custody and current paid accounting before another separately admitted run.
+- [ ] Obtain genuine recommendations within the accepted remaining campaign;
+  only then repair/test ordinary standing operation offline and stop diagnostics.

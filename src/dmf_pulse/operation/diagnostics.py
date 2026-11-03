@@ -5,12 +5,13 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from dmf_pulse.assurance.canonical import canonical_sha256
 from dmf_pulse.operation.models import Metadata, OperationError, Sha
+from dmf_pulse.operation.odds_failure_context import OddsQualityReason, odds_failure_context
 from dmf_pulse.operation.runtime_integrity import IntegrityReason
 
 Stage = Literal[
@@ -211,6 +212,14 @@ class SafeFailure(Metadata):
     code: str = Field(min_length=1, max_length=100)
     typed_code_recognized: bool
     integrity_reason: IntegrityReason | None = None
+    odds_quality_reasons: tuple[OddsQualityReason, ...] = Field(default=(), max_length=17)
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_wire(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if not self.odds_quality_reasons:
+            data.pop("odds_quality_reasons", None)
+        return data
 
     @model_validator(mode="after")
     def code_is_owned(self) -> Self:
@@ -218,6 +227,13 @@ class SafeFailure(Metadata):
 
         if self.code not in CURRENT_FAILURE_CODES:
             raise ValueError("failure code is not in the fixed public catalogue")
+        if self.odds_quality_reasons and (
+            self.code != "CURRENT_ODDS_QUALITY_BLOCKED"
+            or self.stage != "MARKET_ACQUISITION"
+            or self.exception_family != "INGESTION"
+            or tuple(sorted(set(self.odds_quality_reasons))) != self.odds_quality_reasons
+        ):
+            raise ValueError("Odds quality reasons do not bind a sorted owned quality failure")
         return self
 
 
@@ -225,7 +241,7 @@ class SafeFailureError(Exception):
     """Carry an already sanitized internal worker failure without reclassifying it."""
 
     def __init__(self, failure: SafeFailure) -> None:
-        self.failure = SafeFailure.model_validate(failure.model_dump(mode="json"))
+        self.failure = SafeFailure.model_validate_json(failure.model_dump_json())
         super().__init__(self.failure.code)
 
 
@@ -336,7 +352,7 @@ def route_identity(
 def safe_failure(error: Exception, stage: Stage) -> SafeFailure:
     """Classify by code-owned types/constants. Never format an exception."""
     if isinstance(error, SafeFailureError):
-        return SafeFailure.model_validate(error.failure.model_dump(mode="json"))
+        return SafeFailure.model_validate_json(error.failure.model_dump_json())
 
     from pydantic import ValidationError
 
@@ -450,6 +466,7 @@ def safe_failure(error: Exception, stage: Stage) -> SafeFailure:
         code = "CURRENT_INTEGRITY_FAILURE"
         category, stage = "INTEGRITY", "RELEASE_INTEGRITY"
     assert code in CURRENT_FAILURE_CODES
+    odds_reasons: tuple[OddsQualityReason, ...] = ()
     traceback = error.__traceback__
     while traceback is not None:
         frame = traceback.tb_frame
@@ -464,6 +481,12 @@ def safe_failure(error: Exception, stage: Stage) -> SafeFailure:
                     code, category = specific
                     recognized = True
                     stage = "MANAGER_STATE"
+                odds_context = odds_failure_context(
+                    error, module_name, frame.f_code.co_name, traceback.tb_lineno
+                )
+                if odds_context is not None:
+                    code, odds_reasons = odds_context
+                    category, stage, recognized = "RESPONSE_CONTRACT", "MARKET_ACQUISITION", True
         traceback = traceback.tb_next
     return SafeFailure(
         stage=stage,
@@ -472,6 +495,7 @@ def safe_failure(error: Exception, stage: Stage) -> SafeFailure:
         code=code,
         typed_code_recognized=recognized,
         integrity_reason=integrity_reason,
+        odds_quality_reasons=odds_reasons,
     )
 
 

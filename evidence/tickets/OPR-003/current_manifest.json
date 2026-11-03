@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 238847,
+      "bytes": 240521,
       "path": "PLANS.md",
-      "sha256": "735eeb284eb99387390196baaba44e5bf63fb6eae60aee6edd512966c3ec99eb"
+      "sha256": "c39154201a0547877ca88e333d0af3c51cec15f28349caca3e53afea3ceee1b4"
     },
     {
       "bytes": 2761,
@@ -4546,9 +4546,9 @@
       "sha256": "6a032d6ca4fd779f255800f6e02160b01678cca73995f3d1c02744d7d3d5eb48"
     },
     {
-      "bytes": 12196,
+      "bytes": 12327,
       "path": "src/dmf_pulse/operation/campaign_failures.py",
-      "sha256": "acc8e6eef13f6ea315734679635866fad85e77aad41cee4b6e90ad9300ffca00"
+      "sha256": "f4c6bd473cd13d127154a562b05b5e9955d14e27ff2970e778c1fbde869538f3"
     },
     {
       "bytes": 61341,
@@ -4611,9 +4611,9 @@
       "sha256": "309cec4b157d44b8ca9fae9b19ea5d834803e951df78498bce829d7869cecdc7"
     },
     {
-      "bytes": 24426,
+      "bytes": 25794,
       "path": "src/dmf_pulse/operation/diagnostics.py",
-      "sha256": "af153a1d23a2497bc0ac6feeadaeb76ccc9a7663edccad1ab8f0c39af6d47a74"
+      "sha256": "73fea3be304aaf09dd34df46a1085398b8bfb2a065c5d2149dff514b57d4175c"
     },
     {
       "bytes": 8570,
@@ -4654,6 +4654,11 @@
       "bytes": 7057,
       "path": "src/dmf_pulse/operation/models.py",
       "sha256": "decbf38ce5caef878d57d8a134a8dae2e014fc7541ebaef7abfbfa0311f2faae"
+    },
+    {
+      "bytes": 3324,
+      "path": "src/dmf_pulse/operation/odds_failure_context.py",
+      "sha256": "4b216f5bd49b512e742c7a52b5c38b0c1bcbc6c7d8de53f288f7c9ac3a322096"
     },
     {
       "bytes": 15000,
@@ -7841,6 +7846,16 @@
       "sha256": "1046a9e0c575d8d8b4615dec1af16d719c7a02cc0e6f50b879a9c6bc068595a5"
     },
     {
+      "bytes": 8750,
+      "path": "tests/unit/operation/test_odds_failure_diagnostics.py",
+      "sha256": "06f9e81b9ce23104ecb72f1f28f229a4846998538a134c24e9941f62f52364f8"
+    },
+    {
+      "bytes": 7527,
+      "path": "tests/unit/operation/test_odds_failure_diagnostics_security.py",
+      "sha256": "cc5151c6be4c372d34ddef974b8dd1bb9c158188a01f99df0bec6a12e4336412"
+    },
+    {
       "bytes": 4927,
       "path": "tests/unit/operation/test_operator_bootstrap.py",
       "sha256": "7152012c07c5c48840fbe4c4961e909d25d2ca744fda70cef19fba1d0a0c6b41"
@@ -9341,9 +9356,9 @@
       "sha256": "a5601f1172153afb42c7a425eb21906a8652afe9ee96c9d2ed92685848aae620"
     },
     {
-      "bytes": 8260,
+      "bytes": 9257,
       "path": "tickets/OPR-003/CONTRACT.md",
-      "sha256": "a9e3bf04d2b785ac6735b6610ecde2ec318479be82d2fde31ce879ae693af157"
+      "sha256": "aea76024b64dc73f4fc8389332d2eaee9b7720b16079d318b3d696eb27eea510"
     },
     {
       "bytes": 5183,

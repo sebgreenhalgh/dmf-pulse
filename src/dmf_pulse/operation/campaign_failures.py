@@ -1,6 +1,9 @@
 """Closed diagnostic code catalogue; no source text or authority is accepted."""
 
+from dmf_pulse.operation.odds_failure_context import ODDS_FAILURE_ACTIONS
+
 DIAGNOSTIC_FAILURE_ACTIONS: dict[str, str] = {}
+DIAGNOSTIC_FAILURE_ACTIONS.update(ODDS_FAILURE_ACTIONS)
 DIAGNOSTIC_FAILURE_ACTIONS.update(
     {
         "CURRENT_MANAGER_TRANSFER_LIMIT_UNRESOLVED": "The authenticated current-team input has no finite transfer limit. Keep paid access blocked; inspect this supported-contract boundary without inventing a free-transfer count.",
