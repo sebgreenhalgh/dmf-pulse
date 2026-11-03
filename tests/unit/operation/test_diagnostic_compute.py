@@ -247,9 +247,12 @@ def _idle_source(pipe, horizon, key, expiry, connections):
     time.sleep(120)
 
 
-def test_source_shutdown_closes_all_real_siblings(monkeypatch):
+def test_source_shutdown_closes_all_real_siblings(monkeypatch, repository_root):
     from dmf_pulse.operation import campaign_start
 
+    # pytest's importlib loader can import this owned target without adding the
+    # repository namespace to sys.path. Native spawn must import it independently.
+    monkeypatch.syspath_prepend(str(repository_root))
     monkeypatch.setattr(campaign_start, "diagnostic_worker", _idle_source)
     worker = campaign_start.DiagnosticWorker("f" * 64, datetime.now(UTC) + timedelta(hours=1))
     pids = []

@@ -7776,9 +7776,9 @@
       "sha256": "1e35a1a5a604ae1c18a6129f46af9c547b9c589e9354f8e6c2707902a81c2f03"
     },
     {
-      "bytes": 13856,
+      "bytes": 14090,
       "path": "tests/unit/operation/test_diagnostic_compute.py",
-      "sha256": "a726646cdc8f296ff55a352d1458cfb50805c589162b0ae4dd45d9c178a0fc78"
+      "sha256": "0fe6cf9680216af20dd83621c12e2dfd2483813164c573e4dfd60e1246dbb20c"
     },
     {
       "bytes": 4267,
