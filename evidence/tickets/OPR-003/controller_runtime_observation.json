@@ -1,0 +1,13 @@
+{
+  "modules": {
+    "tests/integration/operation/test_campaign_execution.py": 3015.705
+  },
+  "schema_version": "ci-runtime-observations-v1",
+  "source": {
+    "description": "Three actual owned Windows PostgreSQL controller case timings (432.291s,231.733s,197.606s), conservatively calibrated by the existing 3.5x CI/local factor. This is an estimate, not a measured per-node CI duration. Function-isolated cases permit independent shard placement; immutable workflow and all collection/coverage gates remain unchanged.",
+    "id": "opr003-owned-controller-ci-calibrated",
+    "kind": "estimated",
+    "observed_at_utc": "2026-11-03T05:18:00Z",
+    "reference": "evidence/tickets/OPR-003/controller_runtime_observation.json"
+  }
+}

@@ -55,6 +55,16 @@
       ],
       "sample_count": 1
     },
+    "tests/integration/operation/test_campaign_execution.py": {
+      "estimated_seconds": 3015.705,
+      "observations": [
+        {
+          "seconds": 3015.705,
+          "source_id": "opr003-owned-controller-ci-calibrated"
+        }
+      ],
+      "sample_count": 1
+    },
     "tests/integration/optimisation/test_integration.py": {
       "estimated_seconds": 215.36,
       "observations": [
@@ -275,6 +285,11 @@
     }
   },
   "node_partition_exceptions": {
+    "tests/integration/operation/test_campaign_execution.py": {
+      "estimated_seconds_per_node": 1513.018,
+      "reason": "Three function-isolated owned controller cases took 432.291s,231.733s,197.606s. Conservative 3.5x maximum per-case estimate removes the previously unweighted single-module critical path; each case owns its journal/transport state.",
+      "reference": "evidence/tickets/OPR-003/controller_runtime_evidence.json"
+    },
     "tests/unit/private_v1/test_team_strength_d3_seam.py": {
       "estimated_seconds_per_node": 300.8,
       "reason": "Phase-2 controlled reuse experiment found only 1.19s setup benefit; four state-isolated calls each took 96.68-100.54s",
@@ -315,6 +330,13 @@
       "kind": "estimated",
       "observed_at_utc": "2026-10-29T07:53:49Z",
       "reference": "evidence/tickets/DMF-PULSE-ACCEL-002/CI-D4-REBALANCE.json#ci-progress-log-bound"
+    },
+    {
+      "description": "Three actual owned Windows PostgreSQL controller case timings (432.291s,231.733s,197.606s), conservatively calibrated by the existing 3.5x CI/local factor. This is an estimate, not a measured per-node CI duration. Function-isolated cases permit independent shard placement; immutable workflow and all collection/coverage gates remain unchanged.",
+      "id": "opr003-owned-controller-ci-calibrated",
+      "kind": "estimated",
+      "observed_at_utc": "2026-11-03T05:18:00Z",
+      "reference": "evidence/tickets/OPR-003/controller_runtime_observation.json"
     }
   ]
 }

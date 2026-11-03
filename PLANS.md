@@ -3270,3 +3270,17 @@ prefixes passed and no source session started. Restore its original 10,066 bytes
 and SHA4a85e770, retain the failure, and remove scanner false positives through
 equivalent Literal aliases, typed session assignment and split owned literals.
 No marker waiver, source-scope change, model change or consumption reset.
+
+2026-11-03 actual-session correction: session1 completed one zero-credit quota
+HTTP200,498remaining/2used/last0,then stopped before FPL/paid/reservation with
+EXCLUSIVE_ACCOUNT_USAGE_CONTRADICTION. The actual owner attributes2credits to
+the earlier DMF first try and instructs continuation. Retain this as signed
+OWNER_ATTRIBUTED_AGGREGATE_PRIOR_USAGE/NOT_HTTP_PROVEN, bound to exact original
+RES2/consumedkey/account/November and admitted/started/completed quota evidence.
+Append one separate fact; never rewrite old rows, create an HTTP settlement,
+change immutable anchor0, reset spend or increase policy limits. Future counters
+must equal attributed2 plus genuine later settlement costs. Independently review,
+sign and install the correction before the next accepted bounded session. Also
+fix the observed cold inspect command missing original SSPI recovery. Preserve
+session1 failure/close and mandatory separate inspection. Protected modelc4,
+original policy8b, original18/6 prefixes and24marker bytes remain unchanged.

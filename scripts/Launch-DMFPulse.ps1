@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('start','install-reviewed-update','rollback-reviewed-update','withdraw-standing','gw10-diagnostic-paid','gw10-diagnostic-read-only','inspect-gw10-diagnostic')][string]$Action = 'start',
+    [ValidateSet('start','install-reviewed-update','rollback-reviewed-update','withdraw-standing','gw10-diagnostic-paid','gw10-diagnostic-read-only','inspect-gw10-diagnostic','reconcile-gw10-prior-usage')][string]$Action = 'start',
     [string]$Carrier,
     [string]$ReleaseId,
     [string]$SessionKey
@@ -34,6 +34,10 @@ switch ($Action) {
     'inspect-gw10-diagnostic' {
         if ($Carrier -or $ReleaseId -or $SessionKey -cnotmatch '^[0-9a-f]{64}$') { throw 'EXACT_DIAGNOSTIC_SESSION_REQUIRED' }
         $operatorArguments = @('operation','inspect-gw10-diagnostic',$SessionKey)
+    }
+    'reconcile-gw10-prior-usage' {
+        if ($Carrier -or $ReleaseId -or $SessionKey) { throw 'OPERATOR_ARGUMENTS_NOT_ALLOWED' }
+        $operatorArguments = @('operation','reconcile-gw10-prior-usage')
     }
 }
 $operatorLocal = [Environment]::GetFolderPath('LocalApplicationData')

@@ -16,7 +16,7 @@ from dmf_pulse.assurance.canonical import canonical_json_bytes, canonical_sha256
 from dmf_pulse.dashboard.authorization import RefreshGrant
 from dmf_pulse.dashboard.postgres_authorization import ConnectionFactory, PostgresUsageLedger
 from dmf_pulse.dashboard.views import DeskView
-from dmf_pulse.data_model.tables import operator_journal, refresh_control_event
+from dmf_pulse.data_model.tables import operator_journal
 from dmf_pulse.database.schema import current_alembic_revision
 from dmf_pulse.operation.diagnostics import DiagnosticReport
 from dmf_pulse.operation.enrollment import InstalledEnrollment
@@ -227,23 +227,24 @@ class OperationJournal:
         with self._transaction() as (connection, rows):
             self._append(connection, rows, "DISCOVERY", event.model_dump(mode="json"), now=now)
 
-    @staticmethod
     def _paid_state(
-        connection: Connection, rows: list[dict[str, Any]], policy: StandingPolicy, start: datetime
+        self,
+        connection: Connection,
+        rows: list[dict[str, Any]],
+        policy: StandingPolicy,
+        start: datetime,
     ) -> tuple[int, int]:
+        if policy != self.policy:
+            raise OperationError("PRIOR_USAGE_ORIGINAL_ACCOUNT_BINDING_INVALID")
         original = [
-            dict(row)
-            for row in connection.execute(
-                select(refresh_control_event).where(
-                    refresh_control_event.c.ledger_id == policy.ledger_id,
-                    refresh_control_event.c.at >= start,
-                )
-            ).mappings()
+            row
+            for row in self.ledger._read_records(connection)
+            if datetime.fromisoformat(row["at"]) >= start
         ]
         paid = {
-            row["payload"]["reservation_id"]
+            row["reservation_id"]
             for row in original
-            if row["kind"] == "ATTEMPT" and row["payload"]["route_sha256"] == PAID_ROUTE_SHA
+            if row["kind"] == "ATTEMPT" and row["route_sha256"] == PAID_ROUTE_SHA
         }
         from dmf_pulse.operation.campaign_journal import is_diagnostic_settlement
 
@@ -263,9 +264,40 @@ class OperationJournal:
             or len(settled) != len([s for s in settlements if s["consistent"] is True])
         ):
             raise OperationError("QUOTA_SETTLEMENT_LEDGER_CONTRADICTION")
-        return sum(
+        from dmf_pulse.operation.prior_usage import attributed_usage_credits
+
+        attributed = attributed_usage_credits(rows, original, policy, start)
+        return attributed + sum(
             item["last_request_cost"] for item in settlements if item["reservation_id"] in settled
         ), len(paid - settled)
+
+    def record_owner_attributed_prior_usage(self) -> str:
+        """Append one fixed signed account fact; never a settlement or request."""
+        from dmf_pulse.operation.prior_usage import (
+            KIND,
+            load_prior_usage_import,
+            validate_canonical_fact,
+        )
+
+        verified = load_prior_usage_import()
+        if verified.policy != self.policy:
+            raise OperationError("PRIOR_USAGE_CURRENT_INSTALLED_POLICY_REQUIRED")
+        evidence = verified.evidence
+        now = datetime.now(UTC)
+        if not evidence.fact.period_started_at <= now < evidence.fact.period_resets_at:
+            raise OperationError("PRIOR_USAGE_IMPORT_PERIOD_CLOSED")
+        with self._transaction() as (connection, rows):
+            if any(r["payload"]["value"].get("subtype") == KIND for r in rows):
+                raise OperationError("PRIOR_USAGE_DUPLICATE_OR_INVALID_ATTRIBUTION")
+            original = self.ledger._read_records(connection)
+            validate_canonical_fact(evidence.fact, self.policy, rows, original, recorded_at=now)
+            return self._append(
+                connection,
+                rows,
+                "QUOTA",
+                {"subtype": KIND, "evidence": evidence.model_dump(mode="json")},
+                now=now,
+            )
 
     def qualify_quota(self, quota: QuotaProof, *, now: datetime) -> VerifiedPeriod:
         with self._transaction() as (connection, rows):

@@ -75,3 +75,14 @@ publication binding, source uncertainty retention, safe failures and bounded
 cleanup. A controlled market result can never satisfy real pilot acceptance.
 The actual live receipt must distinguish admissions, starts and completed HTTP
 responses and retain actual credit headers independently of model success.
+
+Observed-session correction, authorized by the subsequent actual owner reply:
+account for exactly2 provider-observed prior credits through a separately signed
+owner attribution, explicitly NOT_HTTP_PROVEN. Bind exact old reservation and
+consumed event, canonical November quota proof and same account; preserve old
+rows/reservation/caps/anchor and failed-session consumption. No generic baseline
+override, invented historical invocation, actual-header settlement or clearance
+of unrelated unresolved spend. Correct cold inspection control recovery and
+prove fixed-loader/signature, duplicate/overlap/wrong-identity refusals and
+future fresh-quota accounting. Reviewed signed compatibility is required; this
+owner attribution does not require another routine personal hash decision.

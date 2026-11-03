@@ -350,6 +350,7 @@ def approved_arguments(arguments: list[str]) -> list[str]:
     if arguments in (
         ["operation", "gw10-diagnostic-paid"],
         ["operation", "gw10-diagnostic-read-only"],
+        ["operation", "reconcile-gw10-prior-usage"],
     ):
         return arguments
     if len(arguments) == 3 and arguments[:2] == ["operation", "inspect-gw10-diagnostic"]:

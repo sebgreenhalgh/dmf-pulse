@@ -177,6 +177,10 @@ def run_bounded_session(
 
 def inspect_session(key: str) -> dict[str, object]:
     """Separate explicit inspection step; it cannot invoke or reserve a provider."""
+    from dmf_pulse.operation.local_control import recover_local_control
+
+    authority = load_verified_campaign()
+    recover_local_control(authority.normal_policy)
     journal = DiagnosticJournal.production()
     receipt = journal.session_receipt(key)
     terminal = receipt["terminal_sha256"]

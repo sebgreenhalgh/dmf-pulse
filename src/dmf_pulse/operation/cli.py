@@ -76,6 +76,36 @@ def install_reviewed_update_command(carrier: Path) -> None:
     typer.echo(f"REVIEWED_UPDATE_ACTIVATED: {release.name}; original ledger retained.")
 
 
+@operation_app.command("reconcile-gw10-prior-usage")
+def reconcile_gw10_prior_usage_command() -> None:
+    """Append the one fixed signed prior-usage attribution; no provider access."""
+    from dmf_pulse.operation.campaign_authority import load_verified_campaign
+    from dmf_pulse.operation.journal import OperationJournal
+    from dmf_pulse.operation.local_control import recover_local_control
+
+    try:
+        authority = load_verified_campaign()
+        recover_local_control(authority.normal_policy)
+        digest = OperationJournal.production(
+            authority.normal_policy
+        ).record_owner_attributed_prior_usage()
+    except (OperationError, AuthorizationError, ValidationError, OSError) as error:
+        _fail(error)
+        return
+    typer.echo(
+        json.dumps(
+            {
+                "state": "OWNER_ATTRIBUTED_AGGREGATE_PRIOR_USAGE_RECORDED",
+                "historical_http_proof": "NOT_HTTP_PROVEN",
+                "record_sha256": digest,
+                "provider_requests": 0,
+                "new_reservations": 0,
+            },
+            sort_keys=True,
+        )
+    )
+
+
 @operation_app.command("rollback-reviewed-update")
 def rollback_reviewed_update_command(release_id: str) -> None:
     """Reactivate a retained signed release without downgrading control history."""
