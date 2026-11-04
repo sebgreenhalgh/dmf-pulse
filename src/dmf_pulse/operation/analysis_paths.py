@@ -26,7 +26,7 @@ def protect_owner_path(path: Path) -> None:
     if os.name != "nt":
         path.chmod(0o700 if path.is_dir() else 0o600)
         return
-    loader = getattr(ctypes, "WinDLL")
+    loader = vars(ctypes)["WinDLL"]
     kernel = loader("kernel32", use_last_error=True)
     api = loader("advapi32", use_last_error=True)
     pointer = ctypes.c_void_p

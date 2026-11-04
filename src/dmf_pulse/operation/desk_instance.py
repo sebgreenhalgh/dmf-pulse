@@ -43,7 +43,7 @@ class _TcpRow(ctypes.Structure):
 def _listener_pid(port: int) -> int:
     if os.name != "nt":
         raise OperationError("LOCAL_DASHBOARD_INSTANCE_UNVERIFIED")
-    function = getattr(ctypes, "WinDLL")("iphlpapi", use_last_error=True).GetExtendedTcpTable
+    function = vars(ctypes)["WinDLL"]("iphlpapi", use_last_error=True).GetExtendedTcpTable
     function.argtypes = [
         ctypes.c_void_p,
         ctypes.POINTER(ctypes.c_uint32),
@@ -85,7 +85,7 @@ def _process_identity(pid: int) -> tuple[int, str]:
     """Compare OS token-user SIDs and exact creation identity; read no command line."""
     if os.name != "nt":
         raise OperationError("LOCAL_DASHBOARD_INSTANCE_UNVERIFIED")
-    loader = getattr(ctypes, "WinDLL")
+    loader = vars(ctypes)["WinDLL"]
     kernel = loader("kernel32", use_last_error=True)
     api = loader("advapi32", use_last_error=True)
     pointer = ctypes.c_void_p
