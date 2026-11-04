@@ -4556,9 +4556,9 @@
       "sha256": "57d18e280907ad39cba665c9ad2fb9dbc13f7224e73c0f51cb1a166b5083ecbe"
     },
     {
-      "bytes": 3149,
+      "bytes": 3161,
       "path": "src/dmf_pulse/operation/analysis_paths.py",
-      "sha256": "114db8356a87d1048164180fe2074d2be197eabd62d483102acd001ccf25c819"
+      "sha256": "6fb97114694978c5073e705fc9cbbe3b74e77ae9d1488574d60a37351ff1a10b"
     },
     {
       "bytes": 2169,
@@ -4636,9 +4636,9 @@
       "sha256": "3fe67f742878a4b5522330da3ef74f143c15590ed8f7ac89b599dc1d19f35ded"
     },
     {
-      "bytes": 8733,
+      "bytes": 8757,
       "path": "src/dmf_pulse/operation/desk_instance.py",
-      "sha256": "77d80807a058f7535a11dc6b5593e769e2e8a5c6ae1deec7c0839f055c410357"
+      "sha256": "cd4f8a084878d367ec419e2d5e686c741687ac83451340d1f831ca495048d51e"
     },
     {
       "bytes": 13540,
@@ -4756,9 +4756,9 @@
       "sha256": "2734e8a4a32c6cde9ba884ee34d5a9d1b64155a2cc3d09a6f52cfb5f9044253b"
     },
     {
-      "bytes": 22032,
+      "bytes": 22076,
       "path": "src/dmf_pulse/operation/start.py",
-      "sha256": "7c394f955cc56804aa2ac2fafef10ce98f66aa76282ef312637a93892d65b0f6"
+      "sha256": "f55b1c5468b034d67546809e55dc242d368d57350d1b9f85c9857a7b62a85972"
     },
     {
       "bytes": 2578,

@@ -509,7 +509,8 @@ def run_start(*, progress: Callable[[str], None]) -> None:
     try:
         # Native process/listener ownership proof currently supports Windows.
         # Other platforms can start normally, but cannot reuse an unverified listener.
-        if sys.platform == "win32":
+        windows_instance = sys.platform == "win32"
+        if windows_instance:
             instance = register_instance(instance_path, policy, PORT)
         try:
             recover_local_control(policy)
