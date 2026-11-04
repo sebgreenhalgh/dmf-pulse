@@ -3496,9 +3496,9 @@
       "sha256": "04f2751be30f81b11218d5b4d0fa0b5d1745a91f07727253098a0bf395473b32"
     },
     {
-      "bytes": 19078,
+      "bytes": 19515,
       "path": "src/dmf_pulse/dashboard/app.py",
-      "sha256": "3ffda510d6cf6729bf6fafac17daada5dcc91818f56ae337278282ac62aaf10a"
+      "sha256": "f9892a8a406a6df59480baf47cdf01ba54498eb9ab20f47f099b196252203ee2"
     },
     {
       "bytes": 38405,
@@ -7006,9 +7006,9 @@
       "sha256": "74aaddd94b7fe28bc684cbec579fdac90b1d2d17e21319a75986c745000e9875"
     },
     {
-      "bytes": 15400,
+      "bytes": 15491,
       "path": "tests/unit/dashboard/test_dashboard.py",
-      "sha256": "47b9a065589aa2845dcc3ae3c0c6ef535835d1b73a136f0b77d586c45e91e92f"
+      "sha256": "f5801f294097c21c8e17335979b9bb8afbdfab460053c00179008a691a1a724e"
     },
     {
       "bytes": 4777,
@@ -7029,6 +7029,11 @@
       "bytes": 5634,
       "path": "tests/unit/dashboard/test_market_quota_receipt.py",
       "sha256": "b3fbdc139ee57755b94d995ad194c786ac4bc98bf8e53afe79a661ae9f8d039b"
+    },
+    {
+      "bytes": 2089,
+      "path": "tests/unit/dashboard/test_player_lookup_thread.py",
+      "sha256": "0b19082bd279965b10ffa9d58c0d51dd403aaf71481932315f677f8f13f33007"
     },
     {
       "bytes": 6211,

@@ -184,6 +184,7 @@ def test_real_stack_refresh_player_table_detail_comparison_and_evaluation(model_
     assert request(app, f"/api/compare/{first}/{second}", browser_header=cookie)[0] == 200
     assert request(app, f"/api/compare/{first}/{first}", browser_header=cookie)[0] == 422
     assert request(app, "/api/players/99999999", browser_header=cookie)[0] == 404
+    assert request(app, f"/api/compare/{first}/99999999", browser_header=cookie)[0] == 404
     report = json.loads(request(app, "/api/performance", browser_header=cookie)[2])
     assert report["real_cohort_status"] == "NO RIGHTS-QUALIFIED REAL PROSPECTIVE COHORT"
     assert report["synthetic_report"]["count"] == 8

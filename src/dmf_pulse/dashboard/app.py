@@ -38,6 +38,14 @@ _HEADERS = {
 }
 
 
+def _lookup_call[LookupResult](call: Callable[[], LookupResult]) -> LookupResult:
+    """Translate absent items before iterator exceptions cross an async Future."""
+    try:
+        return call()
+    except StopIteration:
+        raise ValueError("PLAYER_UNAVAILABLE") from None
+
+
 class RefreshInput(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     horizon: Literal[1, 3] = 1
@@ -403,7 +411,9 @@ def create_app(
     @app.get("/api/players/{official_id}")
     async def player(official_id: int) -> Response:
         try:
-            return publish(await asyncio.to_thread(runtime.player, official_id))
+            return publish(
+                await asyncio.to_thread(_lookup_call, lambda: runtime.player(official_id))
+            )
         except (ValueError, StopIteration):
             return _error("PLAYER_UNAVAILABLE", 404)
 
@@ -413,10 +423,12 @@ def create_app(
 
         try:
             if isinstance(runtime, PersistentDeskRuntime):
-                left, right = await asyncio.to_thread(runtime.player_pair, first, second)
+                left, right = await asyncio.to_thread(
+                    _lookup_call, lambda: runtime.player_pair(first, second)
+                )
             else:
-                left = await asyncio.to_thread(runtime.player, first)
-                right = await asyncio.to_thread(runtime.player, second)
+                left = await asyncio.to_thread(_lookup_call, lambda: runtime.player(first))
+                right = await asyncio.to_thread(_lookup_call, lambda: runtime.player(second))
             if (
                 first == second
                 or left.job_id != right.job_id
