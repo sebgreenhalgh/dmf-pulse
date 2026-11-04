@@ -12,7 +12,11 @@ from typing import Literal
 
 from dmf_pulse.credentials.service import CredentialError, CredentialService
 from dmf_pulse.dashboard.authorization import AuthorizationError
-from dmf_pulse.dashboard.current import CurrentEligibility, CurrentRefreshSession
+from dmf_pulse.dashboard.current import (
+    CurrentEligibility,
+    CurrentRefreshSession,
+    CurrentWorkerResult,
+)
 from dmf_pulse.dashboard.runtime import DeskRuntime, JobState
 from dmf_pulse.dashboard.views import DeskView, PlayerDetail
 from dmf_pulse.operation.journal import OperationJournal
@@ -25,6 +29,7 @@ from dmf_pulse.operation.quota import (
     QuotaSourceQualification,
 )
 from dmf_pulse.operation.standing import QuotaProof, StandingPolicy, execution_key, require_policy
+from dmf_pulse.private_v1.one_command import OneCommandResult
 
 PORT = 8765
 
@@ -142,13 +147,31 @@ class SingleAcquisitionRuntime(DeskRuntime):
         on_publication: Callable[[DeskView], None],
         on_failure: Callable[[str], None],
         quota_status: Callable[[], ChargedQuotaStatus | None] | None = None,
+        clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
-        super().__init__(current_session=current_session, on_publication=on_publication)
+        from dmf_pulse.operation.standing_worker import StandingWorker
+
+        super().__init__(
+            current_session=current_session,
+            on_publication=on_publication,
+            current_worker_factory=StandingWorker,
+            clock=clock,
+        )
         self._launch_started = False
         self._on_failure = on_failure
         self._failure_recorded = False
         self._quota_status = quota_status
         self._observed_quota: ChargedQuotaStatus | None = None
+
+    def _accept(
+        self, value: OneCommandResult, *, envelope: CurrentWorkerResult | None = None
+    ) -> None:
+        from dmf_pulse.operation.standing_pipeline import validate_standing_source_proof
+
+        if self._active_launch is None:
+            raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
+        validate_standing_source_proof(tuple(self._diagnostics.events), value, self._active_launch)
+        super()._accept(value, envelope=envelope)
 
     def tick(self) -> JobState:
         state = super().tick()
@@ -327,6 +350,7 @@ def prepare_runtime(
             authorization_id=f"OPR001-{key}",
             entry_id=policy.entry_id,
             deadline_at=event.deadline_at,
+            clock=clock,
         )
         session.preflight(1)
 
@@ -346,6 +370,7 @@ def prepare_runtime(
                 key, code, now=clock(), diagnostics=runtime.diagnostics()
             ),
             quota_status=lambda: journal.charged_quota_status(key),
+            clock=clock,
         )
         runtime.refresh(1)
         return runtime

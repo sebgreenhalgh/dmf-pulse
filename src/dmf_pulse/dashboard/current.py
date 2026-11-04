@@ -573,8 +573,17 @@ def run_current_recommendation(
         clock=active_clock,
     )
     try:
+        service_type = PrivateV1OneCommandService
+        standing_one_gw = (
+            launch.grant.request.authorization_id.startswith("OPR001-")
+            and launch.grant.request.horizon == 1
+        )
+        if standing_one_gw:
+            from dmf_pulse.operation.standing_pipeline import StandingOneGameweekService
+
+            service_type = StandingOneGameweekService
         result = _current_service_scope(
-            PrivateV1OneCommandService(
+            service_type(
                 direct_client_factory=sources.direct,
                 odds_service_factory=sources.odds,
                 score_service_factory=sources.score,
@@ -594,7 +603,9 @@ def run_current_recommendation(
                 operator_approved_at=launch.grant.issued_at,
                 run_id="ACCEL003_CURRENT_MODE",
                 horizon_gameweeks=launch.grant.request.horizon,
-                scenario_count=32
+                scenario_count=256
+                if standing_one_gw
+                else 32
                 if owned and launch.grant.request.horizon == 1
                 else 8
                 if owned

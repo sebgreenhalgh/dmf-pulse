@@ -134,3 +134,37 @@ Investigate supported contracts offline before the final paid-eligible slot;
 another live attempt requires independently reviewed signed maintenance and
 exact current custody/accounting. No slot restoration, silent quality relaxation
 or new owner hash decision is authorized or required.
+
+Post-success slice, active2026-11-04: actual separately inspected session6 has
+REAL_PUBLICATION, independently authenticated by private audit151. The original
+request's section5 now requires ordinary standing offline integration and any
+necessary signed compatible fixes. That retained request has byte SHA256
+07062c58392eb89dbfbbf2754e2572d46a0805f069b914fe8f77786e8a482236.
+No further live acquisition is authorized after this success. Preserve all369
+operator/24financial rows, old286/21 and203/18 prefixes, known6credits/unknown0,
+all24 original filesystem markers and the original normalGW10 consumed event.
+
+The ordinary OPR001 one-GW path may reuse the proven operation-only chip adapter
+and typed assembly with unchanged protected compiler/minutes/kernel/formatters.
+Keep original snapshot identity and derived mapping proof; unknown statuses and
+ambiguous copy/history mappings still reject. Do not fabricate a diagnostic
+campaign authority, rewrite a source snapshot or turn an owned fixture into a
+real result. An operation-only supervisor may own the source plus four fixed
+network-fenced daemon numerical siblings through the existing runtime factory,
+with signed bootstrap, parent-death lifelines and verified all-child cleanup
+before publication. Preserve normal900s limits and every grant/source/quota gate.
+
+Allowed scope is operation/standing_pipeline.py, operation/standing_worker.py,
+necessary operation/start.py and dashboard/current.py glue, the bounded proof
+model/event additions in operation/chip_schema_compat.py and diagnostics.py,
+owned operation and
+dashboard regressions/integration fixtures, this contract, PLANS.md and the
+scoped repository manifest. Keep all493 protected numerical/package members
+byte-identical; no change to models/rules/permissions/routes/budgets/ownership,
+three-GW behavior, canonical control identity/history or P01 artifacts. Prove
+actual compiler/whole-result parity on supported equivalents, next-event owned
+schema compatibility, early negative source/authority cases, signed native
+parent/child isolation and cleanup, and full-size owned runtime inside900s.
+Then complete existing changed-code literal acceptance/CI/clean-wheel gates,
+independent review and signed maintenance installation. No routine personal
+acceptance is reopened within the unchanged accepted standing material policy.

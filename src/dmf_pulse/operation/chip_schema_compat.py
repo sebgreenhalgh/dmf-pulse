@@ -1,4 +1,4 @@
-"""Diagnostic-only typed chip-schema adaptation; original HTTP inputs stay intact.
+"""Operation-owned typed chip-schema adaptation; original HTTP inputs stay intact.
 
 Only a proven past ``played`` observation is translated to the accepted compiler's
 used-history spelling. Explicit inactive copies can be omitted from its argument
@@ -40,6 +40,20 @@ class ChipSchemaProof(Metadata):
     assignment_sha256: Sha
     translated_played_records: int = Field(ge=0, strict=True)
     omitted_inactive_records: int = Field(ge=0, strict=True)
+
+
+class StandingSourceSchemaProof(Metadata):
+    """Derived hashes only; this never attests another provider response."""
+
+    schema_version: Literal["standing-source-schema-proof-v1"] = "standing-source-schema-proof-v1"
+    target_gameweek: int = Field(ge=1, strict=True)
+    snapshot_sha256: Sha
+    fpl_input_sha256: Sha
+    manager_state_sha256: Sha
+    ruleset_sha256: Sha
+    capability_sha256: Sha
+    private_rules_authority_sha256: Sha
+    chip_schema_proof: ChipSchemaProof
 
 
 @dataclass(frozen=True, slots=True, repr=False)

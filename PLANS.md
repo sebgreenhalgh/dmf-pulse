@@ -3357,15 +3357,56 @@ inspection and independent117 preserve full203operator/18financial prefixes;
 current custody is286operator/21financial rows. No genuine publication exists.
 Three sessions and one paid-eligible slot remain; none is restored or refunded.
 
-- [ ] Add operation-only, closed Odds ingestion raise-site and quality-gate
+- [x] Add operation-only, closed Odds ingestion raise-site and quality-gate
   reporting. Prove actual owned parser/compiler refusals, fixed-code privacy and
   unchanged historical receipt compatibility. Preserve every rejection, source
   scope, model byte, scenario count, deadline and request/credit cap.
-- [ ] Investigate supported current Odds contracts offline before spending the
+- [x] Investigate supported current Odds contracts offline before spending the
   final paid-eligible slot. Do not infer the erased session5 cause or remove a
   quality gate merely to accept a response.
-- [ ] Complete required source, installed-wheel, CI and independent signed
+- [x] Complete required source, installed-wheel, CI and independent signed
   maintenance checks for changed executable bytes, then recover exact286/21
   custody and current paid accounting before another separately admitted run.
-- [ ] Obtain genuine recommendations within the accepted remaining campaign;
-  only then repair/test ordinary standing operation offline and stop diagnostics.
+- [x] Obtain genuine recommendations within the accepted remaining campaign and
+  stop live diagnostics. Post-success ordinary repair is tracked below.
+
+2026-11-04 session6: the unchanged signed d3c9e67/ba8a release produced a genuine
+GW10 diagnostic publication after880.188680s. All24 authorized requests completed
+HTTP200 (17FPL,4OpenFootball,2free quota,1paid). Actual response headers prove
+2new credits charged/494remaining/6period-used/unknown0. Independent audit151
+verifies typed publication/model/source lineage, all369operator/24financial rows,
+full286/21 and embedded203/18 prefixes, quiescent close and separate installed
+inspection. Independent155 rehashed every24 original filesystem marker unchanged.
+The actual browser displayed the retained-as-of unvalidated result. All670 derived
+player forecasts and the complete report are retained privately with exact hashes.
+Live acquisition has stopped after success; no further diagnostic session is in
+scope. The last paid-eligible slot is consumed, never restored or refunded.
+
+Active post-success work follows section5 of the owner's original request:
+
+- [x] Port the proven chip-source compatibility and unchanged one-GW assembly
+  through an operation-only ordinary runner. Preserve the original typed FPL
+  snapshot, governed chip proof, normal grant/result binding and all numerical
+  package bytes. Legacy/demo/three-GW behavior remains under its existing path.
+- [x] Inject a supervisor-owned ordinary worker through the existing runtime
+  factory. Own the source worker and four network-fenced numerical siblings,
+  signed child bootstrap, explicit owner-death lifelines and all-child cleanup.
+  Preserve the ordinary900s ceiling, scopes, one-Gameweek deduplication and spend.
+- [ ] Prove next-unconsumed-Gameweek behavior with owned offline fixtures,
+  compiler/kernel parity, negative authority/privacy/cleanup cases and a clean
+  installed-wheel integration/runtime check. No provider or canonical DB writes.
+- [ ] Complete literal changed-code release gates and independent review, then
+  install signed compatibility within the unchanged standing material policy.
+  Do not run another live acquisition to test ordinary operation on consumedGW10.
+
+Ordinary source checkpoint: all441 source files pass strict typing. The full256
+execution input, entire OneCommandResult and presentation match the unchanged
+accepted service exactly. Both owned GW11 played-chip cases, including explicit
+future copies, complete the full256 kernel with unchanged source snapshots
+(550.53s serial across two cases). Fourteen early usage/source/time failures
+refuse before paid access;129 focused controls and94 legacy IPC/privacy cases
+pass. Independent108 private checks include exact session5/6 wire/row identity;
+106 portable owned cases are adopted without private account/artifact inputs.
+One genuine independent handle-close fault was fixed; earlier failed XML and
+owned fixture-setup failures remain retained. Complete native full-size900s
+normal timing, clean/signed installation and final release gates remain open.

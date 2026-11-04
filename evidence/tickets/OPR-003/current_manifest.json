@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 240521,
+      "bytes": 243441,
       "path": "PLANS.md",
-      "sha256": "c39154201a0547877ca88e333d0af3c51cec15f28349caca3e53afea3ceee1b4"
+      "sha256": "e9de54f5869e5124bb30213d8290b5c235b80d1bcf2bc7515cac55aa56073151"
     },
     {
       "bytes": 2761,
@@ -3501,9 +3501,9 @@
       "sha256": "d7cb22c35bb0c11d6c4988188206cccc41b464ada97d8f930fcac8bbb6df92f7"
     },
     {
-      "bytes": 38793,
+      "bytes": 39221,
       "path": "src/dmf_pulse/dashboard/current.py",
-      "sha256": "37af17097e055854381879966b2ebb50d87abf8cceda1752b2820fdac0b5f2d0"
+      "sha256": "d83177c55994c660155afc9ec906a9e9b48ba9700282e861b40f64beddc842a7"
     },
     {
       "bytes": 16424,
@@ -4576,9 +4576,9 @@
       "sha256": "8781f14bb205959d115a9065e3a90568d9b28306add65e3ae7ac732c33fd8261"
     },
     {
-      "bytes": 8216,
+      "bytes": 8701,
       "path": "src/dmf_pulse/operation/chip_schema_compat.py",
-      "sha256": "82bedd512a531e78457411b67f91408deabb61fa53998d3f010b7e8eebc861bf"
+      "sha256": "1984042679009960f5ab0a8b99dda0bf83dfd6c5259d39c268159750fefe9a57"
     },
     {
       "bytes": 23616,
@@ -4611,9 +4611,9 @@
       "sha256": "309cec4b157d44b8ca9fae9b19ea5d834803e951df78498bce829d7869cecdc7"
     },
     {
-      "bytes": 25794,
+      "bytes": 27108,
       "path": "src/dmf_pulse/operation/diagnostics.py",
-      "sha256": "73fea3be304aaf09dd34df46a1085398b8bfb2a065c5d2149dff514b57d4175c"
+      "sha256": "5e67e9949bf8be8b6ad6d600e7b3fee059aa9fbf474e20f7b65a194f4b5cf507"
     },
     {
       "bytes": 8570,
@@ -4696,9 +4696,19 @@
       "sha256": "3aff6ac39d097969c40f5e15482184cba2d2ffb78afe24c4b3476140bd7e0557"
     },
     {
-      "bytes": 16201,
+      "bytes": 13040,
+      "path": "src/dmf_pulse/operation/standing_pipeline.py",
+      "sha256": "c66922c37ffed9b407230eabfcfbf1509e66e7785775deb55af0f58ae9343d92"
+    },
+    {
+      "bytes": 4422,
+      "path": "src/dmf_pulse/operation/standing_worker.py",
+      "sha256": "2734e8a4a32c6cde9ba884ee34d5a9d1b64155a2cc3d09a6f52cfb5f9044253b"
+    },
+    {
+      "bytes": 17070,
       "path": "src/dmf_pulse/operation/start.py",
-      "sha256": "c65eeb6066e8f863e3f767597cb037fb7a033014b3d5e0b968b4e5aeb3017a78"
+      "sha256": "f6e8efc35000b18cf494e1733f3edb5550a4cb498556decb83dcc3ce974ae6b7"
     },
     {
       "bytes": 2578,
@@ -7706,6 +7716,11 @@
       "sha256": "4359dca6bd4a8dea649d912cfe03d18e6352160c37a331cedf16cefc2d1a8019"
     },
     {
+      "bytes": 3075,
+      "path": "tests/unit/operation/standing_pipeline_support.py",
+      "sha256": "14f4d2f71c8c28ec7ea8db3d1a3910918f3d56cfcba73a7f72f83a5e90c37bff"
+    },
+    {
       "bytes": 7392,
       "path": "tests/unit/operation/standing_support.py",
       "sha256": "e745c601843b3cbc9550dfe27a00a251daac5c808fa105544c49ef22bfcbbc10"
@@ -7899,6 +7914,36 @@
       "bytes": 5692,
       "path": "tests/unit/operation/test_standing.py",
       "sha256": "637974f91a680c545c4fadbe27d0a71ed20f43a3b54f78f41bd65a2001effc3d"
+    },
+    {
+      "bytes": 6899,
+      "path": "tests/unit/operation/test_standing_pipeline.py",
+      "sha256": "45eadadea4f59cf6f8a2d2fe726be9bdf07334d7fc4a3557b06ef50101406c52"
+    },
+    {
+      "bytes": 6202,
+      "path": "tests/unit/operation/test_standing_pipeline_failures.py",
+      "sha256": "fa165536d6fa9c0380be4d890957fa0d5dc7b260ffd0c326e6feb79447daeacb"
+    },
+    {
+      "bytes": 8672,
+      "path": "tests/unit/operation/test_standing_source_binding_independent.py",
+      "sha256": "1b6496dfb2351ddfe5b5df4152a19b2e2e87ae98c89bb7bccf766e34d41b9319"
+    },
+    {
+      "bytes": 7675,
+      "path": "tests/unit/operation/test_standing_source_metadata_independent.py",
+      "sha256": "32717736922d4c79195e71f8a3beb1dfb8dd1e29c89bdc61fff3ed3d1782ca3e"
+    },
+    {
+      "bytes": 3012,
+      "path": "tests/unit/operation/test_standing_source_proof.py",
+      "sha256": "f731339dae35adb2dbe46804c8f050664a0c3d5022d0fde886f74dbe308ce605"
+    },
+    {
+      "bytes": 8119,
+      "path": "tests/unit/operation/test_standing_worker_independent.py",
+      "sha256": "8860df7406e6ac9c502d7f349c4cae69c3f4d6e70b2cc61d2b67b4a33568b7a7"
     },
     {
       "bytes": 7036,
@@ -9356,9 +9401,9 @@
       "sha256": "a5601f1172153afb42c7a425eb21906a8652afe9ee96c9d2ed92685848aae620"
     },
     {
-      "bytes": 9257,
+      "bytes": 11609,
       "path": "tickets/OPR-003/CONTRACT.md",
-      "sha256": "aea76024b64dc73f4fc8389332d2eaee9b7720b16079d318b3d696eb27eea510"
+      "sha256": "26c82228dd0a64b9743c34dfa9928e98fdc98383b5fd13c267c98b70710e4ea1"
     },
     {
       "bytes": 5183,

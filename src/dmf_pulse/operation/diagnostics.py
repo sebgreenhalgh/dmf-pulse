@@ -7,9 +7,16 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Annotated, Any, Literal, Self
 
-from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 from dmf_pulse.assurance.canonical import canonical_sha256
+from dmf_pulse.operation.chip_schema_compat import StandingSourceSchemaProof
 from dmf_pulse.operation.models import Metadata, OperationError, Sha
 from dmf_pulse.operation.odds_failure_context import OddsQualityReason, odds_failure_context
 from dmf_pulse.operation.runtime_integrity import IntegrityReason
@@ -77,6 +84,7 @@ EventKind = Literal[
     "TRANSPORT_STARTED",
     "RESPONSE_COMPLETED",
     "FAILURE",
+    "SOURCE_SCHEMA_COMPATIBILITY",
 ]
 
 # Disclosure/security bounds; these do not allocate provider authority or budgets.
@@ -261,9 +269,29 @@ class DiagnosticEvent(Metadata):
     http_status: Annotated[int, Field(ge=100, le=599)] | None = None
     http_category: HttpCategory | None = None
     failure: SafeFailure | None = None
+    source_schema_proof: StandingSourceSchemaProof | None = None
+
+    @field_validator("source_schema_proof", mode="before")
+    @classmethod
+    def validate_copied_source_proof(cls, value: object) -> object:
+        if isinstance(value, StandingSourceSchemaProof):
+            return value.model_dump(mode="python", warnings=False)
+        return value
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_wire(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if self.source_schema_proof is None:
+            data.pop("source_schema_proof", None)
+        return data
 
     @model_validator(mode="after")
     def event_is_coherent(self) -> Self:
+        schema_event = self.kind == "SOURCE_SCHEMA_COMPATIBILITY"
+        if schema_event != (self.source_schema_proof is not None) or (
+            schema_event and self.stage != "MANAGER_STATE"
+        ):
+            raise ValueError("source schema proof differs from the fixed manager event")
         route_event = self.kind in {"ADMITTED", "TRANSPORT_STARTED", "RESPONSE_COMPLETED"}
         if route_event != (self.request is not None):
             raise ValueError("request identity differs from event kind")
@@ -528,6 +556,7 @@ class DiagnosticLog:
         status: object = None,
         failure: SafeFailure | None = None,
         at: datetime | None = None,
+        source_schema_proof: StandingSourceSchemaProof | None = None,
     ) -> None:
         category = http_category(status) if kind == "RESPONSE_COMPLETED" else None
         safe_status = status if type(status) is int and 100 <= status <= 599 else None
@@ -540,12 +569,14 @@ class DiagnosticLog:
             http_status=safe_status,
             http_category=category,
             failure=failure,
+            source_schema_proof=source_schema_proof,
         )
         self.accept(event)
         if self.send is not None:
             self.send(event)
 
     def accept(self, event: DiagnosticEvent) -> None:
+        event = DiagnosticEvent.model_validate(event.model_dump(mode="python", warnings=False))
         if event.sequence != self._sequence or (
             self._last_at is not None and event.at < self._last_at
         ):
