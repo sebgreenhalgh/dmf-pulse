@@ -506,9 +506,9 @@
       "sha256": "b4b48fba44c3d4d2510b4e6fa0779fef2e47ccb81a345a5a44ce0c4014539175"
     },
     {
-      "bytes": 8769,
+      "bytes": 9090,
       "path": "docs/operation/ANALYSIS-DICTIONARY-v1.md",
-      "sha256": "5fea428b16f8edbf3e1bcb4eec08709293e57718f20cb105135f056b36997cf2"
+      "sha256": "4265cea608e554ac40507776cd12ebebd78bfb65cc966958142be8e12a6e9482"
     },
     {
       "bytes": 5783,
@@ -4566,9 +4566,9 @@
       "sha256": "b3f3a6063cbcd2837ef0c9988df2ebea767df252c0d591b80cf35c199c174c19"
     },
     {
-      "bytes": 17902,
+      "bytes": 18437,
       "path": "src/dmf_pulse/operation/analysis_store.py",
-      "sha256": "98f531f359645d172ec7d1ccee616a62b1bdf4b6595583e328c8e42ced1f5b37"
+      "sha256": "bd86ab732767bc31d34218210df4df33a625de17d8f9deb414f0eaac48754446"
     },
     {
       "bytes": 15907,
@@ -7801,9 +7801,9 @@
       "sha256": "d56de16247ad11ed71028c597dbb9fa1ea566476eb403a1937e3adca9cfdf21e"
     },
     {
-      "bytes": 11569,
+      "bytes": 12770,
       "path": "tests/unit/operation/test_analysis_store.py",
-      "sha256": "f711bb6996fe8857edf0c04cbd994a1e8f06ed0121e3d4539f5981ddf0bc40d6"
+      "sha256": "246359a2d82e555dcf999552186543f2d7cc227b1a49a8142000c8ef47c49aa5"
     },
     {
       "bytes": 9849,
@@ -8721,9 +8721,9 @@
       "sha256": "7075b5e83a78ce705fd3941d277c7bd51da58e657c1e43cda84c82aedf432ae2"
     },
     {
-      "bytes": 2603,
+      "bytes": 2717,
       "path": "tests/unit/scripts/test_opr004_repository_validation.py",
-      "sha256": "9c8042421aba01dd1be0830a5c38b82439baa66bb028ac505840e26217dd3714"
+      "sha256": "5f492aed2d5e4789af4cf683be936ea3cd336b5a1dd4a7b62570bb973a275419"
     },
     {
       "bytes": 296,

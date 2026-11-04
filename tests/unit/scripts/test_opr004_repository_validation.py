@@ -1,10 +1,13 @@
 """The explicit analytical exception never authorizes a SQLite control plane."""
 
+import runpy
 from pathlib import Path
 
 import pytest
 
-from scripts.validate_repository import _validate_dat_repository_contract
+_validate_dat_repository_contract = runpy.run_path(
+    str(Path(__file__).resolve().parents[3] / "scripts" / "validate_repository.py")
+)["_validate_dat_repository_contract"]
 
 
 def root(tmp_path, *, authorized=True):

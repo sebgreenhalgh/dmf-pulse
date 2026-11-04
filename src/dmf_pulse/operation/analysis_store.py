@@ -16,6 +16,7 @@ from dmf_pulse.operation.diagnostics import DiagnosticReport
 from dmf_pulse.operation.models import ChargedQuotaStatus
 
 AnalysisStorageError = sqlite3.Error
+_MAX_SNAPSHOT_BYTES = 32 * 1024 * 1024
 
 _SCHEMA = """
 CREATE TABLE snapshots (
@@ -174,7 +175,9 @@ class AnalysisStore:
             check_same_thread=False,
         )
         connection.row_factory = sqlite3.Row
-        connection.setlimit(sqlite3.SQLITE_LIMIT_LENGTH, 16_842_752)
+        # A full 760-player result with optimizer outcomes exceeds 16 MiB.
+        # Query output remains independently bounded to 16 MiB below.
+        connection.setlimit(sqlite3.SQLITE_LIMIT_LENGTH, _MAX_SNAPSHOT_BYTES + 65_536)
         connection.execute("PRAGMA foreign_keys=ON")
         connection.execute("PRAGMA synchronous=FULL")
         if readonly:
@@ -187,7 +190,7 @@ class AnalysisStore:
     def stage(self, snapshot: AnalysisSnapshot) -> str:
         body = snapshot.model_dump_json()
         snapshot = AnalysisSnapshot.model_validate_json(body)
-        if len(body.encode()) > 16_777_216:
+        if len(body.encode()) > _MAX_SNAPSHOT_BYTES:
             raise ValueError("ANALYSIS_SNAPSHOT_TOO_LARGE")
         with closing(self._connect()) as connection, connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -258,7 +261,13 @@ class AnalysisStore:
         return value
 
     def history(self) -> list[dict[str, Any]]:
-        return self.query("SELECT * FROM runs ORDER BY generated_at DESC,run_id DESC")
+        return self.query(
+            "SELECT run_id,digest,canonical_sha256,confirmed_at,run_status,temporal_status,"
+            "provenance_class,validation,rights,permission_origin,generated_at,"
+            "information_cutoff,source_captured_at,gameweek,source_commit,"
+            "implementation_sha,policy_sha256,wheel_sha256 "
+            "FROM runs ORDER BY generated_at DESC,run_id DESC"
+        )
 
     def failure(
         self,

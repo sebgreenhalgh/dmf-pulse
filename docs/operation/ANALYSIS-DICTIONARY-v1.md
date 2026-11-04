@@ -39,6 +39,10 @@ read-only local file for inspection. `--csv` prints query results. `analysis exp
 prints complete rights-permitted derived JSON, optionally `--run-id ID`. Redirect
 these outputs only to a private destination. Neither command uploads anything.
 Cloud AI access requires the owner to supply an export explicitly.
+Snapshots and SQLite values have a separate 32 MiB capacity (plus bounded row
+overhead), accommodating the measured full 760-player optimizer output. History
+lists contain metadata only. Complete private JSON exports use the snapshot path;
+SQL output remains capped at 16 MiB, so query large evidence by selected fields.
 
 | Relation | Grain and content |
 | --- | --- |

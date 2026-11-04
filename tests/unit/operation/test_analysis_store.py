@@ -281,4 +281,32 @@ def test_readonly_queries_bound_output_before_materializing_every_row(store):
     with pytest.raises(ValueError, match="BINARY_OUTPUT_REJECTED"):
         store.query("SELECT randomblob(10) AS owned_blob")
     with pytest.raises(sqlite3.DataError):
-        store.query("SELECT randomblob(20000000) AS oversized_owned_blob")
+        store.query("SELECT randomblob(40000000) AS oversized_owned_blob")
+
+
+def test_full_snapshot_capacity_is_separate_from_history_and_query_output_bounds(
+    store, owned_snapshot
+):
+    # Reproduce the measured full native result's size without repeating its
+    # expensive 760-player simulation. This is an explicitly owned derived note.
+    large_view = owned_snapshot.view.model_copy(
+        update={
+            "restrictions": (*owned_snapshot.view.restrictions, "OWNED_NOTE_" + "x" * 17_500_000)
+        }
+    )
+    large = owned_snapshot.model_copy(update={"view": large_view})
+    publish(store, large)
+    assert store.snapshot() == large
+    history = store.history()
+    assert history[0]["run_id"] == large.run_id
+    assert len(json.dumps(history)) < 4096
+    assert AnalysisSnapshot.model_validate_json(store.export_json()) == large
+    with pytest.raises(ValueError, match="OUTPUT_LIMIT"):
+        store.query("SELECT payload FROM snapshots")
+    before = store.path.read_bytes()
+    too_large = large.model_copy(
+        update={"view": large_view.model_copy(update={"restrictions": ("x" * 33_554_432,)})}
+    )
+    with pytest.raises(ValueError, match="SNAPSHOT_TOO_LARGE"):
+        store.stage(too_large)
+    assert store.path.read_bytes() == before
