@@ -170,9 +170,15 @@ def complete_current(request, tmp_path_factory):
         return worker
 
     runtime = DeskRuntime(
-        current_session=session, current_worker_factory=factory, clock=lambda: DEMO_TIME
+        current_session=session,
+        current_worker_factory=factory,
+        clock=lambda: DEMO_TIME,
+        # The factory computes synchronously before returning its queued IPC.
+        # This fixture checks protocol/data binding, not runner throughput;
+        # native installed-process acceptance separately checks real timeouts.
+        elapsed_clock=lambda: 0.0,
     )
-    app = create_app(runtime=runtime, pairing_code=PAIRING, port=8765)
+    app = create_app(runtime=runtime, pairing_code=PAIRING, port=8765, elapsed_clock=lambda: 0.0)
     _, headers, context = globals()["request"](app, "/api/session", body={"pairing_code": PAIRING})
     cookie = headers.get("set-cookie", "").split(";", 1)[0]
     assert context["synthetic_sources"] and context["execution_mode"] == "PRIVATE_CURRENT"
@@ -184,7 +190,7 @@ def complete_current(request, tmp_path_factory):
         _, _, state = globals()["request"](app, "/api/status", cookie=cookie)
         if state["status"] != "RUNNING":
             break
-    assert state["status"] == "COMPLETE", state
+    assert state["status"] == "COMPLETE", json.dumps(state, sort_keys=True)
     assert len(results) == 1
     yield app, cookie, runtime, session, launches[0], workers[0], results[0], horizon
     runtime.close()

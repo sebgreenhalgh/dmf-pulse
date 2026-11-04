@@ -3437,3 +3437,11 @@ reopen, and hash-bound complete derived optimizer evidence. POSIX first launch
 uses an absolute XDG/home analytical path without Windows discovery APIs. Exact
 captain-only explanations remain unavailable unless actually produced. Final
 source, clean/signed native execution, carrier and installed reviews remain gates.
+
+CI41912013885 retained784passes/16setup errors from the synchronous three-GW
+owned current-mode fixture. The log truncates its refusal code; the historical
+cause remains unproven. The fixture now uses an explicit logical elapsed clock
+for protocol/data binding, with a deterministic regression proving queued IPC is
+discarded after a factory consumes the unchanged900s runtime ceiling. Production
+package bytes and real-clock clean native evidence remain unchanged. Complete
+CI for the corrected test source and all signed/installed gates remain pending.

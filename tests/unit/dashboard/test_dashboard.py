@@ -279,6 +279,23 @@ def test_singleflight_cancel_timeout_failure_and_poisoned_cleanup():
     runtime.refresh(1)
     elapsed[0] = 1.0
     assert runtime.tick().error_code == "RUN_TIMEOUT" and worker.closed
+    # Synchronous owned factories also count toward the unchanged 900s ceiling.
+    # Protocol fixtures must inject their own logical clock rather than depend
+    # on how quickly a loaded CI runner computes before returning queued IPC.
+    elapsed[0] = 0.0
+    worker = Worker([("progress", "owned queued progress")])
+
+    def slow_owned_factory(_):
+        elapsed[0] = 900.0
+        return worker
+
+    runtime = DeskRuntime(
+        demo=True, worker_factory=slow_owned_factory, elapsed_clock=lambda: elapsed[0]
+    )
+    runtime.refresh(1)
+    state = runtime.tick()
+    assert state.error_code == "RUN_TIMEOUT" and state.stages == () and worker.closed
+    runtime.close()
     broken = Worker(fail_close=True)
     calls.clear()
     runtime = DeskRuntime(demo=True, worker_factory=lambda h: (calls.append(h), broken)[1])

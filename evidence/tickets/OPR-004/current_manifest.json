@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 245234,
+      "bytes": 245790,
       "path": "PLANS.md",
-      "sha256": "1f10371901d3aa6431ccf36f56952d7d4b15d938411539f5884b7aabbf5617c5"
+      "sha256": "8906b480903c4273ad7968c1071a4acbf48ef536b8beb9610ab02c3dee478faa"
     },
     {
       "bytes": 2761,
@@ -6991,9 +6991,9 @@
       "sha256": "1ca7b768ee633472aae2c088b4b5fac3ada434f79f8606b5f3a6a3f7f9570515"
     },
     {
-      "bytes": 27902,
+      "bytes": 28242,
       "path": "tests/unit/dashboard/test_current_mode.py",
-      "sha256": "a3c7442cb5a88ae08787650cd9fd0e7610518babced15b365bd3e5feea04c4cb"
+      "sha256": "e7f923d593bcf4191bcb4afca0a498f6d435139c4df157eed02636a5caca6df9"
     },
     {
       "bytes": 12557,
@@ -7006,9 +7006,9 @@
       "sha256": "74aaddd94b7fe28bc684cbec579fdac90b1d2d17e21319a75986c745000e9875"
     },
     {
-      "bytes": 15491,
+      "bytes": 16168,
       "path": "tests/unit/dashboard/test_dashboard.py",
-      "sha256": "f5801f294097c21c8e17335979b9bb8afbdfab460053c00179008a691a1a724e"
+      "sha256": "3b3fd446f5f426d147d1cf7a47e94c41d59e727cfe3f79060178d3be32e88fd6"
     },
     {
       "bytes": 4777,
