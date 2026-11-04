@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import socket
+import sys
 import threading
 import time
 import webbrowser
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from dmf_pulse.credentials.service import CredentialError, CredentialService
 from dmf_pulse.dashboard.authorization import AuthorizationError
@@ -19,6 +20,8 @@ from dmf_pulse.dashboard.current import (
 )
 from dmf_pulse.dashboard.runtime import DeskRuntime, JobState
 from dmf_pulse.dashboard.views import DeskView, PlayerDetail
+from dmf_pulse.operation.analysis_optimizer import AnalysisOptimizerEvidence
+from dmf_pulse.operation.analysis_store import AnalysisStorageError
 from dmf_pulse.operation.journal import OperationJournal
 from dmf_pulse.operation.models import ChargedQuotaStatus, OperationError
 from dmf_pulse.operation.quota import (
@@ -28,10 +31,19 @@ from dmf_pulse.operation.quota import (
     QuotaLookupError,
     QuotaSourceQualification,
 )
-from dmf_pulse.operation.standing import QuotaProof, StandingPolicy, execution_key, require_policy
+from dmf_pulse.operation.standing import (
+    QuotaProof,
+    StandingPolicy,
+    execution_key,
+    require_history_policy,
+    require_policy,
+)
 from dmf_pulse.private_v1.one_command import OneCommandResult
 
 PORT = 8765
+
+if TYPE_CHECKING:
+    from dmf_pulse.operation.analysis_store import AnalysisStore
 
 
 def retained_receipt_view(view: DeskView) -> DeskView:
@@ -88,14 +100,18 @@ class PreparationGuard:
         *,
         provider: Literal["ODDS", "FPL"],
         clock: Callable[[], datetime],
+        cancelled: Callable[[], bool] = lambda: False,
     ) -> None:
         self.policy, self.provider, self.clock = policy, provider, clock
+        self.cancelled = cancelled
         self.path = QUOTA_PATH if provider == "ODDS" else "/api/bootstrap-static/"
         self.host = QUOTA_HOST if provider == "ODDS" else "fantasy.premierleague.com"
         self.started_at = clock()
         self.attempted = False
 
     def admission(self) -> None:
+        if self.cancelled():
+            raise OperationError("OPERATOR_RUN_CANCELLED")
         current = require_policy()
         now = self.clock()
         if current != self.policy or not self.started_at <= now < self.started_at + timedelta(
@@ -147,13 +163,26 @@ class SingleAcquisitionRuntime(DeskRuntime):
         on_publication: Callable[[DeskView], None],
         on_failure: Callable[[str], None],
         quota_status: Callable[[], ChargedQuotaStatus | None] | None = None,
+        on_derived: Callable[[DeskView, OneCommandResult, AnalysisOptimizerEvidence | None], None]
+        | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         from dmf_pulse.operation.standing_worker import StandingWorker
 
+        self._publishing_result: OneCommandResult | None = None
+        self._publishing_optimizer: AnalysisOptimizerEvidence | None = None
+
+        def publish(view: DeskView) -> None:
+            if on_derived is not None:
+                if self._publishing_result is None:
+                    raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
+                on_derived(view, self._publishing_result, self._publishing_optimizer)
+            else:
+                on_publication(view)
+
         super().__init__(
             current_session=current_session,
-            on_publication=on_publication,
+            on_publication=publish,
             current_worker_factory=StandingWorker,
             clock=clock,
         )
@@ -171,7 +200,13 @@ class SingleAcquisitionRuntime(DeskRuntime):
         if self._active_launch is None:
             raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
         validate_standing_source_proof(tuple(self._diagnostics.events), value, self._active_launch)
-        super()._accept(value, envelope=envelope)
+        self._publishing_result = value
+        self._publishing_optimizer = None if envelope is None else envelope.optimizer_evidence
+        try:
+            super()._accept(value, envelope=envelope)
+        finally:
+            self._publishing_result = None
+            self._publishing_optimizer = None
 
     def tick(self) -> JobState:
         state = super().tick()
@@ -298,18 +333,22 @@ def prepare_runtime(
     *,
     progress: Callable[[str], None],
     clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+    ensure_credentials: bool = True,
+    analysis_store: AnalysisStore | None = None,
+    cancelled: Callable[[], bool] = lambda: False,
 ) -> DeskRuntime:
     from dmf_pulse.operation.discovery import discover_event
 
     journal = OperationJournal.production(policy)
     journal.recover()
     progress("Original PostgreSQL ledger recovered; history retained.")
-    ensure_fpl_credential(policy, clock=clock)
+    if ensure_credentials:
+        ensure_fpl_credential(policy, clock=clock)
     launch = journal.begin_launch(now=clock())
     key: str | None = None
     try:
         progress("Checking account quota with the separate zero-credit sports request.")
-        quota_guard = PreparationGuard(policy, provider="ODDS", clock=clock)
+        quota_guard = PreparationGuard(policy, provider="ODDS", clock=clock, cancelled=cancelled)
         observed = QuotaClient(guard=quota_guard, clock=clock).fetch(
             policy.quota_qualification, admission=quota_guard.quota_admission
         )
@@ -326,7 +365,7 @@ def prepare_runtime(
         journal.record_quota(quota, now=clock(), observation=observed)
         journal.qualify_quota(quota, now=clock())
         progress("Quota verified against actual headers and canonical consumption.")
-        discovery_guard = PreparationGuard(policy, provider="FPL", clock=clock)
+        discovery_guard = PreparationGuard(policy, provider="FPL", clock=clock, cancelled=cancelled)
         fpl = next(q for q in policy.qualifications if q.scope.provider == "FPL")
         event = discover_event(
             profile=fpl.profile,
@@ -335,6 +374,8 @@ def prepare_runtime(
             clock=clock,
         )
         journal.record_discovery(event, now=clock())
+        if cancelled():
+            raise OperationError("OPERATOR_RUN_CANCELLED")
         key = execution_key(policy, event.target_gameweek)
         if journal.contains_event(key):
             saved = journal.saved_view(key)
@@ -363,6 +404,41 @@ def prepare_runtime(
                 f"Real recommendations recorded. Odds reserved 2; actual cost {receipt.last_request_cost if receipt else 'unknown'}; remaining {receipt.remaining_credits if receipt else 'unknown'}."
             )
 
+        def publish_analysis(
+            view: DeskView, result: OneCommandResult, optimizer: AnalysisOptimizerEvidence | None
+        ) -> None:
+            from dmf_pulse.operation.analysis_models import AnalysisSnapshot
+            from dmf_pulse.operation.maintenance import verify_active_release
+
+            if analysis_store is None or result.presentation is None or optimizer is None:
+                raise OperationError("REAL_PRIVATE_PUBLICATION_REQUIRED")
+            retained = retained_receipt_view(view)
+            snapshot = AnalysisSnapshot(
+                run_id=view.job_id,
+                provenance_class="NORMAL_STANDING",
+                permission_origin=policy.permission_provenance,
+                implementation_sha=policy.implementation_sha,
+                policy_sha256=policy.semantic_sha256,
+                wheel_sha256=verify_active_release(policy).wheel_sha256,
+                recorded_at=clock(),
+                view=retained,
+                presentation=result.presentation,
+                diagnostics=runtime.diagnostics(),
+                optimizer_evidence=optimizer,
+            )
+            digest = analysis_store.stage(snapshot)
+            canonical = journal.publish(
+                key,
+                retained,
+                now=clock(),
+                diagnostics=runtime.diagnostics(),
+                analysis_sha256=digest,
+            )
+            analysis_store.confirm(snapshot.run_id, digest, canonical, at=clock())
+            progress(
+                "Recommendations durably published to the canonical ledger and analysis warehouse."
+            )
+
         runtime = SingleAcquisitionRuntime(
             current_session=session,
             on_publication=publish,
@@ -370,6 +446,7 @@ def prepare_runtime(
                 key, code, now=clock(), diagnostics=runtime.diagnostics()
             ),
             quota_status=lambda: journal.charged_quota_status(key),
+            on_derived=publish_analysis if analysis_store is not None else None,
             clock=clock,
         )
         runtime.refresh(1)
@@ -402,9 +479,16 @@ def run_start(*, progress: Callable[[str], None]) -> None:
     import uvicorn
 
     from dmf_pulse.dashboard.app import create_app
+    from dmf_pulse.operation.analysis_paths import warehouse_path
+    from dmf_pulse.operation.desk_instance import (
+        register_instance,
+        remove_instance,
+        verified_existing_instance,
+    )
     from dmf_pulse.operation.local_control import recover_local_control
 
-    policy = require_policy()
+    policy = require_history_policy()
+    instance_path = warehouse_path().parent / "desk-instance.json"
     # Reserve the fixed loopback listener before credential entry or source I/O.
     # A repeated invocation opens the existing authenticated application only.
     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -415,17 +499,38 @@ def run_start(*, progress: Callable[[str], None]) -> None:
         listener.listen(8)
     except OSError:
         listener.close()
-        raise OperationError("LOCAL_DASHBOARD_ALREADY_OPEN_USE_EXISTING_WINDOW") from None
+        if verified_existing_instance(instance_path, policy, PORT):
+            webbrowser.open(f"http://127.0.0.1:{PORT}")
+            progress("Opened the existing verified Seb's Desk; no refresh was started.")
+            return
+        raise OperationError("LOCAL_DASHBOARD_INSTANCE_UNVERIFIED") from None
     runtime: DeskRuntime | None = None
+    instance = None
     try:
+        # Native process/listener ownership proof currently supports Windows.
+        # Other platforms can start normally, but cannot reuse an unverified listener.
+        if sys.platform == "win32":
+            instance = register_instance(instance_path, policy, PORT)
         try:
             recover_local_control(policy)
-            runtime = prepare_runtime(policy, progress=progress)
+            from dmf_pulse.operation.analysis_store import AnalysisStore
+            from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+            store = AnalysisStore(warehouse_path())
+            store.initialize()
+            journal = OperationJournal.production(policy)
+            journal.recover()
+            runtime = PersistentDeskRuntime.production(policy, journal, store)
         except (OperationError, AuthorizationError, CredentialError) as error:
             from dmf_pulse.operation.failures import operator_action
 
             progress(f"{error.code}: {operator_action(error.code)}")
             runtime = BlockedRuntime(error.code)
+        except (OSError, ValueError, AnalysisStorageError):
+            progress(
+                "ANALYSIS_STORAGE_UNAVAILABLE_OR_INVALID: saved data was preserved; no refresh was admitted."
+            )
+            runtime = BlockedRuntime("ANALYSIS_STORAGE_UNAVAILABLE_OR_INVALID")
         application = create_app(
             runtime=runtime,
             pairing_code="unused-standing-local-session",
@@ -451,6 +556,10 @@ def run_start(*, progress: Callable[[str], None]) -> None:
         progress(f"Seb's Desk: http://127.0.0.1:{PORT} — forecasts remain unvalidated.")
         server.run(sockets=[listener])
     finally:
-        if runtime is not None:
-            runtime.close()
-        listener.close()
+        try:
+            if runtime is not None:
+                runtime.close()
+        finally:
+            listener.close()
+            if instance is not None and (runtime is None or runtime.cleanup_complete()):
+                remove_instance(instance_path, instance)

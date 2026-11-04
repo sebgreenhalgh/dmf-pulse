@@ -5,6 +5,7 @@ let view = null, page = 'team', polling = null, expiry = null, paired = false, d
 let epoch = 0, expiresPerf = 0;
 let syntheticSources = false, providerEligibility = null;
 let diagnosticReport = null;
+let persistent = false, historyRows = [], analysisStatus = null;
 const diagnosticExport = document.createElement('button');
 diagnosticExport.textContent='Download safe diagnostics';
 diagnosticExport.hidden=true;
@@ -17,6 +18,8 @@ diagnosticExport.onclick=()=>{
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 function applyContext(context) {
+  persistent = context.persistent_history === true;
+  if (persistent) setupPersistent();
   demo = context.demo;
   syntheticSources = context.synthetic_sources;
   providerEligibility = context.eligibility;
@@ -61,7 +64,7 @@ async function api(path, body) {
   } finally {clearTimeout(timeout); requests.delete(controller);}
 }
 function clearPresentation() { epoch++; requests.forEach(c=>c.abort()); requests.clear(); view = null; expiresPerf = 0; $('content').replaceChildren(); if (expiry) clearTimeout(expiry); expiry = null; }
-function fail(error) { if (error.name === 'AbortError') return; clearPresentation(); $('notice').textContent = error.message || 'REQUEST_FAILED'; }
+function fail(error) { if (error.name === 'AbortError') return; if (!persistent) clearPresentation(); $('notice').textContent = error.message || 'REQUEST_FAILED'; }
 function table(parent, headers, rows) {
   const t = document.createElement('table');
   const head = document.createElement('thead'), tr = document.createElement('tr');
@@ -123,6 +126,7 @@ function showDecisions() {
   table(c,['Transfers','Plan','Immediate xPts','Horizon xPts','Gain vs hold','Bank £','FT next'],points.map(p => [p.transfer_count,p.transfers.map(t=>`${names(t.player_out_id)} → ${names(t.player_in_id)}`).join('; ') || 'Hold',fmt(p.immediate_expected_points_after_hit ?? p.comparison_vs_hold?.plan_expected_points_after_hit),fmt(p.expected_horizon_utility),fmt(p.horizon_uplift_vs_hold ?? p.comparison_vs_hold?.expected_uplift),fmt(p.bank_after_tenths/10),p.free_transfers_entering_next_gameweek ?? p.free_transfer_state?.next_decision_deadline ?? 'See report']));
   points.forEach(p => {const q=card(`${p.transfer_count} transfer(s) · paired outcome`); const comparison=p.paired_horizon_comparison || p.comparison_vs_hold; pmf(q,Object.fromEntries(comparison.gain_pmf.map(x=>[x.points,x.probability]))); details(q,'Exact evaluated plan and paired downside',p);});
   if (d.future_plan) details(c,'Provisional future plans · reoptimise at each deadline',d.future_plan);
+  showOptimizerEvidence(c);
 }
 function showPlayers() {
   const grid=text('div','','grid'); $('content').append(grid); metric(grid,'CATALOGUE',view.catalogue_count);metric(grid,'VALID PROJECTIONS',view.projected_count);metric(grid,'UNAVAILABLE',view.blocked_count);
@@ -132,11 +136,11 @@ function showPlayers() {
   view.players.filter(p=>p.expected_points!==null).forEach(p=>{[selectA,selectB].forEach(s=>{const o=text('option',p.catalogue.name);o.value=p.catalogue.official_id;s.append(o);});}); selectB.selectedIndex=1;
   const compare=text('button','Compare players'); compare.onclick=async()=>{try{const result=await api(`/api/compare/${selectA.value}/${selectB.value}`);$('content').replaceChildren();renderDetail(result.left);renderDetail(result.right);}catch(e){fail(e);}};add(controls,selectA,selectB,compare);
   const region=text('div','');c.append(region);
-  if(view.dataset_mode === 'PRIVATE_RETAINED_AS_OF') {compare.disabled=true;selectA.disabled=true;selectB.disabled=true;c.append(text('p','Saved player means are available below. Detailed distributions belonged to the original live session.'))}
+  if(view.dataset_mode === 'PRIVATE_RETAINED_AS_OF' && !analysisStatus?.fixture_details_available) {compare.disabled=true;selectA.disabled=true;selectB.disabled=true;c.append(text('p','Saved player means are available below. Detailed distributions belonged to the original live session.'))}
   function render() {region.replaceChildren();const query=search.value.toLowerCase();const rows=view.players.filter(p=>`${p.catalogue.name} ${p.catalogue.team} ${p.catalogue.position}`.toLowerCase().includes(query)); rows.sort((a,b)=>{if(sort.value==='name')return a.catalogue.name.localeCompare(b.catalogue.name);const av=sort.value==='price'?a.catalogue.price_tenths:a[sort.value],bv=sort.value==='price'?b.catalogue.price_tenths:b[sort.value];return (bv===null?-Infinity:Number(bv))-(av===null?-Infinity:Number(av));});table(region,['Player','Team / position','Price £','GW xPts','p10 / median / p90','Mean MC SE','3GW xPts','xPts/£','Minutes','Start %','60+ %','Goal xPts','Assist xPts','Clean-sheet xPts','Bonus xPts','Modelled fixtures','Confidence','Availability'],rows.map(p=>{const b=text('button',p.catalogue.name);b.onclick=()=>openPlayer(p.catalogue.official_id);return[b,`${p.catalogue.team} / ${p.catalogue.position}`,fmt(p.catalogue.price_tenths/10),fmt(p.expected_points),p.points_p10 == null ? 'Unavailable' : `${p.points_p10} / ${p.median_points} / ${p.points_p90}`,fmt(p.monte_carlo_mean_se,4),fmt(p.three_gameweek_expected_points),fmt(p.points_per_price),fmt(p.expected_minutes,1),p.p_start===null?'Per fixture':fmt(Number(p.p_start)*100),p.p_60_plus===null?'Per fixture':fmt(Number(p.p_60_plus)*100),fmt(p.goals_contribution),fmt(p.assists_contribution),fmt(p.clean_sheet_contribution),fmt(p.bonus_contribution),p.fixtures.join('; '),p.confidence || 'Unavailable',p.catalogue.unavailable_reason || (p.fallback?'Historical fallback':'Projected')];}));}
   search.oninput=render;sort.onchange=render;render();
 }
-async function openPlayer(id) {if(view?.dataset_mode === 'PRIVATE_RETAINED_AS_OF') {$('notice').textContent='Saved as-of player means are shown in the table. Detailed distributions are unavailable in this retained snapshot.';return;}try{const player=await api(`/api/players/${id}`);$('content').replaceChildren();renderDetail(player);}catch(e){fail(e);}}
+async function openPlayer(id) {if(view?.dataset_mode === 'PRIVATE_RETAINED_AS_OF' && !analysisStatus?.fixture_details_available) {$('notice').textContent='Saved as-of player means are shown in the table. Detailed distributions are unavailable in this retained snapshot.';return;}try{const player=await api(`/api/players/${id}`);$('content').replaceChildren();renderDetail(player);}catch(e){fail(e);}}
 function renderDetail(player) {
   if (!paired || document.hidden || !view || player.job_id !== view.job_id || performance.now() >= expiresPerf) return;
   const back=text('button','← Player catalogue','back');back.onclick=()=>render();$('content').append(back);
@@ -199,6 +203,11 @@ async function showPerformance() {
   } catch(e) {fail(e);}
 }
 function showHealth(){
+  if(persistent && analysisStatus?.last_failure?.length){
+    const failure=analysisStatus.last_failure[0], c=card('Last unsuccessful refresh');
+    table(c,['Attempt','Recorded UTC','Reason'],[[failure.attempt_id,failure.recorded_at,failure.error_code]]);
+    details(c,'Retained safe failure and last observed quota evidence',JSON.parse(failure.derived_json || '{}'));
+  }
   const c=card('Information set & publication'), quota=view.market_quota_receipt;
   const retention=view.restrictions.includes('PRIVATE_DERIVED_RECEIPT_RETAINED_SOURCE_BODIES_TRANSIENT')?'Source inputs are transient. Derived recommendations and audit receipts are retained privately.':'Memory-only presentation; cleared when the session ends.';
   table(c,['Control','Observed value'],[['Source captured (UTC)',view.source_captured_at],['Information cutoff (UTC)',view.information_cutoff],['Official deadline (UTC)',view.deadline_at],['Presentation expires (UTC)',view.expires_at],['Horizon',view.gameweeks.join(', ')],['Decision identity',view.team.decision.semantic_sha256],['Dataset',view.dataset_mode],['Catalogue / valid / unavailable',`${view.catalogue_count} / ${view.projected_count} / ${view.blocked_count}`],['Retention',retention]]);
@@ -211,15 +220,16 @@ function showHealth(){
     ['Received (UTC)',quota?.received_at ?? 'Unavailable'],
     ['Evidence source',quota?.source ?? 'Unavailable']
   ]);
-  c.append(text('p',view.dataset_mode === 'PRIVATE_TRANSIENT' ? 'Last request cost comes from the provider response header. Reserved credits are a separate budget, and account period usage includes other requests.' : 'Quota facts in this demonstration come from owned synthetic inputs. They are not a real provider charge.'));
+  c.append(text('p',view.dataset_mode === 'PRIVATE_TRANSIENT' ? 'Last request cost comes from the provider response header. Reserved credits are a separate budget, and account period usage includes other requests.' : 'Quota is the last recorded observation at the timestamp above, not a current live balance.'));
   c.append(text('p','Historical score priors remain reconstructed; commit time is not a claim of current match evidence.'));
   if(quota) details(c,'Complete market quota receipt',quota);
   details(c,'Exact source identities and commit times',view.source_vintages);details(c,'Source/rules/model lineage',view.team.decision.lineage);details(c,'Quality and exact engine report',view.team.report);
 }
 function render(){
-  if (view && performance.now() >= expiresPerf) clearPresentation();
+  if (!persistent && view && performance.now() >= expiresPerf) clearPresentation();
   $('content').replaceChildren();
-  $('page-title').textContent=({team:'My team',players:'Player Lab',decisions:'Decisions',performance:'Model Performance',health:'Data Health'})[page];
+  $('page-title').textContent=({team:'My Squad',players:'Player Forecasts',decisions:'Transfers',captaincy:'Captaincy',history:'History',performance:'Model Performance',health:'Data Status'})[page];
+  if(page==='history'){showHistory();return;}
   if(page==='performance'){showPerformance();return;}
   if(page==='health') showEligibility($('content'));
   if(!view){
@@ -227,7 +237,7 @@ function render(){
     c.append(text('p',providerEligibility?.error_code || 'Click Refresh Recommendations to run the existing application stack. A blocked source is reported explicitly.'));
     return;
   }
-  ({team:showTeam,players:showPlayers,decisions:showDecisions,health:showHealth})[page]();
+  ({team:showTeam,players:showPlayers,decisions:showDecisions,captaincy:showCaptaincy,health:showHealth})[page]();
 }
 async function current(expectedJob){
   const started=performance.now(), generation=epoch;
@@ -241,6 +251,7 @@ async function current(expectedJob){
   if(expiry)clearTimeout(expiry);expiry=setTimeout(()=>{clearPresentation();$('notice').textContent='Presentation lifetime ended. Refresh again.';},remaining);render();
 }
 async function poll(){
+  if(persistent) {await pollPersistent();return;}
   if(!paired||document.hidden)return;
   try{
     const state=await api('/api/status');
@@ -273,11 +284,11 @@ async function poll(){
   }catch(e){fail(e);}
 }
 $('pair-form').onsubmit=async e=>{e.preventDefault();const code=$('pair-code').value;$('pair-code').value='';try{const r=await api('/api/session',{pairing_code:code});applyContext(r);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;render();polling=setInterval(poll,700);}catch(error){$('pair-panel').append(text('p',error.message));}};
-$('refresh').onclick=async()=>{clearPresentation();$('refresh').disabled=true;$('progress').open=true;try{await api('/api/refresh',{horizon:Number($('horizon').value)});await poll();}catch(e){fail(e);$('refresh').disabled=false;}};
-$('cancel').onclick=async()=>{clearPresentation();try{await api('/api/cancel',{});$('notice').textContent='Cancelled and cleared';$('refresh').disabled=false;}catch(e){fail(e);}};
+$('refresh').onclick=async()=>{if(persistent){await refreshPersistent();return;}clearPresentation();$('refresh').disabled=true;$('progress').open=true;try{await api('/api/refresh',{horizon:Number($('horizon').value)});await poll();}catch(e){fail(e);$('refresh').disabled=false;}};
+$('cancel').onclick=async()=>{if(!persistent)clearPresentation();try{await api('/api/cancel',{});$('notice').textContent='Cancelled and cleared';$('refresh').disabled=false;}catch(e){fail(e);}};
 $('logout').onclick=async()=>{clearPresentation();providerEligibility=null;if(polling)clearInterval(polling);paired=false;try{await api('/api/logout',{});}catch(e){fail(e);}$('workspace').hidden=true;$('pair-panel').hidden=false;$('pair-panel').replaceChildren(text('h2','Signed out'),text('p','Restart dmf dashboard to create a new private session.'));};
 document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{page=b.dataset.page;document.querySelectorAll('[data-page]').forEach(n=>n.classList.toggle('selected',n===b));render();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearPresentation();providerEligibility=null;$('stages').replaceChildren();}else if(paired){poll();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(!persistent)clearPresentation();providerEligibility=null;$('stages').replaceChildren();}else if(paired){poll();}});
 window.addEventListener('pagehide',()=>{clearPresentation();providerEligibility=null;});window.addEventListener('pageshow',()=>{if(paired)poll();});
 
 // A reload resumes only a server-authenticated session; no private view is restored locally.
@@ -289,3 +300,116 @@ api('/api/context').then(context=>{
   applyContext(context);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;
   render();polling=setInterval(poll,700);poll();
 }).catch(error=>{if(error.name!=='AbortError'&&error.message!=='SESSION_REQUIRED')fail(error);});
+
+// Persistent operation reads SQLite history; only the explicit action below acquires.
+let persistentSetup = false, persistentPolling = false, refreshChallenge = null;
+function setupPersistent() {
+  if(persistentSetup)return;
+  persistentSetup=true;
+  $('refresh').textContent='Refresh Data & Recommendations';
+  $('horizon').closest('label').hidden=true;
+  $('cancel').textContent='Cancel refresh';
+  document.querySelector('.aside-note').textContent='Private workspace ? Saved local history';
+  const nav=document.querySelector('nav');
+  [['team','MY SQUAD'],['players','PLAYER FORECASTS'],['decisions','TRANSFERS'],['captaincy','CAPTAINCY'],['history','HISTORY'],['health','DATA STATUS']].forEach(([id,label])=>{
+    let button=nav.querySelector(`[data-page="${id}"]`);
+    if(!button){button=text('button',label);button.dataset.page=id;nav.append(button);}
+    button.textContent=label;
+    button.onclick=()=>{page=id;nav.querySelectorAll('button').forEach(b=>b.classList.toggle('selected',b===button));render();};
+  });
+  const modal=document.createElement('dialog');modal.id='fpl-dialog';modal.setAttribute('aria-labelledby','fpl-title');
+  const title=text('h2','Fresh FPL credential');title.id='fpl-title';modal.append(title);
+  modal.append(text('p','Enter a newly issued FPL JWT here only. Expiry is read automatically. The saved result remains available.'));
+  const form=document.createElement('form'), label=text('label','FPL JWT'), input=document.createElement('input');
+  input.id='fresh-fpl-jwt';input.type='password';input.autocomplete='off';input.spellcheck=false;input.maxLength=3800;input.required=true;label.htmlFor=input.id;
+  const submit=text('button','Register & refresh','primary');submit.type='submit';
+  const dismiss=text('button','Cancel');dismiss.type='button';dismiss.onclick=()=>modal.close();
+  form.append(label,input,submit,dismiss);modal.append(form);document.body.append(modal);
+  modal.addEventListener('close',()=>{input.value='';refreshChallenge=null;$('refresh').disabled=false;});
+  form.onsubmit=async event=>{
+    event.preventDefault();
+    let value=input.value;input.value='';
+    const payload={token:value,challenge:refreshChallenge};value='';refreshChallenge=null;
+    submit.disabled=true;modal.close();$('refresh').disabled=true;
+    try{await api('/api/credentials/fpl',payload);$('progress').open=true;await pollPersistent();}
+    catch(error){fail(error);}finally{payload.token='';submit.disabled=false;}
+  };
+}
+async function refreshPersistent(){
+  $('refresh').disabled=true;
+  try{
+    const state=await api('/api/refresh',{horizon:1});
+    if(state.credential_challenge){refreshChallenge=state.credential_challenge;$('fpl-dialog').showModal();$('fresh-fpl-jwt').focus();}
+    else {$('notice').textContent=state.error_code || state.status;await pollPersistent();}
+  }catch(error){fail(error);$('refresh').disabled=false;}
+}
+async function pollPersistent(){
+  if(!paired||document.hidden||persistentPolling)return;
+  persistentPolling=true;
+  try{
+    const state=await api('/api/status');
+    diagnosticReport=state.diagnostics || null;diagnosticExport.hidden=diagnosticReport===null;
+    $('stages').replaceChildren(...state.stages.map(s=>text('li',s)));
+    $('refresh').disabled=state.status==='RUNNING' || $('fpl-dialog').open;
+    providerEligibility=await api('/api/eligibility');
+    analysisStatus=await api('/api/analysis/status');
+    if(!view||view.job_id!==analysisStatus.selected_run){
+      try{view=await api('/api/desk');expiresPerf=Infinity;render();}catch(error){if(error.message!=='NO_CURRENT_RECOMMENDATION')throw error;}
+    }
+    const provenance=analysisStatus.provenance_class==='GW10_DIAGNOSTIC'?'GW10 DIAGNOSTIC | REAL-DATA-DERIVED':analysisStatus.provenance_class==='OWNED_SYNTHETIC'?'OWNED SYNTHETIC | ENGINEERING ONLY':'NORMAL STANDING | REAL-DATA-DERIVED';
+    $('mode').textContent=`${provenance} | UNVALIDATED | HISTORICAL AS-OF`;
+    $('notice').textContent=(state.status==='RUNNING'?'Refreshing - saved result remains visible. ':state.error_code?`${state.error_code}. Saved result retained. `:'')+(view?`Forecast generated ${view.generated_at}; information cutoff ${view.information_cutoff}. Historical as-of, not current data.`:'No successful snapshot is saved.');
+    if(page==='health')render();
+  }catch(error){fail(error);}finally{persistentPolling=false;}
+}
+function showCaptaincy(){
+  const d=view.team.decision, root=d.do_now || d, c=card('Captain and vice-captain');
+  c.append(text('p',`Captain: ${names(root.tactics.captain)} | Vice-captain: ${names(root.tactics.vice_captain)}`));
+  table(c,['Player','Standalone xPts','Role'],view.players.filter(p=>[root.tactics.captain,root.tactics.vice_captain].includes(p.catalogue.player_id)).map(p=>[p.catalogue.name,fmt(p.expected_points),p.catalogue.player_id===root.tactics.captain?'Captain':'Vice-captain']));
+  c.append(text('p','Standalone player means do not establish why this pair was selected. The exact captaincy comparison, joint counterfactuals and explanation are unavailable in the retained engine output. No explanation has been reconstructed.'));
+  details(c,'Actual recommended tactical evidence',root.tactics);
+  if(d.no_transfer_tactics)details(c,'Actual hold tactical evidence',d.no_transfer_tactics);
+  details(c,'Actual optimizer objective and action space',d.action_space_disclosure || d);
+  details(c,'Actual paired plan outcome (not a captain-only counterfactual)',d.paired_comparison || d.horizon_comparison);
+  showOptimizerEvidence(c);
+}
+async function showOptimizerEvidence(parent){
+  if(!persistent)return;
+  const expected=view?.job_id;
+  try{
+    const evidence=await api('/api/analysis/optimizer');
+    if(!paired||view?.job_id!==expected||evidence.run_id!==expected)return;
+    if(evidence.optimizer_evidence){
+      parent.append(text('p','The actual optimizer result is retained below, including evaluated alternatives, plan outcomes and move interactions. It does not establish a captain-only explanation.'));
+      details(parent,'Actual typed optimizer evidence',evidence.optimizer_evidence.optimiser_result);
+    }else parent.append(text('p','The full optimizer object was unavailable in the original retained snapshot.'));
+  }catch(error){parent.append(text('p',error.message));}
+}
+async function showHistory(){
+  const c=card('Immutable saved runs');
+  try{
+    historyRows=await api('/api/history');
+    const controls=text('div','','toolbar'), first=document.createElement('select'), second=document.createElement('select');
+    first.setAttribute('aria-label','First saved run');second.setAttribute('aria-label','Second saved run');
+    historyRows.forEach(row=>[first,second].forEach(select=>{const option=text('option',`GW ${row.gameweek} | ${row.generated_at} | ${row.run_id.slice(0,12)}`);option.value=row.run_id;select.append(option);}));
+    second.selectedIndex=historyRows.length>1?1:0;
+    const compare=text('button','Compare saved runs'), comparison=text('div','');compare.disabled=historyRows.length<2;
+    compare.onclick=async()=>{try{
+      const value=await api('/api/history/compare',{first_run_id:first.value,second_run_id:second.value});
+      comparison.replaceChildren();const result=card('Saved run comparison',comparison);
+      result.append(text('p','Observed differences across retained inputs and Gameweeks. These are not causal explanations, measured accuracy or evidence of improved model skill.'));
+      table(result,['Run','GW','Generated UTC','Provenance','Validation'],[value.first,value.second].map(r=>[r.run_id.slice(0,16),r.gameweeks.join(' / '),r.generated_at,r.provenance_class,r.validation]));
+      table(result,['Player (old / new)','Old xPts','New xPts','Observed delta'],value.players.map(p=>[p.old_name===p.new_name?p.new_name:`${p.old_name || 'Unavailable'} / ${p.new_name || 'Unavailable'}`,fmt(p.old_expected_points),fmt(p.new_expected_points),fmt(p.expected_points_delta)]));
+      details(result,'First saved squad, transfers and captaincy',value.first.team);
+      details(result,'Second saved squad, transfers and captaincy',value.second.team);
+      details(result,'Exact computation versions and comparison restriction', {first:value.first.implementation_sha,second:value.second.implementation_sha,restriction:value.attribution});
+    }catch(error){comparison.replaceChildren(text('p',error.message));}};
+    controls.append(first,second,compare);c.append(controls,comparison);
+    table(c,['Run','GW','Generated UTC','Information cutoff','Provenance','Validation'],historyRows.map(row=>{
+      const button=text('button',row.run_id.slice(0,16));
+      button.onclick=async()=>{try{view=await api('/api/history/select',{run_id:row.run_id});expiresPerf=Infinity;page='team';render();await pollPersistent();}catch(error){fail(error);}};
+      return [button,row.gameweek,row.generated_at,row.information_cutoff,row.provenance_class,row.validation];
+    }));
+    c.append(text('p','Selecting a run reads the local warehouse only. Numerical differences between runs are observable changes, not causal explanations. Read-only SQL and private exports are available through dmf analysis.'));
+  }catch(error){c.append(text('p',error.message));}
+}

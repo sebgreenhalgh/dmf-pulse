@@ -146,6 +146,60 @@ class OperationJournal:
                 "standing_head_sha256": rows[-1]["sha256"] if rows else "0" * 64,
             }
 
+    def local_refresh_check(self, *, now: datetime) -> None:
+        """Read-only preliminary checks; official discovery/enroll remain mandatory."""
+        now = MetadataTime(checked_at=now).checked_at
+        if not self.policy.accepted_at <= now < self.policy.valid_until:
+            raise OperationError("STANDING_PERMISSION_REVIEW_EXPIRED")
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        with self._transaction() as (connection, rows):
+            used, unresolved = self._paid_state(connection, rows, self.policy, start)
+            if unresolved:
+                raise OperationError("QUOTA_EVIDENCE_OR_LEDGER_CONTRADICTION")
+            known = [row for row in rows if row["kind"] == "DISCOVERY"]
+            if known:
+                event = known[-1]["payload"]["value"]
+                if now < datetime.fromisoformat(event["deadline_at"]):
+                    key = execution_key(self.policy, event["target_gameweek"])
+                    if any(row["kind"] == "ENROLL" and row["execution_key"] == key for row in rows):
+                        raise OperationError("GAMEWEEK_ACQUISITION_ALREADY_RECORDED")
+            reservations = [
+                record
+                for record in self.ledger._read_records(connection)
+                if record["kind"] == "RESERVATION"
+                and record["account_sha256"] == self.ledger.account_sha256
+            ]
+            daily = sum(record["day"] == now.date().isoformat() for record in reservations)
+            monthly = sum(record["period"] == start.isoformat() for record in reservations)
+            limits = self.policy.limits
+            if daily + 1 > limits.daily_requests or 2 * (daily + 1) > limits.daily_credits:
+                raise OperationError("DAILY_BUDGET_EXHAUSTED")
+            if monthly + 1 > limits.monthly_requests or 2 * (monthly + 1) > limits.monthly_credits:
+                raise OperationError("MONTHLY_BUDGET_EXHAUSTED")
+            if self.policy.plan_credit_allowance - used < limits.safety_reserve_credits + 2:
+                raise OperationError("QUOTA_BELOW_SAFETY_RESERVE")
+            enrolled = [row for row in rows if row["kind"] == "ENROLL" and row["at"] >= start]
+            if (
+                len(enrolled) >= self.policy.limits.monthly_requests
+                or sum(row["at"].date() == now.date() for row in enrolled)
+                >= self.policy.limits.daily_requests
+            ):
+                raise OperationError("STANDING_REQUEST_BUDGET_EXHAUSTED")
+
+    def analysis_publications(self) -> list[dict[str, Any]]:
+        """Authenticated immutable publication facts only; no enrollment or append."""
+        with self._transaction() as (_, rows):
+            return [
+                {
+                    "key": row["execution_key"],
+                    "sha256": row["sha256"],
+                    "at": row["at"],
+                    "value": row["payload"]["value"],
+                }
+                for row in rows
+                if row["kind"] == "PUBLICATION"
+            ]
+
     def require_no_live_execution(self, *, now: datetime) -> None:
         """Maintenance cannot hide a previous release's unexpired grant or lease."""
         now = MetadataTime(checked_at=now).checked_at
@@ -426,8 +480,13 @@ class OperationJournal:
         *,
         now: datetime,
         diagnostics: DiagnosticReport | None = None,
-    ) -> None:
+        analysis_sha256: str | None = None,
+    ) -> str:
         if view.dataset_mode != "PRIVATE_TRANSIENT" or view.market_quota_receipt is None:
+            raise OperationError("REAL_PRIVATE_PUBLICATION_REQUIRED")
+        if analysis_sha256 is not None and (
+            len(analysis_sha256) != 64 or any(c not in "0123456789abcdef" for c in analysis_sha256)
+        ):
             raise OperationError("REAL_PRIVATE_PUBLICATION_REQUIRED")
         with self._transaction() as (connection, rows):
             if not any(
@@ -437,7 +496,9 @@ class OperationJournal:
                 for row in rows
             ):
                 raise OperationError("ACTUAL_ODDS_SETTLEMENT_REQUIRED")
-            self._append(
+            if any(row["kind"] == "PUBLICATION" and row["execution_key"] == key for row in rows):
+                raise OperationError("AMBIGUOUS_STANDING_PUBLICATION")
+            return self._append(
                 connection,
                 rows,
                 "PUBLICATION",
@@ -445,6 +506,7 @@ class OperationJournal:
                     "view": view.model_dump(mode="json"),
                     "retention": "PRIVATE_DERIVED_AS_OF",
                     "unvalidated": True,
+                    **({"analysis_sha256": analysis_sha256} if analysis_sha256 else {}),
                     **(
                         {"diagnostics": diagnostics.model_dump(mode="json")}
                         if diagnostics is not None

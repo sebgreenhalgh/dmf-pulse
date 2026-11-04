@@ -6,7 +6,7 @@ import typer
 
 
 def start_command() -> None:
-    """Check the accepted standing policy and open Seb's Desk with one acquisition."""
+    """Open saved recommendations; acquire only from the explicit browser Refresh."""
     from dmf_pulse.credentials.service import CredentialError
     from dmf_pulse.dashboard.authorization import AuthorizationError
     from dmf_pulse.operation.diagnostics import safe_failure

@@ -808,6 +808,17 @@ def _validate_dat_repository_contract(root: Path, errors: list[str]) -> None:
         re.compile(r"pytest\.mark\.sqlite\b"),
     )
     prohibited_suffixes = {".db", ".sqlite", ".sqlite3"}
+    # OPR-004 explicitly adds a derived analytical read model. This permits
+    # stdlib use in exactly its store/readonly CLI, never a control-plane driver,
+    # SQLAlchemy SQLite URL, dependency, database artifact or general fallback.
+    analysis_request = root / "tickets/OPR-004/REQUEST.txt"
+    analysis_authorized = analysis_request.is_file() and _sha256(analysis_request) == (
+        "5ff9d85d71d057ec0d2de30934f5f5c2fccee78eadd7ac2d1d569821c16d91b5"
+    )
+    analytical_stdlib_files = {
+        "src/dmf_pulse/operation/analysis_store.py",
+        "src/dmf_pulse/operation/analysis_cli.py",
+    }
     for path in root.rglob("*"):
         relative = path.relative_to(root)
         if any(
@@ -836,6 +847,8 @@ def _validate_dat_repository_contract(root: Path, errors: list[str]) -> None:
         selected_patterns = (
             prohibited_patterns[2:]
             if relative.parts and relative.parts[0] == "tests"
+            else prohibited_patterns[1:]
+            if analysis_authorized and relative.as_posix() in analytical_stdlib_files
             else prohibited_patterns
         )
         if any(pattern.search(text) for pattern in selected_patterns):
@@ -1114,6 +1127,7 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
+    opr004_path = root / "evidence/tickets/OPR-004/current_manifest.json"
     opr003_path = root / "evidence/tickets/OPR-003/current_manifest.json"
     opr002_path = root / "evidence/tickets/OPR-002/current_manifest.json"
     opr001_path = root / "evidence/tickets/OPR-001/current_manifest.json"
@@ -1128,7 +1142,9 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
     active_path = (
-        opr003_path
+        opr004_path
+        if opr004_path.is_file()
+        else opr003_path
         if opr003_path.is_file()
         else opr002_path
         if opr002_path.is_file()

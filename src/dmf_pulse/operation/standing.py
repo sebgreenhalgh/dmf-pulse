@@ -235,7 +235,9 @@ def _unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
     return result
 
 
-def installed_standing_policy(*, required: bool = True) -> StandingPolicy | None:
+def installed_standing_policy(
+    *, required: bool = True, history_only: bool = False
+) -> StandingPolicy | None:
     """Read only the fixed installed resource, never a caller path/environment."""
     try:
         body = (
@@ -272,7 +274,7 @@ def installed_standing_policy(*, required: bool = True) -> StandingPolicy | None
         now = datetime.now(UTC)
         if policy.implementation_sha != implementation_fingerprint():
             raise OperationError("STANDING_RELEASE_IDENTITY_CHANGED")
-        if not policy.accepted_at <= now < policy.valid_until:
+        if now < policy.accepted_at or (not history_only and now >= policy.valid_until):
             raise OperationError("STANDING_PERMISSION_REVIEW_EXPIRED")
         from dmf_pulse.operation.maintenance import verify_active_release
 
@@ -286,6 +288,18 @@ def installed_standing_policy(*, required: bool = True) -> StandingPolicy | None
 
 def require_policy() -> StandingPolicy:
     result = installed_standing_policy()
+    if result is None:
+        raise OperationError("STANDING_OWNER_ACCEPTANCE_REQUIRED")
+    return result
+
+
+def require_history_policy() -> StandingPolicy:
+    """Authenticate retained-data access, without granting time-expired acquisition.
+
+    Signature, installed bytes, original trust and withdrawal checks still run.
+    Every provider/enrollment path continues to use strict require_policy().
+    """
+    result = installed_standing_policy(history_only=True)
     if result is None:
         raise OperationError("STANDING_OWNER_ACCEPTANCE_REQUIRED")
     return result

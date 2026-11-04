@@ -3410,3 +3410,30 @@ pass. Independent108 private checks include exact session5/6 wire/row identity;
 One genuine independent handle-close fault was fixed; earlier failed XML and
 owned fixture-setup failures remain retained. Complete native full-size900s
 normal timing, clean/signed installation and final release gates remain open.
+
+
+2026-11-04 OPR-003 closure: all ordinary owned native, signed installation and
+independent final readiness checks completed; see private FINAL-GW10-OPERATION-REPORT.
+Actual source 0e3c0f, installed private wheel1930758f. First post-install integrity
+refusal remains unproven; later unchanged strict AFTER passed. No live calls after success.
+
+## OPR-004: persistent Desk and analysis warehouse (active)
+
+- [x] Contract and retained-data/source-rights review; authenticated GW10 inputs.
+- [x] Transactional immutable SQLite schema, typed derived records, reconciliation,
+      owner-only access, readonly queries/exports and versioned data dictionary.
+- [x] Separate launch from acquisition; asynchronous explicit Refresh with local
+      admission, secure browser fresh-v2 registration and existing standing pipeline.
+- [x] Persistent browser sections/history/status and intact request boundaries.
+- [ ] Owned unit, negative, crash/concurrency and actual clean-wheel integrations.
+- [ ] Literal release gates, independent source/carrier/artifact review, signed
+      installation, authenticated GW10 seed and actual browser/SQL verification.
+No charged live acquisition; no numerical engine or original control custody changes.
+
+Independent review corrections add historical comparisons, asynchronous database
+reads, authenticated browser-session renewal before explicit Refresh, retention of
+unclosed worker handles, native owner/process/listener verification on Windows
+reopen, and hash-bound complete derived optimizer evidence. POSIX first launch
+uses an absolute XDG/home analytical path without Windows discovery APIs. Exact
+captain-only explanations remain unavailable unless actually produced. Final
+source, clean/signed native execution, carrier and installed reviews remain gates.

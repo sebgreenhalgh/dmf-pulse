@@ -1,0 +1,253 @@
+# DMF PULSE — PERSISTENT SEB'S DESK + LOCAL ANALYSIS DATABASE
+## FULL IMPLEMENTATION — ONE CONSOLIDATED SIGNED RELEASE
+
+Repository: `sebgreenhalgh/dmf-pulse`
+
+Branch: `launch/GW10-real-pilot`
+
+Starting source: `0e3c0fadcf5f84d0527327423c7979463baaabf9`
+
+Local operator checkout:
+`C:\Users\sebgr\Documents\dmf-pulse\review_pack\GW10-LAUNCH`
+
+## OBJECTIVE
+
+Transform Seb's Desk into a persistent, browser-based FPL analysis workspace with a permanent local, queryable database.
+
+The user must be able to:
+
+1. Run the installed launcher and immediately see the latest saved recommendations.
+2. Browse all previously retained forecast runs without acquiring data or consuming credits.
+3. Click a browser button to deliberately refresh data and recommendations.
+4. Enter a newly issued FPL JWT in a secure local browser prompt triggered by that button.
+5. See progress and the new recommendations after successful execution.
+6. Have all permitted derived analytics saved automatically to a durable local database.
+7. Explore that database using local AI tools, Codex, Python or SQL without re-executing the pipeline.
+
+**Content creation is explicitly outside this implementation.** Do not build Instagram, TikTok, video generation, posting automation or public sharing.
+
+The database must nevertheless preserve enough validated decision evidence for separate, future content research.
+
+## A. SEPARATE LAUNCH FROM REFRESH
+
+Refactor `src/dmf_pulse/operation/start.py`, the dashboard runtime, and the browser endpoints.
+
+`dmf start` must:
+
+- Verify the installed signed application and recover the original canonical ledger.
+- Open Seb's Desk immediately.
+- Load the most recent authorized, persisted result.
+- Show historical data even if the FPL token is expired or the previous Gameweek was consumed.
+- Make NO FPL, Odds API or OpenFootball provider requests.
+- Make NO new chargeable reservations or enrollments.
+- Never start a new forecast calculation simply because the browser opens, reloads or reconnects.
+
+The application must have a stable read-only historical view independent of active acquisition eligibility.
+
+Keep the browser responsive even while the computational pipeline runs.
+
+## B. EXPLICIT REFRESH BUTTON
+
+Provide a prominent **Refresh Data & Recommendations** button.
+
+On click:
+
+- Check locally whether the standing policy can admit a fresh attempt, before consuming a Gameweek slot.
+- If ineligible, show the exact reason and the last saved result. Do not erase that result.
+- If eligible, open a secure modal requesting a fresh FPL JWT.
+- Validate expiry automatically and register it using the existing protected FPL_FRESH_V2 credential service.
+- Do not require the user to calculate expiry, enter quota values, provide hashes or return to PowerShell.
+- After successful credential registration, execute the existing approved quota check, official discovery, bounded acquisition and complete recommendation pipeline.
+- Display progress and safe diagnostics in the browser.
+- Show the new results when publication succeeds.
+
+The JWT field must be masked, cleared immediately after submission, never placed in a URL, file, localStorage, IndexedDB, log, analytics event or error response.
+
+Retain the existing strict loopback, Host/Origin, authenticated-session, CSRF, CSP and request-size protections. No additional public listener or external web service.
+
+Maintain a single active refresh job, robust process cleanup and duplicate-click prevention.
+
+A failed refresh retains the previous successful view and records a separate failure. Never replace a successful snapshot with an incomplete result.
+
+## C. PERMANENT LOCAL ANALYSIS DATABASE
+
+Create a durable SQLite analysis warehouse under:
+
+`%LOCALAPPDATA%\DMFPulse\analysis\dmf_pulse.sqlite`
+
+Preserve the canonical PostgreSQL control ledger separately. PostgreSQL remains the authority for account budgets, requests, reservations, consumption, approvals and deduplication.
+
+SQLite is a private analytical read model, not a replacement authorization database.
+
+The warehouse must persist every new successful, rights-permitted recommendation snapshot as an immutable historical run.
+
+Implement appropriate normalized tables or equivalent relational views for:
+
+- Run identity, Gameweek, exact UTC timestamps, source cutoff, computation version and provenance.
+- Manager squad of 15, team value, bank, free transfers and as-of state.
+- Full player catalogue, official FPL identifiers, teams, positions and relevant prices.
+- Per-player projections: expected points, median, p10/p90, standard deviation, Monte Carlo mean SE, expected minutes, start probability, 60+ probability, confidence and fallback indicator.
+- Fixture identities and permitted derived fixture-level projections.
+- Recommended XI, formation, bench order, captain and vice-captain.
+- Transfer plans and ranked alternatives, legal constraints, transfer counts, hits, future transfer state, expected gain and uncertainty.
+- Captaincy alternatives, simulated decision outcomes and actual optimizer explanation evidence where available.
+- Relevant source provenance, model/policy fingerprints, coverage, run status and authorized quota/credit receipts.
+- Run-to-run comparison and model confidence metadata.
+- Clearly separated diagnostic, normal standing, synthetic and other provenance classes.
+
+Store additional rights-permitted derived numerical outputs where available, rather than unnecessarily reducing the saved result to the browser's small summary.
+
+Never fabricate unavailable fields or mathematical explanations.
+
+In particular, the GW10 model recommended Palmer as captain despite Haaland having higher standalone expected points. Preserve the actual captaincy comparison, counterfactuals, joint outcomes and optimization objective if the engine provides them. If the exact reason is not recoverable, record it as unavailable rather than inventing a justification.
+
+## D. DATA RIGHTS AND SECURITY
+
+Existing provider rights and retention rules remain binding.
+
+Store permitted private derived forecasts, summaries, relevant transformed features and audit evidence.
+
+Do not persist prohibited raw FPL/Odds response bodies, credentials, cookies, bearer tokens, restricted market payloads or unauthorized training datasets.
+
+No provider raw-body archive, background scraping, automatic FPL account writes or public content publication.
+
+Apply owner-only Windows access controls to the warehouse, with read-only access supported for local analysis tools.
+
+Include model provenance and restrictions in persisted records so later AI analysis cannot confuse unvalidated forecasts with validated probabilities.
+
+Review whether the proposed persisted fields fit existing source and retention permissions. If a material expansion of authorization is genuinely necessary, consolidate it into one precise owner decision; do not request repeated technical approvals for otherwise in-scope changes.
+
+## E. RELIABLE SNAPSHOTS
+
+Use SQLite transactions and a durable schema migration strategy.
+
+A refresh is considered successfully published only after the canonical publication and corresponding analysis snapshot are durably recorded or can be deterministically reconciled through an idempotent recovery process.
+
+Prevent partial snapshots, duplicate run IDs, corrupted latest pointers and silently overwritten historical outputs.
+
+Preserve older snapshots during installation, rollback and application updates.
+
+Make the following distinctions visible and queryable:
+
+- Forecast generated at / information cutoff.
+- Actual HTTP acquisition time.
+- Current versus historical as-of result.
+- Complete versus failed attempt.
+- Real versus synthetic or diagnostic evidence.
+- Validated versus unvalidated forecast.
+
+Persist historical analytical results across Windows restarts, browser restarts, signed updates and Gameweek transitions.
+
+## F. GW10 HISTORICAL IMPORT
+
+Use existing, independently verified GW10 diagnostic outputs to seed the history, without making provider calls.
+
+Relevant local sources include:
+
+`review_pack/gw10-odds-contract-recovery-001/ACTUAL-SESSION006-PLAYER-FORECASTS.csv`
+
+`review_pack/gw10-odds-contract-recovery-001/ACTUAL-SESSION006-RECOMMENDATIONS.txt`
+
+and the sealed GW10 execution/publication evidence.
+
+Import only authenticated, rights-permitted derived data.
+
+Record the GW10 result as:
+
+**GW10 DIAGNOSTIC — REAL-DATA-DERIVED — UNVALIDATED — HISTORICAL AS-OF**
+
+Preserve its original timestamps, numerical outputs and origin. Do not turn the diagnostic result into a fabricated ordinary standing publication or alter the original consumed Gameweek slot.
+
+For fields not present in the retained source evidence, store explicit null/unavailable values.
+
+After installation, opening Seb's Desk must display the saved GW10 result without requiring a token or network access.
+
+## G. BROWSER EXPERIENCE
+
+The default page must show the most recent saved recommendation.
+
+Provide accessible sections for:
+
+**My Squad** — original 15 players, XI, bench, captaincy, team value and bank.
+
+**Player Forecasts** — searchable and sortable catalogue, xPts, minutes, probabilities, uncertainty and confidence.
+
+**Transfers** — recommended moves, alternatives, hold comparison and expected improvement.
+
+**Captaincy** — captain/vice and side-by-side alternatives with grounded decision evidence.
+
+**History** — selectable past runs and Gameweeks, exact as-of timestamps and comparisons.
+
+**Data Status** — last successful refresh, rights status, observed quota timestamp, consumed Gameweek state and failure diagnostics.
+
+Display retained forecasts even when refreshing is unavailable. Clearly distinguish the last observed Odds quota from a current live balance.
+
+Do not clear the previous view when Refresh is clicked. Keep it visible with a progress indicator until the new snapshot passes all checks.
+
+## H. CODEX / AI ANALYSIS ACCESS
+
+Document the exact permanent warehouse location and schema.
+
+Provide a read-only local SQL/query workflow and a versioned data dictionary.
+
+Provide optional private JSON/CSV exports containing the same rights-permitted derived fields.
+
+Ensure Codex running on the user's Windows computer can inspect the SQLite file or use the documented read-only query command without:
+
+- Running `dmf start`.
+- Accessing provider credentials.
+- Calling FPL or Odds APIs.
+- Reserving credits.
+- Modifying the operational ledger.
+- Altering saved results.
+
+Cloud-hosted AI tools may require an explicitly supplied export; do not silently upload the warehouse to an external service.
+
+## I. PRESERVE EXISTING GOVERNANCE
+
+Keep the original OPR001 standing policy, ledger, consumed GW10 state, numerical engines, supplier scope and monthly spending safeguards.
+
+Under the existing policy, a new paid Odds acquisition remains limited to one admitted attempt per eligible Gameweek.
+
+If the user clicks Refresh after that Gameweek's slot is consumed, explain this in the UI and show the saved result. Do not silently repeat a paid acquisition.
+
+Do not add a higher refresh frequency or expanded budget without an appropriate explicit recurring-scope amendment.
+
+Use the existing independent technical review, signed compatibility release and verified private installation procedures. Do not bypass the unresolved integrity checks.
+
+## J. ACCEPTANCE TESTS
+
+Demonstrate all of the following using actual installed processes and rights-safe owned fixtures:
+
+- Launch and browser open with no token and no provider calls.
+- GW10 historical recommendation visible immediately after launch.
+- All available GW10 player forecasts queryable through the local warehouse.
+- Browser token submission and automatic expiry extraction.
+- Correct credential secrecy and request-boundary enforcement.
+- A user-triggered eligible Refresh runs the complete pipeline.
+- A successful Refresh creates a new immutable local snapshot.
+- Restarting the browser/application restores the latest saved result.
+- Selecting older Gameweeks works without provider access.
+- Failed Refresh leaves the previous snapshot intact.
+- Same-Gameweek duplicate paid acquisition remains blocked.
+- Budget, quota, ledger and authority checks remain unchanged.
+- Concurrent clicks cannot create multiple jobs or chargeable acquisitions.
+- SQLite migrations, crash recovery, read-only querying and historical exports work.
+- Signed installation and rollback do not lose the analysis database.
+- Numerical and model outputs match the unchanged reviewed engines.
+- Secrets and disallowed raw bodies never appear in saved artifacts.
+- Existing signed runtime and external-wheel acceptance remain intact.
+
+Complete the engineering, independent review, signed installation and browser verification as one consolidated implementation.
+
+Do not conduct a new charged live acquisition merely to test this feature when a Gameweek slot is already consumed. Use offline owned fixtures and the authenticated retained GW10 result.
+
+## DEFINITION OF DONE
+
+The actual user workflow is:
+
+**Run launcher → website opens with last saved recommendations → browse complete local history → press Refresh → enter token in browser → calculate → permanently save new results → browse or query with Codex whenever desired.**
+
+The content production system remains a separate future project.
+
+Do not finish with another design-only document or another sequence of narrow operator handoffs. Deliver the working installed application and the permanent, documented, locally queryable warehouse.

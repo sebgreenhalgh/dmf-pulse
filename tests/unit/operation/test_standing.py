@@ -1,6 +1,7 @@
 """Standing authority, fresh calendar/quota admission and event-specific grants."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
+from types import SimpleNamespace
 
 import pytest
 from pydantic import ValidationError
@@ -133,3 +134,50 @@ def test_policy_cannot_expand_accepted_operating_ceiling(policy, change):
     value = policy.limits.model_dump()
     with pytest.raises(ValidationError):
         type(policy.limits).model_validate({**value, **change})
+
+
+def test_historical_reader_keeps_integrity_but_expired_policy_cannot_acquire(policy, monkeypatch):
+    import json
+
+    from dmf_pulse.dashboard import current
+    from dmf_pulse.operation import maintenance
+    from dmf_pulse.operation.start import PreparationGuard
+
+    body = json.dumps(
+        {
+            "schema_version": "trusted-refresh-enrollments-v3",
+            "approvals": [],
+            "qualifications": [],
+            "release_permits": [],
+            "default_authorization_id": None,
+            "standing_policy": policy.model_dump(mode="json"),
+        }
+    ).encode()
+    resource = SimpleNamespace(read_bytes=lambda: body)
+    monkeypatch.setattr(standing, "files", lambda _: SimpleNamespace(joinpath=lambda _: resource))
+    monkeypatch.setattr(current, "implementation_fingerprint", lambda: policy.implementation_sha)
+    checked = []
+    monkeypatch.setattr(maintenance, "verify_active_release", lambda p: checked.append(p))
+    after = policy.valid_until + timedelta(seconds=1)
+
+    class ExpiredClock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return after
+
+    monkeypatch.setattr(standing, "datetime", ExpiredClock)
+    assert standing.require_history_policy() == policy
+    assert checked == [policy]
+    with pytest.raises(OperationError, match="STANDING_PERMISSION_REVIEW_EXPIRED"):
+        standing.require_policy()
+    guard = PreparationGuard(policy, provider="FPL", clock=lambda: after)
+    with pytest.raises(OperationError, match="STANDING_PERMISSION_REVIEW_EXPIRED"):
+        guard.discovery_before_send()
+    assert not guard.attempted
+    monkeypatch.setattr(
+        maintenance,
+        "verify_active_release",
+        lambda _: (_ for _ in ()).throw(OperationError("STANDING_DEPENDENCY_TREE_CHANGED")),
+    )
+    with pytest.raises(OperationError, match="STANDING_DEPENDENCY_TREE_CHANGED"):
+        standing.require_history_policy()

@@ -3,6 +3,8 @@
 from dmf_pulse.operation.campaign_failures import DIAGNOSTIC_FAILURE_ACTIONS
 
 OPERATOR_FAILURE_ACTIONS = {
+    "LOCAL_DASHBOARD_INSTANCE_UNVERIFIED": "The local port belongs to an unverified listener. No page or refresh was opened. Inspect or close that process before launching Seb's Desk; it is never terminated automatically.",
+    "ANALYSIS_STORAGE_UNAVAILABLE_OR_INVALID": "The private analysis warehouse could not be authenticated or opened. Existing files were preserved and no refresh was admitted. Inspect its read-only schema/status or restore an authenticated backup before refreshing.",
     **DIAGNOSTIC_FAILURE_ACTIONS,
     "STANDING_OWNER_ACCEPTANCE_REQUIRED": "Complete the one-time standing policy installation before starting live operation.",
     "STANDING_PERMISSION_REVIEW_EXPIRED": "The accepted season or permission review has ended. Review the changed scope before further acquisition.",

@@ -14,7 +14,7 @@ from typing import Literal
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, ConfigDict, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, SecretStr, StrictStr, field_validator
 from starlette.responses import JSONResponse, Response
 
 from dmf_pulse.dashboard.current import CurrentEligibility
@@ -55,12 +55,30 @@ class SessionInput(BaseModel):
     pairing_code: StrictStr
 
 
+class FplCredentialInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True, hide_input_in_errors=True)
+    token: SecretStr
+    challenge: StrictStr
+
+
+class HistoryInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    run_id: StrictStr
+
+
+class HistoryCompareInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    first_run_id: StrictStr
+    second_run_id: StrictStr
+
+
 class SessionContext(PresentationModel):
     schema_version: Literal["desk-session-v2"] = "desk-session-v2"
     demo: bool
     synthetic_sources: bool
     execution_mode: Literal["DEMO", "PRIVATE_CURRENT"]
     eligibility: CurrentEligibility | None
+    persistent_history: bool = False
 
 
 def _error(code: str, status: int = 400) -> JSONResponse:
@@ -90,6 +108,7 @@ def create_app(
             synthetic_sources=runtime.synthetic_sources,
             execution_mode="DEMO" if runtime.demo else "PRIVATE_CURRENT",
             eligibility=runtime.eligibility(),
+            persistent_history=bool(getattr(runtime, "persistent", False)),
         )
 
     @asynccontextmanager
@@ -100,8 +119,8 @@ def create_app(
             while True:
                 await asyncio.sleep(1)
                 if session is not None and elapsed_clock() - session_started >= 3600:
-                    runtime.cancel()
-                runtime.tick()
+                    await asyncio.to_thread(runtime.cancel)
+                await asyncio.to_thread(runtime.tick)
 
         task = asyncio.create_task(sweep())
         try:
@@ -110,7 +129,7 @@ def create_app(
             task.cancel()
             with suppress(asyncio.CancelledError):
                 await task
-            runtime.close()
+            await asyncio.to_thread(runtime.close)
 
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 
@@ -122,7 +141,7 @@ def create_app(
     @app.exception_handler(Exception)
     async def safe_failure(request: Request, error: Exception) -> Response:
         del request, error
-        runtime.cancel()
+        await asyncio.to_thread(runtime.cancel)
         return _error("REQUEST_FAILED", 500)
 
     @app.middleware("http")
@@ -167,9 +186,10 @@ def create_app(
             except TimeoutError:
                 return _error("REQUEST_TIMEOUT", 408)
             request._body = b"".join(chunks)
+            chunks.clear()
         if request.url.path.startswith("/api/") and request.url.path != "/api/session":
             if session is not None and elapsed_clock() - session_started >= 3600:
-                runtime.cancel()
+                await asyncio.to_thread(runtime.cancel)
                 return _error("SESSION_REQUIRED", 401)
             cookie = request.cookies.get("dmf_session", "")
             if (
@@ -187,7 +207,7 @@ def create_app(
             and request.url.path not in {"/api/session", "/api/logout"}
             and (session is None or elapsed_clock() - session_started >= 3600)
         ):
-            runtime.cancel()
+            await asyncio.to_thread(runtime.cancel)
             return _error("SESSION_REQUIRED", 401)
         response.headers.update(_HEADERS)
         return response
@@ -200,7 +220,12 @@ def create_app(
             media_type="text/html",
             headers=_HEADERS,
         )
-        if trusted_local_navigation and not paired:
+        if trusted_local_navigation and (
+            not paired
+            or session is None
+            or elapsed_clock() - session_started >= 3600
+            or request.cookies.get("dmf_session") != session
+        ):
             # Explicit `dmf start` owns this loopback listener. Only a top-level
             # direct browser navigation can bootstrap its one local session;
             # cross-site requests, frames, scripts and API calls cannot pair it.
@@ -267,36 +292,134 @@ def create_app(
 
     @app.post("/api/refresh")
     async def refresh(value: RefreshInput) -> Response:
-        return JSONResponse(runtime.refresh(value.horizon).model_dump(mode="json"))
+        nonlocal session_started
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        if isinstance(runtime, PersistentDeskRuntime):
+            # An explicit authenticated action gives preparation + the unchanged
+            # bounded run its full browser window. It renews no provider grant.
+            session_started = elapsed_clock()
+        state = await asyncio.to_thread(runtime.refresh, value.horizon)
+        result = state.model_dump(mode="json")
+        if isinstance(runtime, PersistentDeskRuntime):
+            result["credential_challenge"] = runtime.credential_challenge()
+        response = JSONResponse(result)
+        if isinstance(runtime, PersistentDeskRuntime) and session is not None:
+            response.set_cookie(
+                "dmf_session", session, httponly=True, samesite="strict", max_age=3600, path="/"
+            )
+        return response
+
+    @app.post("/api/credentials/fpl")
+    async def register_fpl(value: FplCredentialInput, request: Request) -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        # Remove framework/body references promptly. No exception or validation
+        # handler may return submitted values; access logging is disabled.
+        request._body = b""
+        if hasattr(request, "_json"):
+            request._json = None
+        if not isinstance(runtime, PersistentDeskRuntime):
+            return _error("BROWSER_CREDENTIAL_ENTRY_NOT_ENABLED", 403)
+        secret, challenge = value.token, value.challenge
+        del value
+        try:
+            state = await asyncio.to_thread(runtime.submit_fpl, secret, challenge)
+            return JSONResponse(state.model_dump(mode="json"))
+        finally:
+            del secret
+
+    @app.get("/api/history")
+    async def history() -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        if not isinstance(runtime, PersistentDeskRuntime):
+            return _error("HISTORY_NOT_ENABLED", 404)
+        return JSONResponse(await asyncio.to_thread(runtime.history))
+
+    @app.post("/api/history/select")
+    async def select_history(value: HistoryInput) -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        if not isinstance(runtime, PersistentDeskRuntime):
+            return _error("HISTORY_NOT_ENABLED", 404)
+        selected = await asyncio.to_thread(runtime.select_run, value.run_id)
+        return (
+            _error("HISTORICAL_RUN_UNAVAILABLE", 404)
+            if selected is None
+            else Response(
+                selected.model_dump_json(), media_type="application/json", headers=_HEADERS
+            )
+        )
+
+    @app.get("/api/analysis/status")
+    async def analysis_status() -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        return JSONResponse(
+            await asyncio.to_thread(runtime.analysis_status)
+            if isinstance(runtime, PersistentDeskRuntime)
+            else {"historical": False}
+        )
+
+    @app.post("/api/history/compare")
+    async def compare_history(value: HistoryCompareInput) -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        if not isinstance(runtime, PersistentDeskRuntime):
+            return _error("HISTORY_NOT_ENABLED", 404)
+        comparison = await asyncio.to_thread(
+            runtime.compare_runs, value.first_run_id, value.second_run_id
+        )
+        return (
+            _error("HISTORICAL_COMPARISON_UNAVAILABLE", 422)
+            if comparison is None
+            else JSONResponse(comparison)
+        )
+
+    @app.get("/api/analysis/optimizer")
+    async def optimizer_evidence() -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
+        if not isinstance(runtime, PersistentDeskRuntime):
+            return _error("HISTORY_NOT_ENABLED", 404)
+        return JSONResponse(await asyncio.to_thread(runtime.optimizer_evidence))
 
     @app.get("/api/status")
     async def status() -> Response:
-        return JSONResponse(runtime.tick().model_dump(mode="json"))
+        return JSONResponse((await asyncio.to_thread(runtime.tick)).model_dump(mode="json"))
 
     def publish(value: PresentationModel) -> Response:
         body = value.model_dump_json().encode()
-        if runtime.tick().status != "COMPLETE":
+        if not getattr(runtime, "persistent", False) and runtime.tick().status != "COMPLETE":
             return _error("NO_CURRENT_RECOMMENDATION", 409)
         return Response(body, media_type="application/json", headers=_HEADERS)
 
     @app.get("/api/desk")
     async def desk() -> Response:
-        value = runtime.view()
+        value = await asyncio.to_thread(runtime.view)
         return _error("NO_CURRENT_RECOMMENDATION", 409) if value is None else publish(value)
 
     @app.get("/api/players/{official_id}")
     async def player(official_id: int) -> Response:
         try:
-            return publish(runtime.player(official_id))
+            return publish(await asyncio.to_thread(runtime.player, official_id))
         except (ValueError, StopIteration):
             return _error("PLAYER_UNAVAILABLE", 404)
 
     @app.get("/api/compare/{first}/{second}")
     async def compare(first: int, second: int) -> Response:
+        from dmf_pulse.operation.persistent_desk import PersistentDeskRuntime
+
         try:
-            left, right = runtime.player(first), runtime.player(second)
+            if isinstance(runtime, PersistentDeskRuntime):
+                left, right = await asyncio.to_thread(runtime.player_pair, first, second)
+            else:
+                left = await asyncio.to_thread(runtime.player, first)
+                right = await asyncio.to_thread(runtime.player, second)
             if (
                 first == second
+                or left.job_id != right.job_id
                 or not left.gameweeks
                 or left.gameweeks.keys() != right.gameweeks.keys()
             ):
@@ -316,7 +439,7 @@ def create_app(
             "real_cohort_scope": "PLAYER_COHORT; recovered P01 is a separate MATCH forecast",
             "recovery": recovered.model_dump(mode="json"),
         }
-        if runtime.synthetic_sources:
+        if runtime.synthetic_sources and not getattr(runtime, "persistent", False):
             from dmf_pulse.player_lab.demo import synthetic_evaluation
 
             evaluation = synthetic_evaluation()
@@ -331,12 +454,12 @@ def create_app(
 
     @app.post("/api/cancel")
     async def cancel() -> Response:
-        return JSONResponse(runtime.cancel().model_dump(mode="json"))
+        return JSONResponse((await asyncio.to_thread(runtime.cancel)).model_dump(mode="json"))
 
     @app.post("/api/logout")
     async def logout() -> Response:
         nonlocal session
-        runtime.cancel()
+        await asyncio.to_thread(runtime.cancel)
         session = None
         response = JSONResponse({"status": "SIGNED_OUT"})
         response.delete_cookie("dmf_session", path="/")

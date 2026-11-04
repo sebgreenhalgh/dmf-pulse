@@ -13,6 +13,7 @@ from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct import DirectFplRunAttestation
 from dmf_pulse.ingestion.fpl.direct_payloads import acquire_direct_fpl_snapshot
 from dmf_pulse.ingestion.openfootball.service import CurrentScorePriorBuildRequest
+from dmf_pulse.operation.analysis_optimizer import AnalysisOptimizerEvidence
 from dmf_pulse.operation.chip_schema_compat import StandingSourceSchemaProof
 from dmf_pulse.operation.diagnostic_pipeline import (
     assemble_diagnostic_execution,
@@ -96,7 +97,14 @@ class StandingOneGameweekService(PrivateV1OneCommandService):
     controlled gate, late-paid window or second acquisition is constructed here.
     """
 
+    _optimizer_evidence: AnalysisOptimizerEvidence | None = None
+
+    @property
+    def optimizer_evidence(self) -> AnalysisOptimizerEvidence | None:
+        return self._optimizer_evidence
+
     def run(self, request: OneCommandRequest) -> OneCommandResult:
+        self._optimizer_evidence = None
         if (
             type(request.entry_id) is not int
             or request.entry_id <= 0
@@ -200,6 +208,10 @@ class StandingOneGameweekService(PrivateV1OneCommandService):
         check_guard()
         deadline.check(snapshot.fpl_input.target_event.deadline_at)
         run = self._recommendation_service.run(execution, progress=self._progress)
+        evidence = AnalysisOptimizerEvidence(
+            decision_sha256=run.decision.semantic_sha256, optimiser_result=run.optimiser_result
+        )
+        evidence.require_bound_to(run.decision)
         report = accepted._display_report(run.decision, snapshot, execution.player_identity_map)
         report += deadline_notice(snapshot.fpl_input.target_event.deadline_at)
         presentation = None
@@ -276,4 +288,5 @@ class StandingOneGameweekService(PrivateV1OneCommandService):
         )
         self._progress.message("Recommendation ready")
         self._progress.finish()
+        self._optimizer_evidence = evidence
         return result

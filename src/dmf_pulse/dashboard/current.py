@@ -41,6 +41,7 @@ from dmf_pulse.dashboard.synthetic import DEMO_TIME, demo_inputs
 from dmf_pulse.ingestion.models import RightsProfile
 from dmf_pulse.ingestion.odds.models import QualifiedOperatorQuota, QuotaSource, QuotaState
 from dmf_pulse.ingestion.openfootball.service import ScorePriorProfileId
+from dmf_pulse.operation.analysis_optimizer import AnalysisOptimizerEvidence
 from dmf_pulse.operation.diagnostics import DiagnosticLog
 from dmf_pulse.operation.models import ChargedQuotaStatus
 from dmf_pulse.private_v1.actionability import checked_report
@@ -201,22 +202,28 @@ class CurrentWorkerResult:
     grant_sha256: str
     presentation_sha256: str
     authentication_sha256: str
+    optimizer_evidence: AnalysisOptimizerEvidence | None = None
 
 
 def _result_authentication(
-    launch: CurrentLaunch, result: OneCommandResult, presentation_sha256: str
+    launch: CurrentLaunch,
+    result: OneCommandResult,
+    presentation_sha256: str,
+    optimizer_evidence: AnalysisOptimizerEvidence | None = None,
 ) -> str:
     # The ephemeral worker claim is already shared only by parent and child.
     # Authenticate presentation custody; this never creates source/provider rights.
-    payload = canonical_sha256(
-        [
-            "current-worker-result-v1",
-            launch.grant.semantic_sha256,
-            result.decision.semantic_sha256,
-            presentation_sha256,
-            result.actionability.model_dump(mode="json"),
-        ]
-    ).encode("ascii")
+    parts: list[object] = [
+        "current-worker-result-v1",
+        launch.grant.semantic_sha256,
+        result.decision.semantic_sha256,
+        presentation_sha256,
+        result.actionability.model_dump(mode="json"),
+    ]
+    if optimizer_evidence is not None:
+        parts[0] = "current-worker-result-with-optimizer-v1"
+        parts.append(optimizer_evidence.semantic_sha256)
+    payload = canonical_sha256(parts).encode("ascii")
     return hmac.new(bytes.fromhex(launch.worker_id), payload, hashlib.sha256).hexdigest()
 
 
@@ -280,9 +287,20 @@ def validate_current_result(envelope: CurrentWorkerResult, launch: CurrentLaunch
     if (
         envelope.grant_sha256 != grant.semantic_sha256
         or presentation is None
+        or (
+            grant.request.authorization_id.startswith("OPR001-")
+            and grant.request.horizon == 1
+            and envelope.optimizer_evidence is None
+        )
+        or (
+            envelope.optimizer_evidence is not None
+            and type(envelope.optimizer_evidence) is not AnalysisOptimizerEvidence
+        )
         or not hmac.compare_digest(
             envelope.authentication_sha256,
-            _result_authentication(launch, result, envelope.presentation_sha256),
+            _result_authentication(
+                launch, result, envelope.presentation_sha256, envelope.optimizer_evidence
+            ),
         )
         or envelope.presentation_sha256 != canonical_sha256(presentation.model_dump(mode="json"))
         or result.decision.lineage.code_sha != grant.request.implementation_sha
@@ -293,6 +311,13 @@ def validate_current_result(envelope: CurrentWorkerResult, launch: CurrentLaunch
     ):
         raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
     decision = result.decision
+    if envelope.optimizer_evidence is not None:
+        try:
+            if not isinstance(decision, PrivateV1Decision):
+                raise ValueError("ANALYSIS_OPTIMIZER_DECISION_BINDING_INVALID")
+            envelope.optimizer_evidence.require_bound_to(decision)
+        except (ValueError, TypeError, AttributeError):
+            raise AuthorizationError("WORKER_RESULT_BINDING_INVALID") from None
     actual_gameweeks = {row.gameweek: row.result_sha256 for row in presentation.gameweeks}
     if isinstance(decision, PrivateV1Decision):
         expected_gameweeks = {decision.target_gameweek: decision.lineage.stage9_result_sha256}
@@ -553,6 +578,7 @@ def run_current_recommendation(
     progress: ProgressSink,
     *,
     clock: Callable[[], datetime] | None = None,
+    optimizer_capture: Callable[[AnalysisOptimizerEvidence], None] | None = None,
 ) -> OneCommandResult:
     """The same worker path selects owned transports or eligible real clients."""
     owned = launch.grant.classification == "OWNED_SYNTHETIC"
@@ -582,20 +608,21 @@ def run_current_recommendation(
             from dmf_pulse.operation.standing_pipeline import StandingOneGameweekService
 
             service_type = StandingOneGameweekService
-        result = _current_service_scope(
-            service_type(
-                direct_client_factory=sources.direct,
-                odds_service_factory=sources.odds,
-                score_service_factory=sources.score,
-                _provider_request_guard=guard.check,
-                progress=progress,
-                collect_presentation=True,
-                clock=active_clock,
-                score_prior_rights_profile_id=cast(
-                    ScorePriorProfileId, profiles["OPENFOOTBALL"].rights_profile_id
-                ),
-                _expected_deadline_at=launch.grant.request.deadline_at,
+        service = service_type(
+            direct_client_factory=sources.direct,
+            odds_service_factory=sources.odds,
+            score_service_factory=sources.score,
+            _provider_request_guard=guard.check,
+            progress=progress,
+            collect_presentation=True,
+            clock=active_clock,
+            score_prior_rights_profile_id=cast(
+                ScorePriorProfileId, profiles["OPENFOOTBALL"].rights_profile_id
             ),
+            _expected_deadline_at=launch.grant.request.deadline_at,
+        )
+        result = _current_service_scope(
+            service,
             OneCommandRequest(
                 entry_id=launch.entry_id,
                 code_sha=launch.grant.request.implementation_sha,
@@ -620,6 +647,11 @@ def run_current_recommendation(
         if result.actionability.deadline_at != launch.grant.request.deadline_at:
             raise AuthorizationError("OFFICIAL_DEADLINE_SCOPE_MISMATCH")
         checked_report(result, clock=active_clock)
+        if standing_one_gw and optimizer_capture is not None:
+            evidence = getattr(service, "optimizer_evidence", None)
+            if not isinstance(evidence, AnalysisOptimizerEvidence):
+                raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
+            optimizer_capture(evidence)
         return result
     finally:
         guard.finish_acquisition()
@@ -635,9 +667,17 @@ def current_worker(pipe: Connection, horizon: Literal[1, 3], launch: CurrentLaun
         try:
             if horizon != launch.grant.request.horizon:
                 raise AuthorizationError("AUTHORIZATION_HORIZON_NOT_APPROVED")
-            result = run_current_recommendation(
-                launch, PipeProgress(pipe.send, diagnostics=diagnostics)
-            )
+            captured: list[AnalysisOptimizerEvidence] = []
+            progress = PipeProgress(pipe.send, diagnostics=diagnostics)
+            if launch.grant.request.authorization_id.startswith("OPR001-") and horizon == 1:
+                result = run_current_recommendation(
+                    launch, progress, optimizer_capture=captured.append
+                )
+            else:
+                result = run_current_recommendation(launch, progress)
+            if len(captured) > 1:
+                raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
+            evidence = captured[0] if captured else None
             diagnostics.enter("RESULT_VALIDATION")
             if result.presentation is None:
                 raise AuthorizationError("WORKER_RESULT_BINDING_INVALID")
@@ -646,8 +686,12 @@ def current_worker(pipe: Connection, horizon: Literal[1, 3], launch: CurrentLaun
                 grant_sha256=launch.grant.semantic_sha256,
                 presentation_sha256=canonical_sha256(result.presentation.model_dump(mode="json")),
                 authentication_sha256=_result_authentication(
-                    launch, result, canonical_sha256(result.presentation.model_dump(mode="json"))
+                    launch,
+                    result,
+                    canonical_sha256(result.presentation.model_dump(mode="json")),
+                    evidence,
                 ),
+                optimizer_evidence=evidence,
             )
             validate_current_result(envelope, launch)
             pipe.send(("current_result", envelope))

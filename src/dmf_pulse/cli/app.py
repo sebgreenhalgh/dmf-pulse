@@ -35,6 +35,7 @@ from dmf_pulse.cli.rules_cmd import rules_app
 from dmf_pulse.cli.specs_cmd import specs_app
 from dmf_pulse.cli.start import start_command
 from dmf_pulse.ingestion.errors import IngestionError
+from dmf_pulse.operation.analysis_cli import analysis_app
 from dmf_pulse.operation.cli import operation_app
 
 app = typer.Typer(
@@ -59,6 +60,7 @@ app.add_typer(review_pack_app, name="review-pack")
 app.add_typer(rules_app, name="rules")
 app.add_typer(optimise_app, name="optimise")
 app.add_typer(operation_app, name="operation")
+app.add_typer(analysis_app, name="analysis")
 app.add_typer(player_evidence_app, name="player-evidence")
 app.add_typer(player_lab_app, name="player-lab")
 app.add_typer(prices_app, name="prices")

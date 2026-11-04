@@ -563,3 +563,12 @@ class DeskRuntime:
         with self._lock:
             self._closed = True
             self._discard("CANCELLED", "SESSION_ENDED")
+
+    def cleanup_complete(self) -> bool:
+        """Report confirmed resource release; close() can preserve a failed handle."""
+        with self._lock:
+            return (
+                self._closed
+                and self._worker is None
+                and self._state.error_code != "WORKER_CLEANUP_FAILED"
+            )
