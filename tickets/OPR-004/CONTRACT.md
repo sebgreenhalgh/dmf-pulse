@@ -74,3 +74,13 @@ propagates its actual exit and restores original bytes in finally. No scan
 allowlist, scanner/application byte, numerical value or coverage gate changes.
 This necessary helper, owned adversarial tests and same20-job workflow binding
 are included in the active execution scope; no live provider access is added.
+
+Installed-browser lifecycle correction: a hidden initial context response must
+not strand a subsequently visible page on the pairing panel. One deduplicated
+server-authenticated local context GET path handles initial/visible/pageshow
+resume and hide/show during an aborted in-flight bootstrap. It creates polling
+once, keeps SESSION_REQUIRED fail-closed and preserves explicit logout until a
+new document is loaded. No automatic provider, pairing POST or credential action.
+Owned offline tests execute the actual controller using the already available
+Node QA tool and builtin VM only; no frontend build, package or runtime dependency
+is added. Hosted CI must execute these checks rather than silently skip them.

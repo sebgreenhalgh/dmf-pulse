@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 246359,
+      "bytes": 246980,
       "path": "PLANS.md",
-      "sha256": "f301e892299c493e00e731f86d0c366709fa90ae27bae395e774a32555f8ae05"
+      "sha256": "13ca43edd4928d2367feb2ee9da2a68897a1ee2f4f46d51b11ed6caf3ee4a326"
     },
     {
       "bytes": 2761,
@@ -3611,9 +3611,9 @@
       "sha256": "36ecd7e7df58dcf92351e61014df3a30360685dd8d5eeed225be47eb32669328"
     },
     {
-      "bytes": 44002,
+      "bytes": 44594,
       "path": "src/dmf_pulse/dashboard/resources/desk.js",
-      "sha256": "9515bf5a00383587cfdcc596a8bc644e1d1a9ebb65ed48c4e2947185b1d11b62"
+      "sha256": "8945a8577b812bd0bf0e23ee90f880d11830c762e90164c984697748766a8281"
     },
     {
       "bytes": 1983,
@@ -5791,6 +5791,11 @@
       "sha256": "45109dce357d4a498dd5c73406657d56be119b6a72a82d37fcf71fbc0a5c1b65"
     },
     {
+      "bytes": 7107,
+      "path": "tests/fixtures/dashboard_session_bootstrap.cjs",
+      "sha256": "74a89cf2772497ebe0d5faa2a1cb9a29097542a95e4fd51ca3288508ded22816"
+    },
+    {
       "bytes": 192838,
       "path": "tests/fixtures/evaluation/a02_d1_parent_semantics.json",
       "sha256": "d0b5615b28d530900698948318963c8c361b608e094581148e79dae0406e48b4"
@@ -7054,6 +7059,11 @@
       "bytes": 2874,
       "path": "tests/unit/dashboard/test_recovery_performance.py",
       "sha256": "aa2cda640ec749dedecc07cc5b6b76720121bb4551046437077dfd6e6e2dc829"
+    },
+    {
+      "bytes": 1946,
+      "path": "tests/unit/dashboard/test_session_bootstrap.py",
+      "sha256": "17bfc98d6d6b762b48050c598070d1be3bd184c91ddaf3ffac8271ca20f26ef3"
     },
     {
       "bytes": 5829,
@@ -9511,14 +9521,14 @@
       "sha256": "26c82228dd0a64b9743c34dfa9928e98fdc98383b5fd13c267c98b70710e4ea1"
     },
     {
-      "bytes": 2443,
+      "bytes": 3106,
       "path": "tickets/OPR-004/ACCEPTANCE.md",
-      "sha256": "44a8ce964771221f3aeca25c429f23650c866bebc90afaec9161ac540d604346"
+      "sha256": "6f4ecf03f60511eaaa0e5b6f34a14f04eba87ae4dab0c7db24f26ced66f37c5f"
     },
     {
-      "bytes": 5115,
+      "bytes": 5829,
       "path": "tickets/OPR-004/CONTRACT.md",
-      "sha256": "e897b0c614125a0ecebfbbec78ea2b5f7018a6b90bdd192e92c527786c6f0bc0"
+      "sha256": "25a501b9d972795f6039e70589f8742a2a4de69c9a6fed33332fc73502c95b75"
     },
     {
       "bytes": 13780,

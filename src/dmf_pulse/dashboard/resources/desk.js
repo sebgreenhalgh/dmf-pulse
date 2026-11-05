@@ -6,6 +6,7 @@ let epoch = 0, expiresPerf = 0;
 let syntheticSources = false, providerEligibility = null;
 let diagnosticReport = null;
 let persistent = false, historyRows = [], analysisStatus = null;
+let sessionClosed = false, bootstrapRunning = false, bootstrapQueued = false;
 const diagnosticExport = document.createElement('button');
 diagnosticExport.textContent='Download safe diagnostics';
 diagnosticExport.hidden=true;
@@ -24,6 +25,24 @@ function applyContext(context) {
   syntheticSources = context.synthetic_sources;
   providerEligibility = context.eligibility;
   $('mode').textContent = demo ? 'SYNTHETIC DEMONSTRATION' : syntheticSources ? 'SYNTHETIC CURRENT-MODE ARCHITECTURE' : 'PRIVATE CURRENT';
+}
+function activateAuthenticatedSession(context) {
+  if(sessionClosed||paired||document.hidden)return;
+  applyContext(context);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;
+  render();if(polling===null)polling=setInterval(poll,700);poll();
+}
+async function resumeAuthenticatedSession() {
+  if(sessionClosed||paired||document.hidden)return;
+  bootstrapQueued=true;
+  if(bootstrapRunning)return;
+  bootstrapRunning=true;
+  try {
+    do {
+      bootstrapQueued=false;
+      try {activateAuthenticatedSession(await api('/api/context'));}
+      catch(error){if(error.name!=='AbortError'&&error.message!=='SESSION_REQUIRED')fail(error);}
+    } while(bootstrapQueued&&!sessionClosed&&!paired&&!document.hidden);
+  } finally {bootstrapRunning=false;}
 }
 function showEligibility(parent) {
   if (!providerEligibility) return;
@@ -283,23 +302,19 @@ async function poll(){
     }
   }catch(e){fail(e);}
 }
-$('pair-form').onsubmit=async e=>{e.preventDefault();const code=$('pair-code').value;$('pair-code').value='';try{const r=await api('/api/session',{pairing_code:code});applyContext(r);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;render();polling=setInterval(poll,700);}catch(error){$('pair-panel').append(text('p',error.message));}};
+$('pair-form').onsubmit=async e=>{e.preventDefault();const code=$('pair-code').value;$('pair-code').value='';try{const r=await api('/api/session',{pairing_code:code});activateAuthenticatedSession(r);}catch(error){$('pair-panel').append(text('p',error.message));}};
 $('refresh').onclick=async()=>{if(persistent){await refreshPersistent();return;}clearPresentation();$('refresh').disabled=true;$('progress').open=true;try{await api('/api/refresh',{horizon:Number($('horizon').value)});await poll();}catch(e){fail(e);$('refresh').disabled=false;}};
 $('cancel').onclick=async()=>{if(!persistent)clearPresentation();try{await api('/api/cancel',{});$('notice').textContent='Cancelled and cleared';$('refresh').disabled=false;}catch(e){fail(e);}};
-$('logout').onclick=async()=>{clearPresentation();providerEligibility=null;if(polling)clearInterval(polling);paired=false;try{await api('/api/logout',{});}catch(e){fail(e);}$('workspace').hidden=true;$('pair-panel').hidden=false;$('pair-panel').replaceChildren(text('h2','Signed out'),text('p','Restart dmf dashboard to create a new private session.'));};
+$('logout').onclick=async()=>{sessionClosed=true;bootstrapQueued=false;clearPresentation();providerEligibility=null;if(polling)clearInterval(polling);polling=null;paired=false;try{await api('/api/logout',{});}catch(e){fail(e);}$('workspace').hidden=true;$('pair-panel').hidden=false;$('pair-panel').replaceChildren(text('h2','Signed out'),text('p','Restart dmf dashboard to create a new private session.'));};
 document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{page=b.dataset.page;document.querySelectorAll('[data-page]').forEach(n=>n.classList.toggle('selected',n===b));render();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(!persistent)clearPresentation();providerEligibility=null;$('stages').replaceChildren();}else if(paired){poll();}});
-window.addEventListener('pagehide',()=>{clearPresentation();providerEligibility=null;});window.addEventListener('pageshow',()=>{if(paired)poll();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(!persistent)clearPresentation();providerEligibility=null;$('stages').replaceChildren();}else if(paired){poll();}else resumeAuthenticatedSession();});
+window.addEventListener('pagehide',()=>{clearPresentation();providerEligibility=null;});window.addEventListener('pageshow',()=>{if(paired)poll();else resumeAuthenticatedSession();});
 
 // A reload resumes only a server-authenticated session; no private view is restored locally.
 // A deferred script installs both handlers before session bootstrap. Browser
 // controllers must wait for document completion and this readiness marker.
 document.documentElement.dataset.dmfReady = 'true';
-api('/api/context').then(context=>{
-  if(document.hidden||paired)return;
-  applyContext(context);paired=true;$('pair-panel').hidden=true;$('workspace').hidden=false;
-  render();polling=setInterval(poll,700);poll();
-}).catch(error=>{if(error.name!=='AbortError'&&error.message!=='SESSION_REQUIRED')fail(error);});
+resumeAuthenticatedSession();
 
 // Persistent operation reads SQLite history; only the explicit action below acquires.
 let persistentSetup = false, persistentPolling = false, refreshChallenge = null;

@@ -3453,3 +3453,12 @@ record-page transport retains every root/file field, runs the unchanged scanner
 once, propagates failure and restores original bytes. Application/model/wheel
 bytes stay unchanged; targeted transport checks and fresh exact-source CI precede
 any signing or installation. The earlier failure remains retained, never relabelled.
+
+OPR-004 installed-browser finding: an initial authenticated context response can
+be discarded while the page is hidden, leaving the browser unpaired after it
+becomes visible. Add an offline actual-JavaScript regression before correcting
+the single bootstrap/resume path. Resume may issue only authenticated local
+context GETs, must deduplicate requests/polling and must preserve explicit logout.
+Then run applicable source gates and exact-source CI and renew the reviewed
+signature/installation lineage. Numerical/source-rights equivalence remains
+explicit; no provider request or original custody change is authorized.
