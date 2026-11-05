@@ -66,9 +66,9 @@
       "sha256": "0ccc12cb8f179277f9d5e8a5611a17d6bf6ba9a7eb6585ff0b092a7d097d3db2"
     },
     {
-      "bytes": 15040,
+      "bytes": 15190,
       "path": ".github/workflows/ci.yml",
-      "sha256": "66d5f838c99bf7d7a1bb7aa8dcebc91b0f0c28e4ad8540ec72cdd9d8c0365392"
+      "sha256": "68ca2e3bfec9c114f937a7db752c04dd480c88604c1ff9f779b36f60a5ce5e21"
     },
     {
       "bytes": 1740,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 245790,
+      "bytes": 246359,
       "path": "PLANS.md",
-      "sha256": "8906b480903c4273ad7968c1071a4acbf48ef536b8beb9610ab02c3dee478faa"
+      "sha256": "f301e892299c493e00e731f86d0c366709fa90ae27bae395e774a32555f8ae05"
     },
     {
       "bytes": 2761,
@@ -2624,6 +2624,11 @@
       "bytes": 4565,
       "path": "scripts/run_team_strength_l1.py",
       "sha256": "aaa76ba88d584b11ae171d687287501a5f8f7b8171579eea4f26acc30ec909d8"
+    },
+    {
+      "bytes": 9774,
+      "path": "scripts/scan_ci_coverage.py",
+      "sha256": "19e2885dc4f40e5e6f399faf4acd24b39fb73a03a099bf70ff0b1ce10f5ed09d"
     },
     {
       "bytes": 1061,
@@ -8736,6 +8741,11 @@
       "sha256": "99bf4647b80f26ff66dea3942e3437864c8f011105bc2958abfe499dc24ce270"
     },
     {
+      "bytes": 8310,
+      "path": "tests/unit/scripts/test_scan_ci_coverage.py",
+      "sha256": "3c2a9195224062917725ded2a69835fe354b7feb5d39aad3991c8fbb05df666e"
+    },
+    {
       "bytes": 4535,
       "path": "tests/unit/scripts/test_team_strength_l7_d7_evidence.py",
       "sha256": "7b18529780185baff24ee96c44db0407c91693b53efc30b492f663aac5a19068"
@@ -9506,9 +9516,9 @@
       "sha256": "44a8ce964771221f3aeca25c429f23650c866bebc90afaec9161ac540d604346"
     },
     {
-      "bytes": 4321,
+      "bytes": 5115,
       "path": "tickets/OPR-004/CONTRACT.md",
-      "sha256": "2cd5606013b2425e4a2db4ef20ef74e861e8b9c1d00df7b509e556e638fe75ca"
+      "sha256": "e897b0c614125a0ecebfbbec78ea2b5f7018a6b90bdd192e92c527786c6f0bc0"
     },
     {
       "bytes": 13780,

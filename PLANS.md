@@ -3445,3 +3445,11 @@ for protocol/data binding, with a deterministic regression proving queued IPC is
 discarded after a factory consumes the unchanged900s runtime ceiling. Production
 package bytes and real-clock clean native evidence remain unchanged. Complete
 CI for the corrected test source and all signed/installed gates remain pending.
+
+CI41924349595: all16coverage shards and combined coverage, installed-wheel and
+repository checks passed. Final secret scan refused only the generated report's
+5,282,814-byte size (already compact JSON; unchanged5MiB limit). A CI-only lossless
+record-page transport retains every root/file field, runs the unchanged scanner
+once, propagates failure and restores original bytes. Application/model/wheel
+bytes stay unchanged; targeted transport checks and fresh exact-source CI precede
+any signing or installation. The earlier failure remains retained, never relabelled.

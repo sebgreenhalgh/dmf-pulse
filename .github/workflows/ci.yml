@@ -352,7 +352,10 @@ jobs:
         run: uv run python scripts/validate_repository.py
 
       - name: First-party secret scan
-        run: uv run python scripts/scan_secrets.py
+        run: >-
+          uv run python scripts/scan_ci_coverage.py
+          --retained-original "${RUNNER_TEMP}/coverage-secret-scan-original.json"
+          -- uv run python scripts/scan_secrets.py
 
   quality:
     name: Python 3.13 / Ubuntu
