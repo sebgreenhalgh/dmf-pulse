@@ -1,0 +1,547 @@
+{
+  "baseline": "df26ab0723dea99469fe4c98423402ea91f85776",
+  "no_new_rules_or_source_rights_inferred": true,
+  "owner_request_sha256": "67db2c4ae1226e5041e22f68327e189e32ef70f02f2b632d665eddb9aff48940",
+  "rights": "OPR-004 private derived read model; public GitHub receives no real retained forecast rows",
+  "scopes": [
+    {
+      "decisions": [
+        "ADR-PROD-002",
+        "ADR-GOV-003",
+        "ADR-DATA-005",
+        "ADR-PTS-004",
+        "ADR-UNC-001",
+        "ADR-UNC-002",
+        "ADR-OPT-001",
+        "ADR-OPT-002",
+        "ADR-OPT-004",
+        "ADR-OPT-005",
+        "ADR-OPT-006",
+        "ADR-EVAL-002",
+        "ADR-EVAL-005",
+        "ADR-IMPL-001",
+        "ADR-IMPL-002",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-02",
+        "DMFP-03",
+        "DMFP-05",
+        "DMFP-09",
+        "DMFP-10",
+        "DMFP-12",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A10-one-GW-optimiser"
+    },
+    {
+      "decisions": [
+        "ADR-PROD-001",
+        "ADR-PROD-004",
+        "ADR-DATA-003",
+        "ADR-DATA-004",
+        "ADR-DATA-005",
+        "ADR-OPS-001",
+        "ADR-OPS-002",
+        "ADR-OPS-003",
+        "ADR-OPS-004",
+        "ADR-OPS-005",
+        "ADR-OPS-006",
+        "ADR-ASSUR-001",
+        "ADR-ASSUR-002",
+        "ADR-ASSUR-003",
+        "ADR-ASSUR-004",
+        "ADR-ASSUR-005",
+        "ADR-ASSUR-006",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-02",
+        "DMFP-03",
+        "DMFP-04",
+        "DMFP-05",
+        "DMFP-15",
+        "DMFP-16",
+        "DMFP-17",
+        "DMFP-18",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A12-ops-assurance"
+    },
+    {
+      "decisions": [
+        "ADR-GOV-001",
+        "ADR-GOV-002",
+        "ADR-GOV-004",
+        "ADR-DATA-001",
+        "ADR-DATA-002",
+        "ADR-DATA-003",
+        "ADR-DATA-004",
+        "ADR-DATA-005",
+        "ADR-DATA-006",
+        "ADR-DATA-007",
+        "ADR-ASSUR-005",
+        "ADR-IMPL-001",
+        "ADR-IMPL-002",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-03",
+        "DMFP-05",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A3-data-foundation"
+    },
+    {
+      "decisions": [
+        "ADR-GOV-001",
+        "ADR-GOV-002",
+        "ADR-GOV-004",
+        "ADR-DATA-004",
+        "ADR-DATA-007",
+        "ADR-SRC-001",
+        "ADR-SRC-002",
+        "ADR-MKT-001",
+        "ADR-MKT-002",
+        "ADR-MKT-003",
+        "ADR-MKT-004",
+        "ADR-MKT-005",
+        "ADR-MKT-006",
+        "ADR-EVAL-001",
+        "ADR-EVAL-004",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-03",
+        "DMFP-04",
+        "DMFP-05",
+        "DMFP-06",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A6-normalisation"
+    },
+    {
+      "decisions": [
+        "ADR-GOV-003",
+        "ADR-DATA-004",
+        "ADR-DATA-005",
+        "ADR-DATA-006",
+        "ADR-DATA-007",
+        "ADR-MIN-001",
+        "ADR-MIN-002",
+        "ADR-MIN-003",
+        "ADR-MIN-004",
+        "ADR-UNC-001",
+        "ADR-UNC-002",
+        "ADR-EVAL-001",
+        "ADR-EVAL-004",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-02",
+        "DMFP-03",
+        "DMFP-04",
+        "DMFP-05",
+        "DMFP-06",
+        "DMFP-07",
+        "DMFP-10",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A7-minutes"
+    },
+    {
+      "decisions": [
+        "ADR-DATA-004",
+        "ADR-DATA-005",
+        "ADR-DATA-007",
+        "ADR-MKT-006",
+        "ADR-MIN-003",
+        "ADR-EVT-001",
+        "ADR-EVT-002",
+        "ADR-EVT-003",
+        "ADR-EVT-004",
+        "ADR-EVT-005",
+        "ADR-UNC-002",
+        "ADR-EVAL-001",
+        "ADR-EVAL-004",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-02",
+        "DMFP-03",
+        "DMFP-04",
+        "DMFP-05",
+        "DMFP-06",
+        "DMFP-07",
+        "DMFP-08",
+        "DMFP-10",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A8-events"
+    },
+    {
+      "decisions": [
+        "ADR-GOV-003",
+        "ADR-DATA-004",
+        "ADR-DATA-005",
+        "ADR-PTS-001",
+        "ADR-PTS-002",
+        "ADR-PTS-003",
+        "ADR-PTS-004",
+        "ADR-EVAL-001",
+        "ADR-EVAL-002",
+        "ADR-EVAL-004",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-02",
+        "DMFP-03",
+        "DMFP-05",
+        "DMFP-07",
+        "DMFP-08",
+        "DMFP-09",
+        "DMFP-10",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "A9-points"
+    },
+    {
+      "decisions": [
+        "ADR-DATA-004",
+        "ADR-DATA-005",
+        "ADR-DATA-006",
+        "ADR-EVAL-001",
+        "ADR-EVAL-002",
+        "ADR-EVAL-003",
+        "ADR-EVAL-004",
+        "ADR-EVAL-005",
+        "ADR-EVAL-006",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-01",
+        "DMFP-05",
+        "DMFP-10",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "B1-backtesting"
+    },
+    {
+      "decisions": [
+        "ADR-PROD-002",
+        "ADR-UNC-001",
+        "ADR-UNC-005",
+        "ADR-UNC-007",
+        "ADR-OPT-001",
+        "ADR-OPT-003",
+        "ADR-OPT-004",
+        "ADR-OPT-005",
+        "ADR-OPT-006",
+        "ADR-EVAL-005",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-02",
+        "DMFP-09",
+        "DMFP-10",
+        "DMFP-11",
+        "DMFP-12",
+        "DMFP-15",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "B2-multi-GW"
+    },
+    {
+      "decisions": [
+        "ADR-UNC-006",
+        "ADR-UNC-007",
+        "ADR-PRC-001",
+        "ADR-PRC-002",
+        "ADR-PRC-003",
+        "ADR-PRC-004",
+        "ADR-EVAL-001",
+        "ADR-EVAL-004",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-02",
+        "DMFP-05",
+        "DMFP-10",
+        "DMFP-11",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "B3-price"
+    },
+    {
+      "decisions": [
+        "ADR-GOV-003",
+        "ADR-CHIP-001",
+        "ADR-CHIP-002",
+        "ADR-CHIP-003",
+        "ADR-CHIP-004",
+        "ADR-CHIP-005",
+        "ADR-CHIP-006",
+        "ADR-EVAL-005",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-02",
+        "DMFP-09",
+        "DMFP-10",
+        "DMFP-12",
+        "DMFP-13",
+        "DMFP-15",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "B4-chips"
+    },
+    {
+      "decisions": [
+        "ADR-PROD-003",
+        "ADR-RANK-001",
+        "ADR-RANK-002",
+        "ADR-RANK-003",
+        "ADR-RANK-004",
+        "ADR-EVAL-005",
+        "ADR-ASSUR-006",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-04",
+        "DMFP-05",
+        "DMFP-09",
+        "DMFP-10",
+        "DMFP-12",
+        "DMFP-13",
+        "DMFP-14",
+        "DMFP-15",
+        "DMFP-17",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "B5-rank"
+    },
+    {
+      "decisions": [
+        "ADR-PROD-001",
+        "ADR-PROD-004",
+        "ADR-OPS-001",
+        "ADR-OPS-002",
+        "ADR-OPS-003",
+        "ADR-OPS-004",
+        "ADR-OPS-005",
+        "ADR-OPS-006",
+        "ADR-ASSUR-001",
+        "ADR-UI-001",
+        "ADR-UI-002",
+        "ADR-UI-003",
+        "ADR-UI-004",
+        "ADR-UI-005",
+        "ADR-UI-006",
+        "ADR-UI-007",
+        "ADR-IMPL-001",
+        "ADR-IMPL-003"
+      ],
+      "documents": [
+        "DMFP-00",
+        "DMFP-05",
+        "DMFP-16",
+        "DMFP-17",
+        "DMFP-18",
+        "DMFP-19",
+        "DMFP-20",
+        "DMF-PULSE-CODEX-PLAYBOOK"
+      ],
+      "scope": "B6-control-UI"
+    }
+  ],
+  "sources": [
+    {
+      "bytes": 13573,
+      "path": "specs/manifests/authority_manifest.json",
+      "sha256": "b780a757b922ab8fc70388de2651860f88908a96c5d91cc87bbabbdf555700ac"
+    },
+    {
+      "bytes": 9090,
+      "path": "docs/operation/ANALYSIS-DICTIONARY-v1.md",
+      "sha256": "4265cea608e554ac40507776cd12ebebd78bfb65cc966958142be8e12a6e9482"
+    },
+    {
+      "bytes": 5829,
+      "path": "tickets/OPR-004/CONTRACT.md",
+      "sha256": "25a501b9d972795f6039e70589f8742a2a4de69c9a6fed33332fc73502c95b75"
+    },
+    {
+      "bytes": 98771,
+      "path": "specs/approved/DMFP-00_MASTER_ARCHITECTURE_AND_PRODUCT_DEFINITION.txt",
+      "sha256": "b003c63b392f43dcd2278333af5052ac3330f520b3506cd2a9a2b2d4a0b444a3"
+    },
+    {
+      "bytes": 117021,
+      "path": "specs/approved/DMFP-01_RESEARCH_STANDARD_AND_EVIDENCE_REGISTER.txt",
+      "sha256": "07e35fcba49155e4fd6a149f513172ad72f31dc4aec231d8f9255ca3c2c5b9d6"
+    },
+    {
+      "bytes": 107092,
+      "path": "specs/approved/DMFP-02_FPL_RULES_SCORING_AND_SEASON_CONFIGURATION.txt",
+      "sha256": "7080479a784d57a334f0b3ed8c9bd465c89434729e5f7599f666c269bec11916"
+    },
+    {
+      "bytes": 107465,
+      "path": "specs/approved/DMFP-03_CANONICAL_DATA_MODEL_AND_IDENTIFIERS.txt",
+      "sha256": "f3ecc7bb990e4f3ae0dcedb06438e04cd5516b156c9130fdc542dcd09dcd58ab"
+    },
+    {
+      "bytes": 109820,
+      "path": "specs/approved/DMFP-04_DATA_SOURCES_MARKETS_APIS_AND_LICENSING_ZERO_COST_v1.0.txt",
+      "sha256": "7a29960e3d6dba3f4ed0b4e0d5819e0d8e2ddbd70b79dcf6376b310b59368b85"
+    },
+    {
+      "bytes": 96676,
+      "path": "specs/approved/DMFP-05_INGESTION_STORAGE_AND_DATA_QUALITY.txt",
+      "sha256": "de024be01f8e1fdd1bae259ffe9230508870830644da67dc61639cb70cd943dd"
+    },
+    {
+      "bytes": 79029,
+      "path": "specs/approved/DMFP-06_ODDS_NORMALISATION_AND_MARKET_CONSENSUS.txt",
+      "sha256": "af171422026588db3e4f93301df3af686b3312cdd40dd0cf8c77b35174ec6e6c"
+    },
+    {
+      "bytes": 82803,
+      "path": "specs/approved/DMFP-07_PLAYER_AVAILABILITY_START_AND_MINUTES_MODEL.txt",
+      "sha256": "e6c70afced2e702d99e321a424cec7fbf6c9fccbc91191717566f4aef66d2626"
+    },
+    {
+      "bytes": 82581,
+      "path": "specs/approved/DMFP-08_FOOTBALL_EVENT_DISTRIBUTION_ENGINE.txt",
+      "sha256": "7cb378f26741d28e6b900530102dfdbd2286470c5b8920764792eb70834c18ff"
+    },
+    {
+      "bytes": 74425,
+      "path": "specs/approved/DMFP-09_FPL_POINTS_DISTRIBUTION_ENGINE.txt",
+      "sha256": "1b5ee04f0b57f604072b6536fc8e60be19a0590f101f095614639af7cedd36da"
+    },
+    {
+      "bytes": 88070,
+      "path": "specs/approved/DMFP-10_UNCERTAINTY_SCENARIOS_AND_EARLY_SEASON_POLICY.txt",
+      "sha256": "5914251e325cd4b57f63413820c5d6a0612f6c33cbf73e7e003624d5faf6cf68"
+    },
+    {
+      "bytes": 78300,
+      "path": "specs/approved/DMFP-11_PRICE_CHANGE_AND_TEAM_VALUE_MODEL.txt",
+      "sha256": "32f831e4a249d10cd08323394a713fdd4084b297400503791e410f133184220e"
+    },
+    {
+      "bytes": 94914,
+      "path": "specs/approved/DMFP-12_SQUAD_TRANSFER_AND_LINEUP_OPTIMISER.txt",
+      "sha256": "cba15ba9c72ff68c0ea8dca6ac5cf9075bbb34eefca06e86060cf33f824a84f6"
+    },
+    {
+      "bytes": 86905,
+      "path": "specs/approved/DMFP-13_CAPTAINCY_AND_CHIP_OPTIMISER.txt",
+      "sha256": "6d2a7df75b53e338f96924de64cc4d847ba2964cabe700641086cf9acc8144b0"
+    },
+    {
+      "bytes": 85863,
+      "path": "specs/approved/DMFP-14_RANK_EFFECTIVE_OWNERSHIP_AND_RISK_STRATEGY.txt",
+      "sha256": "e796772890db8e5f6ca9ab8d61605a60a87acf6c545a05ab82c9fc73ae99c6de"
+    },
+    {
+      "bytes": 89447,
+      "path": "specs/approved/DMFP-15_BACKTESTING_CALIBRATION_AND_BENCHMARKS.txt",
+      "sha256": "0feec95bb9a3fb31b5ccc504699681a8170d7c349c18accefc6e3047ab9a15ed"
+    },
+    {
+      "bytes": 79866,
+      "path": "specs/approved/DMFP-16_ORCHESTRATION_APIS_AND_DECISION_PIPELINE.txt",
+      "sha256": "0bf960b211f7f566ae30eed46f1f6b577606d9a8c9fd7229f122f10c64ad18f9"
+    },
+    {
+      "bytes": 103478,
+      "path": "specs/approved/DMFP-17_OBSERVABILITY_REPRODUCIBILITY_SECURITY_COMPLIANCE.txt",
+      "sha256": "83fde67e17d8171c8305707c02b90838c7ad984f651f00636bb5a26d1ecd1486"
+    },
+    {
+      "bytes": 83559,
+      "path": "specs/approved/DMFP-18_DECISION_UI_REPORTING_AND_EXPLANATIONS.txt",
+      "sha256": "6b2efa3193e6aa123e63038956f06f72dc597ce2bd169130dcaab0c160a1cd0f"
+    },
+    {
+      "bytes": 100282,
+      "path": "specs/approved/DMFP-19_CODEX_IMPLEMENTATION_ROADMAP_AND_ACCEPTANCE_TESTS.txt",
+      "sha256": "2b2aac2301956b367b8fbd7c98259ccc7e6edcc9c294038de4e79c8bcabb4691"
+    },
+    {
+      "bytes": 160816,
+      "path": "specs/approved/DMFP-20_ASSUMPTIONS_DECISIONS_AND_OPEN_QUESTIONS.txt",
+      "sha256": "7ed484961cf81af1716db6daa51e6fa05ce2584c33bb04c1d59698e3bf934d72"
+    }
+  ]
+}

@@ -3462,3 +3462,18 @@ context GETs, must deduplicate requests/polling and must preserve explicit logou
 Then run applicable source gates and exact-source CI and renew the reviewed
 signature/installation lineage. Numerical/source-rights equivalence remains
 explicit; no provider request or original custody change is authorized.
+
+# DMF-MODEL-QUALITY-001 (active, 2026-11-07)
+
+- Branch `research/DMF-MODEL-QUALITY-001`, fetched launch base
+  `df26ab0723dea99469fe4c98423402ea91f85776`; separate worktree.
+- Preserve original dirty availability checkout, launch worktree, installed signed
+  release, PostgreSQL and permanent SQLite. Zero live provider calls/credits.
+- [x] Fetch origin, establish clean launch base and create development worktree.
+- [x] Read authority manifest, retained-data dictionary and operational contracts.
+- [x] Finish pipeline/identity/numerical audit; preserve private exact findings.
+- [x] Establish genuine evaluation sample and full architecture gap matrix.
+- [ ] Rank bounded changes; implement diagnostics and justified derived SQL views.
+- [ ] Test, measure, build and verify external installed wheel and immutable history.
+- [ ] Independent review, scoped evidence/manifest, capped review pack, commit/push.
+- [ ] Observe exact-SHA CI and record any remaining programme/approval gates.
