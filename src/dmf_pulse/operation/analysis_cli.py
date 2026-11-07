@@ -17,6 +17,25 @@ from dmf_pulse.operation.analysis_store import AnalysisStore
 analysis_app = typer.Typer(no_args_is_help=True, pretty_exceptions_enable=False)
 
 
+@analysis_app.command("quality")
+def quality(
+    run_id: Annotated[str | None, typer.Option("--run-id")] = None,
+    database: Annotated[Path | None, typer.Option("--database")] = None,
+) -> None:
+    """Diagnose retained forecasts offline; print private derived JSON without writing."""
+    from dmf_pulse.operation.analysis_quality import diagnose_forecast
+
+    try:
+        snapshot = AnalysisStore(database or warehouse_path()).snapshot(run_id)
+        if snapshot is None:
+            raise ValueError("ANALYSIS_RUN_UNAVAILABLE")
+        report = diagnose_forecast(snapshot)
+    except (OSError, ValueError, sqlite3.Error):
+        typer.echo("ANALYSIS_READ_ONLY_QUALITY_FAILED", err=True)
+        raise typer.Exit(2) from None
+    typer.echo(report.model_dump_json(indent=2))
+
+
 @analysis_app.command("query")
 def query(
     sql: Annotated[str, typer.Argument(help="One read-only SQL statement.")],

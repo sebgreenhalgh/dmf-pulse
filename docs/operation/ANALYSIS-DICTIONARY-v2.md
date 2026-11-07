@@ -43,6 +43,8 @@ dmf analysis quality --database PRIVATE_COPY --run-id RUN_ID
 It prints `analysis-quality-v1` / `retained-derived-diagnostics-v1` private derived
 JSON. It is pure after the existing read-only snapshot load: no forecasts,
 credentials, providers, reservations, storage writes or outcome fetches.
+The report carries the unchanged source provenance class, explicit permission
+origin and private derived retention restriction alongside the snapshot hash.
 
 - Counts distinguish missing point forecasts from zero/nonzero forecasts,
   missing minutes and positive minutes. Retained exact all-zero minute PMF can

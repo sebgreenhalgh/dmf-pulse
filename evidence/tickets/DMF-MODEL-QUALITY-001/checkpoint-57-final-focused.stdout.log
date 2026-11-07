@@ -1,0 +1,141 @@
+.........................................................                [100%]
+============================== warnings summary ===============================
+tests/unit/operation/test_analysis_quality_views.py::test_v1_read_and_atomic_idempotent_v2_migration_preserve_all_original_records
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\presentation.py:125: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D5384EB5B0>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_metrics_join_exact_player_fixture_gameweek_components_and_preserve_nulls
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\presentation.py:125: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D5384EB970>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_metrics_join_exact_player_fixture_gameweek_components_and_preserve_nulls
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\fpl_points\models.py:1095: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69F4C0>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_ambiguous_metric_grains_never_enter_new_warehouse_rows[gameweek]
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\models.py:551: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69C9A0>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_ambiguous_metric_grains_never_enter_new_warehouse_rows[gameweek]
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\models.py:551: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69E4D0>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[digest-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69C8B0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[digest-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69E200>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[digest-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69EA70>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[digest-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69E980>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[identity-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69E2F0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[identity-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69D3F0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[identity-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69E6B0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[identity-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69F2E0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_quality_views.py::test_v1_migration_refuses_corruption_and_ambiguous_historical_grains_without_changes[identity-True]
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69D8A0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_stage_not_visible_until_durable_canonical_confirmation
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\ingestion\fpl\parser.py:191: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69C220>
+    @field_validator("news_added", mode="before")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_stage_not_visible_until_durable_canonical_confirmation
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\rules\models.py:196: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69E890>
+    if len(self.source_refs) != len(set(self.source_refs)):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_stage_not_visible_until_durable_canonical_confirmation
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\rules\models.py:196: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D54A69EC50>
+    if len(self.source_refs) != len(set(self.source_refs)):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_concurrent_idempotent_inserts_have_one_complete_snapshot
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D5403E34C0>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_query_bounds_and_utc_confirmation_are_explicit
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\presentation.py:125: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D5404BDF30>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_full_snapshot_capacity_is_separate_from_history_and_query_output_bounds
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\presentation.py:125: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D5404BFA60>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_full_snapshot_capacity_is_separate_from_history_and_query_output_bounds
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\presentation.py:125: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x000001D5404BE6B0>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                          Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------------
+src\dmf_pulse\operation\analysis_cli.py          45     12      6      1    71%   48-50, 52-57, 70-72
+src\dmf_pulse\operation\analysis_quality.py     132      8     56      8    91%   91, 133, 163, 200, 215, 219, 225, 230
+src\dmf_pulse\operation\analysis_store.py       160      9     66      8    92%   251, 283, 302-303, 331, 344, 361, 416, 484
+-----------------------------------------------------------------------------------------
+TOTAL                                           337     29    128     17    90%
+Coverage JSON written to file review_pack/quality-final-coverage.json
+57 passed, 21 warnings in 279.92s (0:04:39)

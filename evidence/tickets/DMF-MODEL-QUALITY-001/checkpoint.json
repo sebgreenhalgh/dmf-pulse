@@ -1,0 +1,52 @@
+{
+  "programme": "DMF-MODEL-QUALITY-001",
+  "branch": "research/DMF-MODEL-QUALITY-001",
+  "baseline": "df26ab0723dea99469fe4c98423402ea91f85776",
+  "status": "RESEARCH_IMPLEMENTATION_AWAITING_FINAL_GATE_RESULTS",
+  "completed": [
+    "current model audit",
+    "authenticated private GW10 audit",
+    "validation scorecard with zero matched labels",
+    "18-capability gap matrix",
+    "bounded roadmap",
+    "offline quality command",
+    "three additive derived SQL views",
+    "copy-only migration and history preservation",
+    "independent technical review with no unresolved P0/P1/material P2"
+  ],
+  "tests": {
+    "functional_pre_metadata_focused": 64,
+    "inherited": 73,
+    "sql_performance": 1,
+    "quality_pre_metadata_line_coverage_percent": 99.24242424242425,
+    "quality_pre_metadata_branch_coverage_percent": 98.21428571428571,
+    "provenance_metadata_offline_smoke": "PASS",
+    "final_metadata_focused_retest": "RUNNING"
+  },
+  "gates": {
+    "frozen_sync": "PASS",
+    "format": "PASS",
+    "lint": "PASS",
+    "local_mypy": "BLOCKED_WINDOWS_APPLICATION_CONTROL",
+    "copy_migration": "PASS",
+    "outside_checkout_wheel_owned_v1_v2": "PASS for final provenance-carrying wheel 3205b1635f05e1f1dded1503a33005e439890f035b6f8ba05ca144e2dae48260",
+    "postgres_migration_matrix": "PASS isolated port 55439",
+    "comprehensive_wheel": "RUNNING against isolated test database",
+    "final_exact_sha_CI": "PENDING_COMMIT_AND_PUSH",
+    "repository_validation": "PASS at source checkpoint; final evidence reseal remains",
+    "secret_scan": "PASS after raw synthetic security case-name JUnit retained privately without scanner exceptions"
+  },
+  "safety": {
+    "provider_calls": 0,
+    "credits_consumed": 0,
+    "production_model_promotion": false,
+    "installed_release_changed": false,
+    "canonical_warehouse_changed": false,
+    "canonical_ledger_accessed": false,
+    "PR_or_merge": false
+  },
+  "scientific_claim": "No measured forecast-accuracy improvement; all forecasts remain UNVALIDATED.",
+  "production_schema_blocker": "Signed v1 reader rejects v2 user_version; separate rollback-compatible activation acceptance required.",
+  "private_evidence": "Exact GW10 numerical findings and live-store hash proof remain under ignored review_pack/private-audit; not publicly certified.",
+  "next_executable_action": "Finish local final gate processes; update receipts/manifests, commit evidence and push; inspect exact-SHA CI; build capped immutable-HEAD review pack. Future model work follows MQ-002/MQ-003 source/protocol dependencies."
+}

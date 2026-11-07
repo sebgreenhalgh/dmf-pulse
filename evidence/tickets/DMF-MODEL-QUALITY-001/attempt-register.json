@@ -1,0 +1,85 @@
+{
+  "failed_attempts": [
+    {
+      "attempt": "initial new unit tests",
+      "outcome": "5 failed;16 passed",
+      "reason": "test expected no pre-existing missing forecast; corrected test denominator"
+    },
+    {
+      "attempt": "broad checkpoint suite",
+      "outcome": "124 setup errors in 567.79 seconds",
+      "reason": "shared pytest temp directory access denied; no test body verdict; rerun using explicit workspace basetemp"
+    },
+    {
+      "attempt": "initial SQL performance check",
+      "outcome": "one setup error",
+      "reason": "same shared temp restriction; rerun with workspace basetemp passed"
+    },
+    {
+      "attempt": "local strict mypy",
+      "outcome": "exit 1",
+      "reason": "Windows Application Control blocked librt.base64; no type verdict; exact Linux CI required"
+    },
+    {
+      "attempt": "first comprehensive wheel check",
+      "outcome": "failed",
+      "reason": "disposable DMF_TEST_DATABASE_URL required; no canonical database was used"
+    },
+    {
+      "attempt": "first secret scan with command traces",
+      "outcome": "7 findings",
+      "reason": "UTF-16 redirected log and synthetic test URL sentinel in failed stack traces; raw failures retained privately, public chronological receipt preserves outcomes; no scanner allowlist or detection rules changed"
+    },
+    {
+      "attempt": "subsequent scanner check",
+      "outcome": "2 findings",
+      "reason": "Inherited passing JUnit repeats a deliberate security-test URL sentinel in its case name; raw JUnit retained privately and complete outcome/case-hash receipt retained publicly; no scanner exception added"
+    },
+    {
+      "attempt": "final provenance wheel QA before rebuild finished",
+      "outcome": "mandatory provenance assertion refused the older installed wheel",
+      "reason": "QA started before asynchronous rebuild completion; final source wheel byte check now passed; QA repeated only after build completion",
+      "raw_commands_sha256": "81dca34e0140bd1688d3820f1ece74776b991351f29174d882ce551d00161e97"
+    }
+  ],
+  "artifact_custody": [
+    {
+      "artifact": "focused.stdout.log",
+      "raw_sha256": "273f3dcae1fe3259acf892ecb0dea2854bdcfdf86d32603c43b9e5932dc235f6",
+      "raw_bytes": 796341,
+      "retained_privately_at": "review_pack/failed-attempts/focused.stdout.log"
+    },
+    {
+      "artifact": "focused.stderr.log",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "retained_privately_at": "review_pack/failed-attempts/focused.stderr.log"
+    },
+    {
+      "artifact": "focused.xml",
+      "raw_sha256": "61934c2ee99d0677d558cf13bfa04b41a2989e828e0c1a4868d90844bf1d86cb",
+      "raw_bytes": 814827,
+      "retained_privately_at": "review_pack/failed-attempts/focused.xml"
+    },
+    {
+      "artifact": "focused.json",
+      "raw_sha256": "46b62f8ec36e1f612b32cb1c8395f31448c5fb141a952d0598f2acbd88a960c4",
+      "raw_bytes": 1540,
+      "retained_privately_at": "review_pack/failed-attempts/focused.json"
+    },
+    {
+      "artifact": "final-focused.stdout.log",
+      "raw_sha256": "58f8dcab3f5f154f34547050e608cf949e8cdacbe10d6f75aae77a4a47b9389e",
+      "public_utf8_sha256": "878c5c11ddc7b2abef94a30f91aa68822576116e091ae9e7bcd1cdba591885a9",
+      "change": "UTF-16 to UTF-8 only; original retained privately"
+    },
+    {
+      "artifact": "inherited-final.stdout.log",
+      "raw_sha256": "6b3a2a0729bf23ddb587591bb6f621e26dc3a299fd75732cacc4375e88a93142",
+      "public_utf8_sha256": "c15074e70a5fa7d0ec1634ffe72504143918b8b95bc72438edef7b6da772b021",
+      "change": "UTF-16 to UTF-8 only; original retained privately"
+    }
+  ],
+  "statistical_experiments": [],
+  "no_model_superiority_experiments_or_promotions": true
+}

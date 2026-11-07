@@ -18,6 +18,72 @@ from dmf_pulse.operation.models import ChargedQuotaStatus
 AnalysisStorageError = sqlite3.Error
 _MAX_SNAPSHOT_BYTES = 32 * 1024 * 1024
 
+_QUALITY_VIEWS = """
+CREATE VIEW player_gameweek_metrics_v2 AS
+ WITH catalogue AS MATERIALIZED (
+ SELECT run_id,json_group_object(player_id,official_id) AS by_id
+ FROM player_forecasts WHERE player_id IS NOT NULL GROUP BY run_id)
+ SELECT s.run_id, r.digest AS snapshot_sha256,
+ json_extract(c.by_id,'$.' || json_quote(p.key)) AS official_id, p.key AS player_id,
+ json_extract(g.value,'$.gameweek') AS gameweek,
+ json_extract(g.value,'$.result_sha256') AS projection_sha256,
+ json_extract(p.value,'$.ruleset_hash') AS ruleset_hash,
+ json_extract(p.value,'$.expected_points') AS expected_points,
+ json_extract(p.value,'$.probability_zero_points') AS probability_zero_points,
+ json_extract(p.value,'$.scenario_effective_sample_size') AS effective_sample_size,
+ json_extract(p.value,'$.monte_carlo_mean_se') AS mean_se,
+ json_extract(p.value,'$.pmf') AS points_pmf_json,
+ json_extract(p.value,'$.component_breakdown') AS components_json,
+ json_extract(p.value,'$.bps_bonus') AS bonus_json,
+ json_extract(p.value,'$.threshold_probability_se') AS probability_se_json,
+ p.value AS derived_json
+ FROM snapshots s JOIN runs r ON r.run_id=s.run_id
+ JOIN catalogue c ON c.run_id=s.run_id,
+ json_each(s.payload,'$.presentation.gameweeks') g,
+ json_each(g.value,'$.summaries') p
+ WHERE json_type(c.by_id,'$.' || json_quote(p.key)) IS NOT NULL;
+CREATE VIEW player_fixture_metrics_v2 AS
+ WITH catalogue AS MATERIALIZED (
+ SELECT run_id,json_group_object(player_id,official_id) AS by_id
+ FROM player_forecasts WHERE player_id IS NOT NULL GROUP BY run_id)
+ SELECT s.run_id, r.digest AS snapshot_sha256,
+ json_extract(c.by_id,'$.' || json_quote(p.key)) AS official_id, p.key AS player_id,
+ json_extract(x.value,'$.gameweek') AS gameweek,
+ json_extract(x.value,'$.official_fixture_id') AS official_fixture_id,
+ json_extract(x.value,'$.fixture_id') AS fixture_id,
+ json_extract(x.value,'$.result_sha256') AS projection_sha256,
+ json_extract(p.value,'$.ruleset_hash') AS ruleset_hash,
+ json_extract(p.value,'$.expected_points') AS expected_points,
+ json_extract(p.value,'$.probability_zero_points') AS probability_zero_points,
+ json_extract(p.value,'$.component_breakdown') AS components_json,
+ json_extract(p.value,'$.pmf') AS points_pmf_json,
+ json_extract(m.value,'$.p_start') AS p_start,
+ json_extract(m.value,'$.p_zero_minutes') AS p_zero_minutes,
+ json_extract(m.value,'$.expected_minutes') AS expected_minutes,
+ json_extract(m.value,'$.minute_pmf') AS minute_pmf_json,
+ json_extract(m.value,'$.confidence_reasons') AS minutes_confidence_reasons_json
+ FROM snapshots s JOIN runs r ON r.run_id=s.run_id
+ JOIN catalogue c ON c.run_id=s.run_id,
+ json_each(s.payload,'$.presentation.fixtures') x,
+ json_each(x.value,'$.summaries') p
+ LEFT JOIN json_each(x.value,'$.minutes') m ON m.key=p.key
+ WHERE json_type(c.by_id,'$.' || json_quote(p.key)) IS NOT NULL;
+CREATE VIEW player_component_metrics_v2 AS
+ SELECT run_id,snapshot_sha256,official_id,player_id,gameweek,
+ 'GAMEWEEK' AS metric_scope,NULL AS official_fixture_id,c.key AS component,
+ json_extract(c.value,'$.expected_points') AS expected_points,
+ json_extract(c.value,'$.probability_nonzero') AS probability_nonzero,
+ json_extract(c.value,'$.variance') AS variance
+ FROM player_gameweek_metrics_v2,json_each(components_json) c
+ UNION ALL
+ SELECT run_id,snapshot_sha256,official_id,player_id,gameweek,
+ 'FIXTURE' AS metric_scope,official_fixture_id,c.key AS component,
+ json_extract(c.value,'$.expected_points') AS expected_points,
+ json_extract(c.value,'$.probability_nonzero') AS probability_nonzero,
+ json_extract(c.value,'$.variance') AS variance
+ FROM player_fixture_metrics_v2,json_each(components_json) c;
+"""
+
 _SCHEMA = """
 CREATE TABLE snapshots (
  run_id TEXT PRIMARY KEY, digest TEXT NOT NULL UNIQUE, payload TEXT NOT NULL CHECK(json_valid(payload))
@@ -128,6 +194,40 @@ CREATE VIEW run_player_changes AS SELECT a.run_id AS old_run_id,b.run_id AS new_
 """
 
 
+def _require_metric_identities(snapshot: AnalysisSnapshot) -> None:
+    """Reject ambiguous new metric grains; original v1 history remains readable."""
+    ids = [
+        p.catalogue.player_id for p in snapshot.view.players if p.catalogue.player_id is not None
+    ]
+    presentation = snapshot.presentation
+    mapped = set(ids)
+    ambiguous = len(ids) != len(mapped)
+    if presentation is not None:
+        catalogue = {p.player_id: p for p in presentation.catalogue if p.player_id is not None}
+        ambiguous = ambiguous or (
+            len({g.gameweek for g in presentation.gameweeks}) != len(presentation.gameweeks)
+            or len({f.official_fixture_id for f in presentation.fixtures})
+            != len(presentation.fixtures)
+            or len({f.fixture_id for f in presentation.fixtures}) != len(presentation.fixtures)
+            or any(
+                key != summary.player_id
+                or key not in mapped
+                or catalogue[key].team not in {fixture.home, fixture.away}
+                for fixture in presentation.fixtures
+                for key, summary in fixture.summaries.items()
+            )
+            or any(
+                key != minutes.player_id
+                or key not in mapped
+                or catalogue[key].position != minutes.position
+                for fixture in presentation.fixtures
+                for key, minutes in fixture.minutes.items()
+            )
+        )
+    if ambiguous:
+        raise ValueError("ANALYSIS_METRIC_IDENTITY_AMBIGUOUS")
+
+
 class AnalysisStore:
     """Explicit open/migrate/write; no mutable latest pointer or historical overwrite."""
 
@@ -144,7 +244,7 @@ class AnalysisStore:
             connection.execute("PRAGMA foreign_keys=ON")
             connection.execute("PRAGMA synchronous=FULL")
             version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if version not in {0, 1}:
+            if version not in {0, 1, 2}:
                 raise ValueError("ANALYSIS_SCHEMA_VERSION_UNSUPPORTED")
             if version == 0:
                 if connection.execute("SELECT count(*) FROM sqlite_master").fetchone()[0]:
@@ -163,6 +263,22 @@ class AnalysisStore:
                 connection.executescript(
                     "BEGIN IMMEDIATE;\n" + _SCHEMA + triggers + "\nPRAGMA user_version=1; COMMIT;"
                 )
+            # Each migration is atomic. Never rewrite a snapshot, publication,
+            # original JSON, digest or v1 view; readers can still open v1 offline.
+            with connection:
+                connection.execute("BEGIN IMMEDIATE")
+                if connection.execute("PRAGMA user_version").fetchone()[0] == 1:
+                    for payload, digest in connection.execute(
+                        "SELECT payload,digest FROM snapshots"
+                    ):
+                        retained = AnalysisSnapshot.model_validate_json(payload)
+                        if retained.semantic_sha256 != digest:
+                            raise ValueError("ANALYSIS_DIGEST_MISMATCH")
+                        _require_metric_identities(retained)
+                    for statement in _QUALITY_VIEWS.strip().split(";"):
+                        if statement.strip():
+                            connection.execute(statement)
+                    connection.execute("PRAGMA user_version=2")
             if connection.execute("PRAGMA quick_check").fetchone()[0] != "ok":
                 raise ValueError("ANALYSIS_DATABASE_CORRUPT")
 
@@ -182,7 +298,7 @@ class AnalysisStore:
         connection.execute("PRAGMA synchronous=FULL")
         if readonly:
             connection.execute("PRAGMA query_only=ON")
-        if connection.execute("PRAGMA user_version").fetchone()[0] != 1:
+        if connection.execute("PRAGMA user_version").fetchone()[0] not in {1, 2}:
             connection.close()
             raise ValueError("ANALYSIS_SCHEMA_VERSION_UNSUPPORTED")
         return connection
@@ -190,6 +306,7 @@ class AnalysisStore:
     def stage(self, snapshot: AnalysisSnapshot) -> str:
         body = snapshot.model_dump_json()
         snapshot = AnalysisSnapshot.model_validate_json(body)
+        _require_metric_identities(snapshot)
         if len(body.encode()) > _MAX_SNAPSHOT_BYTES:
             raise ValueError("ANALYSIS_SNAPSHOT_TOO_LARGE")
         with closing(self._connect()) as connection, connection:

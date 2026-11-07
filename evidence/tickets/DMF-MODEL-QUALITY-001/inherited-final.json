@@ -1,0 +1,321 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=review_pack/inherited-final-temp",
+    "tests/unit/operation/test_analysis_admission.py",
+    "tests/unit/operation/test_analysis_optimizer.py",
+    "tests/unit/operation/test_analysis_portability.py",
+    "tests/unit/operation/test_persistent_desk.py",
+    "tests/unit/operation/test_start.py",
+    "tests/unit/dashboard/test_dashboard.py",
+    "tests/unit/dashboard/test_session_bootstrap.py"
+  ],
+  "exit_code": 0,
+  "tests": 73,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "seconds": 265.731,
+  "raw_junit_sha256": "221773d74833ba950f07bde4c9d12bc0ae17dc5f89cb5af4210128fc06c83be1",
+  "raw_junit_private_location": "review_pack/retained-test-streams/inherited-final.xml",
+  "raw_not_published_reason": "Inherited security test case name contains a deliberate URL query sentinel; scanner is unchanged. Complete stdout remains public.",
+  "case_class_and_name_sha256": [
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "c48d2e00fba82406c61936869da00e8819c7ca8b1c457c5b9e897932be197156"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "cba1690546f8e8e314bde0d1a462e21f4c9dad940c555c09bfc2da286350c165"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "6c721689ba4a48ff66b8c49c461f516bdc51cc689f05541b3987960dcec9bee8"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "efbba4dd86624bc0f6208d1d62e13150c35144dd6f5f23cae036668000733d64"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "633b8c6ea5447dfc7ba2333c994164576c129dea36ddffaba37e4d9c04e1da24"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "3271b58acb8aeabba8188cfc6c932323df4576c6edce57c8175040714fa603c7"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_admission",
+      "case_name_sha256": "a06745767927b59471eb93b2706f3d273299cd3b766a0d21b8745c82daf2874e"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_optimizer",
+      "case_name_sha256": "a1af2420da33c9e8af41cb76f7be9aec924e08f09d5575b70d06c83fe8d796f4"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_optimizer",
+      "case_name_sha256": "b22aac7fa87c1547ca74c054e868f89ceeb52a2205e603e37fc067d1fb4e7b8d"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_optimizer",
+      "case_name_sha256": "5306aadb13a34d0f442ff9d22bf3cfb564c73bed2aa7917e05d93fd3ff9de821"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_optimizer",
+      "case_name_sha256": "b4c0dbefbde87e02ea1f1e1f21c1f52ec1d1c5fe0893477f9cdaf1411d5b6a28"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_optimizer",
+      "case_name_sha256": "7a6a65a6b54238a90a16d39864247ce56802da4950d4ee54a868b35789f4a837"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_optimizer",
+      "case_name_sha256": "4cae5b71ec4df74ef31df3d108d4f65dc82a6b8c069a194955596b11ae82ae66"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_portability",
+      "case_name_sha256": "5769c0f782085532d9ceea140dfd7d5bd7305319dec921d22dff33db282d49c5"
+    },
+    {
+      "class": "tests.unit.operation.test_analysis_portability",
+      "case_name_sha256": "431db558ce5753626e87a64403ac6108dbc5bf3822f612548955df4a92801946"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "7c6b5f3fc828eadb34a36c11486acd22ba6d7100566ad456391ef22e1963c4d3"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "e1d8bc9fd38a7914a18a8f2b90e6cf8221eaade5a32bb55afd5fe07473b53628"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "27824a9aaa00c93d7641686b8068348fef662307124ce2558e35582dd990f7ee"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "e8864d7241a6ed0ec3b1d8bc6a9b197e3b6a05c73725ded57489898259375c4d"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "30a07bdf783e70c414d44e7e3dfa3af5b53c13e7ba2a084547eb517cd7e1c074"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "d56b5a87d1096623a15bf90c48a547a50cd9ad1358d71e3e49599a85419a5a90"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "8effbedec7a763c47705c1a2c6e7ce04c1976bf9b41bfd89f6465fea656ed159"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "b653f68221efb00a82fbec9543e344e4d8431959d51491e3979b1da52623125e"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "6f0fd126a1acbecb53094459ac729a89562a71ca89525361ba26e516f7eea754"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "bc5c5acfe5c9ce0bb932ae4d65efa2f534aa837b0528c33eb31f4de2dfcc9dc0"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "554a96335e3c8b75f815dc81fb230175a8cacf9db6f1e0bcc9a76bc60f786137"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "4732a14164139a7f30d7223c6ca60613577223daadf827fa5aa93aa8bb4350b4"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "c1bc49a6849b2eb41aef7909b1088bb037c624b0001e70b80177937547ff6f84"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "6d941446927ce60c4f08303268bd49536c2df26e577b1363c330cb5692844a55"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "fdfa7ddbab7287ccae4ce078504ca1e74715de877d9372caf9e85521073f644c"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "42a03853e2ae90fb116436711c45b9edade784bdc39aaa939247d359727c78b6"
+    },
+    {
+      "class": "tests.unit.operation.test_persistent_desk",
+      "case_name_sha256": "b7f7f943d2935f7f09a05ab3ed50baf2bcf78791650f32ddf15fac7ed5751f10"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "63cd0d99b27763611b5733f3984bcf58167d1f94cec0da484f43310392f5c4ce"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "f68e6be238926566b7a3764c19f7872e3d120a729bbccac66b83c66bb63f1564"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "70668d3fe77a9d83feb568829793e716a45172cff9d048ee8de88adc0d95c13b"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "9250d04485c2c130233247f900b4f23ba9b4ec6efadb0c772c47093738549cb8"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "92adac14da0625ac1a0572ae46c08b17e7a07ce75691458da16de5198ebd5e8c"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "a99a2852c5bc2a6afaed48fc1e91cf0849e4c9df8660348ce45e2ea6aeedf0eb"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "03bfd62d647500229210ad5f716d7450c0c2c5b14fe1c429972d6244944a318f"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "d5ac6345b37fd1dd44c35f7d5a5fb0c5d85d258e037550f8538867051c5ef5ab"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "0adc659e378e7fd158e9f694ed46928c443bcb17f0e1e0738c4cd0a62c11ab90"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "e121535b006e420e5c27f91e7e86e27ed3dfc7c17623a3189b1d94ba222b2c7b"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "03dbf03662d31846dd4556a4f6da0c7e6f9d344f975efa4553ca47736f352353"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "dc6547df70931952908f969b46572483af2362ed10ef586880ba221cc8f32159"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "845cad9e75d77e3d826a2d757ea1adc37b3a70b44d712b4bc69d5f275e42982c"
+    },
+    {
+      "class": "tests.unit.operation.test_start",
+      "case_name_sha256": "edfa74848b5eaf952526f9d47970cb19f32f67252bc2d99bce305eb6d72cfbc9"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "eda1ba860fe49cff2e026a180cb2440e30d256c39d4dc327bee19c8b87f436da"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "f6281c0e92cd26ee21d6adc1f478fffbe4eb345ead5fd66e6bf88e1d617d48db"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "c7dfd0197607d8dde05fd5c3ad6a9721d7778a397f03b9ea5e1627676262c192"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "49c49171ac15c3d3f1ea4f63aab7f5c6f56672d56e9840b17f7e163c7708bb4f"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "f06ff6dfc194c18d30ceac847ed3ee704ff2a2245a70e3d0733dcd7bf52f3fef"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "efd9ca79f6003b4ae05112987a45493bdfa94f9e341bbe8c60f1b2394c615e72"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "342f38f8c38b5dd3c08280d38271ba130c4e54e713d552c30bb928a416b95bb1"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "c9df22f0a83e420ec71809fe27ed72fda283e3f9f62ec5b4fa230b7ddf547497"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "c920d8768f64f2e11e4ddf4fb9b04bd75d851cc97baf2689f10e9035b3316f57"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "2e7d0309c42eb53e4274966b8a41a1b319694dbc824282e923ead32e5b0b3c75"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "7f560628a8f52de733ed2fe2b9d2070c4b6eca17fa6d3df145d93733f702a987"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "d832396c74b8578366f787bd7ac5d34271972826213e8dfe5c5de20caf2df114"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "ba03036db478833b5bdf4d35a595d8bb08d7dc379e9b7743574a2b9234d55729"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "1885b28ef102480deeda4f6bfa4f2c0b5c2ba6c08117c7fdc645b7fa5646ca06"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "93ecba0cf3bd5ee12406b75df4d2d5b9546e0f012c28a21161831dd71f44d493"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "24bf1270b4e248897dbd614f1bfc4461fe3c75ee034f988180ba7ca4440efc5c"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "bf66b80f6744c561e692c45eb3e2bcd2e423326b469c206fab724f82f462a7a1"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "134444e24b9837e6bf2c02b0febf14c876404ff06674cf5df36bd1dba45addd9"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "29084ab8309f54de7e1288f7076e25262cd6bf09fc963b3cba7d2e6ddf2e9e33"
+    },
+    {
+      "class": "tests.unit.dashboard.test_dashboard",
+      "case_name_sha256": "b6d34bf8e71f9bbb436c55f296f88188bd90a589365bb3970139ed63d2916e0c"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "ff135a2ef687edd66ac721503d5ea963f7de67a797c0f88a9cc61e367630b610"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "1b314c47ab82e862137f9510cbf94d40975fe0d09a4df4673e17f228a67195ae"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "f212f48a89c3cd4d995252b267b687dd41836b5903815582f62e86f37671624c"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "a63f9b0cb80bcab9fd2c7d5cae69de5196e20950b4c7b98512cc7cffc7cdb6c0"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "03be2a3d1ed284f0d3bc054b66633fa508758344a5fbe9b236c5fd90d1462b96"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "28316fc8159a60bbcbb7689e1124e625c77ec9046afd80036edebc6ebe5256ec"
+    },
+    {
+      "class": "tests.unit.dashboard.test_session_bootstrap",
+      "case_name_sha256": "b1e6170a1b4b995d28e2a8c377c0887bd90de960f20d567b49695375a3b9ad40"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "baseline_revision": "20260803_0005",
+  "baseline_state": {
+    "availability_table_count": 12,
+    "revision": "20260803_0005"
+  },
+  "data_preservation": {
+    "baseline_seed": {},
+    "downgraded_seed": {},
+    "final_seed": {},
+    "head_seed": {},
+    "status": "PASS"
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "name": "dmf_pulse_test",
+    "port": 55439,
+    "postgres_version": "18.4"
+  },
+  "matrix": [
+    {
+      "from": "base",
+      "status": "PASS",
+      "to": "20261101_0010"
+    },
+    {
+      "from": "20261101_0010",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20261101_0010"
+    },
+    {
+      "from": "20261101_0010",
+      "status": "PASS",
+      "to": "20260803_0005"
+    },
+    {
+      "from": "20260803_0005",
+      "status": "PASS",
+      "to": "20261101_0010"
+    }
+  ],
+  "metadata_drift_check": "PASS",
+  "offline_sql": {
+    "bytes": 307855,
+    "path": "review_pack/quality-offline-upgrade.sql",
+    "secret_free": true,
+    "sha256": "c678e04930b4370c63c6dc8f35e9271a35f722048e5ba993dce76a3038eb6805"
+  },
+  "revision_count": 5,
+  "revisions": [
+    "20260807_0006",
+    "20261029_0007",
+    "20261029_0008",
+    "20261030_0009",
+    "20261101_0010"
+  ],
+  "schema": {
+    "alembic_revision": "20261101_0010",
+    "schema_sha256": "a94554e247a16b87f47a6510b6fbc579c4b21cc7a0025a55db9e027da6579b0a",
+    "table_count": 77,
+    "view_count": 12
+  },
+  "schema_manifest": {
+    "path": "evidence/tickets/DMF-MODEL-QUALITY-001/postgres-schema.json",
+    "sha256": "32df9192c7e50d14635a91abb38ae71003816c339539627bf419f6677421d746"
+  },
+  "status": "PASS",
+  "target_revision": "20261101_0010",
+  "ticket_id": "OPR-001"
+}

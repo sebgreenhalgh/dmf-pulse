@@ -3473,7 +3473,23 @@ explicit; no provider request or original custody change is authorized.
 - [x] Read authority manifest, retained-data dictionary and operational contracts.
 - [x] Finish pipeline/identity/numerical audit; preserve private exact findings.
 - [x] Establish genuine evaluation sample and full architecture gap matrix.
-- [ ] Rank bounded changes; implement diagnostics and justified derived SQL views.
+- [x] Rank bounded changes; implement diagnostics and justified derived SQL views.
 - [ ] Test, measure, build and verify external installed wheel and immutable history.
 - [ ] Independent review, scoped evidence/manifest, capped review pack, commit/push.
 - [ ] Observe exact-SHA CI and record any remaining programme/approval gates.
+
+## MODEL-QUALITY-001 verified research checkpoint
+
+- Audit and authority checkpoint pushed as `705809a8f553d2182892e9709c265444daa63249`.
+- Implemented offline quality reporting and additive v2 derived views; numerical,
+  source, dependency, rules and CI paths are unchanged. No live migration/install.
+- 64 final focused tests and 73 inherited tests pass; quality module has
+  99.24% lines / 98.21% branches. Owned 760-player SQL stress passes the 5s cap.
+- Exact research wheel works outside checkout on owned v1/v2 databases.
+- Real research-copy migration preserves original snapshots and every v1 row;
+  canonical warehouse and signed active-release manifest hashes remain unchanged.
+- Disposable PostgreSQL 18.4 migration matrix passes on isolated port 55439.
+- Independent review: no unresolved P0/P1/material P2. Local mypy is blocked by
+  Windows Application Control; exact final-SHA hosted CI remains required.
+- Next programme ticket is MQ-002 match-time membership / MQ-003 qualified real
+  forecast custody, under the roadmap dependencies; no new data authority inferred.

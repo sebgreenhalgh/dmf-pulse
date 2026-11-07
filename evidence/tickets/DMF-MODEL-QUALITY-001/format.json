@@ -1,0 +1,26 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "ruff",
+    "format",
+    "--check",
+    "."
+  ],
+  "started_at": "2026-11-07T00:19:58.612728+00:00",
+  "offline": true,
+  "uv_cache": "workspace review_pack/uv-cache",
+  "exit_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 0.3453593000303954,
+  "stdout": {
+    "path": "format.stdout.log",
+    "sha256": "afe31bec57768d1548cdd62398690b9d65250c21745baa1ea9205865b350467f",
+    "bytes": 29
+  },
+  "stderr": {
+    "path": "format.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+}

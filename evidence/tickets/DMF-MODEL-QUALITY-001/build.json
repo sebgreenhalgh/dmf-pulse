@@ -1,0 +1,23 @@
+{
+  "command": [
+    "uv",
+    "build",
+    "--no-build-isolation"
+  ],
+  "started_at": "2026-11-06T23:55:21.065509+00:00",
+  "offline": true,
+  "uv_cache": "workspace review_pack/uv-cache",
+  "exit_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 14.247945699840784,
+  "stdout": {
+    "path": "build.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "stderr": {
+    "path": "build.stderr.log",
+    "sha256": "dd94a6871938be98b33cd47a32e4d8d4ce4ca950cb09b21b458f122afbfea8c6",
+    "bytes": 309
+  }
+}

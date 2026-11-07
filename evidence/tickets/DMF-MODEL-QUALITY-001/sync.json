@@ -1,0 +1,24 @@
+{
+  "command": [
+    "uv",
+    "sync",
+    "--all-groups",
+    "--frozen"
+  ],
+  "started_at": "2026-11-06T23:45:49.223313+00:00",
+  "offline": true,
+  "uv_cache": "workspace review_pack/uv-cache",
+  "exit_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 0.054789300076663494,
+  "stdout": {
+    "path": "sync.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "stderr": {
+    "path": "sync.stderr.log",
+    "sha256": "b16946139e5a7def16f0fb414c1360d4606d89d4acdbe4beb77e5214c14ffde2",
+    "bytes": 27
+  }
+}

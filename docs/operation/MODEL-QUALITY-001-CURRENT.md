@@ -32,6 +32,19 @@ provider routes, model resources and rules remain unchanged.
 
 ## Specific GW10 questions and evidence limits
 
+The current 1X2 and totals adapters use raw implied probabilities `1 / decimal_odds`.
+Primary de-vigging is the power method (solve `sum(raw_i ** k) = 1`), with an
+explicit proportional fallback `raw_i / sum(raw)` on numerical failure. Eligible
+canonical operators are deduplicated; conflicting same-time aliases are excluded.
+Consensus is the equal-weight mean of eligible power vectors, with operator and
+power-versus-proportional disagreement recorded. These are market-derived
+uncertainty diagnostics, not empirical football probability calibration.
+`score_projection.py` solves the coherent simplex problem equivalent to
+`KL(q || prior) + 0.5 * sum(weight_j / uncertainty_j**2 * (A_j q - target_j)**2)`;
+the policy caps constraint families and records residuals/fallback. This
+mathematical consistency cannot establish that event-allocation or minutes
+probabilities are calibrated.
+
 **Grade E:** it is explicitly assigned in `player_prior.py` for both governed
 donor and stale current-GW binding, then propagated to point summaries. It is
 not computed by noticing that every player lacks history. Minutes can have
@@ -39,6 +52,15 @@ different grades. Private audit quantifies exact carried INDIVIDUAL versus
 position-only rows; neither row counts nor the xPts sums of those rows measure
 the causal contribution of individualized evidence. That requires freezing an
 ablation on the same source/seed/lineup/market surface.
+
+For the Stage-7 role utility before coherent lineup sampling, the policy implies
+`prior weight = 2 / (2 + sum(recency_weight * regime/evidence_modifier))`.
+Conditional minute-bin estimates similarly use strength 3 against the retained
+role-specific observation weight. These are shrinkage weights on intermediate
+utilities/distributions, not additive fractions of final xPts. Actual individual
+weights cannot be recovered from the historical saved view because the retained
+history rows and sufficient evidence counts are absent. Calling this family
+empirical Bayes does not make its synthetic fitted global priors real calibration.
 
 **Identity:** catalogue labels come from current official IDs, not name-based
 historical football knowledge. Unusual combinations are not proven errors.

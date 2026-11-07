@@ -1,0 +1,24 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "mypy",
+    "src/dmf_pulse"
+  ],
+  "started_at": "2026-11-06T23:45:50.218760+00:00",
+  "offline": true,
+  "uv_cache": "workspace review_pack/uv-cache",
+  "exit_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 0.2634009998291731,
+  "stdout": {
+    "path": "mypy.stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "stderr": {
+    "path": "mypy.stderr.log",
+    "sha256": "d10997147f9efcb2f49e5f0ac31f1752f9e5a0f31783e3a32175d8642ade5166",
+    "bytes": 703
+  }
+}

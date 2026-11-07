@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "wheel_sha256": "37289741065bbe2f5e3517d48f5ebd05b01462854a759ff0d9a2383406f32fb2",
+  "outside_checkout": true,
+  "frozen_hash_checked_runtime_dependencies": true,
+  "owned_v1_v2_quality_cli": true,
+  "database_bytes_unchanged": true,
+  "production_release_installed_or_modified": false,
+  "provider_calls": 0,
+  "qa_root": "C:\\Users\\sebgr\\AppData\\Local\\Temp\\dmf-quality-wheel-5obcq3xx"
+}

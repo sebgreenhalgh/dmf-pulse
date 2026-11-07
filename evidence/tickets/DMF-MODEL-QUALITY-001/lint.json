@@ -1,0 +1,25 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "ruff",
+    "check",
+    "."
+  ],
+  "started_at": "2026-11-07T00:19:58.960290+00:00",
+  "offline": true,
+  "uv_cache": "workspace review_pack/uv-cache",
+  "exit_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 0.35059230006299913,
+  "stdout": {
+    "path": "lint.stdout.log",
+    "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "bytes": 19
+  },
+  "stderr": {
+    "path": "lint.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+}

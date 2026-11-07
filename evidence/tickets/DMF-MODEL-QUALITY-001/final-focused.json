@@ -1,0 +1,35 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=review_pack/quality-seal-temp",
+    "tests/unit/operation/test_analysis_quality.py",
+    "tests/unit/operation/test_analysis_quality_views.py",
+    "tests/unit/operation/test_analysis_store.py",
+    "--cov=dmf_pulse.operation.analysis_quality",
+    "--cov=dmf_pulse.operation.analysis_store",
+    "--cov=dmf_pulse.operation.analysis_cli",
+    "--cov-branch",
+    "--cov-fail-under=0",
+    "--cov-report=term-missing",
+    "--cov-report=json:review_pack/quality-final-coverage.json",
+    "--junitxml=evidence/tickets/DMF-MODEL-QUALITY-001/final-focused.xml"
+  ],
+  "exit_code": 0,
+  "seconds": 478.13856570003554,
+  "offline": true,
+  "stdout": {
+    "path": "final-focused.stdout.log",
+    "bytes": 3330,
+    "sha256": "1564df887107d22d410a1f21341204db6f44dbcca1ef136be0d217d1f44cfd4f"
+  },
+  "stderr": {
+    "path": "final-focused.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
