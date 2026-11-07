@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "source_sha256": "9c956de4bda5897413e5bfccb2fea3f2f13b79d0ed57981c3126734db6dc84cc",
+  "negative_uncertainty_and_zero_minutes_case": "PASS",
+  "provenance_copied_unchanged": true,
+  "deterministic_repeat": "PASS",
+  "numerical_change": false
+}

@@ -21,7 +21,10 @@
     "quality_pre_metadata_line_coverage_percent": 99.24242424242425,
     "quality_pre_metadata_branch_coverage_percent": 98.21428571428571,
     "provenance_metadata_offline_smoke": "PASS",
-    "final_metadata_focused_retest": "RUNNING"
+    "final_metadata_focused_retest": "PASS 64 tests",
+    "quality_line_coverage_percent": 99.25925925925925,
+    "quality_branch_coverage_percent": 98.21428571428571,
+    "typing_variable_rename_smoke": "PASS; no numerical change"
   },
   "gates": {
     "frozen_sync": "PASS",
@@ -31,8 +34,8 @@
     "copy_migration": "PASS",
     "outside_checkout_wheel_owned_v1_v2": "PASS for final provenance-carrying wheel 3205b1635f05e1f1dded1503a33005e439890f035b6f8ba05ca144e2dae48260",
     "postgres_migration_matrix": "PASS isolated port 55439",
-    "comprehensive_wheel": "RUNNING against isolated test database",
-    "final_exact_sha_CI": "PENDING_COMMIT_AND_PUSH",
+    "comprehensive_wheel": "FAILED attempt2 at unchanged 900s child bound; serial final-source retry RUNNING",
+    "final_exact_sha_CI": "a8debc6 failed strict typing; two variable-reuse errors fixed; next exact-SHA CI required",
     "repository_validation": "PASS at source checkpoint; final evidence reseal remains",
     "secret_scan": "PASS after raw synthetic security case-name JUnit retained privately without scanner exceptions"
   },
@@ -48,5 +51,5 @@
   "scientific_claim": "No measured forecast-accuracy improvement; all forecasts remain UNVALIDATED.",
   "production_schema_blocker": "Signed v1 reader rejects v2 user_version; separate rollback-compatible activation acceptance required.",
   "private_evidence": "Exact GW10 numerical findings and live-store hash proof remain under ignored review_pack/private-audit; not publicly certified.",
-  "next_executable_action": "Finish local final gate processes; update receipts/manifests, commit evidence and push; inspect exact-SHA CI; build capped immutable-HEAD review pack. Future model work follows MQ-002/MQ-003 source/protocol dependencies."
+  "next_executable_action": "Finish serial comprehensive wheel gate; seal native-byte evidence, commit/push typing fix, observe exact-SHA CI, clean disposable TEST resources, and build immutable-HEAD capped review packet."
 }

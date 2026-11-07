@@ -1,0 +1,3 @@
+2026-11-07T00:25:34.6937703Z src/dmf_pulse/operation/analysis_quality.py:175: error: Incompatible types in assignment (expression has type "float | None", variable has type "str | None")  [assignment]
+2026-11-07T00:25:34.6939150Z src/dmf_pulse/operation/analysis_quality.py:179: error: Unsupported operand types for < ("str" and "int")  [operator]
+2026-11-07T00:25:35.0476509Z Found 2 errors in 1 file (checked 451 source files)

@@ -40,6 +40,17 @@
       "outcome": "mandatory provenance assertion refused the older installed wheel",
       "reason": "QA started before asynchronous rebuild completion; final source wheel byte check now passed; QA repeated only after build completion",
       "raw_commands_sha256": "81dca34e0140bd1688d3820f1ece74776b991351f29174d882ce551d00161e97"
+    },
+    {
+      "attempt": "research implementation CI a8debc61a66bf09d32a671d228147b6489faaa0e",
+      "outcome": "strict mypy failed with 2 loop-variable type errors",
+      "reason": "String/probability and float uncertainty loops reused value variable; renamed uncertainty variables without changing computations",
+      "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42318048967"
+    },
+    {
+      "attempt": "comprehensive wheel attempt2 with isolated PostgreSQL",
+      "outcome": "inherited paired ASGI/current/numerical-parity/CLI probe timed out at its unchanged 900s bound; overall elapsed 1093.63s",
+      "reason": "Ran concurrently with coverage; final unchanged-bound serial retry planned; no numerical/solver changes or bound relaxation"
     }
   ],
   "artifact_custody": [

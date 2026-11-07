@@ -44,3 +44,8 @@ evidence/tickets/DMF-PULSE-ACCEL-001/PRIVATE-*.json -text whitespace=blank-at-eo
 
 # OPR-004 authority is authenticated against the owner's exact pasted bytes.
 tickets/OPR-004/REQUEST.txt binary
+
+# Exact research command captures and digest ledgers retain native bytes.
+evidence/tickets/DMF-MODEL-QUALITY-001/*.log binary
+evidence/tickets/DMF-MODEL-QUALITY-001/*.json binary
+evidence/tickets/DMF-MODEL-QUALITY-001/*.xml binary

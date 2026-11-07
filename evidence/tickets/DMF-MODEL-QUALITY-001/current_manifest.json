@@ -56,9 +56,9 @@
       "sha256": "a5a6551955ebe95fa4790673079c707a601e30ce4f382bae2e5176089148b6e4"
     },
     {
-      "bytes": 2897,
+      "bytes": 3129,
       "path": ".gitattributes",
-      "sha256": "436e930fbbb8140bc90eea0be6156ac189bef5fb082e8c570040c9f58a299585"
+      "sha256": "db8c44c8f4d7a15f16939ac07b3148dd0eef0e93fa444764bcba52d6a06acc80"
     },
     {
       "bytes": 100,
@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 249055,
+      "bytes": 249605,
       "path": "PLANS.md",
-      "sha256": "008ccf61bb6c8dce8b5599793b2d4613337ab0d566ab92938b12c778deb08187"
+      "sha256": "570fe3dbfcde0e96a1dd878c7dd66b07594d6648757b42d3c26aed6e85173ee3"
     },
     {
       "bytes": 2761,
@@ -4601,9 +4601,9 @@
       "sha256": "b3f3a6063cbcd2837ef0c9988df2ebea767df252c0d591b80cf35c199c174c19"
     },
     {
-      "bytes": 11054,
+      "bytes": 11114,
       "path": "src/dmf_pulse/operation/analysis_quality.py",
-      "sha256": "fb107cb110bb034d70d4a6c145b58e0ffb760a20fa86b9f1358bf3f424092c62"
+      "sha256": "9c956de4bda5897413e5bfccb2fea3f2f13b79d0ed57981c3126734db6dc84cc"
     },
     {
       "bytes": 24665,
@@ -9236,9 +9236,9 @@
       "sha256": "3e336a19fa1a22bfba2fc51710ac2baec02083ce01f4da4d78c7d917376e1467"
     },
     {
-      "bytes": 2273,
+      "bytes": 2575,
       "path": "tickets/DMF-MODEL-QUALITY-001/CONTRACT.md",
-      "sha256": "bb1d603b2fc9d1775282309ab9caff56bb7eaf934c59833ea6078edafcdbb49e"
+      "sha256": "cc9b684341ecb0b7adc376da77ea978a0c8b9205a7168cca4357c61d11e0856f"
     },
     {
       "bytes": 6048,

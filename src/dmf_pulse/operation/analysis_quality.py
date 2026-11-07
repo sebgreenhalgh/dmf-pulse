@@ -172,12 +172,12 @@ def diagnose_forecast(snapshot: AnalysisSnapshot) -> ForecastQuality:
             row_issues.add("RETAINED_MINUTES_MISMATCH")
         if row.expected_points not in {None, 0} and minutes == 0:
             row_issues.add("NONZERO_POINTS_WITH_ZERO_EXPECTED_MINUTES")
-        for label, value in (
+        for uncertainty_label, uncertainty_value in (
             ("MEAN_SE", row.monte_carlo_mean_se),
             ("STANDARD_DEVIATION", row.points_standard_deviation),
         ):
-            if value is not None and value < 0:
-                row_issues.add(f"{label}_NEGATIVE")
+            if uncertainty_value is not None and uncertainty_value < 0:
+                row_issues.add(f"{uncertainty_label}_NEGATIVE")
         if (
             row.points_p10 is not None
             and row.points_p90 is not None

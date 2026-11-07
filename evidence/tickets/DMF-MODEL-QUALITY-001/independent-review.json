@@ -5,7 +5,7 @@
   "unresolved_p1": 0,
   "unresolved_material_p2": 0,
   "reviewed_source_sha256": {
-    "src/dmf_pulse/operation/analysis_quality.py": "fb107cb110bb034d70d4a6c145b58e0ffb760a20fa86b9f1358bf3f424092c62",
+    "src/dmf_pulse/operation/analysis_quality.py": "9c956de4bda5897413e5bfccb2fea3f2f13b79d0ed57981c3126734db6dc84cc",
     "src/dmf_pulse/operation/analysis_store.py": "dc6e6a905e773c42cae3b376cd0b81d24282f8ef1dcc9152b12e587ea981cc0d",
     "src/dmf_pulse/operation/analysis_cli.py": "b5d2de6f633934059a06593c796d4cd686735a2986523e0c59a957c442258b70",
     "tickets/DMF-MODEL-QUALITY-001/build_review.py": "6aa5349a09342c1fec79dd1aa68ec397e62d8bb38f579ff883901931140679f1"
@@ -40,5 +40,7 @@
       "components_count": 1.9626201000064611
     }
   },
-  "metadata_followup": "Exact independent comparison confirms only provenance import, fields and copies changed; no numerical logic change; deterministic test asserts classification."
+  "metadata_followup": "Exact independent comparison confirms only provenance import, fields and copies changed; no numerical logic change; deterministic test asserts classification.",
+  "typing_followup": "CI-caught loop-variable type collision fixed by behavior-equivalent local rename; independently reviewed; exact-SHA mypy still required.",
+  "evidence_portability_followup": "Narrow native-byte attributes for this ticket only; reviewed; first-party secret scanning unchanged."
 }

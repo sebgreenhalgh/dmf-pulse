@@ -22,6 +22,10 @@ docs/operation, operation/analysis_quality.py, operation/analysis_store.py,
 operation/analysis_cli.py, owned analysis tests, and minimal scoped assurance
 manifest registration if required. Existing numerical engines, rules, source
 routes, dependency lock, signed installed release and all live stores are frozen.
+The ticket's exact stdout/stderr, JSON receipts and JUnit captures have a narrow
+`.gitattributes` byte-preservation entry so Windows CRLF normalization cannot
+invalidate command or evidence digests in a Linux checkout. This changes no
+scanner exception, application semantics or pre-existing artifact.
 
 Keep actual owner forecasts, database copies and private numerical audit outside
 tracked files, under ignored review_pack. Push source, synthetic tests, public-safe

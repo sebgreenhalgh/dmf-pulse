@@ -39,13 +39,13 @@
       "percent_branches_covered_display": "50"
     },
     "src\\dmf_pulse\\operation\\analysis_quality.py": {
-      "covered_lines": 131,
-      "num_statements": 132,
-      "percent_covered": 98.93617021276596,
+      "covered_lines": 134,
+      "num_statements": 135,
+      "percent_covered": 98.95287958115183,
       "percent_covered_display": "99",
       "missing_lines": 1,
       "excluded_lines": 0,
-      "percent_statements_covered": 99.24242424242425,
+      "percent_statements_covered": 99.25925925925925,
       "percent_statements_covered_display": "99",
       "num_branches": 56,
       "num_partial_branches": 1,
@@ -81,5 +81,6 @@
   "public_live_database_hash_custody": "Not independently certified by public packet; exact proof stays owner-only",
   "provider_calls": 0,
   "credits_consumed": 0,
-  "production_activation": false
+  "production_activation": false,
+  "coverage_source_note": "Final full metadata coverage preceded behavior-equivalent typing loop-variable rename; same executable statements and branch structure. Targeted rename smoke passed."
 }

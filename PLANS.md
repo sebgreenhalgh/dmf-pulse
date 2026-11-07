@@ -3493,3 +3493,11 @@ explicit; no provider request or original custody change is authorized.
   Windows Application Control; exact final-SHA hosted CI remains required.
 - Next programme ticket is MQ-002 match-time membership / MQ-003 qualified real
   forecast custody, under the roadmap dependencies; no new data authority inferred.
+
+- Final metadata coverage rerun passed all 64 tests (134/135 lines, 55/56 branches).
+- CI at `a8debc6` caught two reused-loop-variable typing errors; local names are
+  corrected without numerical change and targeted smoke/independent review pass.
+- Narrow ticket-only capture attributes preserve native-byte evidence hashes on
+  Linux and Windows without changing secret scan rules.
+- The full inherited wheel probe hit its unchanged 900s child limit while coverage
+  ran. One serial final-source retry is in progress; do not classify it as passed.

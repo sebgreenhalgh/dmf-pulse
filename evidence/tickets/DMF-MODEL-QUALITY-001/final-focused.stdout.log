@@ -1,0 +1,33 @@
+................................................................         [100%]
+============================== warnings summary ===============================
+tests/unit/operation/test_analysis_store.py::test_concurrent_idempotent_inserts_have_one_complete_snapshot
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\fpl_points\models.py:1095: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x00000202A8143880>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_unknown_schema_and_tampering_fail_closed
+  C:\Users\sebgr\anaconda3\Lib\enum.py:199: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x00000202A8143F10>
+    def __get__(self, instance, ownerclass=None):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/unit/operation/test_analysis_store.py::test_query_bounds_and_utc_confirmation_are_explicit
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\src\dmf_pulse\private_v1\presentation.py:125: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x00000202A8142890>
+    @model_validator(mode="after")
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.9-final-0 _______________
+
+Name                                          Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------------
+src\dmf_pulse\operation\analysis_cli.py          45     12      6      1    71%   48-50, 52-57, 70-72
+src\dmf_pulse\operation\analysis_quality.py     135      1     56      1    99%   94
+src\dmf_pulse\operation\analysis_store.py       160      9     66      8    92%   251, 283, 302-303, 331, 344, 361, 416, 484
+-----------------------------------------------------------------------------------------
+TOTAL                                           340     22    128     10    93%
+Coverage JSON written to file review_pack/quality-final-coverage.json
+64 passed, 3 warnings in 471.71s (0:07:51)
