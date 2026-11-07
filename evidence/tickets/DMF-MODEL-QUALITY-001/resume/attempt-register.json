@@ -425,5 +425,31 @@
   ],
   "original_sealed_attempt_register_preserved": true,
   "failed_strict_fixture_attempts_preserved_privately": true,
-  "installed_attempts": "installed-selector-diagnosis.json"
+  "installed_attempts": "installed-selector-diagnosis.json",
+  "final_continuation": {
+    "initial_final_gate_status": "FAIL_SECRET_METADATA_EXPORT",
+    "native_gate_receipt_sha256": "845cbede2a9b98f3d2ff3113278be646793e12e9283ed2575775963026168198",
+    "browser_tests": 63,
+    "owned_model_packet_loop_tests": 80,
+    "final_tiers": [
+      {
+        "tier": "INTEGRATION",
+        "tests": 514,
+        "command_seconds": 132.52713440009393,
+        "pytest_command_seconds": 130.74449309986085,
+        "status": "PARTIAL_FEEDBACK_PASS"
+      },
+      {
+        "tier": "FOCUSED",
+        "tests": 131,
+        "command_seconds": 45.38026540004648,
+        "pytest_command_seconds": 43.57815539999865,
+        "status": "PARTIAL_FEEDBACK_PASS"
+      }
+    ],
+    "metadata_export_provenance": "junit-export-provenance.json",
+    "native_failed_evidence_retained": true,
+    "post_export_gate_status": "PASS_POST_EXPORT_CHECKS_IDENTICAL_WHEEL",
+    "post_export_receipt_sha256": "1179b574957388b0ec571a115a8c94b2059c860702dd0bac1fcfbc1aa0bfae97"
+  }
 }

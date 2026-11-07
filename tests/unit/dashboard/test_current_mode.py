@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import json
 import pickle
-import selectors
 from dataclasses import replace
 from datetime import timedelta
 
@@ -38,23 +37,15 @@ from dmf_pulse.ingestion.errors import IngestionError
 from dmf_pulse.ingestion.fpl.direct import DirectHttpResponse
 from dmf_pulse.ingestion.odds.client import OddsHttpResponse
 from dmf_pulse.private_v1.progress import NullProgress
+from tests.unit.scripts.script_support import load_script
 
 pytestmark = pytest.mark.unit
 PAIRING = "owned-current-mode-pairing-only"
 
 
-class _Selector(selectors.SelectSelector):
-    def select(self, timeout=None):
-        assert not self.get_map()
-        return []
-
-
-class _Loop(asyncio.SelectorEventLoop):
-    def _make_self_pipe(self):
-        self._ssock = self._csock = None
-
-    def _close_self_pipe(self):
-        return
+_probe = load_script("accel003_wheel_probe")
+_Selector = _probe._NoIoSelector
+_Loop = _probe._NoIoLoop
 
 
 def request(app, path, *, cookie=None, body=None):

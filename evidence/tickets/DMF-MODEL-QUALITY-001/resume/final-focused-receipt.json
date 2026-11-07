@@ -1,0 +1,91 @@
+{
+  "tier": "FOCUSED",
+  "head": "466849ac330eba439371e54a5af42b2190909b7e",
+  "source": {
+    "head": "466849ac330eba439371e54a5af42b2190909b7e",
+    "clean": false,
+    "git_diff_sha256": "2b2ecaedd1d65ba9acb76bfadded142cadcfee365f1602f84b59b8da5cf74708",
+    "git_status_sha256": "c3c30f19b9643cc552dc7d2d83b02a49f184a6b67ff08f3ab37a8f501636d25a",
+    "untracked_authored_file_sha256": {
+      "scripts/model_quality_custody.py": "10df1ef443fbea6147ec3224fb2a4f4d8126de50b7f0dd407b41c889d486d8a9",
+      "scripts/model_quality_math.py": "7532f3b483d9782d73d4dcaed34012e4532f3f256edc1568fc53f7a06be7dfe1",
+      "scripts/model_quality_membership.py": "ffb70ccee55cb150b7be07c598e7817fa45cd6065b36ad5dbc6923f9b1903bd3",
+      "tests/unit/scripts/test_model_quality_custody.py": "1ce62586b4417098913aee05851a6e1e7343731d6ca75d592c774f5965f89ffd",
+      "tests/unit/scripts/test_model_quality_math.py": "d1cdc5991a2e735aa077e1034d95e593db833d931c063ef18507ca7e0cfeb596",
+      "tests/unit/scripts/test_model_quality_membership.py": "5b1ba92b0d43af7acdbb227fe69b27ff59ef2a79ff8c7cc904776f2be1da9fa3",
+      "tests/unit/scripts/test_quality_review_custody.py": "f8026c1d1747747c5999f282198546016cc6a87f50245346b06cd91d819a9838",
+      "tickets/DMF-MODEL-QUALITY-001/MQ000-CONTRACT.md": "08372f5260fe39ea16c21b1dcea4f19aac10e377c40ddf36fc9b35f210c77076",
+      "tickets/DMF-MODEL-QUALITY-001/MQ002-CONTRACT.md": "1d090e422670648c26a47ffa506360d5e91fab90c76b3a875d70ebe83af7c26c",
+      "tickets/DMF-MODEL-QUALITY-001/MQ003-CONTRACT.md": "75e2878318ac0f4b0b18838339e9926519fab86f33e5ec823ec5c98a28244b54"
+    },
+    "qualification": "partial feedback source snapshot; full acceptance requires clean exact-commit CI"
+  },
+  "status": "PARTIAL_FEEDBACK_PASS",
+  "planned_steps": 3,
+  "completed_steps": 3,
+  "full_release_acceptance": false,
+  "global_coverage_floor_applied": false,
+  "type_check": "NOT_REQUESTED",
+  "steps": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.3130012000910938,
+      "stdout_sha256": "4ae9c06b9f39def4f7592ca856041203e6b4d9a0558348210f2cdc46ad845d13",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.3281959998421371,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-763b72e6103c\\pytest",
+        "--durations=20",
+        "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-763b72e6103c\\junit.xml",
+        "tests/integration/package/test_import_side_effects.py",
+        "tests/unit/assurance/test_secret_scan.py",
+        "tests/unit/ingestion/test_rights_and_fixtures.py",
+        "tests/unit/operation/test_analysis_quality.py",
+        "tests/unit/operation/test_analysis_quality_views.py",
+        "tests/unit/operation/test_analysis_store.py",
+        "--cov=dmf_pulse.operation.analysis_cli",
+        "--cov=dmf_pulse.operation.analysis_quality",
+        "--cov=dmf_pulse.operation.analysis_store",
+        "--cov-branch",
+        "--cov-fail-under=0",
+        "--cov-report=term-missing",
+        "--cov-report=json:C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-763b72e6103c\\coverage.json"
+      ],
+      "exit_code": 0,
+      "seconds": 43.57815539999865,
+      "stdout_sha256": "e98948b6f21b82552eee9b9181e0765012ee8c7026e200bd946244267803955b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

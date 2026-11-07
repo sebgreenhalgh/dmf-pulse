@@ -1,0 +1,146 @@
+{
+  "fast-be1595bb9092-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\fast-be1595bb9092\\junit.xml",
+    "native_sha256": "e86cc0d45747f337652197bc2654c56659e3ecbb021720624a5ff9cb16a118cf",
+    "export_sha256": "73dafea4295649b8705021b3f763bc4d8601feb33b5329692da555d234134d39",
+    "testcase_count": 136,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_zero_insertion_and_mapping_order_do_not_change_fixed_grid_score",
+        "original_encoded_sha256": "065726018c453e81525ff14d43ee7cb174235136221ec898c737c084de2652b1",
+        "decoded_utf8_sha256": "6f6fee2b76beb57ce16910df6ae49b2c417bbc873a7a6d06df15a8c0f6af39c7"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_valid_rare_tail_mean_can_exceed_p90",
+        "original_encoded_sha256": "1622f1038923bc2a953777fa08e0a32dba94741b2479f6c170254e8634b312e9",
+        "decoded_utf8_sha256": "e266d7c1796600f8eed9575f9bce3e1f6ad7d172cb30fd097725fa91853c1106"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_expected_score_propriety_identity_for_arbitrary_mass",
+        "original_encoded_sha256": "6344640efa8ce2c183cf6e525e87d9ce91219316cc96c6419ee0f2cdf6f51891",
+        "decoded_utf8_sha256": "bb42076d44c827fa63dd1761f4d66732d7dfe1226fd9f0540f4b6d370ebd5d5b"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_membership.py::test_double_requires_exact_per_fixture_values_and_is_order_invariant",
+        "original_encoded_sha256": "c42b254af6b6cedcadd73205b5fdb2100da2b98d878f05bcde715b2ac24be371",
+        "decoded_utf8_sha256": "802dddb795b935605d76545e2dc9888c9e17292cc5db58f2017ccfebf58ca2cd"
+      }
+    ],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "integration-5658682c7661-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-5658682c7661\\junit.xml",
+    "native_sha256": "eb6bdf42aa96ccd3946546a06b34a3011aefd1316bc1bfb91613aa830ca5a4f8",
+    "export_sha256": "e6e5f2b3848413bc48d9182e977a507d65e9ffef1bd5d0dac247ba3223f83909",
+    "testcase_count": 509,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_zero_insertion_and_mapping_order_do_not_change_fixed_grid_score",
+        "original_encoded_sha256": "57ac1e8c7a068eab8f57287ee79f18329e01d648e703efa55bd53c933123a5fd",
+        "decoded_utf8_sha256": "4725920a83d3aaa5172c03565f1b46e686c94adba742ea7ae9b194633a183250"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_valid_rare_tail_mean_can_exceed_p90",
+        "original_encoded_sha256": "af0dd9d6888e1a78ba0683d429f7df12bdffd3107774e7179163856167f85d31",
+        "decoded_utf8_sha256": "1ab6b6fc12c9fa7edeb57a3595ee264538f2e634c939787f81a5acb837d5fc8d"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_expected_score_propriety_identity_for_arbitrary_mass",
+        "original_encoded_sha256": "78581796f0a5743f50968055ba6e08bcd7e52146abad63647e79f471bfc0d2b0",
+        "decoded_utf8_sha256": "a7480a798396b25d913ffa3d028f81b1396100d5d72b7382fabbece8d655050e"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_membership.py::test_double_requires_exact_per_fixture_values_and_is_order_invariant",
+        "original_encoded_sha256": "cb819f689fff814293297e9579678b90ff8df38cef87eb9798ce066cfde6dd22",
+        "decoded_utf8_sha256": "183a93c1bd4d7034fa5eac9804af0b5f212db5baef8f896faebfedfa9d98de06"
+      }
+    ],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "focused-62cdec8a811c-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\junit.xml",
+    "native_sha256": "db00948305a9247bda947674e0b1db59ba7c1e2c9c90bbe10858b3e8625503dd",
+    "export_sha256": "db00948305a9247bda947674e0b1db59ba7c1e2c9c90bbe10858b3e8625503dd",
+    "testcase_count": 131,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "final-owned-unit-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\resume-final-unit-junit.xml",
+    "native_sha256": "9e961679cba7290cdc25b516bb82ac36ba9a94e21cec908008ebe4478b3652cc",
+    "export_sha256": "06fa9fe993cc1f46cba1d1a13af9a1b93c4d80c07396254c211a5619bf9ed1fb",
+    "testcase_count": 80,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_zero_insertion_and_mapping_order_do_not_change_fixed_grid_score",
+        "original_encoded_sha256": "0120c486a96cf0c5475f1f065b375b8c32a42edca24ab7bfc9215d33b9bba826",
+        "decoded_utf8_sha256": "d6d692eeed54e04368b421f89d75d74724c7b50d2dc5a33ae10867ed7ff57d44"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_valid_rare_tail_mean_can_exceed_p90",
+        "original_encoded_sha256": "89c0251ce53d67ae82165cd809598ec8d42ae6557c3dfc4d08a8678d11d1568f",
+        "decoded_utf8_sha256": "3772869b68f4dc1cfdcc477c5b703bf240493fb10445fa313cb71bdb6f9f0ae8"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_expected_score_propriety_identity_for_arbitrary_mass",
+        "original_encoded_sha256": "f476c978df2dac188d511a5d2d3223b6744987563f53a942369efc06d92efc53",
+        "decoded_utf8_sha256": "d291ae349438e0de77014956f8259319bf21df362112ef9b8848b36da2a1ae05"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_membership.py::test_double_requires_exact_per_fixture_values_and_is_order_invariant",
+        "original_encoded_sha256": "774e831cc295eebf26304be57e26b3d058e44c19b7c775171f9b74afd40bf0bf",
+        "decoded_utf8_sha256": "eddb81f94a7f7edc63cdfea427972399da4bae4e6268c98bc47d3e11d8dd238f"
+      }
+    ],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "final-integration-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-6d7723c2fc85\\junit.xml",
+    "native_sha256": "e7c5cc6cef6f2188eb8ba34b5216511ee72f21d91679e94206b9887a35bacbd3",
+    "export_sha256": "402a7efe1a317ec1bfaa8f1a3a88aa0f5a2679a46e39a883fc55b2cee6ddd029",
+    "testcase_count": 514,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_zero_insertion_and_mapping_order_do_not_change_fixed_grid_score",
+        "original_encoded_sha256": "462f5d96df3bce18dfdd70c4b5cc9ae57123d61cbab30eba8563030762253a6f",
+        "decoded_utf8_sha256": "09c66d7ae502d5825add6af01e42d068b2b9e18eb895c7e0a5bcc130581d3675"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_valid_rare_tail_mean_can_exceed_p90",
+        "original_encoded_sha256": "0e9ffc42f0d278d863e1c009a904cf134a1174fea87f9c691aff26b47701d0f8",
+        "decoded_utf8_sha256": "4fc8c8d14673d45f56f2951ded6da6335c7e53160af243af704afef9f04e2bf7"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_math.py::test_expected_score_propriety_identity_for_arbitrary_mass",
+        "original_encoded_sha256": "f476c978df2dac188d511a5d2d3223b6744987563f53a942369efc06d92efc53",
+        "decoded_utf8_sha256": "d291ae349438e0de77014956f8259319bf21df362112ef9b8848b36da2a1ae05"
+      },
+      {
+        "property": "hypothesis-statistics-tests/unit/scripts/test_model_quality_membership.py::test_double_requires_exact_per_fixture_values_and_is_order_invariant",
+        "original_encoded_sha256": "f666a3dae04c180ac2fff427d85b645315c913a3a10d6638081cd6df5c350293",
+        "decoded_utf8_sha256": "4bba085f6158653537719160eb1b1fb5be27b917212074a215627f5cafb8e47a"
+      }
+    ],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "final-focused-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-763b72e6103c\\junit.xml",
+    "native_sha256": "f58e5258fd6b629007e9d1c4fd1ad954abde42f3e3194a8deec795117b7789b3",
+    "export_sha256": "f58e5258fd6b629007e9d1c4fd1ad954abde42f3e3194a8deec795117b7789b3",
+    "testcase_count": 131,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  }
+}

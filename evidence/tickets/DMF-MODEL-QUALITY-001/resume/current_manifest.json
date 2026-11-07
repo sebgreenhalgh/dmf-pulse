@@ -171,9 +171,9 @@
       "sha256": "c73ac563fed3440d97d85d031320a96f1476a6d4faba091a0ea9f3970d1ee93a"
     },
     {
-      "bytes": 251552,
+      "bytes": 253207,
       "path": "PLANS.md",
-      "sha256": "4655968aed51c86c9170314d34f7418d3026b54aa933476f162434b23e3961f2"
+      "sha256": "dd04cb85a6303acc59f5cafb2ee03015b0d9737e6a4b44ac870db6c8ff006144"
     },
     {
       "bytes": 2761,
@@ -531,9 +531,9 @@
       "sha256": "2739a39d17c377c65280ec4a6138e578f984952de36650affab84d5f83a9c0d2"
     },
     {
-      "bytes": 9029,
+      "bytes": 10126,
       "path": "docs/operation/MODEL-QUALITY-001-ROADMAP.md",
-      "sha256": "628d9fbdce33279adc9cb87fcb4205d911fbd5d7264feb6b0f4bba0c46d25ed1"
+      "sha256": "cca1c201b04163f5c4ba5fbd2ba132190f173d67dd84c8ba235c16156a833ef8"
     },
     {
       "bytes": 6500,
@@ -541,9 +541,14 @@
       "sha256": "c4c8d22cea84643c3a8657d404f1ec1f6500dedd6bce36294ea1e345aaf8a967"
     },
     {
-      "bytes": 11619,
+      "bytes": 17776,
       "path": "docs/operation/QUALITY-CLEANUP-ACCELERATION.md",
-      "sha256": "f40b6cc2f9150b10bd2bed6b895f4e1369b9dce670d7282798342fee00a64eae"
+      "sha256": "8cf5a5054796c4f76e7b92dd4248784bffd2ca16a2a2c5c044d84aa53eddd2aa"
+    },
+    {
+      "bytes": 1154,
+      "path": "docs/operation/README.md",
+      "sha256": "d076ee0f723193fb4fca7cfc8f22e1d68f22619b36b6f0b36f56268a4cb3468a"
     },
     {
       "bytes": 5783,
@@ -2604,6 +2609,21 @@
       "bytes": 7674,
       "path": "scripts/import_team_strength_corpus.py",
       "sha256": "508166eb21eaf3648a580461d7f486fefdc9e2af4555d124dafc8c4d02d9d0b7"
+    },
+    {
+      "bytes": 9419,
+      "path": "scripts/model_quality_custody.py",
+      "sha256": "10df1ef443fbea6147ec3224fb2a4f4d8126de50b7f0dd407b41c889d486d8a9"
+    },
+    {
+      "bytes": 6406,
+      "path": "scripts/model_quality_math.py",
+      "sha256": "7532f3b483d9782d73d4dcaed34012e4532f3f256edc1568fc53f7a06be7dfe1"
+    },
+    {
+      "bytes": 7668,
+      "path": "scripts/model_quality_membership.py",
+      "sha256": "ffb70ccee55cb150b7be07c598e7817fa45cd6065b36ad5dbc6923f9b1903bd3"
     },
     {
       "bytes": 16796,
@@ -7076,9 +7096,9 @@
       "sha256": "1ca7b768ee633472aae2c088b4b5fac3ada434f79f8606b5f3a6a3f7f9570515"
     },
     {
-      "bytes": 28242,
+      "bytes": 28093,
       "path": "tests/unit/dashboard/test_current_mode.py",
-      "sha256": "e7f923d593bcf4191bcb4afca0a498f6d435139c4df157eed02636a5caca6df9"
+      "sha256": "4e0b0434171cd84bc2b94079db9caf509bbe615a3b7bbebc3a15e4b94ca89131"
     },
     {
       "bytes": 12557,
@@ -8861,6 +8881,21 @@
       "sha256": "7075b5e83a78ce705fd3941d277c7bd51da58e657c1e43cda84c82aedf432ae2"
     },
     {
+      "bytes": 10958,
+      "path": "tests/unit/scripts/test_model_quality_custody.py",
+      "sha256": "1ce62586b4417098913aee05851a6e1e7343731d6ca75d592c774f5965f89ffd"
+    },
+    {
+      "bytes": 6334,
+      "path": "tests/unit/scripts/test_model_quality_math.py",
+      "sha256": "d1cdc5991a2e735aa077e1034d95e593db833d931c063ef18507ca7e0cfeb596"
+    },
+    {
+      "bytes": 9553,
+      "path": "tests/unit/scripts/test_model_quality_membership.py",
+      "sha256": "5b1ba92b0d43af7acdbb227fe69b27ff59ef2a79ff8c7cc904776f2be1da9fa3"
+    },
+    {
       "bytes": 2717,
       "path": "tests/unit/scripts/test_opr004_repository_validation.py",
       "sha256": "5f492aed2d5e4789af4cf683be936ea3cd336b5a1dd4a7b62570bb973a275419"
@@ -8874,6 +8909,11 @@
       "bytes": 1543,
       "path": "tests/unit/scripts/test_quality_resume_manifest.py",
       "sha256": "0f4e3f950e3b5eb82419851b9466d5634cd6062fb31a59b2b1e3351d4bc43d3c"
+    },
+    {
+      "bytes": 4741,
+      "path": "tests/unit/scripts/test_quality_review_custody.py",
+      "sha256": "f8026c1d1747747c5999f282198546016cc6a87f50245346b06cd91d819a9838"
     },
     {
       "bytes": 8310,
@@ -9316,6 +9356,21 @@
       "sha256": "cc9b684341ecb0b7adc376da77ea978a0c8b9205a7168cca4357c61d11e0856f"
     },
     {
+      "bytes": 2709,
+      "path": "tickets/DMF-MODEL-QUALITY-001/MQ000-CONTRACT.md",
+      "sha256": "08372f5260fe39ea16c21b1dcea4f19aac10e377c40ddf36fc9b35f210c77076"
+    },
+    {
+      "bytes": 2202,
+      "path": "tickets/DMF-MODEL-QUALITY-001/MQ002-CONTRACT.md",
+      "sha256": "1d090e422670648c26a47ffa506360d5e91fab90c76b3a875d70ebe83af7c26c"
+    },
+    {
+      "bytes": 3405,
+      "path": "tickets/DMF-MODEL-QUALITY-001/MQ003-CONTRACT.md",
+      "sha256": "75e2878318ac0f4b0b18838339e9926519fab86f33e5ec823ec5c98a28244b54"
+    },
+    {
       "bytes": 3160,
       "path": "tickets/DMF-MODEL-QUALITY-001/RESUME-ACCEPTANCE.md",
       "sha256": "6ac42ab567e29b296da731b2e438c30f5a444c630612e43e633f815ebfb752d7"
@@ -9326,9 +9381,9 @@
       "sha256": "62bf33bab2028841696e806c833e452082d71495b541523045d43a1eca6b5efb"
     },
     {
-      "bytes": 6048,
+      "bytes": 12643,
       "path": "tickets/DMF-MODEL-QUALITY-001/build_review.py",
-      "sha256": "6aa5349a09342c1fec79dd1aa68ec397e62d8bb38f579ff883901931140679f1"
+      "sha256": "96376a9004502545affdc75add232af9c9b155d34177ac54566a9b95221fb53b"
     },
     {
       "bytes": 3377,

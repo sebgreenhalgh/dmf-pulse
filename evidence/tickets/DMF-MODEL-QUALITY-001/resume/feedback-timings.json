@@ -1,0 +1,82 @@
+{
+  "tiers": [
+    {
+      "attempt": "fast-be1595bb9092",
+      "tier": "FAST",
+      "tests": 136,
+      "step_seconds": [
+        0.3273844001814723,
+        0.3252181999851018,
+        10.613749800017104
+      ],
+      "status": "PARTIAL_FEEDBACK_PASS",
+      "scope": "Partial feedback; not FULL release acceptance"
+    },
+    {
+      "attempt": "integration-5658682c7661",
+      "tier": "INTEGRATION",
+      "tests": 509,
+      "step_seconds": [
+        0.3376714000478387,
+        0.34483129996806383,
+        145.737176500028
+      ],
+      "status": "PARTIAL_FEEDBACK_PASS",
+      "scope": "Partial feedback; not FULL release acceptance"
+    },
+    {
+      "attempt": "focused-62cdec8a811c",
+      "tier": "FOCUSED",
+      "tests": 131,
+      "step_seconds": [
+        0.2776313000358641,
+        0.22349440003745258,
+        44.32351289992221
+      ],
+      "status": "PARTIAL_FEEDBACK_PASS",
+      "scope": "Partial feedback; not FULL release acceptance"
+    }
+  ],
+  "before_focused": {
+    "tests": 64,
+    "command_seconds": 474.4945,
+    "pytest_seconds": 471.71
+  },
+  "browser": "browser-current-mode.json",
+  "full_before": {
+    "run": 42321646466,
+    "status": "PASS_ALL20",
+    "job_chain_seconds": 6226.0,
+    "slowest_shard_job_seconds": 5125.0
+  },
+  "full_after": "Exact finalcommit FULL remains mandatory; checkpoint-time pending runs are not passes.",
+  "comparability": "Warm frozen Windows local captures; old focused64 vs new131 with essentialsmokes/coverage; FAST/INTEGRATIONhadnoidenticalformalbeforetier; no cross-host speedratio claimed.",
+  "final_local_tiers": [
+    {
+      "tier": "INTEGRATION",
+      "tests": 514,
+      "command_seconds": 132.52713440009393,
+      "pytest_command_seconds": 130.74449309986085,
+      "status": "PARTIAL_FEEDBACK_PASS"
+    },
+    {
+      "tier": "FOCUSED",
+      "tests": 131,
+      "command_seconds": 45.38026540004648,
+      "pytest_command_seconds": 43.57815539999865,
+      "status": "PARTIAL_FEEDBACK_PASS"
+    }
+  ],
+  "engineering_full_observed": {
+    "before_run": 42321646466,
+    "after_engineering_run": 42334930131,
+    "after_commit": "466849ac330eba439371e54a5af42b2190909b7e",
+    "before_job_chain_seconds": 6226.0,
+    "after_job_chain_seconds": 3739.0,
+    "before_max_shard_job_seconds": 5125.0,
+    "after_max_shard_job_seconds": 2839.0,
+    "chain_observed_reduction_percent": 39.95,
+    "max_shard_observed_reduction_percent": 44.6,
+    "scope": "Observed successful engineering runs; not a pure causal scheduling estimate or the later source FULL result."
+  }
+}

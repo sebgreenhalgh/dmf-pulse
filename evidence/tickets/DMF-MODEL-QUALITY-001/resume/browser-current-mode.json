@@ -1,0 +1,23 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "--frozen",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=review_pack/resume-current-mode",
+    "--durations=15",
+    "--junitxml=review_pack/resume-current-mode-junit.xml",
+    "tests/unit/dashboard/test_current_mode.py",
+    "tests/unit/scripts/test_accel003_no_io_loop.py"
+  ],
+  "exit_code": 0,
+  "tests": 63,
+  "pytest_reported_seconds": 352.46,
+  "junit_sha256": "ead69301bdf55ea1bc496b29deb2656effc8af60a1d4b4bc1748041592c69742",
+  "capture": "NativeJUnit plus tool-reported decoded process result; no separately authenticated raw stdout file",
+  "source_sha256": "4e0b0434171cd84bc2b94079db9caf509bbe615a3b7bbebc3a15e4b94ca89131",
+  "all_original_assertions_cohorts_scenarios_retained": true
+}

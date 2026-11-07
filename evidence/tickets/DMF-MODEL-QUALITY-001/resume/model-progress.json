@@ -1,0 +1,42 @@
+{
+  "classification": "OWNED_MATHEMATICAL_AND_ORCHESTRATION_RESEARCH_ONLY",
+  "MQ000": {
+    "tests": 31,
+    "metric_version": "MQ000_FIXED_GRID_ORDINAL_RPS_V1",
+    "summary_version": "MQ000_LOWER_INVERSE_CDF_SUMMARY_V1",
+    "production_metrics_changed": false
+  },
+  "MQ002": {
+    "tests": 17,
+    "contract_version": "MQ002_OWNED_MATCH_TIME_MEMBERSHIP_V1",
+    "real_inputs_admitted": false,
+    "owned_champion_counterexample": "Same observed60minutes; historicalwitnessclub/fixture differfromcurrentclub-assignedchampion, noforecastaccuracyclaim"
+  },
+  "MQ003": {
+    "tests": 21,
+    "contract_version": "MQ003_EXISTING_LEDGER_COMPLETE_POPULATION_V1",
+    "qualified_sources": 0,
+    "accepted_intents": 0,
+    "real_capture": "BLOCKED",
+    "real_database_connections": 0,
+    "readiness_query_exit": 2,
+    "native_future_deployment_acceptance": "REQUIRED",
+    "permitted_local_audit_matched_final_labels": 0
+  },
+  "source_sha256": {
+    "scripts/model_quality_math.py": "7532f3b483d9782d73d4dcaed34012e4532f3f256edc1568fc53f7a06be7dfe1",
+    "scripts/model_quality_membership.py": "ffb70ccee55cb150b7be07c598e7817fa45cd6065b36ad5dbc6923f9b1903bd3",
+    "scripts/model_quality_custody.py": "10df1ef443fbea6147ec3224fb2a4f4d8126de50b7f0dd407b41c889d486d8a9",
+    "tests/unit/scripts/test_model_quality_math.py": "d1cdc5991a2e735aa077e1034d95e593db833d931c063ef18507ca7e0cfeb596",
+    "tests/unit/scripts/test_model_quality_membership.py": "5b1ba92b0d43af7acdbb227fe69b27ff59ef2a79ff8c7cc904776f2be1da9fa3",
+    "tests/unit/scripts/test_model_quality_custody.py": "1ce62586b4417098913aee05851a6e1e7343731d6ca75d592c774f5965f89ffd",
+    "tests/unit/scripts/test_quality_review_custody.py": "f8026c1d1747747c5999f282198546016cc6a87f50245346b06cd91d819a9838",
+    "tickets/DMF-MODEL-QUALITY-001/MQ000-CONTRACT.md": "08372f5260fe39ea16c21b1dcea4f19aac10e377c40ddf36fc9b35f210c77076",
+    "tickets/DMF-MODEL-QUALITY-001/MQ002-CONTRACT.md": "1d090e422670648c26a47ffa506360d5e91fab90c76b3a875d70ebe83af7c26c",
+    "tickets/DMF-MODEL-QUALITY-001/MQ003-CONTRACT.md": "75e2878318ac0f4b0b18838339e9926519fab86f33e5ec823ec5c98a28244b54",
+    "tickets/DMF-MODEL-QUALITY-001/build_review.py": "96376a9004502545affdc75add232af9c9b155d34177ac54566a9b95221fb53b"
+  },
+  "package_source_changed": false,
+  "new_dependencies": false,
+  "predictive_skill_or_promotion_claim": false
+}

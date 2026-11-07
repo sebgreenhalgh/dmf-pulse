@@ -49,3 +49,20 @@ reviewed rollout/rollback plan (compatible rollback reader or approved schema-on
 reverse migration on a closed, verified backup). No live migration or installed
 release replacement is part of this programme. Merely passing v2 research-copy
 tests does not clear that deployment gate.
+
+## Verified continuation progress
+
+MQ000 now has separately versioned fixed-grid ordinal RPS and PMF quantile
+contracts under `scripts/model_quality_math.py`, with exact rational arithmetic
+and adversarial/property tests. Accepted Stage12/Stage11 behavior is unchanged.
+MQ002 has an owned match-time membership resolver with whole-aggregate exclusion
+for missing/ambiguous evidence; no real training adapter or source right is inferred.
+MQ003 orchestrates complete original forecasts/final labels through existing
+qualified adapters and server-clock custody, with explicit partial/unknown outcomes.
+The actual real-source registry and owner-intent set remain empty, so real capture
+and native deployment remain blocked pending their applicable acceptance.
+
+The original 19-capability matrix continues to describe the unchanged production
+champion; these research prototypes do not upgrade a deployed capability or its
+information grade. The [consolidated continuation report](QUALITY-CLEANUP-ACCELERATION.md)
+records test/cleanup evidence, unchanged live assets and the next exact-SHA FULL gate.

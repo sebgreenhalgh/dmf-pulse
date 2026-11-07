@@ -1,165 +1,265 @@
-# Quality, cleanup and feedback continuation
+# DMF Pulse — cleanup, faster feedback and model-quality checkpoint
 
-Research branch: `research/DMF-MODEL-QUALITY-001`. The original audit at
-`12fa98b977b99b75ac8dc37754701ee99dcfea9b` remains the starting checkpoint.
-This continuation changes test automation and owned fixtures, not the numerical
-champion, provider routes, installed operator, rules, trust or live databases.
-No live FPL/Odds request or credit was used. No PR or merge was created.
+The continuation removed 15 obsolete remote branches, closed the completed issue,
+archived 101 verified bytecode caches and implemented four feedback tiers. The
+analytical edit loop fell from 474.49s to 45.38s while adding essential smokes.
+MQ000 mathematical challengers, an owned MQ002 membership resolver and an MQ003
+bridge to the existing custody service now have 69 passing owned tests.
 
-## Verified findings
+Production package bytes, signed installation, canonical SQLite, both live
+PostgreSQL clusters, source rights and the accepted numerical champion are
+unchanged. Zero FPL/Odds calls or credits, FPL account writes, PRs, merges, model
+promotion or production migrations occurred. Real research capture remains
+blocked by missing qualification and owner protocol intent. Final exact-commit
+FULL CI is a separate gate; checkpoint-time status and detached final observations
+are recorded explicitly rather than relabelled as an earlier pass.
 
-The baseline's [CI run 42321646466](https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466)
-completed successfully: all 20 required jobs passed, including merged coverage,
-strict typing, PostgreSQL, performance and installed wheels. This accepts that
-baseline only. Every continuation source checkpoint needs its own FULL result.
+The **overall local size-reduction target is not achieved**: listed development
+bytes grew 698,421,699 during QA/evidence generation despite isolating 226,312,744
+cache bytes. No disk-space saving is claimed. Unknown or unsafe material stays
+on HOLD; this report does not authorize deleting it.
 
-The copied installed ACCEL003 harness used a selector that returned immediately
-despite a positive wait timeout. Its socket-free loop therefore busy-spun while
-waiting for executor work. An 80ms executor experiment observed 133,099 selector
-calls and 0.125s CPU before, versus 10 calls and CPU below the timer's resolution
-after adding an event-backed blocking wait/wakeup. This is a harness fix; the
-installed wheel and application engine are unchanged.
+## A. GitHub and repository navigation
 
-The instrumented original complete acceptance failed after 832.54s: both full
-horizon parity cases passed, but cancellation polling exceeded its existing
-phase limit and reached an uninitialized local. It was **not** a timeout. The
-corrected complete run passed in 379.05s under the unchanged 900s bound. Horizon
-1 fell from 257.34s to 86.47s; horizon 3 from 402.84s to 227.70s. These are serial
-runs on this Windows host, not a universal throughput guarantee. All original
-121-catalogue/120-projected, full-result numerical comparisons, exclusions,
-cancellation phases, actual worker/ASGI/CLI and network guards remain.
-Earlier 900s failures remain in the original sealed evidence.
+| Item | Before | After verified cleanup |
+| --- | ---: | ---: |
+| Remote branches, paginated |125|110|
+| Open PRs |0|0|
+| Historical PR records |22|22|
+| Open issues |1|0|
+| Tags / releases |1 /1|1 /1|
+| GitHub protected flags / rulesets |0 /0|0 /0|
+| Registered local worktrees |105|105|
 
-The first diagnostic supervisor accidentally observed its source digest at
-completion. The original receipt is preserved. A supplemental receipt explicitly
-records a retrospective replay of the exact timing instrumentation over the
-immutable baseline Git blob; the result equals the preserved executed driver.
-The corrected run captured its source digest before launch. Neither observation
-is relabelled as a prelaunch measurement of the failed run.
+`main`, `launch/GW10-real-pilot`, research and 87 registered-worktree branch names
+were preserved. Each deleted tip was an ancestor of **all three** surviving
+main/launch/research roots. An ordinary atomic push used a pinned exact deletion
+set/old-tip pre-push guard; stale-tip and server-rejection atomicity were proved
+in a disposable native Git repository. One pilot and 14 further deletions were
+reconciled against all surviving refs. No force option or history rewrite was used.
+Exact names/tips are in [remote-cleanup.json](../../evidence/tickets/DMF-MODEL-QUALITY-001/resume/remote-cleanup.json).
 
-## Four feedback tiers
+The static-acceptance branch remains HOLD because `ACCEPTANCE_COMMANDS.ps1:5`
+references it. Unique/unreviewed tips and branches referenced by worktrees remain.
+The complete 125-row classification is preserved privately and in durable recovery.
+[Issue 14](https://github.com/sebgreenhalgh/dmf-pulse/issues/14) was closed only after
+checking its workflow-removal criterion and all comments; ancestor
+`17b6aa576459c652e14015dcfd7b7cf0bffd6f9d` supplies the removal. Its body and 84
+comments remain. No PR backlog was invented.
 
-Use Python 3.13, the frozen uv environment and explicit affected test paths.
-Each run creates a fresh ignored `review_pack/dev-checks/<tier>-<id>` containing
-commands, source identity, raw streams, durations, hashes and JUnit. No artifacts
-are acceptance caches. A changed source, interrupted command, timeout, failure
-or incomplete run cannot receive a pass receipt.
+Active research checkout is `review_pack/MODEL-QUALITY-001` on
+`research/DMF-MODEL-QUALITY-001`; required launch checkout is `review_pack/GW10-LAUNCH`.
+The original dirty availability checkout remains untouched. This report and the
+existing audit/roadmap are linked from the [operations index](README.md).
 
-| Tier | Example | Meaning |
+## B. Local archive, protected assets and storage
+
+**Owner deletion archive:**
+`C:\Users\sebgr\Documents\DMF_PULSE_ARCHIVE_PENDING_OWNER_DELETION`
+
+Only 101 flat, proven recreatable CPython 3.13 cache directories were moved:
+3,590 files / 226,312,744 logical bytes. Including the owner README, the measured
+archive has 3,591 files / 226,313,018 bytes. Every cache file has one link, current
+magic/header, and an exact complete compile/marshal body reproduced from sibling
+source that remains in place. No source or cached code was executed/loaded for
+that proof. Original/destination paths, commits, counts, hashes, reasons and
+restore references are in [local-cleanup.json](../../evidence/tickets/DMF-MODEL-QUALITY-001/resume/local-cleanup.json).
+
+Native preflight checked exact sources/targets, ancestors/device, clean unchanged
+checkout, process command references, services/tasks and directory locks. Fresh
+proofs, identity checks and owner checks preceded each move. All final bytes,
+file IDs, timestamps, link counts, retained-source hashes and 3,691 cache directory/
+file owner+SYSTEM protected ACLs passed independent verification. All 19 held
+caches remain in place: three from unreadable checkouts and 16 with mismatched
+owners. Another 7,256 discovered caches remain unproven/HOLD.
+
+Whole environments remain HOLD. Installed RECORDs do not independently authenticate
+the locked wheel, and shared hardlinks make broad ACL resets unsafe. No worktree,
+package source, native dependency or old evidence tree was bulk-moved or removed.
+The preliminary whole-environment proposal is superseded, not deletion approval.
+
+The first preflight stopped on an exited-process metadata race; another stopped
+on PowerShell Set-Acl's audit privilege. The first pilot moved one cache but its
+directory-first ACL update removed inherited child ACEs. The stop, original
+journal and exact bytes were preserved. A disposable-proven, owner-preserving
+DACL-only repair restored all 38 files; independent verification passed. The final
+executor protects files first, changes directories last and preserves owners.
+All failed and repaired receipts remain; no incomplete pilot was counted as pass.
+
+**Durable evidence/rollback folder — keep this:**
+`C:\Users\sebgr\Documents\DMF_PULSE_CLEANUP_RECOVERY_20261107`
+
+It is outside both checkout and deletion archive. All 266 content-only copies have
+verified independent inodes, sizes and hashes, with owner/SYSTEM-only access.
+`RESTORE.md` contains 101 exact source/destination commands, refuses recreated
+source paths and explains original Access-section SDDL restoration. Historical
+proposals remain evidence only; only the executed 101-cache set is deletion-safe.
+
+| Metadata inventory | Before | After snapshot |
+| --- | ---: | ---: |
+| Listed logical file bytes |37,609,285,121|38,307,706,820|
+| Protected/reparse exclusions |19|19|
+| Metadata access errors |441|446|
+| Registered worktrees / dirty |105 /8|105 /8|
+
+These are lower bounds over the recorded development scope, not complete allocated
+disk usage. New QA outputs and retained evidence contributed to growth; snapshots
+are not a causal attribution of every byte. The signed installation and live
+PostgreSQL contents are not included in a recursive disk estimate. At least
+5,372,122,659 counted metadata bytes remain in protected launch/ACCEL002 roots,
+excluding their pruned runtime/data paths and other protected locations.
+
+Both live PostgreSQL data roots are under GW10-LAUNCH; their executable dependency
+is under `review_pack/ACCEL-002/review_pack/postgres-runtime/pgsql/bin`. The cluster
+inside `standing-operation-001/owned-postgres-002/data` is live despite its name.
+Neither data tree was recursively scanned/hashed/copied. The signed operator,
+canonical SQLite, original audit custody, P01, trust, dirty worktrees and active
+research were preserved. Initial/final root and launch HEAD/status metadata agree.
+
+**Same-volume space freed: 0 bytes.** Owner deletion may recover approximately
+226,312,744 logical cache file bytes; allocated NTFS blocks/compression/directory
+overhead are not measured. No other HOLD directory is approved for deletion.
+
+## C. Faster testing, evidence and remaining bottlenecks
+
+| Tier/check | Before | Verified after |
 | --- | --- | --- |
-| FAST | `uv run --frozen python scripts/dev_checks.py fast --target tests/unit/scripts/test_dev_checks.py` | Format/lint, explicit targeted types where supplied, affected unit tests and essential security/rights/import smokes; no coverage instrumentation. |
-| FOCUSED | `uv run --frozen python scripts/dev_checks.py focused --target tests/unit/operation/test_analysis_quality.py --target tests/unit/operation/test_analysis_quality_views.py --target tests/unit/operation/test_analysis_store.py --coverage-module dmf_pulse.operation.analysis_quality --coverage-module dmf_pulse.operation.analysis_store --coverage-module dmf_pulse.operation.analysis_cli` | All affected subsystem modules plus smokes, with explicitly scoped branch coverage. Its zero global floor avoids misrepresenting partial coverage as a repository gate. |
-| INTEGRATION | `uv run --frozen python scripts/dev_checks.py integration --target tests/integration/operation/test_analysis_fixture_parity.py --target tests/unit/scripts --target tests/unit/operation/test_analysis_fixture_integrity.py` | Fresh complete owned engine execution and every-field equality for the frozen analytical input, plus affected tooling and smokes. Add applicable database/browser integration targets for those changes. |
-| FULL | `uv run --frozen python scripts/dev_checks.py full --ci-run <exact-push-run-id>` | Requires clean unchanged HEAD, the actual authoritative ci.yml workflow ID, a successful push event for that HEAD, and all 20 exact mandatory jobs successful. It verifies full authoritative CI; it does not promote or sign a release. |
+| FAST | No equivalent formal tier |136 tests,10.61s pytest command +0.65s format/lint; no coverage |
+| FOCUSED analytical loop |64 tests,474.49s command /471.71s pytest |131 tests,45.38s final tier command; branch coverage retained |
+| INTEGRATION | No equivalent formal tier |514 tests,132.53s final tier command; fresh full engine, scripts and smokes |
+| Browser current-mode + loop regressions | No comparable Windows capture; old Linux module bound 1481.80s is a different host/coverage scope |63 tests,352.46s; both complete horizons retained |
+| Installed complete ACCEL003 probe |832.54s failed; earlier 900s timeouts preserved |379.05s PASS with unchanged 900s bound and wheel |
+| FULL |20 jobs PASS at 12fa; 6,226s job chain; slowest shard 5,125s |Engineering 466: all 20 jobs passed in 3,739s; later final-SHA result independently required |
 
-When package source changes, partial checks conservatively type-check all
-`src/dmf_pulse` unless explicit source targets were provided. Tests/automation
-only report typing `NOT_REQUESTED`. An earlier Windows Application Control block
-of mypy/librt remains historical failed evidence. The continuation's literal
-strict typing run passed in 45.59s without changing or replacing the checker.
-Any future host-policy failure must remain blocked; do not bypass host policy.
+The focused reduction exceeds 90% for this measured edit loop, with more smokes
+and coverage in both commands. Other rows differ in scope/host and do not support
+an invented percentage. Dependencies were warm/frozen; CI sync was about 1s and
+was not the dominant bottleneck. No new dependencies/actions or acceptance cache
+were added. Slow numerical simulation still dominates complete acceptance.
 
-Owned unit fixture loading removes duplicate full engine setup from analytical
-store/report tests. It retains all 121 rows, 120 projected players and complete
-presentation; every consumer gets a fresh validated model. Raw bytes, semantic
-hash, ownership and population are pinned. The integration test regenerates the
-complete engine and requires **every field and the semantic hash** to match.
-No custody/hash exclusions were added. Any package identity change requires
-explicit reviewed fixture regeneration; do not silently refresh pins. The first
-old-QA fixture failed strict build identity equality and was replaced with a
-complete current-source regeneration. Failed attempts remain recorded.
+The copied socket-free selector returned immediately despite positive timeout,
+busy-spinning while executor work waited for the GIL. An 80ms executor probe showed
+133,099 selects / 0.125s CPU before versus 10 selects / CPU below timer resolution
+after event-backed wait/wakeup. Both current-browser tests and installed proof
+now reuse the corrected loop. Original horizons 1/3, 121 catalogue / 120 projected,
+exact result comparisons, cancellation, real worker, ASGI/CLI and network guards
+remain. No fixture, tolerance, scenario or 900s limit was weakened.
 
-The initial accelerated focused run passed 131 tests in 42.72s command time,
-39.15s pytest time, versus 64 tests in 474.49s/471.71s previously. The added tests
-include essential smokes; coverage was enabled in both. This supports a greater
-than 90% reduction in this local edit loop. It is not a comparison of the entire
-suite or a claim that model execution became 90% faster.
+The original instrumented run passed both numerical cases but failed cancellation
+polling. Same-case horizon times fell 257.34→86.47s and 402.84→227.70s. It was a
+failed full run, not a completed baseline PASS. Its supervisor observed the source
+digest too late; the untouched receipt has a transparent supplemental retrospective
+reconstruction equalling the preserved executed driver. The corrected run measured
+its source before launch. Neither observation is misrepresented.
 
-## CI scheduling
+Analytical unit tests now load an exact owned full snapshot with fresh independent
+models. Strict raw/semantic/provenance/population pins apply. The integration
+test regenerates the complete engine and requires **every field and semantic
+hash** to match, with no custody exclusions. An older QA fixture failed build
+identity equality and was regenerated; failed attempts remain. Package changes
+must trigger explicit reviewed regeneration rather than silent pin refresh.
 
-All 16 successful baseline shard logs supplied 573 approximate module-fragment
-elapsed observations. Progress timestamps include setup/output/scheduling effects,
-so the manifest labels them **estimated**, not measured pytest node durations.
-The existing validated LPT scheduler and 16-shard architecture remain intact.
-No dependency or action, workflow permission, selection marker, timeout, seed,
-scenario count, coverage threshold or acceptance job changed. Frozen dependency
-sync took about one second in the baseline; extra dependency caching would not
-address the dominant cost.
+The existing 16-shard scheduler uses 573 honestly labelled approximate progress-log
+observations. Original 8,526 tests remain exactly once with identical collection
+digest; new tests are collected normally too. Three independent standing-pipeline
+cases can occupy separate shards; D4's expensive shared module fixtures stay
+together. Estimated loads were 2,551s maximum / ~1,972s elsewhere, not measured
+speedups. The engineering run passed all 20 jobs: observed job chain 6,226→3,739s (39.95% reduction), and slowest shard 5,125→2,839s (44.60%). Runner variation and the combined changes limit causal attribution. The later source commit still requires its own FULL result. No workflow permission,
+coverage floor, job, seed, scenario count or acceptance timeout changed.
 
-The exact original 8,526-node multiset and digest remain once each. The three
-function-isolated full 256-scenario standing-pipeline cases can occupy different
-shards; they own their transports, manager state and monkeypatches. D4's expensive
-module fixtures stay together. Updated estimated loads are 2,551s longest and
-about 1,972s elsewhere, versus an observed baseline maximum 5,092s. These are
-different kinds of measurements: no measured CI speedup is claimed until the
-new exact-SHA run completes. Normal collection additionally includes new tests.
+Run `uv run --frozen python scripts/dev_checks.py` with `fast`, `focused` or
+`integration` plus explicit `--target` paths. Essential rights/security/import
+smokes are always added. Source changes, interruptions, failed startup and timeouts
+cannot receive pass receipts. Explicit scoped coverage is partial feedback; it
+does not satisfy the global release floor. Core source changes conservatively
+type-check all `src/dmf_pulse` unless explicit applicable type targets are supplied.
 
-## Repository and local cleanup
+FULL uses `full --ci-run <id>` from clean unchanged HEAD and authenticates the
+actual ci.yml workflow ID/path, exact push SHA and all 20 mandatory successful
+jobs. PR merge checkouts, omissions/skips and local PASS assertions are refused.
+Production promotion/signing remains separate.
 
-Paginated inventory found 125 remote branches, 22 historical PRs, zero open PRs,
-one open issue, one tag and one release. Fifteen obsolete non-worktree branch
-tips were ancestors of **all three** surviving main/launch/research roots. An
-ordinary atomic push with a pinned exact deletion-set/old-tip pre-push guard
-removed one pilot then fourteen branches. Before/after reconciliation verified
-110 remaining refs unchanged, with tags/releases preserved. Native disposable
-Git experiments proved stale-tip refusal and server-rejection atomicity. No
-force option or history rewrite was used. The static acceptance branch remains
-on HOLD because root PowerShell automation references it.
+## D. Model-quality continuation
 
-[Issue 14](https://github.com/sebgreenhalgh/dmf-pulse/issues/14) was closed as
-completed only after its workflow-removal criterion and all comments were read;
-the removal is in preserved ancestor `17b6aa576459c652e14015dcfd7b7cf0bffd6f9d`.
-Its body and 84 comments remain. No open PR or issue remains at that check.
+| Research slice | Implemented and tested | Boundary |
+| --- | --- | --- |
+| MQ000 |31 tests: exact Fraction arithmetic, declared fixed-grid ordinal RPS, zero-key/permutation/propriety properties; inclusive PMF quantiles accept valid upper/lower rare tails |Accepted Stage 12 scores and Stage 11 optimizer validators unchanged; new versions opt-in only |
+| MQ002 |17 tests: exact historical membership, transfers, doubles, blank/missing distinctions, postponement/rearrangement, ambiguity, cutoff, zero-minute starts; actual unchanged champion counterexample |Owned inputs only; no real source/training authority or production adapter inferred |
+| MQ003 |21 tests: complete original player×model population, existing adapter and source/intent/population gates, native custody calls, final-label append, partial/unknown outcomes and interruptions |No warehouse reconstruction, real ledger connection or fabricated historical freeze; native future deployment needs applicable qualification/acceptance |
 
-The local inventory covers 105 registered worktrees and 37,609,285,121 listed
-logical bytes. It excludes 19 protected paths and reports 441 metadata access
-errors; this is a lower bound, not a complete disk or allocated-block measure.
-Eight dirty worktrees and their unique work remain protected. The launch data
-depends on PostgreSQL executables under `review_pack/ACCEL-002`; age/name alone
-would have misclassified this live dependency. Both live clusters, the signed
-operator, permanent SQLite, original audit custody and active research remain.
-No worktree has been force removed or manually moved.
+The MQ002 same-input owned counterexample changes one fixture/team assignment
+while retaining observed 60 minutes; no prediction or accuracy gain is inferred.
+MQ003 reuses server-clock native transactions and Stage 12 evaluation. A batch is
+not atomic: completed hashes and the uncertain attempted cell are preserved on
+failure; reconcile before retry. Missing labels remain missing, revisions stay
+explicit and previous vintages are not erased.
 
-Whole environment/site-packages proposals are **HOLD**: mutable installed RECORDs
-are insufficient proof against a locked wheel, and shared hardlinks make broad
-ACL resets unsafe. The bounded alternative proves only flat CPython 3.13 caches
-with one link per file, current magic/header, exact complete compile/marshal body
-reproduction from sibling sources that remain in place, no reparse points, and
-fresh identity/membership checks. No source or bytecode is executed or loaded.
-The first 120 caches cover 4,264 files and 268,862,105 logical bytes. Another 7,256
-discovered caches remain unproven/HOLD. Actual moves require reviewed native
-PowerShell containment, process/task/service/CWD-lock and rollback safeguards.
-Fresh Git status excluded three caches spanning two unreadable checkouts; the
-reviewed execution subset is 117 caches / 262,151,451 bytes. The first preflight
-stopped after 73 read-only checks on an exited-process metadata race. The next
-stopped before any candidate at the PowerShell Set-Acl audit-privilege boundary.
-Both receipts remain; the narrower owner/DACL .NET API was tested on an isolated
-new directory. No stopped preflight is counted as an archived cache.
+`model_quality_math.py --owned-demonstration` shows invariant 1/2 RPS and a valid
+mean 1 above p90=0. `model_quality_custody.py --readiness` reports the actual empty
+real registry: 0 qualified sources, 0 accepted intents, nonzero exit and no DB/provider
+access. The operational Stage 9 snapshot adapter remains synthetic-only. Real
+membership and original-output retention require exact source/purpose/retention
+qualification, budget and protocol approval. Matched finalized evaluation sample
+remains 0 in this permitted audit; no confidence grade, calibration or predictive
+skill upgrade is claimed. See the three bounded contracts in the ticket.
 
-Archive destination:
-`C:\Users\sebgr\Documents\DMF_PULSE_ARCHIVE_PENDING_OWNER_DELETION`.
-Owner/SYSTEM-only manifests, per-file proofs and original ACL/restore receipts
-stay in durable private custody outside the deletion archive. A same-volume move
-frees **zero bytes**. Only the owner may delete the archive; recoverable logical
-file bytes are not an NTFS allocated-space guarantee.
+## E. Database and protected release status
 
-## Checkpoint and remaining programme
+Canonical warehouse SHA256 remains
+`bdbf46c917819438e7d4a8033b087a9cb5a583930bb005d13692c5485ef9eaa7`;
+active-release manifest remains
+`bd28d6827cb7c1dbb244225996beff6a726250072ac18836d4c72270b8ba4132`.
+The rebuilt research wheel is exactly the earlier 1,987,239-byte wheel
+`654d1d5638a61b7feca916c4e889cb0c920a38b6f21989e75e6864e14d36075e`.
+No redundant installed run was needed for identical bytes; final hosted gates
+remain required. The earlier local type-checker policy failure is retained, and
+the continuation's literal strict typing passed without replacing the checker.
 
-This is an engineering checkpoint. Mathematical MQ-000 challengers, MQ-002 exact
-match-time membership and MQ-003 prospective custody remain next in the accepted
-order. No accuracy gain, real-label evaluation or production activation is
-claimed. Unqualified rights, missing membership, late freeze or absent finalized
-labels remain explicit blockers; no new data authority is inferred.
+Research v2 quality diagnostics, identity guards and three derived views remain.
+Canonical live data stays v1. The signed v1 reader rejects schema 2; no v2 production
+migration is authorized until compatible deployment/rollback acceptance exists.
+Original model audit, 19-capability matrix and [roadmap](MODEL-QUALITY-001-ROADMAP.md)
+remain controlling context. GrowthOS and content production remain outside scope.
 
-Continuation source, review and gate receipts live in
-`evidence/tickets/DMF-MODEL-QUALITY-001/resume/`. The original sealed evidence is
-historical and is not overwritten. A final exact-commit FULL CI result, archive
-outcome and independent review must accompany any completed handoff.
+## F. Review, reproducibility and next executable gate
 
-Local continuation gates passed frozen sync, formatting, lint, strict typing,
-fresh integration (138.99s), focused coverage (45.86s), inherited regressions
-(180.44s), SQL stress (7.28s) and build (16.69s). Repository validation then
-correctly rejected the stale sealed baseline current manifest. The validator
-now prefers a separately captured continuation manifest; regression tests verify
-old bytes remain unchanged, new source is checked, and malformed/stale continuation
-manifests fail closed. Secret/repository/final-diff results follow in gate receipts.
+Starting checkpoint `12fa98b977b99b75ac8dc37754701ee99dcfea9b` passed all 20 jobs in
+[run 42321646466](https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466).
+Engineering checkpoint `466849ac330eba439371e54a5af42b2190909b7e` was independently
+verified against all 2,018 Git blobs before its push; its CI is
+[run 42334930131](https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42334930131).
+All 20 engineering jobs passed. This does not stand in for the later source checkpoint's FULL gate.
+
+Independent review cleared P0/P1/material P2 for executed branch cleanup, native
+cache/recovery outcome, feedback/CI controls and all research slices. Valid
+findings were corrected, including ACL order, exact source custody, push-event
+binding, manifest preservation and ZIP overwrite/duplicate/opaque payload safety.
+The original sealed manifest and all failed attempts remain; current continuation
+manifests advance with source while prior committed versions stay immutable in Git.
+
+A final secret-scan attempt correctly stopped on base64-encoded Hypothesis statistics and a compressed metadata sentence. The native XML and failure receipt remain private/preserved. Public JUnit exports losslessly decode those library statistics to readable text, record native/export hashes and preserve every testcase unchanged. The scanner and allowlist were not altered.
+
+Final source hashes, command/JUnit/coverage receipts, before/after summaries,
+review and remaining gates are under `evidence/tickets/DMF-MODEL-QUALITY-001/resume`.
+Exact reviewed/accepted HEAD and CI observations are bound in the detached review
+receipt. Build from clean HEAD with
+`uv run --frozen python tickets/DMF-MODEL-QUALITY-001/build_review.py --continuation`;
+after FULL, supply its `--full-receipt` capture to reauthenticate/include the actual
+result. Pending/FULL packets have separate immutable paths, exactly 20 flat files,
+<=32 MiB payload, CRC/digests and source-freeze checks. An existing altered ZIP is
+preserved/refused, including duplicate entries, comments and trailing payloads.
+
+Next executable gate is the exact final-SHA FULL check and any smallest valid
+correction it identifies. Further storage reduction needs independent wheel/
+temporary-output qualification; real research needs source/intent/native custody
+acceptance. No unresolved item is silently converted into approval.
+
+## G. Owner action
+
+Only the verified contents of
+`C:\Users\sebgr\Documents\DMF_PULSE_ARCHIVE_PENDING_OWNER_DELETION`
+are prepared for owner deletion. The agent has not deleted this archive. Keep
+`C:\Users\sebgr\Documents\DMF_PULSE_CLEANUP_RECOVERY_20261107` and the protected
+operating/research assets. The 101 cache sources can be recompiled from retained
+source; no evidence, application install, signed wheel, database or worktree is
+being delegated for deletion. No action is requested on HOLD material.

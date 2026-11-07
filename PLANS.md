@@ -3477,12 +3477,36 @@ reviewed MQ-000/002/003 research paths. No production activation is authorized.
 - [x] Observe run 42321646466 and isolate the installed ACCEL003 timeout.
 - [x] Implement measured FAST/FOCUSED/INTEGRATION/FULL workflows and safe CI speedups.
 - [x] Prune only conclusively obsolete refs; preserve unique work and governance.
-- [ ] Archive proven recreatable/obsolete local files using owner-only ACLs and
+- [x] Archive proven recreatable/obsolete local files using owner-only ACLs and
   exact rollback receipts; never traverse/copy live PostgreSQL internals.
-- [ ] Implement separately reviewed mathematical challengers and bounded
+- [x] Implement separately reviewed mathematical challengers and bounded
   membership/custody improvements without changing the production champion.
 - [ ] Independently review, execute required gates, commit/push and provide one
   consolidated before/after handoff with exact remaining blockers.
+
+Continuation outcome: 15 remote refs removed, issue 14 closed, 101 exclusive
+bytecode caches (226,312,744 bytes) archived and independently verified; 19 unsafe
+caches and all unqualified environment proposals remain HOLD. Durable rollback
+and proofs are outside the checkout/archive in Documents/DMF_PULSE_CLEANUP_RECOVERY_20261107.
+Same-volume moves freed zero bytes; listed development storage grew during QA,
+so the overall disk-reduction target remains unmet and is disclosed.
+
+The unchanged exact wheel passes the corrected complete installed probe in
+379.05s under the original 900s bound. FAST: 136 tests/10.61s pytest; focused:
+131 tests/45.38s final tier; integration: 514 tests/132.53s final tier. Shared-loop browser
+regressions pass all 57 cases plus 6 loop checks in 352.46s. MQ000/002/003 have
+69 owned tests, preserve every production package byte and infer no real rights.
+Exact final-HEAD FULL CI and clean-HEAD capped packet remain the final gate;
+the detached receipts bind their actual source SHA without a circular evidence commit.
+
+Engineering checkpoint `466849ac330eba439371e54a5af42b2190909b7e` passed all
+20 hosted jobs: 3,739s observed job chain versus 6,226s before. Final local
+typing, 80 model/packet/loop tests, inherited tests, SQL performance and build
+passed. A metadata-only secret-scan failure is preserved; readable JUnit
+statistics exports retain every testcase and exactly reversible statistics.
+Independent review verified all six exports, source/scanner integrity and
+archive/recovery outcomes. Final post-export scan, commit, exact-SHA FULL and
+capped packet are recorded separately; no pending check is a pass.
 
 - Branch `research/DMF-MODEL-QUALITY-001`, fetched launch base
   `df26ab0723dea99469fe4c98423402ea91f85776`; separate worktree.

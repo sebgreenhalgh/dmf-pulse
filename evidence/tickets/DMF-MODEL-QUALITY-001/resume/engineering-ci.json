@@ -1,0 +1,183 @@
+{
+  "head": "466849ac330eba439371e54a5af42b2190909b7e",
+  "run_id": 42334930131,
+  "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42334930131",
+  "event": "push",
+  "workflow_id": 328901691,
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "databaseId": 128289598865,
+      "name": "Pre-flight",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:38:32Z",
+      "completedAt": "2026-11-07T03:39:54Z"
+    },
+    {
+      "databaseId": 128289908423,
+      "name": "Coverage shard 3 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:06:21Z"
+    },
+    {
+      "databaseId": 128289908433,
+      "name": "Coverage shard 12 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:16:13Z"
+    },
+    {
+      "databaseId": 128289908435,
+      "name": "Coverage shard 5 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:20:45Z"
+    },
+    {
+      "databaseId": 128289908441,
+      "name": "Coverage shard 9 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:18:33Z"
+    },
+    {
+      "databaseId": 128289908443,
+      "name": "Coverage shard 1 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:07:37Z"
+    },
+    {
+      "databaseId": 128289908446,
+      "name": "Coverage shard 6 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:14:29Z"
+    },
+    {
+      "databaseId": 128289908475,
+      "name": "Coverage shard 13 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:15:53Z"
+    },
+    {
+      "databaseId": 128289908481,
+      "name": "Coverage shard 14 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T03:58:53Z"
+    },
+    {
+      "databaseId": 128289908485,
+      "name": "Coverage shard 7 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:14:35Z"
+    },
+    {
+      "databaseId": 128289908488,
+      "name": "Coverage shard 15 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:03:29Z"
+    },
+    {
+      "databaseId": 128289908497,
+      "name": "Coverage shard 2 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:09:16Z"
+    },
+    {
+      "databaseId": 128289908498,
+      "name": "Coverage shard 8 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:11:26Z"
+    },
+    {
+      "databaseId": 128289908508,
+      "name": "Coverage shard 0 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:17:03Z"
+    },
+    {
+      "databaseId": 128289908514,
+      "name": "Coverage shard 10 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:00:13Z"
+    },
+    {
+      "databaseId": 128289908565,
+      "name": "Coverage shard 4 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:27:15Z"
+    },
+    {
+      "databaseId": 128289908568,
+      "name": "Coverage shard 11 of 16",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T03:39:56Z",
+      "completedAt": "2026-11-07T04:14:55Z"
+    },
+    {
+      "databaseId": 128300808329,
+      "name": "Combined coverage gate",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T04:27:17Z",
+      "completedAt": "2026-11-07T04:28:11Z"
+    },
+    {
+      "databaseId": 128301013022,
+      "name": "Post-coverage acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T04:28:13Z",
+      "completedAt": "2026-11-07T04:40:47Z"
+    },
+    {
+      "databaseId": 128303780592,
+      "name": "Python 3.13 / Ubuntu",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-07T04:40:49Z",
+      "completedAt": "2026-11-07T04:40:51Z"
+    }
+  ],
+  "comparison": {
+    "before_run": 42321646466,
+    "after_engineering_run": 42334930131,
+    "after_commit": "466849ac330eba439371e54a5af42b2190909b7e",
+    "before_job_chain_seconds": 6226.0,
+    "after_job_chain_seconds": 3739.0,
+    "before_max_shard_job_seconds": 5125.0,
+    "after_max_shard_job_seconds": 2839.0,
+    "chain_observed_reduction_percent": 39.95,
+    "max_shard_observed_reduction_percent": 44.6,
+    "scope": "Observed successful engineering runs; not a pure causal scheduling estimate or the later source FULL result."
+  }
+}

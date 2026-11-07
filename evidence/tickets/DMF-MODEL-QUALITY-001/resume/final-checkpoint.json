@@ -1,0 +1,33 @@
+{
+  "status_at_creation": "REVIEWED_LOCAL_CHECKPOINT_EXACT_HEAD_FULL_CI_REQUIRED",
+  "source_commit_binding": "The containing Git commit; actual HEAD and FULL status are recorded by detached review/CI receipts to avoid a circular evidence-only commit.",
+  "parent_engineering_commit": "466849ac330eba439371e54a5af42b2190909b7e",
+  "initial_checkpoint": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "remote_branches": {
+    "before": 125,
+    "after": 110,
+    "deleted": 15
+  },
+  "open_prs": 0,
+  "open_issues": 0,
+  "archive": {
+    "directories": 101,
+    "files": 3590,
+    "bytes": 226312744,
+    "same_volume_freed_bytes": 0,
+    "overall_size_reduction_target_met": false
+  },
+  "model_tests": 69,
+  "final_subsystem_tests": 514,
+  "browser_and_loop_tests": 63,
+  "partial_tiers_are_full_acceptance": false,
+  "remaining": [
+    "Exact final-HEAD FULLCI and clean-HEAD cappedpacket",
+    "Source/purpose/retention andownerprotocolqualification beforeanyrealresearchcapture",
+    "Nativeacceptancebeforefuturerealorchestrationdeployment",
+    "Wheel/temporary-outputqualificationbeforefurtherstoragepruning",
+    "Reviewedcompatibledeploymentrollbackbeforeanyschema2productionmigration"
+  ],
+  "engineering_full_ci": "PASS_ALL20_RUN42334930131",
+  "no_live_FPL_Odds_calls_credits_FPL_account_writes_production_change_or_promotion": true
+}

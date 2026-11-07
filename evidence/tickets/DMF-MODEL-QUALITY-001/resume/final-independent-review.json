@@ -1,0 +1,42 @@
+{
+  "reviewer": "independent_quality_review",
+  "status": "NO_UNRESOLVED_P0_P1_MATERIAL_P2_IN_IMPLEMENTED_REVIEWED_SCOPE",
+  "engineering_commit": "466849ac330eba439371e54a5af42b2190909b7e",
+  "source_sha256": {
+    "scripts/accel003_wheel_probe.py": "2f29254cd199572101c7f917c8c141e3ed366b9b80a5e862b0ea7d081b3189b4",
+    "scripts/dev_checks.py": "ea998b54513bef9f5c297ab625ecb0904494393d0fc31b2baf524406cb22c20f",
+    "scripts/branch_cleanup_guard.py": "2ca52551fad65620f2dbfe3a3491a38f4eb433b8da854759a6aa8bdcd23ece41",
+    "scripts/bytecode_cache_proof.py": "a728418cf82c7b77439f61a056390b6d3a23860ab56db0eef9ca737909a59b60",
+    "scripts/validate_repository.py": "42b255faa425fb90108e5590c08dd8b63151ccfa579489479d68a4ba7bc1e54d",
+    "tests/unit/dashboard/test_current_mode.py": "4e0b0434171cd84bc2b94079db9caf509bbe615a3b7bbebc3a15e4b94ca89131",
+    "scripts/model_quality_math.py": "7532f3b483d9782d73d4dcaed34012e4532f3f256edc1568fc53f7a06be7dfe1",
+    "scripts/model_quality_membership.py": "ffb70ccee55cb150b7be07c598e7817fa45cd6065b36ad5dbc6923f9b1903bd3",
+    "scripts/model_quality_custody.py": "10df1ef443fbea6147ec3224fb2a4f4d8126de50b7f0dd407b41c889d486d8a9",
+    "tests/unit/scripts/test_model_quality_math.py": "d1cdc5991a2e735aa077e1034d95e593db833d931c063ef18507ca7e0cfeb596",
+    "tests/unit/scripts/test_model_quality_membership.py": "5b1ba92b0d43af7acdbb227fe69b27ff59ef2a79ff8c7cc904776f2be1da9fa3",
+    "tests/unit/scripts/test_model_quality_custody.py": "1ce62586b4417098913aee05851a6e1e7343731d6ca75d592c774f5965f89ffd",
+    "tests/unit/scripts/test_quality_review_custody.py": "f8026c1d1747747c5999f282198546016cc6a87f50245346b06cd91d819a9838",
+    "tickets/DMF-MODEL-QUALITY-001/MQ000-CONTRACT.md": "08372f5260fe39ea16c21b1dcea4f19aac10e377c40ddf36fc9b35f210c77076",
+    "tickets/DMF-MODEL-QUALITY-001/MQ002-CONTRACT.md": "1d090e422670648c26a47ffa506360d5e91fab90c76b3a875d70ebe83af7c26c",
+    "tickets/DMF-MODEL-QUALITY-001/MQ003-CONTRACT.md": "75e2878318ac0f4b0b18838339e9926519fab86f33e5ec823ec5c98a28244b54",
+    "tickets/DMF-MODEL-QUALITY-001/build_review.py": "96376a9004502545affdc75add232af9c9b155d34177ac54566a9b95221fb53b"
+  },
+  "actual_archive_and_recovery": "All 101 caches and 3590 files (226312744 bytes) passed exact content, identity, timestamp, link, retained-source and owner/SYSTEM ACL checks. All 266 independent recovery copies verified; all 19 held caches remain.",
+  "owned_model_tests": 69,
+  "browser_tests": 63,
+  "packet_custody_tests": 5,
+  "actual_final_clean_HEAD_packet_and_FULL": "REQUIRED_SEPARATE_DETACHED_OBSERVATIONS",
+  "production_or_model_activation": false,
+  "engineering_ci": "All 20 required jobs passed at 466849ac; final source still requires its own exact-HEAD result.",
+  "metadata_export": "Hypothesis statistics decoded losslessly to readable UTF8; all testcase content unchanged and native XML retained. Scanner and allowlist unchanged.",
+  "metadata_export_independent_verification": {
+    "exports": 6,
+    "testcase_occurrences_byte_identical": 1501,
+    "statistics_properties_exactly_reversible": 16,
+    "native_originals_unchanged": true,
+    "exporter_sha256": "6a09d7cb77c43d1625f0c94cc2175f20ef518be0db8efc49f51fe806a6ac6728",
+    "export_provenance_sha256": "6afe15174b787d5ee5f1b049c7c054a4b92420dbfc3a81fa353575bbefefe9bf",
+    "scanner_and_allowlist_unchanged": true,
+    "full_scanner_and_final_source_FULL_are_separate_gates": true
+  }
+}
