@@ -13,6 +13,7 @@ import selectors
 import socket
 import sys
 import tempfile
+import threading
 from pathlib import Path
 from time import monotonic, sleep
 from typing import Any
@@ -275,9 +276,20 @@ def _install_network_guard() -> None:
 
 
 class _NoIoSelector(selectors.SelectSelector):
+    def __init__(self) -> None:
+        super().__init__()
+        self._wakeup = threading.Event()
+
+    def wake(self) -> None:
+        self._wakeup.set()
+
     def select(self, timeout: float | None = None) -> list[Any]:
-        del timeout
-        assert not self.get_map(), "in-memory ASGI acceptance registered an IO descriptor"
+        if self.get_map():
+            raise AssertionError("in-memory ASGI acceptance registered an IO descriptor")
+        # ASGI uses asyncio.to_thread. Block without a socket until its callback
+        # wakes us; spinning here competes with that worker for the Python GIL.
+        self._wakeup.wait(timeout)
+        self._wakeup.clear()
         return []
 
 
@@ -287,6 +299,11 @@ class _NoIoLoop(asyncio.SelectorEventLoop):
 
     def _close_self_pipe(self) -> None:
         return
+
+    def _write_to_self(self) -> None:
+        selector = self._selector
+        if selector is not None:
+            selector.wake()
 
 
 def request(

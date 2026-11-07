@@ -7,6 +7,26 @@
   },
   "max_samples_per_module": 5,
   "modules": {
+    "tests/assurance/fpl_points/test_assurance_mutations.py": {
+      "estimated_seconds": 22.329,
+      "observations": [
+        {
+          "seconds": 22.329,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/assurance/optimisation/test_assurance.py": {
+      "estimated_seconds": 0.003,
+      "observations": [
+        {
+          "seconds": 0.003,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
     "tests/assurance/optimisation/test_r2c_artifact_validation.py": {
       "estimated_seconds": 977.0,
       "observations": [
@@ -21,9 +41,33 @@
         {
           "seconds": 668.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 655.939,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
+    },
+    "tests/assurance/optimisation/test_r2c_cli_contract.py": {
+      "estimated_seconds": 0.298,
+      "observations": [
+        {
+          "seconds": 0.298,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/assurance/optimisation/test_r2f_coverage_regressions.py": {
+      "estimated_seconds": 0.069,
+      "observations": [
+        {
+          "seconds": 0.069,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
     },
     "tests/assurance/optimisation/test_surface.py": {
       "estimated_seconds": 217.18,
@@ -31,6 +75,180 @@
         {
           "seconds": 217.18,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 164.854,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/contract/availability/test_audit0073_portability.py": {
+      "estimated_seconds": 0.007,
+      "observations": [
+        {
+          "seconds": 0.007,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/availability/test_min007_packaged_resources.py": {
+      "estimated_seconds": 0.017,
+      "observations": [
+        {
+          "seconds": 0.017,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/availability/test_min007_public_contracts.py": {
+      "estimated_seconds": 0.066,
+      "observations": [
+        {
+          "seconds": 0.066,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/chips/test_public_contracts.py": {
+      "estimated_seconds": 0.046,
+      "observations": [
+        {
+          "seconds": 0.046,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/evaluation/test_cli_contract.py": {
+      "estimated_seconds": 3.255,
+      "observations": [
+        {
+          "seconds": 3.255,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/evaluation/test_public_contracts.py": {
+      "estimated_seconds": 0.015,
+      "observations": [
+        {
+          "seconds": 0.015,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/football_events/test_current_score_prior_contract.py": {
+      "estimated_seconds": 0.025,
+      "observations": [
+        {
+          "seconds": 0.025,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/football_events/test_public_score_contract.py": {
+      "estimated_seconds": 0.237,
+      "observations": [
+        {
+          "seconds": 0.237,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/fpl/test_cli_usage_contract.py": {
+      "estimated_seconds": 0.865,
+      "observations": [
+        {
+          "seconds": 0.865,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/fpl/test_fixture_oracles.py": {
+      "estimated_seconds": 0.024,
+      "observations": [
+        {
+          "seconds": 0.024,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/fpl/test_public_models.py": {
+      "estimated_seconds": 0.038,
+      "observations": [
+        {
+          "seconds": 0.038,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/fpl_points/test_packaged_resources.py": {
+      "estimated_seconds": 0.007,
+      "observations": [
+        {
+          "seconds": 0.007,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/fpl_points/test_upstream_contracts.py": {
+      "estimated_seconds": 0.618,
+      "observations": [
+        {
+          "seconds": 0.618,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/markets/test_nrm006_public_contracts.py": {
+      "estimated_seconds": 0.012,
+      "observations": [
+        {
+          "seconds": 0.012,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/odds/test_public_odds_contracts.py": {
+      "estimated_seconds": 0.8,
+      "observations": [
+        {
+          "seconds": 0.8,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/optimisation/test_contract.py": {
+      "estimated_seconds": 0.008,
+      "observations": [
+        {
+          "seconds": 0.008,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/optimisation/test_multi_gameweek_integration.py": {
+      "estimated_seconds": 0.163,
+      "observations": [
+        {
+          "seconds": 0.163,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -41,6 +259,190 @@
         {
           "seconds": 214.55,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 164.45,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/contract/optimisation/test_stage11_integration.py": {
+      "estimated_seconds": 2.139,
+      "observations": [
+        {
+          "seconds": 2.139,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/player_lab/test_cli.py": {
+      "estimated_seconds": 2.489,
+      "observations": [
+        {
+          "seconds": 2.489,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/player_lab/test_recovery_cli.py": {
+      "estimated_seconds": 0.031,
+      "observations": [
+        {
+          "seconds": 0.031,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/prices/test_cli_contract.py": {
+      "estimated_seconds": 0.662,
+      "observations": [
+        {
+          "seconds": 0.662,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/prices/test_public_contracts.py": {
+      "estimated_seconds": 0.275,
+      "observations": [
+        {
+          "seconds": 0.275,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/rules/test_2026_27_final_evidence.py": {
+      "estimated_seconds": 1.016,
+      "observations": [
+        {
+          "seconds": 1.016,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/contract/rules/test_2026_27_full_season_readiness.py": {
+      "estimated_seconds": 1.332,
+      "observations": [
+        {
+          "seconds": 1.332,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/availability/test_min007b_dataset.py": {
+      "estimated_seconds": 0.036,
+      "observations": [
+        {
+          "seconds": 0.036,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/availability/test_min007c_role_model.py": {
+      "estimated_seconds": 0.19,
+      "observations": [
+        {
+          "seconds": 0.19,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/availability/test_min007d_minutes.py": {
+      "estimated_seconds": 0.102,
+      "observations": [
+        {
+          "seconds": 0.102,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/availability/test_min007e_lineup.py": {
+      "estimated_seconds": 0.571,
+      "observations": [
+        {
+          "seconds": 0.571,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/availability/test_min007g_evaluation.py": {
+      "estimated_seconds": 11.995,
+      "observations": [
+        {
+          "seconds": 11.995,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/availability/test_min007g_predictions.py": {
+      "estimated_seconds": 2.613,
+      "observations": [
+        {
+          "seconds": 2.613,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/chips/test_stage14_golden.py": {
+      "estimated_seconds": 0.121,
+      "observations": [
+        {
+          "seconds": 0.121,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/evaluation/test_golden_scorecards.py": {
+      "estimated_seconds": 0.011,
+      "observations": [
+        {
+          "seconds": 0.011,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/football_events/test_balanced_fixture_golden.py": {
+      "estimated_seconds": 0.169,
+      "observations": [
+        {
+          "seconds": 0.169,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/fpl_points/test_reference_goldens.py": {
+      "estimated_seconds": 0.062,
+      "observations": [
+        {
+          "seconds": 0.062,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/markets/test_nrm006_goldens.py": {
+      "estimated_seconds": 1.154,
+      "observations": [
+        {
+          "seconds": 1.154,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -51,6 +453,550 @@
         {
           "seconds": 214.13,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 111.149,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/golden/optimisation/test_multi_gameweek_oracle.py": {
+      "estimated_seconds": 0.717,
+      "observations": [
+        {
+          "seconds": 0.717,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/optimisation/test_stage11_golden.py": {
+      "estimated_seconds": 8.501,
+      "observations": [
+        {
+          "seconds": 8.501,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/optimisation/test_three_gameweek_ft_carry.py": {
+      "estimated_seconds": 64.275,
+      "observations": [
+        {
+          "seconds": 64.275,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/prices/test_price_golden.py": {
+      "estimated_seconds": 0.044,
+      "observations": [
+        {
+          "seconds": 0.044,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/rules/test_one_gameweek.py": {
+      "estimated_seconds": 0.013,
+      "observations": [
+        {
+          "seconds": 0.013,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/golden/rules/test_scoring_oracles.py": {
+      "estimated_seconds": 0.518,
+      "observations": [
+        {
+          "seconds": 0.518,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073_cli_mapping.py": {
+      "estimated_seconds": 67.1,
+      "observations": [
+        {
+          "seconds": 67.1,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073_db_relational_integrity.py": {
+      "estimated_seconds": 0.807,
+      "observations": [
+        {
+          "seconds": 0.807,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073_evaluation_integrity.py": {
+      "estimated_seconds": 0.295,
+      "observations": [
+        {
+          "seconds": 0.295,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073_g_persistence_assurance.py": {
+      "estimated_seconds": 16.19,
+      "observations": [
+        {
+          "seconds": 16.19,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073_registry_atomicity.py": {
+      "estimated_seconds": 0.958,
+      "observations": [
+        {
+          "seconds": 0.958,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073b_dataset_freeze.py": {
+      "estimated_seconds": 0.117,
+      "observations": [
+        {
+          "seconds": 0.117,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073b_evaluation_provenance.py": {
+      "estimated_seconds": 0.105,
+      "observations": [
+        {
+          "seconds": 0.105,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073b_final_output_freeze.py": {
+      "estimated_seconds": 0.562,
+      "observations": [
+        {
+          "seconds": 0.562,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073b_prediction_graph_freeze.py": {
+      "estimated_seconds": 0.201,
+      "observations": [
+        {
+          "seconds": 0.201,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073c_exact_lookup_visibility.py": {
+      "estimated_seconds": 0.34,
+      "observations": [
+        {
+          "seconds": 0.34,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073c_final_output_truthfulness.py": {
+      "estimated_seconds": 0.72,
+      "observations": [
+        {
+          "seconds": 0.72,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_audit0073d_constraint_scope.py": {
+      "estimated_seconds": 0.887,
+      "observations": [
+        {
+          "seconds": 0.887,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_manual_override_cli.py": {
+      "estimated_seconds": 3.738,
+      "observations": [
+        {
+          "seconds": 3.738,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_manual_override_stage8.py": {
+      "estimated_seconds": 0.638,
+      "observations": [
+        {
+          "seconds": 0.638,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007f_asof.py": {
+      "estimated_seconds": 0.729,
+      "observations": [
+        {
+          "seconds": 0.729,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007f_concurrency.py": {
+      "estimated_seconds": 0.623,
+      "observations": [
+        {
+          "seconds": 0.623,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007f_constraints.py": {
+      "estimated_seconds": 0.206,
+      "observations": [
+        {
+          "seconds": 0.206,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007f_persistence.py": {
+      "estimated_seconds": 0.444,
+      "observations": [
+        {
+          "seconds": 0.444,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007g_cli.py": {
+      "estimated_seconds": 9.972,
+      "observations": [
+        {
+          "seconds": 9.972,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007g_persistence.py": {
+      "estimated_seconds": 0.002,
+      "observations": [
+        {
+          "seconds": 0.002,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/availability/test_min007g_service.py": {
+      "estimated_seconds": 16.923,
+      "observations": [
+        {
+          "seconds": 16.923,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/chips/test_stage14_vertical_slice.py": {
+      "estimated_seconds": 0.783,
+      "observations": [
+        {
+          "seconds": 0.783,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/dashboard/test_postgres_authorization.py": {
+      "estimated_seconds": 3.925,
+      "observations": [
+        {
+          "seconds": 3.925,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/data_model/test_concurrency.py": {
+      "estimated_seconds": 1.091,
+      "observations": [
+        {
+          "seconds": 1.091,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/data_model/test_cross_season_competition_constraints.py": {
+      "estimated_seconds": 1.009,
+      "observations": [
+        {
+          "seconds": 1.009,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/data_model/test_data_model_postgres.py": {
+      "estimated_seconds": 4.184,
+      "observations": [
+        {
+          "seconds": 4.184,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/data_model/test_rules_registry.py": {
+      "estimated_seconds": 0.866,
+      "observations": [
+        {
+          "seconds": 0.866,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/evaluation/test_service_vertical_slice.py": {
+      "estimated_seconds": 0.08,
+      "observations": [
+        {
+          "seconds": 0.08,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/football_events/test_events_cli.py": {
+      "estimated_seconds": 1.206,
+      "observations": [
+        {
+          "seconds": 1.206,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/football_events/test_events_cli_adversarial.py": {
+      "estimated_seconds": 0.972,
+      "observations": [
+        {
+          "seconds": 0.972,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/fpl_points/test_current_player_allocation_port.py": {
+      "estimated_seconds": 7.087,
+      "observations": [
+        {
+          "seconds": 7.087,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/fpl_points/test_fixture_pipeline.py": {
+      "estimated_seconds": 14.639,
+      "observations": [
+        {
+          "seconds": 14.639,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/odds/test_odds_idempotency_asof.py": {
+      "estimated_seconds": 14.489,
+      "observations": [
+        {
+          "seconds": 14.489,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/odds/test_odds_temporal_publication_mapping.py": {
+      "estimated_seconds": 2.828,
+      "observations": [
+        {
+          "seconds": 2.828,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/odds/test_the_odds_api_recorded_ingestion.py": {
+      "estimated_seconds": 6.478,
+      "observations": [
+        {
+          "seconds": 6.478,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_bundle_rights_quality_gate.py": {
+      "estimated_seconds": 1.562,
+      "observations": [
+        {
+          "seconds": 1.562,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_concurrency.py": {
+      "estimated_seconds": 12.687,
+      "observations": [
+        {
+          "seconds": 12.687,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py": {
+      "estimated_seconds": 4.995,
+      "observations": [
+        {
+          "seconds": 4.995,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_lifecycle_resume.py": {
+      "estimated_seconds": 8.813,
+      "observations": [
+        {
+          "seconds": 8.813,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_pair_context_integrity.py": {
+      "estimated_seconds": 1.521,
+      "observations": [
+        {
+          "seconds": 1.521,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_replay_time_policy.py": {
+      "estimated_seconds": 7.594,
+      "observations": [
+        {
+          "seconds": 7.594,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_fpl_temporal_identity.py": {
+      "estimated_seconds": 9.574,
+      "observations": [
+        {
+          "seconds": 9.574,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_openfootball_score_prior_cli.py": {
+      "estimated_seconds": 0.709,
+      "observations": [
+        {
+          "seconds": 0.709,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/ingestion/test_repository_negative_controls.py": {
+      "estimated_seconds": 2.351,
+      "observations": [
+        {
+          "seconds": 2.351,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/markets/test_current_market_identity_readonly.py": {
+      "estimated_seconds": 96.2,
+      "observations": [
+        {
+          "seconds": 96.2,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/markets/test_market_normalisation_consensus.py": {
+      "estimated_seconds": 13.666,
+      "observations": [
+        {
+          "seconds": 13.666,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/markets/test_normalisation_asof_cache_concurrency.py": {
+      "estimated_seconds": 14.788,
+      "observations": [
+        {
+          "seconds": 14.788,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/migrations/test_migrations.py": {
+      "estimated_seconds": 43.788,
+      "observations": [
+        {
+          "seconds": 43.788,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -61,6 +1007,60 @@
         {
           "seconds": 3015.705,
           "source_id": "opr003-owned-controller-ci-calibrated"
+        },
+        {
+          "seconds": 1160.706,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/integration/operation/test_campaign_journal.py": {
+      "estimated_seconds": 4.584,
+      "observations": [
+        {
+          "seconds": 4.584,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/operation/test_owned_console.py": {
+      "estimated_seconds": 95.293,
+      "observations": [
+        {
+          "seconds": 95.293,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/operation/test_prior_usage.py": {
+      "estimated_seconds": 2.81,
+      "observations": [
+        {
+          "seconds": 2.81,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/operation/test_shared_control_transaction.py": {
+      "estimated_seconds": 1.277,
+      "observations": [
+        {
+          "seconds": 1.277,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/operation/test_standing_journal.py": {
+      "estimated_seconds": 3.759,
+      "observations": [
+        {
+          "seconds": 3.759,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -71,6 +1071,2700 @@
         {
           "seconds": 215.36,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 184.617,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/integration/package/test_import_side_effects.py": {
+      "estimated_seconds": 2.761,
+      "observations": [
+        {
+          "seconds": 2.761,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/package/test_installed_wheel.py": {
+      "estimated_seconds": 622.141,
+      "observations": [
+        {
+          "seconds": 622.141,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/package/test_min007_installed_wheel.py": {
+      "estimated_seconds": 13.567,
+      "observations": [
+        {
+          "seconds": 13.567,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/player_evidence/test_owned_pipeline.py": {
+      "estimated_seconds": 0.07,
+      "observations": [
+        {
+          "seconds": 0.07,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/player_evidence/test_owned_wyscout.py": {
+      "estimated_seconds": 0.035,
+      "observations": [
+        {
+          "seconds": 0.035,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/player_lab/test_real_custody.py": {
+      "estimated_seconds": 8.132,
+      "observations": [
+        {
+          "seconds": 8.132,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/player_lab/test_research_store.py": {
+      "estimated_seconds": 13.441,
+      "observations": [
+        {
+          "seconds": 13.441,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/prices/test_current_rules_integration.py": {
+      "estimated_seconds": 1.191,
+      "observations": [
+        {
+          "seconds": 1.191,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/prices/test_price_workflow.py": {
+      "estimated_seconds": 1.46,
+      "observations": [
+        {
+          "seconds": 1.46,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/rank_strategy/test_exact_mini_league.py": {
+      "estimated_seconds": 0.025,
+      "observations": [
+        {
+          "seconds": 0.025,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/rank_strategy/test_hidden_opponent_actions.py": {
+      "estimated_seconds": 0.023,
+      "observations": [
+        {
+          "seconds": 0.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/rank_strategy/test_mini_league_rank_utility.py": {
+      "estimated_seconds": 0.014,
+      "observations": [
+        {
+          "seconds": 0.014,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/rank_strategy/test_synthetic_overall_field.py": {
+      "estimated_seconds": 0.046,
+      "observations": [
+        {
+          "seconds": 0.046,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/repository/test_authority_stage_map.py": {
+      "estimated_seconds": 0.054,
+      "observations": [
+        {
+          "seconds": 0.054,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/repository/test_manifests.py": {
+      "estimated_seconds": 2.92,
+      "observations": [
+        {
+          "seconds": 2.92,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/integration/rules/test_rules_cli.py": {
+      "estimated_seconds": 2.125,
+      "observations": [
+        {
+          "seconds": 2.125,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/performance/optimisation/test_preflight.py": {
+      "estimated_seconds": 0.012,
+      "observations": [
+        {
+          "seconds": 0.012,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/availability/test_dataset_properties.py": {
+      "estimated_seconds": 1.026,
+      "observations": [
+        {
+          "seconds": 1.026,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/availability/test_lineup_properties.py": {
+      "estimated_seconds": 7.889,
+      "observations": [
+        {
+          "seconds": 7.889,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/availability/test_minutes_properties.py": {
+      "estimated_seconds": 2.548,
+      "observations": [
+        {
+          "seconds": 2.548,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/availability/test_projection_properties.py": {
+      "estimated_seconds": 6.029,
+      "observations": [
+        {
+          "seconds": 6.029,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/availability/test_role_model_properties.py": {
+      "estimated_seconds": 1.006,
+      "observations": [
+        {
+          "seconds": 1.006,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/chips/test_inventory_properties.py": {
+      "estimated_seconds": 0.009,
+      "observations": [
+        {
+          "seconds": 0.009,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/chips/test_scheduler_properties.py": {
+      "estimated_seconds": 4.462,
+      "observations": [
+        {
+          "seconds": 4.462,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/chips/test_service_properties.py": {
+      "estimated_seconds": 2.946,
+      "observations": [
+        {
+          "seconds": 2.946,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/config/test_config_properties.py": {
+      "estimated_seconds": 3.276,
+      "observations": [
+        {
+          "seconds": 3.276,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/evaluation/test_properties.py": {
+      "estimated_seconds": 0.024,
+      "observations": [
+        {
+          "seconds": 0.024,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/football_events/test_score_distribution_properties.py": {
+      "estimated_seconds": 3.073,
+      "observations": [
+        {
+          "seconds": 3.073,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/fpl_points/test_properties.py": {
+      "estimated_seconds": 11.738,
+      "observations": [
+        {
+          "seconds": 11.738,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/ingestion/test_fpl_properties.py": {
+      "estimated_seconds": 4.68,
+      "observations": [
+        {
+          "seconds": 4.68,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/ingestion/test_odds_properties.py": {
+      "estimated_seconds": 1.284,
+      "observations": [
+        {
+          "seconds": 1.284,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/markets/test_normalisation_properties.py": {
+      "estimated_seconds": 12.233,
+      "observations": [
+        {
+          "seconds": 12.233,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/optimisation/test_multi_gameweek_properties.py": {
+      "estimated_seconds": 23.047,
+      "observations": [
+        {
+          "seconds": 23.047,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/optimisation/test_oracle_equivalence.py": {
+      "estimated_seconds": 8.041,
+      "observations": [
+        {
+          "seconds": 8.041,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/optimisation/test_properties.py": {
+      "estimated_seconds": 0.285,
+      "observations": [
+        {
+          "seconds": 0.285,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/prices/test_price_properties.py": {
+      "estimated_seconds": 0.95,
+      "observations": [
+        {
+          "seconds": 0.95,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/rank_strategy/test_multiplier_properties.py": {
+      "estimated_seconds": 0.3,
+      "observations": [
+        {
+          "seconds": 0.3,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/rank_strategy/test_opponent_properties.py": {
+      "estimated_seconds": 0.671,
+      "observations": [
+        {
+          "seconds": 0.671,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/rank_strategy/test_rank_properties.py": {
+      "estimated_seconds": 0.258,
+      "observations": [
+        {
+          "seconds": 0.258,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/rank_strategy/test_rank_utility_properties.py": {
+      "estimated_seconds": 0.747,
+      "observations": [
+        {
+          "seconds": 0.747,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/rank_strategy/test_synthetic_properties.py": {
+      "estimated_seconds": 0.588,
+      "observations": [
+        {
+          "seconds": 0.588,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/property/rules/test_rules_properties.py": {
+      "estimated_seconds": 2.572,
+      "observations": [
+        {
+          "seconds": 2.572,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/replay/chips/test_chip_replay.py": {
+      "estimated_seconds": 0.241,
+      "observations": [
+        {
+          "seconds": 0.241,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/replay/evaluation/test_policy_replay.py": {
+      "estimated_seconds": 0.286,
+      "observations": [
+        {
+          "seconds": 0.286,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/replay/prices/test_adversarial_replay.py": {
+      "estimated_seconds": 0.777,
+      "observations": [
+        {
+          "seconds": 0.777,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/security/test_fpl_cli_redaction.py": {
+      "estimated_seconds": 0.594,
+      "observations": [
+        {
+          "seconds": 0.594,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/security/test_fpl_rights_raw_retention.py": {
+      "estimated_seconds": 1.239,
+      "observations": [
+        {
+          "seconds": 1.239,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/security/test_fpl_tls_retry.py": {
+      "estimated_seconds": 0.012,
+      "observations": [
+        {
+          "seconds": 0.012,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/security/test_live_odds_001_traceback_security.py": {
+      "estimated_seconds": 0.052,
+      "observations": [
+        {
+          "seconds": 0.052,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/security/test_odds_429_retry_policy.py": {
+      "estimated_seconds": 0.059,
+      "observations": [
+        {
+          "seconds": 0.059,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/security/test_odds_credentials_quota_retention.py": {
+      "estimated_seconds": 2.117,
+      "observations": [
+        {
+          "seconds": 2.117,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_acceptance_runner.py": {
+      "estimated_seconds": 0.131,
+      "observations": [
+        {
+          "seconds": 0.131,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_coverage_gate.py": {
+      "estimated_seconds": 0.018,
+      "observations": [
+        {
+          "seconds": 0.018,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_evidence.py": {
+      "estimated_seconds": 0.072,
+      "observations": [
+        {
+          "seconds": 0.072,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_evidence_boundary_branches.py": {
+      "estimated_seconds": 0.018,
+      "observations": [
+        {
+          "seconds": 0.018,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_fpl004_coverage_gate.py": {
+      "estimated_seconds": 0.074,
+      "observations": [
+        {
+          "seconds": 0.074,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_fpl004_review_evidence.py": {
+      "estimated_seconds": 0.214,
+      "observations": [
+        {
+          "seconds": 0.214,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_manifests.py": {
+      "estimated_seconds": 0.019,
+      "observations": [
+        {
+          "seconds": 0.019,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_min007h_fail_closed.py": {
+      "estimated_seconds": 1.665,
+      "observations": [
+        {
+          "seconds": 1.665,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_nrm006_acceptance_verifier.py": {
+      "estimated_seconds": 0.842,
+      "observations": [
+        {
+          "seconds": 0.842,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_nrm006_coverage_gate.py": {
+      "estimated_seconds": 0.043,
+      "observations": [
+        {
+          "seconds": 0.043,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_nrm006_evidence_generator.py": {
+      "estimated_seconds": 0.03,
+      "observations": [
+        {
+          "seconds": 0.03,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_nrm006_review_pack.py": {
+      "estimated_seconds": 3.088,
+      "observations": [
+        {
+          "seconds": 3.088,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_odd005_complete_evidence.py": {
+      "estimated_seconds": 0.287,
+      "observations": [
+        {
+          "seconds": 0.287,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_odd005_coverage_gate.py": {
+      "estimated_seconds": 0.046,
+      "observations": [
+        {
+          "seconds": 0.046,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_odd005_review_pack.py": {
+      "estimated_seconds": 0.81,
+      "observations": [
+        {
+          "seconds": 0.81,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_review_pack.py": {
+      "estimated_seconds": 0.3,
+      "observations": [
+        {
+          "seconds": 0.3,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_secret_scan.py": {
+      "estimated_seconds": 0.045,
+      "observations": [
+        {
+          "seconds": 0.045,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_specifications.py": {
+      "estimated_seconds": 0.912,
+      "observations": [
+        {
+          "seconds": 0.912,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_ticket_ids.py": {
+      "estimated_seconds": 0.048,
+      "observations": [
+        {
+          "seconds": 0.048,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/assurance/test_wheel_entrypoint.py": {
+      "estimated_seconds": 0.05,
+      "observations": [
+        {
+          "seconds": 0.05,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0071_remediation.py": {
+      "estimated_seconds": 0.222,
+      "observations": [
+        {
+          "seconds": 0.222,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0072_exact_decimal_remediation.py": {
+      "estimated_seconds": 1.903,
+      "observations": [
+        {
+          "seconds": 1.903,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0072_lineup_remediation.py": {
+      "estimated_seconds": 12.941,
+      "observations": [
+        {
+          "seconds": 12.941,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0072_minutes_remediation.py": {
+      "estimated_seconds": 0.454,
+      "observations": [
+        {
+          "seconds": 0.454,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0073_cli_semantics.py": {
+      "estimated_seconds": 26.583,
+      "observations": [
+        {
+          "seconds": 26.583,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0073_public_identity_remediation.py": {
+      "estimated_seconds": 0.06,
+      "observations": [
+        {
+          "seconds": 0.06,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0073_registry_remediation.py": {
+      "estimated_seconds": 0.008,
+      "observations": [
+        {
+          "seconds": 0.008,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0073b_finalization_provenance.py": {
+      "estimated_seconds": 0.004,
+      "observations": [
+        {
+          "seconds": 0.004,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0073c_final_output_lookup.py": {
+      "estimated_seconds": 0.007,
+      "observations": [
+        {
+          "seconds": 0.007,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_audit0073d_constraint_scope.py": {
+      "estimated_seconds": 0.002,
+      "observations": [
+        {
+          "seconds": 0.002,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_current_model.py": {
+      "estimated_seconds": 46.632,
+      "observations": [
+        {
+          "seconds": 46.632,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_dataset.py": {
+      "estimated_seconds": 0.434,
+      "observations": [
+        {
+          "seconds": 0.434,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_evaluation.py": {
+      "estimated_seconds": 16.161,
+      "observations": [
+        {
+          "seconds": 16.161,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_lineup.py": {
+      "estimated_seconds": 2.82,
+      "observations": [
+        {
+          "seconds": 2.82,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_manual_override.py": {
+      "estimated_seconds": 3.308,
+      "observations": [
+        {
+          "seconds": 3.308,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_manual_override_validation.py": {
+      "estimated_seconds": 0.836,
+      "observations": [
+        {
+          "seconds": 0.836,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_min007_decimal_guard_coverage.py": {
+      "estimated_seconds": 0.133,
+      "observations": [
+        {
+          "seconds": 0.133,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_min007_remaining_math_core_coverage.py": {
+      "estimated_seconds": 7.552,
+      "observations": [
+        {
+          "seconds": 7.552,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_min007_role_model_coverage.py": {
+      "estimated_seconds": 0.508,
+      "observations": [
+        {
+          "seconds": 0.508,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_minutes.py": {
+      "estimated_seconds": 0.336,
+      "observations": [
+        {
+          "seconds": 0.336,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_projection.py": {
+      "estimated_seconds": 0.008,
+      "observations": [
+        {
+          "seconds": 0.008,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_registry.py": {
+      "estimated_seconds": 0.005,
+      "observations": [
+        {
+          "seconds": 0.005,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/availability/test_role_model.py": {
+      "estimated_seconds": 0.531,
+      "observations": [
+        {
+          "seconds": 0.531,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_artifacts.py": {
+      "estimated_seconds": 0.301,
+      "observations": [
+        {
+          "seconds": 0.301,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_bench_boost.py": {
+      "estimated_seconds": 0.107,
+      "observations": [
+        {
+          "seconds": 0.107,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_captaincy.py": {
+      "estimated_seconds": 0.116,
+      "observations": [
+        {
+          "seconds": 0.116,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_compiler.py": {
+      "estimated_seconds": 0.017,
+      "observations": [
+        {
+          "seconds": 0.017,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_contract_validation.py": {
+      "estimated_seconds": 0.113,
+      "observations": [
+        {
+          "seconds": 0.113,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_free_hit.py": {
+      "estimated_seconds": 1.142,
+      "observations": [
+        {
+          "seconds": 1.142,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_inventory.py": {
+      "estimated_seconds": 0.039,
+      "observations": [
+        {
+          "seconds": 0.039,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_scheduler.py": {
+      "estimated_seconds": 0.334,
+      "observations": [
+        {
+          "seconds": 0.334,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_service.py": {
+      "estimated_seconds": 2.868,
+      "observations": [
+        {
+          "seconds": 2.868,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_service_model_guards.py": {
+      "estimated_seconds": 0.838,
+      "observations": [
+        {
+          "seconds": 0.838,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_temporal_leakage.py": {
+      "estimated_seconds": 0.072,
+      "observations": [
+        {
+          "seconds": 0.072,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_wildcard.py": {
+      "estimated_seconds": 0.594,
+      "observations": [
+        {
+          "seconds": 0.594,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/chips/test_wildcard_contracts.py": {
+      "estimated_seconds": 1.733,
+      "observations": [
+        {
+          "seconds": 1.733,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_chips_cli.py": {
+      "estimated_seconds": 0.983,
+      "observations": [
+        {
+          "seconds": 0.983,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_commands.py": {
+      "estimated_seconds": 1.063,
+      "observations": [
+        {
+          "seconds": 1.063,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_fpl_current_input.py": {
+      "estimated_seconds": 2.382,
+      "observations": [
+        {
+          "seconds": 2.382,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_fpl_ingest_commands_direct.py": {
+      "estimated_seconds": 1.611,
+      "observations": [
+        {
+          "seconds": 1.611,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_odds_market_commands.py": {
+      "estimated_seconds": 3.407,
+      "observations": [
+        {
+          "seconds": 3.407,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_pulse.py": {
+      "estimated_seconds": 4.098,
+      "observations": [
+        {
+          "seconds": 4.098,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_rank_cli.py": {
+      "estimated_seconds": 0.887,
+      "observations": [
+        {
+          "seconds": 0.887,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/cli/test_team_strength_cli.py": {
+      "estimated_seconds": 15.722,
+      "observations": [
+        {
+          "seconds": 15.722,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/config/test_loader.py": {
+      "estimated_seconds": 0.107,
+      "observations": [
+        {
+          "seconds": 0.107,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/config/test_redaction.py": {
+      "estimated_seconds": 0.026,
+      "observations": [
+        {
+          "seconds": 0.026,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/credentials/test_boundaries.py": {
+      "estimated_seconds": 1.685,
+      "observations": [
+        {
+          "seconds": 1.685,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/credentials/test_fpl_jwt.py": {
+      "estimated_seconds": 0.203,
+      "observations": [
+        {
+          "seconds": 0.203,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/credentials/test_fresh_fpl.py": {
+      "estimated_seconds": 0.132,
+      "observations": [
+        {
+          "seconds": 0.132,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/credentials/test_service.py": {
+      "estimated_seconds": 0.145,
+      "observations": [
+        {
+          "seconds": 0.145,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_attempt_preflight.py": {
+      "estimated_seconds": 0.235,
+      "observations": [
+        {
+          "seconds": 0.235,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_current_cli.py": {
+      "estimated_seconds": 2.246,
+      "observations": [
+        {
+          "seconds": 2.246,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_current_credential_ordering.py": {
+      "estimated_seconds": 3.059,
+      "observations": [
+        {
+          "seconds": 3.059,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_current_diagnostics.py": {
+      "estimated_seconds": 3.863,
+      "observations": [
+        {
+          "seconds": 3.863,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_current_mode.py": {
+      "estimated_seconds": 1481.801,
+      "observations": [
+        {
+          "seconds": 1481.801,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_current_observation_clock.py": {
+      "estimated_seconds": 631.472,
+      "observations": [
+        {
+          "seconds": 631.472,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_current_team_value.py": {
+      "estimated_seconds": 144.047,
+      "observations": [
+        {
+          "seconds": 144.047,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_dashboard.py": {
+      "estimated_seconds": 131.244,
+      "observations": [
+        {
+          "seconds": 131.244,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_diagnostic_review_regressions.py": {
+      "estimated_seconds": 2.982,
+      "observations": [
+        {
+          "seconds": 2.982,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_fpl_route_capacity.py": {
+      "estimated_seconds": 0.023,
+      "observations": [
+        {
+          "seconds": 0.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_live_authorization.py": {
+      "estimated_seconds": 0.295,
+      "observations": [
+        {
+          "seconds": 0.295,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_market_quota_receipt.py": {
+      "estimated_seconds": 0.096,
+      "observations": [
+        {
+          "seconds": 0.096,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_player_lookup_thread.py": {
+      "estimated_seconds": 0.247,
+      "observations": [
+        {
+          "seconds": 0.247,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_post_gw10_recovery.py": {
+      "estimated_seconds": 645.008,
+      "observations": [
+        {
+          "seconds": 645.008,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_postgres_control_contract.py": {
+      "estimated_seconds": 0.058,
+      "observations": [
+        {
+          "seconds": 0.058,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_recovery_performance.py": {
+      "estimated_seconds": 0.041,
+      "observations": [
+        {
+          "seconds": 0.041,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_session_bootstrap.py": {
+      "estimated_seconds": 0.423,
+      "observations": [
+        {
+          "seconds": 0.423,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_worker_diagnostic_protocol.py": {
+      "estimated_seconds": 1.898,
+      "observations": [
+        {
+          "seconds": 1.898,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/dashboard/test_worker_pipe_privacy.py": {
+      "estimated_seconds": 27.415,
+      "observations": [
+        {
+          "seconds": 27.415,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/database/test_dat003_branch_contracts.py": {
+      "estimated_seconds": 0.598,
+      "observations": [
+        {
+          "seconds": 0.598,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/database/test_database_contracts.py": {
+      "estimated_seconds": 0.033,
+      "observations": [
+        {
+          "seconds": 0.033,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/database/test_migration_statement_execution.py": {
+      "estimated_seconds": 0.011,
+      "observations": [
+        {
+          "seconds": 0.011,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_benchmarks.py": {
+      "estimated_seconds": 0.055,
+      "observations": [
+        {
+          "seconds": 0.055,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_calibration.py": {
+      "estimated_seconds": 0.018,
+      "observations": [
+        {
+          "seconds": 0.018,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_configuration.py": {
+      "estimated_seconds": 0.047,
+      "observations": [
+        {
+          "seconds": 0.047,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_distribution_multivariate.py": {
+      "estimated_seconds": 0.025,
+      "observations": [
+        {
+          "seconds": 0.025,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_folds.py": {
+      "estimated_seconds": 0.026,
+      "observations": [
+        {
+          "seconds": 0.026,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_information_and_vintages.py": {
+      "estimated_seconds": 0.02,
+      "observations": [
+        {
+          "seconds": 0.02,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_leakage.py": {
+      "estimated_seconds": 0.029,
+      "observations": [
+        {
+          "seconds": 0.029,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_model_validation.py": {
+      "estimated_seconds": 0.036,
+      "observations": [
+        {
+          "seconds": 0.036,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_canonical.py": {
+      "estimated_seconds": 80.854,
+      "observations": [
+        {
+          "seconds": 80.854,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_fallback_a02.py": {
+      "estimated_seconds": 98.527,
+      "observations": [
+        {
+          "seconds": 98.527,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_fallback_a03.py": {
+      "estimated_seconds": 30.996,
+      "observations": [
+        {
+          "seconds": 30.996,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_fallback_d1.py": {
+      "estimated_seconds": 17.559,
+      "observations": [
+        {
+          "seconds": 17.559,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_fallback_d2.py": {
+      "estimated_seconds": 14.234,
+      "observations": [
+        {
+          "seconds": 14.234,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_metadata_candidate.py": {
+      "estimated_seconds": 44.289,
+      "observations": [
+        {
+          "seconds": 44.289,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_p01_synthetic_readiness.py": {
+      "estimated_seconds": 400.804,
+      "observations": [
+        {
+          "seconds": 400.804,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_point_probability_metrics.py": {
+      "estimated_seconds": 0.023,
+      "observations": [
+        {
+          "seconds": 0.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_regret_reports_artifacts.py": {
+      "estimated_seconds": 0.048,
+      "observations": [
+        {
+          "seconds": 0.048,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_team_strength_mixture_analysis.py": {
+      "estimated_seconds": 0.017,
+      "observations": [
+        {
+          "seconds": 0.017,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_team_strength_prospective.py": {
+      "estimated_seconds": 284.923,
+      "observations": [
+        {
+          "seconds": 284.923,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/evaluation/test_team_strength_replay.py": {
+      "estimated_seconds": 12.241,
+      "observations": [
+        {
+          "seconds": 12.241,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_coherence_adversarial.py": {
+      "estimated_seconds": 0.126,
+      "observations": [
+        {
+          "seconds": 0.126,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_decimal_boundaries.py": {
+      "estimated_seconds": 0.032,
+      "observations": [
+        {
+          "seconds": 0.032,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_evaluation.py": {
+      "estimated_seconds": 0.451,
+      "observations": [
+        {
+          "seconds": 0.451,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_manual_minutes_context.py": {
+      "estimated_seconds": 4.042,
+      "observations": [
+        {
+          "seconds": 4.042,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_market_constraint_adversarial.py": {
+      "estimated_seconds": 0.049,
+      "observations": [
+        {
+          "seconds": 0.049,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_market_constraints.py": {
+      "estimated_seconds": 0.026,
+      "observations": [
+        {
+          "seconds": 0.026,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_minutes_context.py": {
+      "estimated_seconds": 0.522,
+      "observations": [
+        {
+          "seconds": 0.522,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_poisson.py": {
+      "estimated_seconds": 0.013,
+      "observations": [
+        {
+          "seconds": 0.013,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_poisson_boundaries.py": {
+      "estimated_seconds": 0.005,
+      "observations": [
+        {
+          "seconds": 0.005,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_projection_boundaries.py": {
+      "estimated_seconds": 0.013,
+      "observations": [
+        {
+          "seconds": 0.013,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_public_model_boundaries.py": {
+      "estimated_seconds": 7.703,
+      "observations": [
+        {
+          "seconds": 7.703,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_score_distribution.py": {
+      "estimated_seconds": 0.886,
+      "observations": [
+        {
+          "seconds": 0.886,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_score_grid.py": {
+      "estimated_seconds": 0.026,
+      "observations": [
+        {
+          "seconds": 0.026,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_score_projection.py": {
+      "estimated_seconds": 1.728,
+      "observations": [
+        {
+          "seconds": 1.728,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_service_adversarial.py": {
+      "estimated_seconds": 1.026,
+      "observations": [
+        {
+          "seconds": 1.026,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_service_and_artifacts.py": {
+      "estimated_seconds": 0.658,
+      "observations": [
+        {
+          "seconds": 0.658,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_adapter.py": {
+      "estimated_seconds": 49.427,
+      "observations": [
+        {
+          "seconds": 49.427,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_hardening.py": {
+      "estimated_seconds": 51.289,
+      "observations": [
+        {
+          "seconds": 51.289,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_mixture.py": {
+      "estimated_seconds": 24.766,
+      "observations": [
+        {
+          "seconds": 24.766,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_mixture_stage8.py": {
+      "estimated_seconds": 25.587,
+      "observations": [
+        {
+          "seconds": 25.587,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_model.py": {
+      "estimated_seconds": 12.233,
+      "observations": [
+        {
+          "seconds": 12.233,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_numerics.py": {
+      "estimated_seconds": 0.767,
+      "observations": [
+        {
+          "seconds": 0.767,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/football_events/test_team_strength_parameter_draws.py": {
+      "estimated_seconds": 25.602,
+      "observations": [
+        {
+          "seconds": 25.602,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_accepted_rules_adapter.py": {
+      "estimated_seconds": 0.585,
+      "observations": [
+        {
+          "seconds": 0.585,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_allocation.py": {
+      "estimated_seconds": 2.21,
+      "observations": [
+        {
+          "seconds": 2.21,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_current_gw_stale_prior.py": {
+      "estimated_seconds": 3.692,
+      "observations": [
+        {
+          "seconds": 3.692,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_current_player_posterior_contract.py": {
+      "estimated_seconds": 6.18,
+      "observations": [
+        {
+          "seconds": 6.18,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_current_player_shadow.py": {
+      "estimated_seconds": 7.256,
+      "observations": [
+        {
+          "seconds": 7.256,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_current_player_shadow_diagnostics.py": {
+      "estimated_seconds": 7.506,
+      "observations": [
+        {
+          "seconds": 7.506,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_current_player_shadow_operations.py": {
+      "estimated_seconds": 1.347,
+      "observations": [
+        {
+          "seconds": 1.347,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_current_player_shadow_stage9.py": {
+      "estimated_seconds": 11.023,
+      "observations": [
+        {
+          "seconds": 11.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_evaluation_and_artifacts.py": {
+      "estimated_seconds": 3.849,
+      "observations": [
+        {
+          "seconds": 3.849,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_fail_closed_edges.py": {
+      "estimated_seconds": 1.537,
+      "observations": [
+        {
+          "seconds": 1.537,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_player_event_port_invariants.py": {
+      "estimated_seconds": 0.852,
+      "observations": [
+        {
+          "seconds": 0.852,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_player_prior.py": {
+      "estimated_seconds": 2.378,
+      "observations": [
+        {
+          "seconds": 2.378,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_rules_and_scoring.py": {
+      "estimated_seconds": 0.261,
+      "observations": [
+        {
+          "seconds": 0.261,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_seed.py": {
+      "estimated_seconds": 0.006,
+      "observations": [
+        {
+          "seconds": 0.006,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_shadow_probe_acquisition_trace.py": {
+      "estimated_seconds": 0.019,
+      "observations": [
+        {
+          "seconds": 0.019,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_shadow_probe_failure_diagnostics.py": {
+      "estimated_seconds": 2.815,
+      "observations": [
+        {
+          "seconds": 2.815,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_summaries_and_mc.py": {
+      "estimated_seconds": 2.972,
+      "observations": [
+        {
+          "seconds": 2.972,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/fpl_points/test_versioned_assist_classification.py": {
+      "estimated_seconds": 7.236,
+      "observations": [
+        {
+          "seconds": 7.236,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_client.py": {
+      "estimated_seconds": 0.109,
+      "observations": [
+        {
+          "seconds": 0.109,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_config.py": {
+      "estimated_seconds": 0.017,
+      "observations": [
+        {
+          "seconds": 0.017,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_config_boundaries.py": {
+      "estimated_seconds": 0.091,
+      "observations": [
+        {
+          "seconds": 0.091,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_independent_review_remediation.py": {
+      "estimated_seconds": 1.27,
+      "observations": [
+        {
+          "seconds": 1.27,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_parser.py": {
+      "estimated_seconds": 0.13,
+      "observations": [
+        {
+          "seconds": 0.13,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_parser_boundaries.py": {
+      "estimated_seconds": 0.347,
+      "observations": [
+        {
+          "seconds": 0.347,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_private_operator_profile.py": {
+      "estimated_seconds": 0.474,
+      "observations": [
+        {
+          "seconds": 0.474,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_service.py": {
+      "estimated_seconds": 0.175,
+      "observations": [
+        {
+          "seconds": 0.175,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_service_boundaries.py": {
+      "estimated_seconds": 0.236,
+      "observations": [
+        {
+          "seconds": 0.236,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_acquisition.py": {
+      "estimated_seconds": 0.521,
+      "observations": [
+        {
+          "seconds": 0.521,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_corpus.py": {
+      "estimated_seconds": 0.141,
+      "observations": [
+        {
+          "seconds": 0.141,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_current.py": {
+      "estimated_seconds": 225.101,
+      "observations": [
+        {
+          "seconds": 225.101,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_data.py": {
+      "estimated_seconds": 10.513,
+      "observations": [
+        {
+          "seconds": 10.513,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_governance.py": {
+      "estimated_seconds": 0.177,
+      "observations": [
+        {
+          "seconds": 0.177,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_governance_boundaries.py": {
+      "estimated_seconds": 0.316,
+      "observations": [
+        {
+          "seconds": 0.316,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/openfootball/test_team_strength_sealed_boundaries.py": {
+      "estimated_seconds": 1.753,
+      "observations": [
+        {
+          "seconds": 1.753,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_current_penalty_hierarchy.py": {
+      "estimated_seconds": 0.323,
+      "observations": [
+        {
+          "seconds": 0.323,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_current_player_history.py": {
+      "estimated_seconds": 2.708,
+      "observations": [
+        {
+          "seconds": 2.708,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_current_unified_state.py": {
+      "estimated_seconds": 11.203,
+      "observations": [
+        {
+          "seconds": 11.203,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_current_unified_state_boundaries.py": {
+      "estimated_seconds": 123.51,
+      "observations": [
+        {
+          "seconds": 123.51,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_current_unified_state_tamper.py": {
+      "estimated_seconds": 82.467,
+      "observations": [
+        {
+          "seconds": 82.467,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_client.py": {
+      "estimated_seconds": 0.144,
+      "observations": [
+        {
+          "seconds": 0.144,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_game_settings.py": {
+      "estimated_seconds": 0.062,
+      "observations": [
+        {
+          "seconds": 0.062,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_input.py": {
+      "estimated_seconds": 0.526,
+      "observations": [
+        {
+          "seconds": 0.526,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_manager_boundaries.py": {
+      "estimated_seconds": 35.857,
+      "observations": [
+        {
+          "seconds": 35.857,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_manager_chips.py": {
+      "estimated_seconds": 14.959,
+      "observations": [
+        {
+          "seconds": 14.959,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_manager_state.py": {
+      "estimated_seconds": 1.743,
+      "observations": [
+        {
+          "seconds": 1.743,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_manager_tamper.py": {
+      "estimated_seconds": 5.091,
+      "observations": [
+        {
+          "seconds": 5.091,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_current_manager_validation.py": {
+      "estimated_seconds": 42.497,
+      "observations": [
+        {
+          "seconds": 42.497,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_direct.py": {
+      "estimated_seconds": 0.052,
+      "observations": [
+        {
+          "seconds": 0.052,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_direct_transport.py": {
+      "estimated_seconds": 0.058,
+      "observations": [
+        {
+          "seconds": 0.058,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_entry_duplicate_resolution.py": {
+      "estimated_seconds": 0.036,
+      "observations": [
+        {
+          "seconds": 0.036,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_manager_provider.py": {
+      "estimated_seconds": 21.183,
+      "observations": [
+        {
+          "seconds": 21.183,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_odds_fixture_identity.py": {
+      "estimated_seconds": 0.882,
+      "observations": [
+        {
+          "seconds": 0.882,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_odds_team_identity.py": {
+      "estimated_seconds": 0.772,
+      "observations": [
+        {
+          "seconds": 0.772,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_parser.py": {
+      "estimated_seconds": 0.407,
+      "observations": [
+        {
+          "seconds": 0.407,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_provider_config.py": {
+      "estimated_seconds": 0.011,
+      "observations": [
+        {
+          "seconds": 0.011,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_fpl_service_boundaries.py": {
+      "estimated_seconds": 0.155,
+      "observations": [
+        {
+          "seconds": 0.155,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_gw10_reviewed_source_freeze.py": {
+      "estimated_seconds": 3.558,
+      "observations": [
+        {
+          "seconds": 3.558,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_horizon_probe.py": {
+      "estimated_seconds": 4.198,
+      "observations": [
+        {
+          "seconds": 4.198,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_horizon_rights_approval.py": {
+      "estimated_seconds": 0.109,
+      "observations": [
+        {
+          "seconds": 0.109,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_ingestion_branch_oracles.py": {
+      "estimated_seconds": 0.09,
+      "observations": [
+        {
+          "seconds": 0.09,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_ingestion_repository_service_boundaries.py": {
+      "estimated_seconds": 0.05,
+      "observations": [
+        {
+          "seconds": 0.05,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_live_odds_001_credentials.py": {
+      "estimated_seconds": 0.046,
+      "observations": [
+        {
+          "seconds": 0.046,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_live_odds_001_current_boundaries.py": {
+      "estimated_seconds": 0.358,
+      "observations": [
+        {
+          "seconds": 0.358,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_live_odds_001_provider_drift.py": {
+      "estimated_seconds": 0.5,
+      "observations": [
+        {
+          "seconds": 0.5,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_live_odds_001_transport.py": {
+      "estimated_seconds": 0.32,
+      "observations": [
+        {
+          "seconds": 0.32,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_odds_foundation.py": {
+      "estimated_seconds": 0.232,
+      "observations": [
+        {
+          "seconds": 0.232,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_odds_model_config_boundaries.py": {
+      "estimated_seconds": 0.061,
+      "observations": [
+        {
+          "seconds": 0.061,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_odds_persistence_boundaries.py": {
+      "estimated_seconds": 0.048,
+      "observations": [
+        {
+          "seconds": 0.048,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_odds_publication_attestation_boundaries.py": {
+      "estimated_seconds": 0.052,
+      "observations": [
+        {
+          "seconds": 0.052,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_odds_transport_parser_boundaries.py": {
+      "estimated_seconds": 0.083,
+      "observations": [
+        {
+          "seconds": 0.083,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_one_command_assembly.py": {
+      "estimated_seconds": 35.987,
+      "observations": [
+        {
+          "seconds": 35.987,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_one_command_odds_transient.py": {
+      "estimated_seconds": 0.008,
+      "observations": [
+        {
+          "seconds": 0.008,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_operator_odds_transient.py": {
+      "estimated_seconds": 0.022,
+      "observations": [
+        {
+          "seconds": 0.022,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_private_operator_odds.py": {
+      "estimated_seconds": 0.161,
+      "observations": [
+        {
+          "seconds": 0.161,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/ingestion/test_rights_and_fixtures.py": {
+      "estimated_seconds": 0.132,
+      "observations": [
+        {
+          "seconds": 0.132,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_current_market_contract_invariants.py": {
+      "estimated_seconds": 16.589,
+      "observations": [
+        {
+          "seconds": 16.589,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_current_market_identity_repository.py": {
+      "estimated_seconds": 47.286,
+      "observations": [
+        {
+          "seconds": 47.286,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_current_market_weight_canonicalisation.py": {
+      "estimated_seconds": 26.447,
+      "observations": [
+        {
+          "seconds": 26.447,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_current_markets.py": {
+      "estimated_seconds": 14.921,
+      "observations": [
+        {
+          "seconds": 14.921,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_current_markets_boundaries.py": {
+      "estimated_seconds": 364.78,
+      "observations": [
+        {
+          "seconds": 364.78,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_normalisation.py": {
+      "estimated_seconds": 3.622,
+      "observations": [
+        {
+          "seconds": 3.622,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_policy_boundaries.py": {
+      "estimated_seconds": 0.021,
+      "observations": [
+        {
+          "seconds": 0.021,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/markets/test_private_operator_odds_source.py": {
+      "estimated_seconds": 18.097,
+      "observations": [
+        {
+          "seconds": 18.097,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -81,6 +3775,670 @@
         {
           "seconds": 2.77,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 0.171,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/markets/test_service_boundaries.py": {
+      "estimated_seconds": 0.497,
+      "observations": [
+        {
+          "seconds": 0.497,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_accel005_frozen_boundaries.py": {
+      "estimated_seconds": 5.486,
+      "observations": [
+        {
+          "seconds": 5.486,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_account_evidence.py": {
+      "estimated_seconds": 0.08,
+      "observations": [
+        {
+          "seconds": 0.08,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_analysis_admission.py": {
+      "estimated_seconds": 0.081,
+      "observations": [
+        {
+          "seconds": 0.081,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_analysis_optimizer.py": {
+      "estimated_seconds": 142.023,
+      "observations": [
+        {
+          "seconds": 142.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_analysis_portability.py": {
+      "estimated_seconds": 0.116,
+      "observations": [
+        {
+          "seconds": 0.116,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_analysis_quality.py": {
+      "estimated_seconds": 173.445,
+      "observations": [
+        {
+          "seconds": 173.445,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_analysis_quality_views.py": {
+      "estimated_seconds": 170.148,
+      "observations": [
+        {
+          "seconds": 170.148,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_analysis_store.py": {
+      "estimated_seconds": 160.078,
+      "observations": [
+        {
+          "seconds": 160.078,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_authorization_preview.py": {
+      "estimated_seconds": 0.054,
+      "observations": [
+        {
+          "seconds": 0.054,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign.py": {
+      "estimated_seconds": 0.18,
+      "observations": [
+        {
+          "seconds": 0.18,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_authority.py": {
+      "estimated_seconds": 4.332,
+      "observations": [
+        {
+          "seconds": 4.332,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_controls.py": {
+      "estimated_seconds": 0.211,
+      "observations": [
+        {
+          "seconds": 0.211,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_inspection_recovery.py": {
+      "estimated_seconds": 0.046,
+      "observations": [
+        {
+          "seconds": 0.046,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_publication.py": {
+      "estimated_seconds": 189.1,
+      "observations": [
+        {
+          "seconds": 189.1,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_source_authority.py": {
+      "estimated_seconds": 0.313,
+      "observations": [
+        {
+          "seconds": 0.313,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_supervisor.py": {
+      "estimated_seconds": 0.024,
+      "observations": [
+        {
+          "seconds": 0.024,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_campaign_worker_privacy.py": {
+      "estimated_seconds": 13.622,
+      "observations": [
+        {
+          "seconds": 13.622,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_chip_schema_compat.py": {
+      "estimated_seconds": 6.15,
+      "observations": [
+        {
+          "seconds": 6.15,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_console_and_cli.py": {
+      "estimated_seconds": 0.257,
+      "observations": [
+        {
+          "seconds": 0.257,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_desk_instance.py": {
+      "estimated_seconds": 0.089,
+      "observations": [
+        {
+          "seconds": 0.089,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_detailed_readiness.py": {
+      "estimated_seconds": 0.023,
+      "observations": [
+        {
+          "seconds": 0.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_diagnostic_compute.py": {
+      "estimated_seconds": 149.184,
+      "observations": [
+        {
+          "seconds": 149.184,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_diagnostic_compute_privacy.py": {
+      "estimated_seconds": 13.915,
+      "observations": [
+        {
+          "seconds": 13.915,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_diagnostic_full_owned.py": {
+      "estimated_seconds": 812.306,
+      "observations": [
+        {
+          "seconds": 812.306,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_diagnostic_market.py": {
+      "estimated_seconds": 0.269,
+      "observations": [
+        {
+          "seconds": 0.269,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_diagnostic_pipeline.py": {
+      "estimated_seconds": 453.439,
+      "observations": [
+        {
+          "seconds": 453.439,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_discovery.py": {
+      "estimated_seconds": 0.129,
+      "observations": [
+        {
+          "seconds": 0.129,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_enrolled_wheel.py": {
+      "estimated_seconds": 0.446,
+      "observations": [
+        {
+          "seconds": 0.446,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_execution_diagnostics.py": {
+      "estimated_seconds": 0.061,
+      "observations": [
+        {
+          "seconds": 0.061,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_installation.py": {
+      "estimated_seconds": 1.816,
+      "observations": [
+        {
+          "seconds": 1.816,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_integrity_diagnostics.py": {
+      "estimated_seconds": 0.064,
+      "observations": [
+        {
+          "seconds": 0.064,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_integrity_initialization.py": {
+      "estimated_seconds": 0.012,
+      "observations": [
+        {
+          "seconds": 0.012,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_maintenance.py": {
+      "estimated_seconds": 5.616,
+      "observations": [
+        {
+          "seconds": 5.616,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_manager_failure_diagnostics.py": {
+      "estimated_seconds": 12.106,
+      "observations": [
+        {
+          "seconds": 12.106,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_odds_failure_diagnostics.py": {
+      "estimated_seconds": 0.172,
+      "observations": [
+        {
+          "seconds": 0.172,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_odds_failure_diagnostics_security.py": {
+      "estimated_seconds": 0.097,
+      "observations": [
+        {
+          "seconds": 0.097,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_operator_bootstrap.py": {
+      "estimated_seconds": 0.331,
+      "observations": [
+        {
+          "seconds": 0.331,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_operator_metadata.py": {
+      "estimated_seconds": 0.107,
+      "observations": [
+        {
+          "seconds": 0.107,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_paid_header_hook.py": {
+      "estimated_seconds": 0.02,
+      "observations": [
+        {
+          "seconds": 0.02,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_paid_quota_freshness.py": {
+      "estimated_seconds": 0.057,
+      "observations": [
+        {
+          "seconds": 0.057,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_persistent_cleanup.py": {
+      "estimated_seconds": 0.024,
+      "observations": [
+        {
+          "seconds": 0.024,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_persistent_desk.py": {
+      "estimated_seconds": 185.446,
+      "observations": [
+        {
+          "seconds": 185.446,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_prior_usage.py": {
+      "estimated_seconds": 15.796,
+      "observations": [
+        {
+          "seconds": 15.796,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_quota.py": {
+      "estimated_seconds": 0.288,
+      "observations": [
+        {
+          "seconds": 0.288,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_recurring_review.py": {
+      "estimated_seconds": 0.364,
+      "observations": [
+        {
+          "seconds": 0.364,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_runtime_integrity.py": {
+      "estimated_seconds": 0.467,
+      "observations": [
+        {
+          "seconds": 0.467,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing.py": {
+      "estimated_seconds": 0.294,
+      "observations": [
+        {
+          "seconds": 0.294,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing_pipeline.py": {
+      "estimated_seconds": 3183.128,
+      "observations": [
+        {
+          "seconds": 3183.128,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing_pipeline_failures.py": {
+      "estimated_seconds": 5.971,
+      "observations": [
+        {
+          "seconds": 5.971,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing_source_binding_independent.py": {
+      "estimated_seconds": 12.328,
+      "observations": [
+        {
+          "seconds": 12.328,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing_source_metadata_independent.py": {
+      "estimated_seconds": 0.154,
+      "observations": [
+        {
+          "seconds": 0.154,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing_source_proof.py": {
+      "estimated_seconds": 0.023,
+      "observations": [
+        {
+          "seconds": 0.023,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_standing_worker_independent.py": {
+      "estimated_seconds": 0.024,
+      "observations": [
+        {
+          "seconds": 0.024,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_start.py": {
+      "estimated_seconds": 0.754,
+      "observations": [
+        {
+          "seconds": 0.754,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/operation/test_supplier_enrollment.py": {
+      "estimated_seconds": 0.037,
+      "observations": [
+        {
+          "seconds": 0.037,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_future_transfer_scope.py": {
+      "estimated_seconds": 149.258,
+      "observations": [
+        {
+          "seconds": 149.258,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_legality.py": {
+      "estimated_seconds": 0.009,
+      "observations": [
+        {
+          "seconds": 0.009,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_multi_gameweek_assurance.py": {
+      "estimated_seconds": 2.37,
+      "observations": [
+        {
+          "seconds": 2.37,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py": {
+      "estimated_seconds": 0.186,
+      "observations": [
+        {
+          "seconds": 0.186,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_multi_gameweek_contract_hardening.py": {
+      "estimated_seconds": 10.4,
+      "observations": [
+        {
+          "seconds": 10.4,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_multi_gameweek_solver.py": {
+      "estimated_seconds": 3.961,
+      "observations": [
+        {
+          "seconds": 3.961,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_multi_gameweek_state.py": {
+      "estimated_seconds": 0.257,
+      "observations": [
+        {
+          "seconds": 0.257,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_multi_gameweek_tree.py": {
+      "estimated_seconds": 1.178,
+      "observations": [
+        {
+          "seconds": 1.178,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_r2b_semantics.py": {
+      "estimated_seconds": 111.519,
+      "observations": [
+        {
+          "seconds": 111.519,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_r7_canonical_primitives.py": {
+      "estimated_seconds": 0.418,
+      "observations": [
+        {
+          "seconds": 0.418,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -99,9 +4457,63 @@
         {
           "seconds": 513.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 328.574,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
+    },
+    "tests/unit/optimisation/test_stage10_batch.py": {
+      "estimated_seconds": 34.386,
+      "observations": [
+        {
+          "seconds": 34.386,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_stage10_r7_factoring.py": {
+      "estimated_seconds": 23.872,
+      "observations": [
+        {
+          "seconds": 23.872,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_stage11_d7_policy_generation.py": {
+      "estimated_seconds": 221.37,
+      "observations": [
+        {
+          "seconds": 221.37,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_stage11_exact_acceleration.py": {
+      "estimated_seconds": 107.875,
+      "observations": [
+        {
+          "seconds": 107.875,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_stage11_r7_layers.py": {
+      "estimated_seconds": 284.159,
+      "observations": [
+        {
+          "seconds": 284.159,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
     },
     "tests/unit/optimisation/test_terminal_r7_equivalence.py": {
       "estimated_seconds": 341.36,
@@ -109,6 +4521,120 @@
         {
           "seconds": 341.36,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 299.102,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/optimisation/test_three_gameweek_horizon.py": {
+      "estimated_seconds": 0.742,
+      "observations": [
+        {
+          "seconds": 0.742,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/optimisation/test_transfer_count_frontier.py": {
+      "estimated_seconds": 3.069,
+      "observations": [
+        {
+          "seconds": 3.069,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_evidence/test_participation_features.py": {
+      "estimated_seconds": 0.638,
+      "observations": [
+        {
+          "seconds": 0.638,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_evidence/test_wyscout_adapter.py": {
+      "estimated_seconds": 0.213,
+      "observations": [
+        {
+          "seconds": 0.213,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_actuals_compatibility.py": {
+      "estimated_seconds": 0.056,
+      "observations": [
+        {
+          "seconds": 0.056,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_cohort_runner.py": {
+      "estimated_seconds": 1.558,
+      "observations": [
+        {
+          "seconds": 1.558,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_locator.py": {
+      "estimated_seconds": 0.039,
+      "observations": [
+        {
+          "seconds": 0.039,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_player_lab.py": {
+      "estimated_seconds": 0.858,
+      "observations": [
+        {
+          "seconds": 0.858,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_real_contracts.py": {
+      "estimated_seconds": 0.053,
+      "observations": [
+        {
+          "seconds": 0.053,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_recovery.py": {
+      "estimated_seconds": 0.146,
+      "observations": [
+        {
+          "seconds": 0.146,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/player_lab/test_stage9_snapshot.py": {
+      "estimated_seconds": 0.078,
+      "observations": [
+        {
+          "seconds": 0.078,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -119,6 +4645,90 @@
         {
           "seconds": 2.0,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 0.096,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/prices/test_decisions_evaluation_artifacts.py": {
+      "estimated_seconds": 0.1,
+      "observations": [
+        {
+          "seconds": 0.1,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_independent_review_remediation.py": {
+      "estimated_seconds": 1.228,
+      "observations": [
+        {
+          "seconds": 1.228,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_models_pressure_calibration.py": {
+      "estimated_seconds": 0.127,
+      "observations": [
+        {
+          "seconds": 0.127,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_observations_cycles.py": {
+      "estimated_seconds": 0.048,
+      "observations": [
+        {
+          "seconds": 0.048,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_paths_selling.py": {
+      "estimated_seconds": 0.1,
+      "observations": [
+        {
+          "seconds": 0.1,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_service_cli.py": {
+      "estimated_seconds": 6.381,
+      "observations": [
+        {
+          "seconds": 6.381,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/prices/test_transfer_flows.py": {
+      "estimated_seconds": 0.044,
+      "observations": [
+        {
+          "seconds": 0.044,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_a1_03_history_binding.py": {
+      "estimated_seconds": 3.186,
+      "observations": [
+        {
+          "seconds": 3.186,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -129,6 +4739,40 @@
         {
           "seconds": 392.21,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 241.657,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_a1_allocation_injection.py": {
+      "estimated_seconds": 178.147,
+      "observations": [
+        {
+          "seconds": 178.147,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_a1_shadow_adapter.py": {
+      "estimated_seconds": 5.777,
+      "observations": [
+        {
+          "seconds": 5.777,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_a2_live_shadow_observation.py": {
+      "estimated_seconds": 82.396,
+      "observations": [
+        {
+          "seconds": 82.396,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -147,26 +4791,168 @@
         {
           "seconds": 462.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 572.988,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
+    },
+    "tests/unit/private_v1/test_actionability.py": {
+      "estimated_seconds": 0.286,
+      "observations": [
+        {
+          "seconds": 0.286,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_artifact_boundaries.py": {
+      "estimated_seconds": 0.017,
+      "observations": [
+        {
+          "seconds": 0.017,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_bounded_horizon_candidates.py": {
+      "estimated_seconds": 0.281,
+      "observations": [
+        {
+          "seconds": 0.281,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
     },
     "tests/unit/private_v1/test_bounded_horizon_oracle.py": {
-      "estimated_seconds": 254.31,
+      "estimated_seconds": 271.699,
       "observations": [
         {
           "seconds": 254.31,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 271.699,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_cli.py": {
+      "estimated_seconds": 3.049,
+      "observations": [
+        {
+          "seconds": 3.049,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_contracts.py": {
+      "estimated_seconds": 0.021,
+      "observations": [
+        {
+          "seconds": 0.021,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_deadline_orchestration.py": {
+      "estimated_seconds": 1023.262,
+      "observations": [
+        {
+          "seconds": 1023.262,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_future_scope_assembly.py": {
+      "estimated_seconds": 79.343,
+      "observations": [
+        {
+          "seconds": 79.343,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
     },
     "tests/unit/private_v1/test_horizon_candidate_oracle.py": {
-      "estimated_seconds": 259.18,
+      "estimated_seconds": 279.357,
       "observations": [
         {
           "seconds": 259.18,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 279.357,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_horizon_candidate_screen.py": {
+      "estimated_seconds": 0.038,
+      "observations": [
+        {
+          "seconds": 0.038,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_horizon_markets.py": {
+      "estimated_seconds": 15.608,
+      "observations": [
+        {
+          "seconds": 15.608,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_input_coherence.py": {
+      "estimated_seconds": 14.313,
+      "observations": [
+        {
+          "seconds": 14.313,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_live_publication.py": {
+      "estimated_seconds": 0.903,
+      "observations": [
+        {
+          "seconds": 0.903,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_live_transient.py": {
+      "estimated_seconds": 18.048,
+      "observations": [
+        {
+          "seconds": 18.048,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_new_purpose_odds_decision.py": {
+      "estimated_seconds": 344.641,
+      "observations": [
+        {
+          "seconds": 344.641,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -177,6 +4963,70 @@
         {
           "seconds": 583.24,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 501.846,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_prior_only_candidate.py": {
+      "estimated_seconds": 0.168,
+      "observations": [
+        {
+          "seconds": 0.168,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_progress.py": {
+      "estimated_seconds": 0.088,
+      "observations": [
+        {
+          "seconds": 0.088,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_reviewed_score_prior_routing.py": {
+      "estimated_seconds": 2.44,
+      "observations": [
+        {
+          "seconds": 2.44,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_rolling_contract_hardening.py": {
+      "estimated_seconds": 21.534,
+      "observations": [
+        {
+          "seconds": 21.534,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_rolling_contracts.py": {
+      "estimated_seconds": 12.768,
+      "observations": [
+        {
+          "seconds": 12.768,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_rolling_service.py": {
+      "estimated_seconds": 86.65,
+      "observations": [
+        {
+          "seconds": 86.65,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -187,6 +5037,50 @@
         {
           "seconds": 316.72,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 274.862,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_service.py": {
+      "estimated_seconds": 62.326,
+      "observations": [
+        {
+          "seconds": 62.326,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_stage7_progress.py": {
+      "estimated_seconds": 0.015,
+      "observations": [
+        {
+          "seconds": 0.015,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_comparison_contracts.py": {
+      "estimated_seconds": 0.057,
+      "observations": [
+        {
+          "seconds": 0.057,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_d1_controls.py": {
+      "estimated_seconds": 0.295,
+      "observations": [
+        {
+          "seconds": 0.295,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -197,6 +5091,30 @@
         {
           "seconds": 446.29,
           "source_id": "phase2-local-profile-ci-calibrated"
+        },
+        {
+          "seconds": 353.922,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_team_strength_d1_markets.py": {
+      "estimated_seconds": 7.978,
+      "observations": [
+        {
+          "seconds": 7.978,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_d2_wrapper.py": {
+      "estimated_seconds": 0.041,
+      "observations": [
+        {
+          "seconds": 0.041,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -215,9 +5133,13 @@
         {
           "seconds": 1491.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 1138.625,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
     },
     "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py": {
       "estimated_seconds": 2551.107,
@@ -225,6 +5147,50 @@
         {
           "seconds": 2551.107,
           "source_id": "accel002-ci-40831728997"
+        },
+        {
+          "seconds": 2485.935,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 2
+    },
+    "tests/unit/private_v1/test_team_strength_d7_diagnostics.py": {
+      "estimated_seconds": 0.004,
+      "observations": [
+        {
+          "seconds": 0.004,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_d7_evidence.py": {
+      "estimated_seconds": 0.006,
+      "observations": [
+        {
+          "seconds": 0.006,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_l1.py": {
+      "estimated_seconds": 275.536,
+      "observations": [
+        {
+          "seconds": 275.536,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_l1_cli.py": {
+      "estimated_seconds": 0.017,
+      "observations": [
+        {
+          "seconds": 0.017,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
       "sample_count": 1
@@ -243,9 +5209,33 @@
         {
           "seconds": 672.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 640.244,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
+    },
+    "tests/unit/private_v1/test_team_strength_l2.py": {
+      "estimated_seconds": 0.912,
+      "observations": [
+        {
+          "seconds": 0.912,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_screen_metrics.py": {
+      "estimated_seconds": 0.054,
+      "observations": [
+        {
+          "seconds": 0.054,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
     },
     "tests/unit/private_v1/test_team_strength_shadow_cases.py": {
       "estimated_seconds": 1604.0,
@@ -261,9 +5251,13 @@
         {
           "seconds": 1604.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 2142.834,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
     },
     "tests/unit/private_v1/test_team_strength_shadow_comparison.py": {
       "estimated_seconds": 662.0,
@@ -279,26 +5273,535 @@
         {
           "seconds": 662.0,
           "source_id": "phase2-run-35952828470"
+        },
+        {
+          "seconds": 619.044,
+          "source_id": "mq001-ci-42321646466-progress"
         }
       ],
-      "sample_count": 3
+      "sample_count": 4
+    },
+    "tests/unit/private_v1/test_team_strength_shadow_inputs.py": {
+      "estimated_seconds": 129.944,
+      "observations": [
+        {
+          "seconds": 129.944,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_team_strength_u_closure.py": {
+      "estimated_seconds": 0.04,
+      "observations": [
+        {
+          "seconds": 0.04,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/private_v1/test_transfer_frontier.py": {
+      "estimated_seconds": 25.464,
+      "observations": [
+        {
+          "seconds": 25.464,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_artifacts.py": {
+      "estimated_seconds": 2.539,
+      "observations": [
+        {
+          "seconds": 2.539,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_contracts.py": {
+      "estimated_seconds": 0.075,
+      "observations": [
+        {
+          "seconds": 0.075,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_effective_ownership.py": {
+      "estimated_seconds": 0.025,
+      "observations": [
+        {
+          "seconds": 0.025,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_joint_opponent_actions.py": {
+      "estimated_seconds": 0.035,
+      "observations": [
+        {
+          "seconds": 0.035,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_manager_multipliers.py": {
+      "estimated_seconds": 0.024,
+      "observations": [
+        {
+          "seconds": 0.024,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_mini_league.py": {
+      "estimated_seconds": 0.074,
+      "observations": [
+        {
+          "seconds": 0.074,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_opponent_actions.py": {
+      "estimated_seconds": 0.053,
+      "observations": [
+        {
+          "seconds": 0.053,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_opponent_contracts.py": {
+      "estimated_seconds": 0.063,
+      "observations": [
+        {
+          "seconds": 0.063,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_rank_utility.py": {
+      "estimated_seconds": 0.098,
+      "observations": [
+        {
+          "seconds": 0.098,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_rank_utility_contracts.py": {
+      "estimated_seconds": 0.033,
+      "observations": [
+        {
+          "seconds": 0.033,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_rank_utility_gates.py": {
+      "estimated_seconds": 0.155,
+      "observations": [
+        {
+          "seconds": 0.155,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_service.py": {
+      "estimated_seconds": 0.677,
+      "observations": [
+        {
+          "seconds": 0.677,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_service_model_guards.py": {
+      "estimated_seconds": 0.428,
+      "observations": [
+        {
+          "seconds": 0.428,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_synthetic_contracts.py": {
+      "estimated_seconds": 0.031,
+      "observations": [
+        {
+          "seconds": 0.031,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_synthetic_field.py": {
+      "estimated_seconds": 0.092,
+      "observations": [
+        {
+          "seconds": 0.092,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_synthetic_model_guards.py": {
+      "estimated_seconds": 0.069,
+      "observations": [
+        {
+          "seconds": 0.069,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rank_strategy/test_utility_model_guards.py": {
+      "estimated_seconds": 0.072,
+      "observations": [
+        {
+          "seconds": 0.072,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_2026_27_save_contract.py": {
+      "estimated_seconds": 1.239,
+      "observations": [
+        {
+          "seconds": 1.239,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_2026_27_verification_gate.py": {
+      "estimated_seconds": 0.192,
+      "observations": [
+        {
+          "seconds": 0.192,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_authoring_schema.py": {
+      "estimated_seconds": 1.735,
+      "observations": [
+        {
+          "seconds": 1.735,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_bonus_and_lifecycle.py": {
+      "estimated_seconds": 0.755,
+      "observations": [
+        {
+          "seconds": 0.755,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_contract_branch_oracles.py": {
+      "estimated_seconds": 0.437,
+      "observations": [
+        {
+          "seconds": 0.437,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_fail_closed_branches.py": {
+      "estimated_seconds": 0.627,
+      "observations": [
+        {
+          "seconds": 0.627,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_one_gameweek.py": {
+      "estimated_seconds": 0.053,
+      "observations": [
+        {
+          "seconds": 0.053,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_private_transient_authority.py": {
+      "estimated_seconds": 4.31,
+      "observations": [
+        {
+          "seconds": 4.31,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_schema_v11_capabilities.py": {
+      "estimated_seconds": 4.389,
+      "observations": [
+        {
+          "seconds": 4.389,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_scoring_edges.py": {
+      "estimated_seconds": 1.276,
+      "observations": [
+        {
+          "seconds": 1.276,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/rules/test_yaml_and_compiler.py": {
+      "estimated_seconds": 2.165,
+      "observations": [
+        {
+          "seconds": 2.165,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_accel003_parity_archive.py": {
+      "estimated_seconds": 0.056,
+      "observations": [
+        {
+          "seconds": 0.056,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_accel003_quota_parity.py": {
+      "estimated_seconds": 0.443,
+      "observations": [
+        {
+          "seconds": 0.443,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_accel003_wheel_probe.py": {
+      "estimated_seconds": 0.138,
+      "observations": [
+        {
+          "seconds": 0.138,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_accel005_migration_plan.py": {
+      "estimated_seconds": 1.797,
+      "observations": [
+        {
+          "seconds": 1.797,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_ci_coverage_shards.py": {
+      "estimated_seconds": 0.525,
+      "observations": [
+        {
+          "seconds": 0.525,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_ci_coverage_transport.py": {
+      "estimated_seconds": 0.083,
+      "observations": [
+        {
+          "seconds": 0.083,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_ci_workflow_contract.py": {
+      "estimated_seconds": 0.8,
+      "observations": [
+        {
+          "seconds": 0.8,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_dashboard_wheel_cli.py": {
+      "estimated_seconds": 2.89,
+      "observations": [
+        {
+          "seconds": 2.89,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_gcs008_acceptance.py": {
+      "estimated_seconds": 0.041,
+      "observations": [
+        {
+          "seconds": 0.041,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_gcs008_coverage_gate.py": {
+      "estimated_seconds": 1.555,
+      "observations": [
+        {
+          "seconds": 1.555,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_gcs008_scope.py": {
+      "estimated_seconds": 0.074,
+      "observations": [
+        {
+          "seconds": 0.074,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_gcs008_wheel.py": {
+      "estimated_seconds": 1.088,
+      "observations": [
+        {
+          "seconds": 1.088,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_opr004_repository_validation.py": {
+      "estimated_seconds": 0.042,
+      "observations": [
+        {
+          "seconds": 0.042,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_opt010_repository_validation.py": {
+      "estimated_seconds": 2.008,
+      "observations": [
+        {
+          "seconds": 2.008,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_scan_ci_coverage.py": {
+      "estimated_seconds": 23.483,
+      "observations": [
+        {
+          "seconds": 23.483,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_team_strength_l7_d7_evidence.py": {
+      "estimated_seconds": 0.007,
+      "observations": [
+        {
+          "seconds": 0.007,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_test_suite.py": {
+      "estimated_seconds": 1.159,
+      "observations": [
+        {
+          "seconds": 1.159,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/scripts/test_wheel_platform_roots.py": {
+      "estimated_seconds": 1.09,
+      "observations": [
+        {
+          "seconds": 1.09,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
+    },
+    "tests/unit/system/test_doctor.py": {
+      "estimated_seconds": 1.593,
+      "observations": [
+        {
+          "seconds": 1.593,
+          "source_id": "mq001-ci-42321646466-progress"
+        }
+      ],
+      "sample_count": 1
     }
   },
   "node_partition_exceptions": {
     "tests/integration/operation/test_campaign_execution.py": {
-      "estimated_seconds_per_node": 1513.018,
-      "reason": "Three function-isolated owned controller cases took 432.291s,231.733s,197.606s. Conservative 3.5x maximum per-case estimate removes the previously unweighted single-module critical path; each case owns its journal/transport state.",
-      "reference": "evidence/tickets/OPR-003/controller_runtime_evidence.json"
+      "estimated_seconds_per_node": 507.849,
+      "reason": "Largest elapsed module-fragment bound across the successful baseline node-partitioned shards. Includes log/setup overhead; an estimate, not a measured per-node duration. Existing independent-state partition justification remains in its prior referenced evidence.",
+      "reference": "evidence/tickets/DMF-MODEL-QUALITY-001/resume/ci-module-timings.json"
+    },
+    "tests/unit/operation/test_standing_pipeline.py": {
+      "estimated_seconds_per_node": 1061.043,
+      "reason": "Three independent function-scoped full256-scenario cases own transport, manager state, diagnostics and monkeypatch state; no module/session fixture or shared model setup in this module. Approximate3183.128s module bound divided by3 is an average scheduling estimate, not measured per-node time. Every original assertion and scenario remains.",
+      "reference": "evidence/tickets/DMF-MODEL-QUALITY-001/resume/ci-module-timings.json"
     },
     "tests/unit/private_v1/test_team_strength_d3_seam.py": {
-      "estimated_seconds_per_node": 300.8,
-      "reason": "Phase-2 controlled reuse experiment found only 1.19s setup benefit; four state-isolated calls each took 96.68-100.54s",
-      "reference": "evidence/tickets/CI-TEST-RATIONALISATION-001/SETUP_REUSE_REVIEW.md"
+      "estimated_seconds_per_node": 379.77,
+      "reason": "Largest elapsed module-fragment bound across the successful baseline node-partitioned shards. Includes log/setup overhead; an estimate, not a measured per-node duration. Existing independent-state partition justification remains in its prior referenced evidence.",
+      "reference": "evidence/tickets/DMF-MODEL-QUALITY-001/resume/ci-module-timings.json"
     },
     "tests/unit/private_v1/test_team_strength_shadow_cases.py": {
-      "estimated_seconds_per_node": 598.143,
-      "reason": "Five independent canonical case calls took 84.06-92.65s each; duplicating the 83.23s immutable model setup trades bounded aggregate work for removal of the 26m44s critical-path floor",
-      "reference": "evidence/tickets/CI-RUNTIME-SCHEDULING-001/ARCHITECTURE.md"
+      "estimated_seconds_per_node": 573.894,
+      "reason": "Largest elapsed module-fragment bound across the successful baseline node-partitioned shards. Includes log/setup overhead; an estimate, not a measured per-node duration. Existing independent-state partition justification remains in its prior referenced evidence.",
+      "reference": "evidence/tickets/DMF-MODEL-QUALITY-001/resume/ci-module-timings.json"
     }
   },
   "schema_version": "ci-runtime-history-v1",
@@ -337,6 +5840,13 @@
       "kind": "estimated",
       "observed_at_utc": "2026-11-03T05:18:00Z",
       "reference": "evidence/tickets/OPR-003/controller_runtime_observation.json"
+    },
+    {
+      "description": "Approximate module elapsed bounds from all16 successful Linux branch-coverage job progress logs at12fa98b; includes fixture/session/output scheduling overhead, not measured pytest module or node duration. Repeated node-partitioned module bounds are summed. Exact8526-node baseline plan preserved.",
+      "id": "mq001-ci-42321646466-progress",
+      "kind": "estimated",
+      "observed_at_utc": "2026-11-07T02:28:18Z",
+      "reference": "evidence/tickets/DMF-MODEL-QUALITY-001/resume/ci-module-timings.json"
     }
   ]
 }

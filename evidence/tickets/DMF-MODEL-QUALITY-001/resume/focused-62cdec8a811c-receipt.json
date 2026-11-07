@@ -1,0 +1,96 @@
+{
+  "tier": "FOCUSED",
+  "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "source": {
+    "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+    "clean": false,
+    "git_diff_sha256": "d31ed1fcfc91180d358a64cddf7af7b57bdc02dd6331bb23138eaa35a3c709cd",
+    "git_status_sha256": "0f57fe1696228610d0b1dfe9fab9077da03875771954c71e7ca7bfa2b7d44397",
+    "untracked_authored_file_sha256": {
+      "fixtures/operation/analysis/manifest.json": "951a2eb7c93fd8faa81e47d510c23a4af6280ecb17c002721ce171abd70aa870",
+      "fixtures/operation/analysis/owned_full_snapshot_v1.json": "83b899584c6629e74838dfb55015dd2b8ccc7ef4f4f1361249004868da9cd83a",
+      "scripts/branch_cleanup_guard.py": "2ca52551fad65620f2dbfe3a3491a38f4eb433b8da854759a6aa8bdcd23ece41",
+      "scripts/bytecode_cache_proof.py": "a728418cf82c7b77439f61a056390b6d3a23860ab56db0eef9ca737909a59b60",
+      "scripts/dev_checks.py": "ea998b54513bef9f5c297ab625ecb0904494393d0fc31b2baf524406cb22c20f",
+      "tests/integration/operation/test_analysis_fixture_parity.py": "d9cad085de4799ca9aae93e43db456a54180c09ddf7df3112da22e5d9b41c9a9",
+      "tests/unit/operation/analysis_test_support.py": "e94016b87b51283704783bcd5de95e5e4f3af6d79539de4c709476985f39f512",
+      "tests/unit/operation/test_analysis_fixture_integrity.py": "84ca86c97dafde017a83d6cf65e76ff714d8f5b169d08b300d2965b02d8ac50d",
+      "tests/unit/scripts/script_support.py": "464aee5bb0ab39e5e3e29632d8eaaab97b28a6683bc616c97922a660c4ff2ea1",
+      "tests/unit/scripts/test_accel003_no_io_loop.py": "8e594acb25f94c3f659c985d201fae3ea760b5d6e875996086cf743070ed8135",
+      "tests/unit/scripts/test_branch_cleanup_guard.py": "ae8219fff8f98b57e97c873c3f2dafdaf9777fbc6d3a3f09becafaec453bb357",
+      "tests/unit/scripts/test_bytecode_cache_proof.py": "d9db623e1139e33cf1fda61236220423552b1921e21c8cecea346c7a49a14304",
+      "tests/unit/scripts/test_dev_checks.py": "d8b0c5f5507cbb44e7b2113ebe44e3f242872b6e27065e8d2cd6e8a2986ea9ae",
+      "tickets/DMF-MODEL-QUALITY-001/RESUME-ACCEPTANCE.md": "af94ddaea483707993d07314b9e74b1fb0216283d7c70aed9fc07f96a9224034",
+      "tickets/DMF-MODEL-QUALITY-001/RESUME-CONTRACT.md": "62bf33bab2028841696e806c833e452082d71495b541523045d43a1eca6b5efb"
+    },
+    "qualification": "partial feedback source snapshot; full acceptance requires clean exact-commit CI"
+  },
+  "status": "PARTIAL_FEEDBACK_PASS",
+  "planned_steps": 3,
+  "completed_steps": 3,
+  "full_release_acceptance": false,
+  "global_coverage_floor_applied": false,
+  "type_check": "NOT_REQUESTED",
+  "steps": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.2776313000358641,
+      "stdout_sha256": "0a5823ef0a35b00c095ec64d6b67782b490c6a1206347b19bf07ca637ae51c12",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.22349440003745258,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\pytest",
+        "--durations=20",
+        "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\junit.xml",
+        "tests/integration/package/test_import_side_effects.py",
+        "tests/unit/assurance/test_secret_scan.py",
+        "tests/unit/ingestion/test_rights_and_fixtures.py",
+        "tests/unit/operation/test_analysis_quality.py",
+        "tests/unit/operation/test_analysis_quality_views.py",
+        "tests/unit/operation/test_analysis_store.py",
+        "--cov=dmf_pulse.operation.analysis_cli",
+        "--cov=dmf_pulse.operation.analysis_quality",
+        "--cov=dmf_pulse.operation.analysis_store",
+        "--cov-branch",
+        "--cov-fail-under=0",
+        "--cov-report=term-missing",
+        "--cov-report=json:C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\coverage.json"
+      ],
+      "exit_code": 0,
+      "seconds": 44.32351289992221,
+      "stdout_sha256": "10110470363a1013650f6f659f96cb588a969fe16e95003241b6285cc82b6a65",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

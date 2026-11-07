@@ -49,3 +49,6 @@ tickets/OPR-004/REQUEST.txt binary
 evidence/tickets/DMF-MODEL-QUALITY-001/*.log binary
 evidence/tickets/DMF-MODEL-QUALITY-001/*.json binary
 evidence/tickets/DMF-MODEL-QUALITY-001/*.xml binary
+evidence/tickets/DMF-MODEL-QUALITY-001/resume/*.log binary
+evidence/tickets/DMF-MODEL-QUALITY-001/resume/*.json binary
+evidence/tickets/DMF-MODEL-QUALITY-001/resume/*.xml binary

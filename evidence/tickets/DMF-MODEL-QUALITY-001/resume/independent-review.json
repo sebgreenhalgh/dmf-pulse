@@ -1,0 +1,36 @@
+{
+  "reviewer": "independent_quality_review",
+  "scope": "Engineering checkpoint; native archive pilot remains separately gated",
+  "status": "NO_UNRESOLVED_P0_P1_MATERIAL_P2_IN_REVIEWED_IMPLEMENTATION",
+  "source_sha256": {
+    "scripts/accel003_wheel_probe.py": "2f29254cd199572101c7f917c8c141e3ed366b9b80a5e862b0ea7d081b3189b4",
+    "scripts/dev_checks.py": "ea998b54513bef9f5c297ab625ecb0904494393d0fc31b2baf524406cb22c20f",
+    "scripts/branch_cleanup_guard.py": "2ca52551fad65620f2dbfe3a3491a38f4eb433b8da854759a6aa8bdcd23ece41",
+    "scripts/bytecode_cache_proof.py": "a728418cf82c7b77439f61a056390b6d3a23860ab56db0eef9ca737909a59b60",
+    "scripts/validate_repository.py": "42b255faa425fb90108e5590c08dd8b63151ccfa579489479d68a4ba7bc1e54d",
+    "tests/unit/scripts/script_support.py": "464aee5bb0ab39e5e3e29632d8eaaab97b28a6683bc616c97922a660c4ff2ea1",
+    "tests/unit/scripts/test_accel003_no_io_loop.py": "8e594acb25f94c3f659c985d201fae3ea760b5d6e875996086cf743070ed8135",
+    "tests/unit/scripts/test_dev_checks.py": "d8b0c5f5507cbb44e7b2113ebe44e3f242872b6e27065e8d2cd6e8a2986ea9ae",
+    "tests/unit/scripts/test_branch_cleanup_guard.py": "ae8219fff8f98b57e97c873c3f2dafdaf9777fbc6d3a3f09becafaec453bb357",
+    "tests/unit/scripts/test_bytecode_cache_proof.py": "d9db623e1139e33cf1fda61236220423552b1921e21c8cecea346c7a49a14304",
+    "tests/unit/scripts/test_quality_resume_manifest.py": "0f4e3f950e3b5eb82419851b9466d5634cd6062fb31a59b2b1e3351d4bc43d3c",
+    "tests/unit/operation/analysis_test_support.py": "e94016b87b51283704783bcd5de95e5e4f3af6d79539de4c709476985f39f512",
+    "tests/unit/operation/test_analysis_quality.py": "44ceef73ae0beb7e2da7a085e7b74ceae1cb401e75a2caef319b2a8941f6a872",
+    "tests/unit/operation/test_analysis_store.py": "71da4a1d055f0d2bc8fda3c0e1d847487d5e1bbfccb23013a5232b18953537f5",
+    "tests/integration/operation/test_analysis_fixture_parity.py": "d9cad085de4799ca9aae93e43db456a54180c09ddf7df3112da22e5d9b41c9a9",
+    "fixtures/operation/analysis/owned_full_snapshot_v1.json": "83b899584c6629e74838dfb55015dd2b8ccc7ef4f4f1361249004868da9cd83a",
+    "config/testing/runtime_history.json": "6ce5ad758d9491c2a969fc256c5c52e47e16979b93f2ba7d00b044d4e0f36423"
+  },
+  "findings_resolved": [
+    "Selector positive waits block and executor callbacks wake reliably",
+    "FULL requires actual authoritative workflow ID/path, exact push HEAD and all20mandatoryjobs",
+    "Ordinary atomic branch deletion guard proves exact set+expected tips without force",
+    "Frozen fixture regenerated; strict all-field and semantic equality preserved",
+    "Cache shared inodes/unknown files/reparse paths excluded; no whole environment deletion",
+    "Current continuation manifest validates full tree while sealed predecessor remains immutable"
+  ],
+  "independent_cheap_checks": "49cache/shard +28dev/loop +10manifest tests passed; branch native stale-tip/atomicity proof reviewed",
+  "native_archive_status": "PREFLIGHT_PENDING; no moves counted",
+  "production_or_model_promotion": false,
+  "line_endings": "Authored runtime/fixture manifest JSON normalized to mandatory LF; parsed semantic content unchanged."
+}

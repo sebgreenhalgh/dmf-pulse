@@ -1,0 +1,71 @@
+{
+  "tier": "FOCUSED",
+  "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "status": "PARTIAL_FEEDBACK_PASS",
+  "full_release_acceptance": false,
+  "source_status": "DIRTY_WORKTREE_AT_INVOCATION",
+  "type_check": "NOT_REQUESTED_TEST_OR_AUTOMATION_ONLY",
+  "global_coverage_floor_applied": false,
+  "steps": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.37729549990035594,
+      "stdout_sha256": "19726c535d6717852aff674513949139082277c0ecfa3d425e5a4a4dd3bdeb59",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.3366796998307109,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-58fa2e802f12\\pytest",
+        "--durations=20",
+        "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-58fa2e802f12\\junit.xml",
+        "tests/integration/package/test_import_side_effects.py",
+        "tests/unit/assurance/test_secret_scan.py",
+        "tests/unit/ingestion/test_rights_and_fixtures.py",
+        "tests/unit/operation/test_analysis_quality.py",
+        "tests/unit/operation/test_analysis_quality_views.py",
+        "tests/unit/operation/test_analysis_store.py",
+        "--cov=dmf_pulse.operation.analysis_cli",
+        "--cov=dmf_pulse.operation.analysis_quality",
+        "--cov=dmf_pulse.operation.analysis_store",
+        "--cov-branch",
+        "--cov-fail-under=0",
+        "--cov-report=term-missing",
+        "--cov-report=json:C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-58fa2e802f12\\coverage.json"
+      ],
+      "exit_code": 0,
+      "seconds": 42.7183825999964,
+      "stdout_sha256": "c9c311508a1db01609f146c0b66a8fa13674b672b3ba27b1c36211cc9ef2daaa",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

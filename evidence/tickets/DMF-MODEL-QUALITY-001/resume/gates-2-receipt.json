@@ -1,0 +1,181 @@
+{
+  "status": "FAIL",
+  "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "steps": [
+    {
+      "name": "frozen-sync",
+      "command": [
+        "uv",
+        "sync",
+        "--all-groups",
+        "--frozen"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06896549998782575,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "964d07d725b08fe89ac25f9b12942f0e42d4fe113f9d1745756199e51f6b56a1"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.3649222000967711,
+      "stdout_sha256": "0a5823ef0a35b00c095ec64d6b67782b490c6a1206347b19bf07ca637ae51c12",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.47629830008372664,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typing",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "exit_code": 0,
+      "seconds": 45.58566850004718,
+      "stdout_sha256": "a28e46a61d0094a379cc5bc53f92994559dda0d09fd27d1cde1228f8943d5ffc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "integration",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/dev_checks.py",
+        "integration",
+        "--target",
+        "tests/integration/operation/test_analysis_fixture_parity.py",
+        "--target",
+        "tests/unit/scripts",
+        "--target",
+        "tests/unit/operation/test_analysis_fixture_integrity.py"
+      ],
+      "exit_code": 0,
+      "seconds": 138.99121939996257,
+      "stdout_sha256": "c63f3af98323f1e1bab1fe9282cb6eed8bdac4df2e46f306bab8d740aa4b04c2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "focused",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/dev_checks.py",
+        "focused",
+        "--target",
+        "tests/unit/operation/test_analysis_quality.py",
+        "--target",
+        "tests/unit/operation/test_analysis_quality_views.py",
+        "--target",
+        "tests/unit/operation/test_analysis_store.py",
+        "--coverage-module",
+        "dmf_pulse.operation.analysis_quality",
+        "--coverage-module",
+        "dmf_pulse.operation.analysis_store",
+        "--coverage-module",
+        "dmf_pulse.operation.analysis_cli"
+      ],
+      "exit_code": 0,
+      "seconds": 45.855018500005826,
+      "stdout_sha256": "a7f98d6707dedec7aaf5783ef28cc026fcc29f61027c3ae23859a8a656bd6bf8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "inherited",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=review_pack/resume-inherited-temp",
+        "tests/unit/operation/test_analysis_admission.py",
+        "tests/unit/operation/test_analysis_optimizer.py",
+        "tests/unit/operation/test_analysis_portability.py",
+        "tests/unit/operation/test_persistent_desk.py",
+        "tests/unit/operation/test_start.py",
+        "tests/unit/dashboard/test_dashboard.py",
+        "tests/unit/dashboard/test_session_bootstrap.py"
+      ],
+      "exit_code": 0,
+      "seconds": 180.43837180011906,
+      "stdout_sha256": "ea8ee9d7da4fdabd7dd07b4f4154e50a5da6734dd453f09b9b2c5452fe03bb01",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "performance",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-s",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=review_pack/resume-performance-temp",
+        "tests/performance/operation/test_quality_sql.py"
+      ],
+      "exit_code": 0,
+      "seconds": 7.276642699958757,
+      "stdout_sha256": "c59633c1f2af688c108480235ebdf829f44b0875b04c8e160d498cad7df91ff7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "command": [
+        "uv",
+        "build",
+        "--no-build-isolation"
+      ],
+      "exit_code": 0,
+      "seconds": 16.68914100015536,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "dd94a6871938be98b33cd47a32e4d8d4ce4ca950cb09b21b458f122afbfea8c6"
+    },
+    {
+      "name": "repository",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/validate_repository.py"
+      ],
+      "exit_code": 1,
+      "seconds": 10.998946900013834,
+      "stdout_sha256": "1c0624d9e5cfc236dc632f06a455e8ff7674363c9ba6c15a522c92a202319c79",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

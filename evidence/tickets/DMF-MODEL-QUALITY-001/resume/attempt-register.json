@@ -1,0 +1,429 @@
+{
+  "all_partial_attempts": [
+    {
+      "attempt": "focused-58fa2e802f12",
+      "status": "PARTIAL_FEEDBACK_PASS",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "FOCUSED",
+      "receipt_sha256": "ffeaf6d72481e87b2cf47246d65fba5c4a564bd29a7ac7b4b625e7861d081f29",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.37729549990035594
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.3366796998307109
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-58fa2e802f12\\pytest",
+            "--durations=20",
+            "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-58fa2e802f12\\junit.xml",
+            "tests/integration/package/test_import_side_effects.py",
+            "tests/unit/assurance/test_secret_scan.py",
+            "tests/unit/ingestion/test_rights_and_fixtures.py",
+            "tests/unit/operation/test_analysis_quality.py",
+            "tests/unit/operation/test_analysis_quality_views.py",
+            "tests/unit/operation/test_analysis_store.py",
+            "--cov=dmf_pulse.operation.analysis_cli",
+            "--cov=dmf_pulse.operation.analysis_quality",
+            "--cov=dmf_pulse.operation.analysis_store",
+            "--cov-branch",
+            "--cov-fail-under=0",
+            "--cov-report=term-missing",
+            "--cov-report=json:C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-58fa2e802f12\\coverage.json"
+          ],
+          "exit_code": 0,
+          "seconds": 42.7183825999964
+        }
+      ],
+      "pytest": {
+        "tests": 131,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 34.793
+      }
+    },
+    {
+      "attempt": "focused-62cdec8a811c",
+      "status": "PARTIAL_FEEDBACK_PASS",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "FOCUSED",
+      "receipt_sha256": "c25d6bd2bfb3c8db273655f3e4e332abb26912847e68e95c1b0b7a7c90b8b30f",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.2776313000358641
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.22349440003745258
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\pytest",
+            "--durations=20",
+            "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\junit.xml",
+            "tests/integration/package/test_import_side_effects.py",
+            "tests/unit/assurance/test_secret_scan.py",
+            "tests/unit/ingestion/test_rights_and_fixtures.py",
+            "tests/unit/operation/test_analysis_quality.py",
+            "tests/unit/operation/test_analysis_quality_views.py",
+            "tests/unit/operation/test_analysis_store.py",
+            "--cov=dmf_pulse.operation.analysis_cli",
+            "--cov=dmf_pulse.operation.analysis_quality",
+            "--cov=dmf_pulse.operation.analysis_store",
+            "--cov-branch",
+            "--cov-fail-under=0",
+            "--cov-report=term-missing",
+            "--cov-report=json:C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\focused-62cdec8a811c\\coverage.json"
+          ],
+          "exit_code": 0,
+          "seconds": 44.32351289992221
+        }
+      ],
+      "pytest": {
+        "tests": 131,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 37.754
+      }
+    },
+    {
+      "attempt": "integration-0d755d58bfcf",
+      "status": "SOURCE_CHANGED_DURING_CHECKS",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "INTEGRATION",
+      "receipt_sha256": "637f34c75fb002f71f67cd03506a1d717452e13b2c4998145476f7bfbe8ab6e6",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.28598050004802644
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.2869734999258071
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-0d755d58bfcf\\pytest",
+            "--durations=20",
+            "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-0d755d58bfcf\\junit.xml",
+            "tests/integration/operation/test_analysis_fixture_parity.py",
+            "tests/integration/package/test_import_side_effects.py",
+            "tests/unit/assurance/test_secret_scan.py",
+            "tests/unit/ingestion/test_rights_and_fixtures.py",
+            "tests/unit/operation/test_analysis_fixture_integrity.py",
+            "tests/unit/scripts"
+          ],
+          "exit_code": 0,
+          "seconds": 136.24649229994975
+        }
+      ],
+      "pytest": {
+        "tests": 437,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 131.007
+      }
+    },
+    {
+      "attempt": "integration-47e5270e0214",
+      "status": "FAIL",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "INTEGRATION",
+      "receipt_sha256": "d38bc81231a3256624ed62cc5b7e09077c6b15ad388834ef5d89744d12acbeb8",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 1,
+          "seconds": 0.31415700004436076
+        }
+      ]
+    },
+    {
+      "attempt": "integration-5744d3e374ec",
+      "status": "FAIL",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "INTEGRATION",
+      "receipt_sha256": "c8802b1fc80cdab18267f2d5e460e7b427db4d5d1af52fff90b0dc52aec7a75e",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.35656729992479086
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.3685685000382364
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-5744d3e374ec\\pytest",
+            "--durations=20",
+            "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-5744d3e374ec\\junit.xml",
+            "tests/integration/operation/test_analysis_fixture_parity.py",
+            "tests/integration/package/test_import_side_effects.py",
+            "tests/unit/assurance/test_secret_scan.py",
+            "tests/unit/ingestion/test_rights_and_fixtures.py",
+            "tests/unit/scripts/test_accel003_no_io_loop.py",
+            "tests/unit/scripts/test_dev_checks.py"
+          ],
+          "exit_code": 1,
+          "seconds": 82.22948540002108
+        }
+      ],
+      "pytest": {
+        "tests": 95,
+        "failures": 1,
+        "errors": 0,
+        "seconds": 77.724
+      }
+    },
+    {
+      "attempt": "integration-5e61f4b48a58",
+      "status": "FAIL",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "INTEGRATION",
+      "receipt_sha256": "474ea669868177f06182f4f74f99e53037fd3a537300c49e229f5af3d1b4f793",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.3119601998478174
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.35230050003156066
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-5e61f4b48a58\\pytest",
+            "--durations=20",
+            "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-5e61f4b48a58\\junit.xml",
+            "tests/integration/operation/test_analysis_fixture_parity.py",
+            "tests/integration/package/test_import_side_effects.py",
+            "tests/unit/assurance/test_secret_scan.py",
+            "tests/unit/ingestion/test_rights_and_fixtures.py",
+            "tests/unit/scripts/test_accel003_no_io_loop.py",
+            "tests/unit/scripts/test_dev_checks.py"
+          ],
+          "exit_code": 2,
+          "seconds": 4.208273299969733
+        }
+      ],
+      "pytest": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 2,
+        "seconds": 0.0
+      }
+    },
+    {
+      "attempt": "integration-6ae96bd151eb",
+      "status": "PARTIAL_FEEDBACK_PASS",
+      "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+      "tier": "INTEGRATION",
+      "receipt_sha256": "398ce95e205f3eb007fbcc1b15ba7c4ac0af3446d9c0e36ae909e1428ba1f17c",
+      "steps": [
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "format",
+            "--check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.26856709993444383
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "ruff",
+            "check",
+            "."
+          ],
+          "exit_code": 0,
+          "seconds": 0.2656421000137925
+        },
+        {
+          "command": [
+            "uv",
+            "run",
+            "--frozen",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-6ae96bd151eb\\pytest",
+            "--durations=20",
+            "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\dev-checks\\integration-6ae96bd151eb\\junit.xml",
+            "tests/integration/operation/test_analysis_fixture_parity.py",
+            "tests/integration/package/test_import_side_effects.py",
+            "tests/unit/assurance/test_secret_scan.py",
+            "tests/unit/ingestion/test_rights_and_fixtures.py",
+            "tests/unit/operation/test_analysis_fixture_integrity.py",
+            "tests/unit/scripts"
+          ],
+          "exit_code": 0,
+          "seconds": 137.37840369995683
+        }
+      ],
+      "pytest": {
+        "tests": 439,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 133.025
+      }
+    }
+  ],
+  "literal_gate_attempts": [
+    {
+      "attempt": 1,
+      "status": "FAIL"
+    },
+    {
+      "attempt": 2,
+      "status": "FAIL"
+    },
+    {
+      "attempt": 3,
+      "status": "PASS"
+    }
+  ],
+  "original_sealed_attempt_register_preserved": true,
+  "failed_strict_fixture_attempts_preserved_privately": true,
+  "installed_attempts": "installed-selector-diagnosis.json"
+}

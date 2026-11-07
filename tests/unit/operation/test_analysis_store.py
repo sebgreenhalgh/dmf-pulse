@@ -9,34 +9,24 @@ import pytest
 from typer.testing import CliRunner
 
 from dmf_pulse.cli.app import app
-from dmf_pulse.dashboard.synthetic import DEMO_TIME, run_synthetic_recommendation
-from dmf_pulse.dashboard.views import desk_view
+from dmf_pulse.dashboard.synthetic import DEMO_TIME
 from dmf_pulse.operation.analysis_models import AnalysisSnapshot
 from dmf_pulse.operation.analysis_store import AnalysisStore
-from dmf_pulse.private_v1.progress import NullProgress
+from tests.unit.operation.analysis_test_support import load_owned_snapshot
 
 
 @pytest.fixture(scope="module")
 def owned_snapshot():
-    result = run_synthetic_recommendation(1, NullProgress())
-    view = desk_view(
-        result,
-        job_id="owned-first",
-        mode="SYNTHETIC_DEMONSTRATION",
-        generated_at=DEMO_TIME,
-        expires_at=DEMO_TIME + timedelta(minutes=15),
-    )
-    return AnalysisSnapshot(
-        run_id=view.job_id,
-        provenance_class="OWNED_SYNTHETIC",
-        permission_origin="OWNED_FIXTURE",
-        source_commit="1" * 40,
-        implementation_sha="2" * 40,
-        policy_sha256="3" * 64,
-        wheel_sha256="4" * 64,
-        recorded_at=DEMO_TIME,
-        view=view,
-        presentation=result.presentation,
+    snapshot = load_owned_snapshot()
+    return snapshot.model_copy(
+        update={
+            "run_id": "owned-first",
+            "view": snapshot.view.model_copy(update={"job_id": "owned-first"}),
+            "source_commit": "1" * 40,
+            "implementation_sha": "2" * 40,
+            "policy_sha256": "3" * 64,
+            "wheel_sha256": "4" * 64,
+        }
     )
 
 

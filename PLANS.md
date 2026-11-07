@@ -3465,6 +3465,25 @@ explicit; no provider request or original custody change is authorized.
 
 # DMF-MODEL-QUALITY-001 (active, 2026-11-07)
 
+## Owner-authorized cleanup and acceleration continuation
+
+Resume `12fa98b977b99b75ac8dc37754701ee99dcfea9b`; preserve its completed audit.
+The new attached request authorizes reachability-proven branch pruning,
+dependency-proven local archiving, test-platform improvements and separately
+reviewed MQ-000/002/003 research paths. No production activation is authorized.
+
+- [x] Inventory all remote refs/PRs/issues/releases with pagination, all worktrees,
+  storage and active process/data paths; classify before moving anything.
+- [x] Observe run 42321646466 and isolate the installed ACCEL003 timeout.
+- [x] Implement measured FAST/FOCUSED/INTEGRATION/FULL workflows and safe CI speedups.
+- [x] Prune only conclusively obsolete refs; preserve unique work and governance.
+- [ ] Archive proven recreatable/obsolete local files using owner-only ACLs and
+  exact rollback receipts; never traverse/copy live PostgreSQL internals.
+- [ ] Implement separately reviewed mathematical challengers and bounded
+  membership/custody improvements without changing the production champion.
+- [ ] Independently review, execute required gates, commit/push and provide one
+  consolidated before/after handoff with exact remaining blockers.
+
 - Branch `research/DMF-MODEL-QUALITY-001`, fetched launch base
   `df26ab0723dea99469fe4c98423402ea91f85776`; separate worktree.
 - Preserve original dirty availability checkout, launch worktree, installed signed

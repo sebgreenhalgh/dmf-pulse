@@ -1,0 +1,13 @@
+RUF059 Unpacked variable `path` is never used
+  --> tests\unit\scripts\test_bytecode_cache_proof.py:77:20
+   |
+76 | def test_literal_relocation_verifies_bytes_identity_and_retained_source(tmp_path):
+77 |     source, cache, path = owned_cache(tmp_path)
+   |                    ^^^^
+78 |     receipt = proof.prove_cache(cache)
+79 |     assert isinstance(receipt["files"][0]["device"], str)
+   |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+Found 1 error.
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).

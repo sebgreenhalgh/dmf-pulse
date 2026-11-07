@@ -1,0 +1,15 @@
+{
+  "classification": "WHOLLY_REPOSITORY_OWNED_SYNTHETIC_TEST_FIXTURE",
+  "schema_version": "owned-analysis-fixture-v1",
+  "path": "fixtures/operation/analysis/owned_full_snapshot_v1.json",
+  "sha256": "83b899584c6629e74838dfb55015dd2b8ccc7ef4f4f1361249004868da9cd83a",
+  "snapshot_sha256": "74c90cd4a0afcf0dc24520b17c3416561dae7f725768079690e60f091db95eb9",
+  "bytes": 2192237,
+  "players": 121,
+  "projected": 120,
+  "package_code_identity": "16f045ec22193e97197be49b4a0a62a657c1349d6ee614c998ed42dffc66d53a",
+  "full_regeneration": "tests/integration/operation/test_analysis_fixture_parity.py",
+  "origin": "Fresh complete run_synthetic_recommendation(1) from unchanged package sources at 12fa98b977b99b75ac8dc37754701ee99dcfea9b; current continuation test harness constructed the snapshot; no owner/real forecast or provider input",
+  "supersedes": "Initial uncommitted owned QA fixture had unauthenticated computation-build identity and failed strict build-lineage equality. It was regenerated, not granted hash exclusions. Failed attempts remain in continuation evidence.",
+  "acceptance": "unit fixtures only; fresh full engine regeneration and exact full-field equality remain mandatory in INTEGRATION/FULL"
+}

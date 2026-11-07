@@ -1,0 +1,33 @@
+{
+  "classification": "ENGINEERING_CHECKPOINT_FULL_CI_PENDING",
+  "parent_checkpoint": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "baseline_full_ci": "PASS_ALL20_42321646466",
+  "local_gates": "Frozen sync,format,lint,strict typing,fresh integration,focused coverage,inherited regressions,SQL performance,build,repository validation,secret scan,diff check PASS across explicit receipts; earlier failures preserved",
+  "installed_full_probe": "PASS_379.0465647_SECONDS_UNCHANGED900_BOUND_UNCHANGED_WHEEL",
+  "branch_cleanup": {
+    "before": 125,
+    "after": 110,
+    "deleted": 15,
+    "open_prs": 0,
+    "open_issues": 0
+  },
+  "local_archive": {
+    "status": "PREFLIGHT_PENDING",
+    "moved_bytes": 0,
+    "117_proven_candidate_bytes": 262151451,
+    "same_volume_freed_bytes": 0
+  },
+  "canonical_sqlite_sha256": "bdbf46c917819438e7d4a8033b087a9cb5a583930bb005d13692c5485ef9eaa7",
+  "active_release_manifest_sha256": "bd28d6827cb7c1dbb244225996beff6a726250072ac18836d4c72270b8ba4132",
+  "unchanged_production_package": true,
+  "new_full_ci": "REQUIRED_EXACT_PUSH_SHA_NOT_YET_RUN",
+  "remaining": [
+    "Complete native cache archive preflight/pilot/verified moves",
+    "Bounded separately reviewed MQ000 mathematical challengers",
+    "MQ002 membership-safe owned path and evidence qualification",
+    "MQ003 existing freeze/label custody bridge with missing rights/intent/labels explicit",
+    "Final independent review,FULL CI,capped review packet"
+  ],
+  "no_live_provider_calls_or_credits": true,
+  "production_install_migration_promotion": false
+}

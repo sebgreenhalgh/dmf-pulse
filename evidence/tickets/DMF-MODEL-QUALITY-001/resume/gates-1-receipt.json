@@ -1,0 +1,50 @@
+{
+  "status": "FAIL",
+  "head": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "steps": [
+    {
+      "name": "frozen-sync",
+      "command": [
+        "uv",
+        "sync",
+        "--all-groups",
+        "--frozen"
+      ],
+      "exit_code": 0,
+      "seconds": 0.15150299994274974,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "82efd546d31427bedf3e5aa9cf7d5520f1d8b94ce539422c13f5b6c1acb123f2"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.4116783000063151,
+      "stdout_sha256": "0a5823ef0a35b00c095ec64d6b67782b490c6a1206347b19bf07ca637ae51c12",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 1,
+      "seconds": 0.3234999000560492,
+      "stdout_sha256": "2df44eb9f133256570ca48bc6d1387df8d8250191acfb7e385bba0ae08aa66e3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

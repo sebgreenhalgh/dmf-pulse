@@ -1127,6 +1127,9 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
         validate_repository_manifest,
     )
 
+    quality001_resume_path = (
+        root / "evidence/tickets/DMF-MODEL-QUALITY-001/resume/current_manifest.json"
+    )
     quality001_path = root / "evidence/tickets/DMF-MODEL-QUALITY-001/current_manifest.json"
     opr004_path = root / "evidence/tickets/OPR-004/current_manifest.json"
     opr003_path = root / "evidence/tickets/OPR-003/current_manifest.json"
@@ -1143,7 +1146,9 @@ def _validate_current_manifest(root: Path, errors: list[str]) -> None:
     fpl_path = root / "evidence/tickets/FPL-004/current_manifest.json"
     dat_path = root / "evidence/tickets/DAT-003/current_manifest.json"
     active_path = (
-        quality001_path
+        quality001_resume_path
+        if quality001_resume_path.is_file()
+        else quality001_path
         if quality001_path.is_file()
         else opr004_path
         if opr004_path.is_file()

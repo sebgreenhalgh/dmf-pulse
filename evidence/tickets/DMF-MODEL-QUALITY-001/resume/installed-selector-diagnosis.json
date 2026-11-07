@@ -1,0 +1,166 @@
+{
+  "classification": "WHOLLY_OWNED_OFFLINE_SYNTHETIC_ACCEPTANCE",
+  "unchanged_installed_wheel_sha256": "654d1d5638a61b7feca916c4e889cb0c920a38b6f21989e75e6864e14d36075e",
+  "application_source_changed": false,
+  "provider_calls": 0,
+  "credits": 0,
+  "before_failure": "Both full horizon parity cases passed; cancellation polling exceeded its existing90s phase bound and hit uninitialized local state. Failed, not timed out. Earlier900s timeouts remain separately preserved.",
+  "after_result": "All original horizon1/3,121catalogue/120projected, exact whole-result parity, cancellation, CLI and network guards pass under the unchanged900s bound.",
+  "binding_correction": {
+    "original_receipt_sha256": "9c1ce60f8e9a25ccc7b39c7411280027db7fc862cbd56a2a7dc2d82283944f83",
+    "original_receipt_preserved": true,
+    "binding_correction": "Original source_driver_sha256 was observed after completion after the source changed. It is not the launched-source digest. This retrospective reconstruction replays only exact literal timing replacements over the immutable12fa Git blob and equals the preserved executed driver bytes. No prelaunch measurement is claimed.",
+    "reconstructed_source_sha256": "020b50a8a9c2a5bb16f2e355987397e4144a209c306d69666ab98cf87b5d5b95",
+    "preserved_executed_driver_sha256": "2a0d559fa4264b8215e17e87fc2bfb96d60820658b7e73b9a8b2d1789db65043",
+    "retrospective_reconstruction_matches_executed_bytes": true
+  },
+  "runs": [
+    {
+      "label": "before",
+      "exit_code": 1,
+      "timed_out": false,
+      "seconds": 832.5448842998594,
+      "unchanged_timeout_seconds": 900,
+      "source_driver_sha256": "020b50a8a9c2a5bb16f2e355987397e4144a209c306d69666ab98cf87b5d5b95",
+      "source_binding": "RETROSPECTIVE_RECONSTRUCTION_EQUALS_PRESERVED_EXECUTED_DRIVER",
+      "executed_instrumented_driver_sha256": "2a0d559fa4264b8215e17e87fc2bfb96d60820658b7e73b9a8b2d1789db65043",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "a1bf7030c1a1b6c141582deda26375026a9bfedf728c4e0da17af1c789ab0771",
+      "phase_events": [
+        {
+          "phase": "case_begin",
+          "elapsed": 0.010936199920251966,
+          "horizon": 1
+        },
+        {
+          "phase": "detail_end",
+          "elapsed": 261.8060769001022,
+          "horizon": 1
+        },
+        {
+          "phase": "comparison_end",
+          "elapsed": 262.04849159996957,
+          "horizon": 1
+        },
+        {
+          "phase": "case_end",
+          "elapsed": 262.1108669999521,
+          "horizon": 1,
+          "seconds": 257.3418661998585
+        },
+        {
+          "phase": "case_begin",
+          "elapsed": 262.1110050000716,
+          "horizon": 3
+        },
+        {
+          "phase": "detail_end",
+          "elapsed": 664.3406080999412,
+          "horizon": 3
+        },
+        {
+          "phase": "comparison_end",
+          "elapsed": 664.927885199897,
+          "horizon": 3
+        },
+        {
+          "phase": "case_end",
+          "elapsed": 664.9678994000424,
+          "horizon": 3,
+          "seconds": 402.8425521000754
+        },
+        {
+          "phase": "cancellation_begin",
+          "elapsed": 664.9679849001113,
+          "kind": "acquisition"
+        }
+      ]
+    },
+    {
+      "label": "after",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 379.04656470008194,
+      "unchanged_timeout_seconds": 900,
+      "source_driver_sha256": "2f29254cd199572101c7f917c8c141e3ed366b9b80a5e862b0ea7d081b3189b4",
+      "source_binding": "MEASURED_PRELAUNCH",
+      "executed_instrumented_driver_sha256": "51965a0a4270d5f4f64367cb5afa8db4d1ece2a4b4d7f2f627867df406337969",
+      "stdout_sha256": "ab09a3e4a2541cb005d9fbdf5c4bd0f3618be941888576a997e2e8a754d23678",
+      "stderr_sha256": "ba4242cbd74c37d6880dcf64689ab9436b08c3e29b3cd420badeac53b1f0c061",
+      "phase_events": [
+        {
+          "phase": "case_begin",
+          "elapsed": 0.007482900051400065,
+          "horizon": 1
+        },
+        {
+          "phase": "detail_end",
+          "elapsed": 90.90917070000432,
+          "horizon": 1
+        },
+        {
+          "phase": "comparison_end",
+          "elapsed": 91.15538230002858,
+          "horizon": 1
+        },
+        {
+          "phase": "case_end",
+          "elapsed": 91.17256310000084,
+          "horizon": 1,
+          "seconds": 86.46820380003192
+        },
+        {
+          "phase": "case_begin",
+          "elapsed": 91.1726869000122,
+          "horizon": 3
+        },
+        {
+          "phase": "detail_end",
+          "elapsed": 318.26104050013237,
+          "horizon": 3
+        },
+        {
+          "phase": "comparison_end",
+          "elapsed": 318.8559932000935,
+          "horizon": 3
+        },
+        {
+          "phase": "case_end",
+          "elapsed": 318.88661050004885,
+          "horizon": 3,
+          "seconds": 227.70057019987144
+        },
+        {
+          "phase": "cancellation_begin",
+          "elapsed": 318.8867045000661,
+          "kind": "acquisition"
+        },
+        {
+          "phase": "cancellation_end",
+          "elapsed": 324.5190435999539,
+          "kind": "acquisition",
+          "seconds": 5.632104400079697
+        },
+        {
+          "phase": "cancellation_begin",
+          "elapsed": 324.51910370006226,
+          "kind": "modelling"
+        },
+        {
+          "phase": "cancellation_end",
+          "elapsed": 374.594984699972,
+          "kind": "modelling",
+          "seconds": 50.074641700135544
+        },
+        {
+          "phase": "cli_begin",
+          "elapsed": 374.5950396999251
+        },
+        {
+          "phase": "cli_end",
+          "elapsed": 378.21004109992646
+        }
+      ]
+    }
+  ]
+}

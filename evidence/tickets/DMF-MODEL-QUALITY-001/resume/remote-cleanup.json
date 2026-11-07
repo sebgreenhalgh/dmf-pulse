@@ -1,0 +1,98 @@
+{
+  "before_branches": 125,
+  "after_branches": 110,
+  "deleted_count": 15,
+  "deletions": [
+    {
+      "name": "stage/A9/PTS-009-red-card-dismissal-r3",
+      "exact_tip": "793c4533063a291933899e67161c3db3a0f0f9a5"
+    },
+    {
+      "name": "integration/current-fpl/CURRENT-FPL-STATE-001A-manual-transient",
+      "exact_tip": "d8054f812910ca5db4c1f4a5bacfb4653d9353ce"
+    },
+    {
+      "name": "integration/current-fpl/CURRENT-FPL-STATE-001B-fpl-odds-identity",
+      "exact_tip": "c23acdb587b39c43263628f642d326bcc62a3d83"
+    },
+    {
+      "name": "integration/current-fpl/CURRENT-FPL-STATE-001C-operator-manager-state",
+      "exact_tip": "ad49f0981f731b282130bd879ec3b1d35f24629e"
+    },
+    {
+      "name": "integration/current-fpl/CURRENT-FPL-STATE-001D-unified-current-state",
+      "exact_tip": "a310beb73a8a09995cd2df1c27a2242181d0b702"
+    },
+    {
+      "name": "integration/post-ci/LIVE-ODDS-001-on-repaired-main",
+      "exact_tip": "feca6ae96837396059bc404007dc52ca71af4a68"
+    },
+    {
+      "name": "readiness/RUL-2026-27-full-season-activation",
+      "exact_tip": "1cfa7a9a7b01e1b9f19a8426306c32870840f7ea"
+    },
+    {
+      "name": "remediation/CI-COVERAGE-SHARD-001-sharded-coverage",
+      "exact_tip": "70d972c49fbb357977cc9cec37361fade6b792fa"
+    },
+    {
+      "name": "stage/A1/FND-001-foundation",
+      "exact_tip": "12049a7de23a4a8fcca3d219dbcab1bf5e1027ea"
+    },
+    {
+      "name": "stage/A7/MIN-007-final-recovery",
+      "exact_tip": "c34f98755057c02e5160a50015abb1b070782d8a"
+    },
+    {
+      "name": "stage/A10/OPT-010-one-gameweek-optimiser",
+      "exact_tip": "49103e03bb1e7500aff5c15b90b136f2cc476405"
+    },
+    {
+      "name": "stage/A11/OPT-011-multi-gameweek-transfer-optimiser",
+      "exact_tip": "ec41e4cabcf722380016c5c960430bb7ae942e2f"
+    },
+    {
+      "name": "stage/A12/EVAL-012-backtesting-framework",
+      "exact_tip": "18e71e4974ac348edd53548518bd937989ee3ad1"
+    },
+    {
+      "name": "stage/A14/CHIP-014-chip-optimisation",
+      "exact_tip": "f4da141704f78b6d3f90610e1c5f61c1433077c2"
+    },
+    {
+      "name": "stage/A15/RANK-015-rank-aware-strategy",
+      "exact_tip": "9b28b31aa8eec0daf0161077b196ffc99ae5f7bd"
+    }
+  ],
+  "retained_refs_verified_unchanged": true,
+  "force_push": false,
+  "atomic_ordinary_push": true,
+  "pre_push_guard_sha256": "2ca52551fad65620f2dbfe3a3491a38f4eb433b8da854759a6aa8bdcd23ece41",
+  "pinned_private_qualification_manifest_sha256": "c815920da66f8034ebb763a199b781ce67d3e477871e1628d86da4226e12dea6",
+  "pilot_receipt_sha256": "c3f2094c1398c12d4a2e4262aa1fe84be864a00ce7037b10e83f8f480d2c21ae",
+  "remaining_receipt_sha256": "f80c9c7103c9318795294ceb8768fe911c29635f2bf79a17abacb2e7c56af517",
+  "preserved_active_or_registered_branch_names": 87,
+  "automation_dependency_held": "stage/A9/PTS-009-static-acceptance-r2 referenced by ACCEPTANCE_COMMANDS.ps1:5",
+  "tags": {
+    "before": 1,
+    "after": 1
+  },
+  "releases": {
+    "before": 1,
+    "after": 1
+  },
+  "open_prs": {
+    "before": 0,
+    "after": 0
+  },
+  "open_issues": {
+    "before": 1,
+    "after": 0
+  },
+  "closed_issue": {
+    "number": 14,
+    "reason": "Temporary Stage15 workflows removed in ancestor17b6aa576459c652e14015dcfd7b7cf0bffd6f9d; all84 comments retained",
+    "closing_comment_id": 6701208483
+  },
+  "unique_or_unreviewed_refs": "HOLD; no forced history/tag/release changes or PR/merge"
+}

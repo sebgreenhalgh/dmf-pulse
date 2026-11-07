@@ -1,0 +1,3016 @@
+{
+  "source_commit": "12fa98b977b99b75ac8dc37754701ee99dcfea9b",
+  "run_id": 42321646466,
+  "method": "Approximate module walltimes from successive module completion timestamps in successful Linux branch-coverage logs; includes fixture/session/output scheduling overhead; millisecond resolution. Original downloaded plan binds exact collected tests.",
+  "jobs": [
+    {
+      "job_id": 128247999669,
+      "shard": 0,
+      "test_count": 112,
+      "pytest_seconds": 2489.87,
+      "modules": [
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d4_rolling_diagnostics.py",
+          "seconds": 2485.935,
+          "completion_utc": "2026-11-07T01:44:52.054Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999669"
+    },
+    {
+      "job_id": 128247999702,
+      "shard": 1,
+      "test_count": 1,
+      "pytest_seconds": 510.54,
+      "modules": [
+        {
+          "module": "tests/integration/operation/test_campaign_execution.py",
+          "seconds": 507.849,
+          "completion_utc": "2026-11-07T01:11:58.456Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999702"
+    },
+    {
+      "job_id": 128247999768,
+      "shard": 2,
+      "test_count": 1,
+      "pytest_seconds": 346.33,
+      "modules": [
+        {
+          "module": "tests/integration/operation/test_campaign_execution.py",
+          "seconds": 344.541,
+          "completion_utc": "2026-11-07T01:09:09.013Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999768"
+    },
+    {
+      "job_id": 128247999703,
+      "shard": 3,
+      "test_count": 1,
+      "pytest_seconds": 309.97,
+      "modules": [
+        {
+          "module": "tests/integration/operation/test_campaign_execution.py",
+          "seconds": 308.316,
+          "completion_utc": "2026-11-07T01:08:32.274Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999703"
+    },
+    {
+      "job_id": 128247999663,
+      "shard": 4,
+      "test_count": 642,
+      "pytest_seconds": 4252.05,
+      "modules": [
+        {
+          "module": "tests/assurance/optimisation/test_r2c_artifact_validation.py",
+          "seconds": 655.939,
+          "completion_utc": "2026-11-07T01:14:28.350Z"
+        },
+        {
+          "module": "tests/contract/evaluation/test_public_contracts.py",
+          "seconds": 0.015,
+          "completion_utc": "2026-11-07T01:14:28.365Z"
+        },
+        {
+          "module": "tests/golden/availability/test_min007e_lineup.py",
+          "seconds": 0.571,
+          "completion_utc": "2026-11-07T01:14:28.936Z"
+        },
+        {
+          "module": "tests/golden/markets/test_nrm006_goldens.py",
+          "seconds": 1.154,
+          "completion_utc": "2026-11-07T01:14:30.090Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073_evaluation_integrity.py",
+          "seconds": 0.295,
+          "completion_utc": "2026-11-07T01:14:30.385Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007f_concurrency.py",
+          "seconds": 0.623,
+          "completion_utc": "2026-11-07T01:14:31.008Z"
+        },
+        {
+          "module": "tests/integration/fpl_points/test_current_player_allocation_port.py",
+          "seconds": 7.087,
+          "completion_utc": "2026-11-07T01:14:38.095Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_lifecycle_resume.py",
+          "seconds": 8.813,
+          "completion_utc": "2026-11-07T01:14:46.908Z"
+        },
+        {
+          "module": "tests/integration/prices/test_price_workflow.py",
+          "seconds": 1.46,
+          "completion_utc": "2026-11-07T01:14:48.368Z"
+        },
+        {
+          "module": "tests/property/availability/test_projection_properties.py",
+          "seconds": 6.029,
+          "completion_utc": "2026-11-07T01:14:54.397Z"
+        },
+        {
+          "module": "tests/property/optimisation/test_properties.py",
+          "seconds": 0.285,
+          "completion_utc": "2026-11-07T01:14:54.682Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_evidence_boundary_branches.py",
+          "seconds": 0.018,
+          "completion_utc": "2026-11-07T01:14:54.700Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_nrm006_evidence_generator.py",
+          "seconds": 0.03,
+          "completion_utc": "2026-11-07T01:14:54.730Z"
+        },
+        {
+          "module": "tests/unit/availability/test_minutes.py",
+          "seconds": 0.336,
+          "completion_utc": "2026-11-07T01:14:55.066Z"
+        },
+        {
+          "module": "tests/unit/chips/test_service.py",
+          "seconds": 2.868,
+          "completion_utc": "2026-11-07T01:14:57.934Z"
+        },
+        {
+          "module": "tests/unit/cli/test_fpl_ingest_commands_direct.py",
+          "seconds": 1.611,
+          "completion_utc": "2026-11-07T01:14:59.545Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_point_probability_metrics.py",
+          "seconds": 0.023,
+          "completion_utc": "2026-11-07T01:14:59.568Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_decimal_boundaries.py",
+          "seconds": 0.032,
+          "completion_utc": "2026-11-07T01:14:59.600Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_score_distribution.py",
+          "seconds": 0.886,
+          "completion_utc": "2026-11-07T01:15:00.486Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_fail_closed_edges.py",
+          "seconds": 1.537,
+          "completion_utc": "2026-11-07T01:15:02.023Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_parser.py",
+          "seconds": 0.13,
+          "completion_utc": "2026-11-07T01:15:02.153Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_service_boundaries.py",
+          "seconds": 0.236,
+          "completion_utc": "2026-11-07T01:15:02.389Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_current_unified_state_tamper.py",
+          "seconds": 82.467,
+          "completion_utc": "2026-11-07T01:16:24.856Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_game_settings.py",
+          "seconds": 0.062,
+          "completion_utc": "2026-11-07T01:16:24.918Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_manager_state.py",
+          "seconds": 1.743,
+          "completion_utc": "2026-11-07T01:16:26.661Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_service_boundaries.py",
+          "seconds": 0.155,
+          "completion_utc": "2026-11-07T01:16:26.816Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_private_operator_odds.py",
+          "seconds": 0.161,
+          "completion_utc": "2026-11-07T01:16:26.977Z"
+        },
+        {
+          "module": "tests/unit/markets/test_service_boundaries.py",
+          "seconds": 0.497,
+          "completion_utc": "2026-11-07T01:16:27.474Z"
+        },
+        {
+          "module": "tests/unit/operation/test_discovery.py",
+          "seconds": 0.129,
+          "completion_utc": "2026-11-07T01:16:27.603Z"
+        },
+        {
+          "module": "tests/unit/operation/test_execution_diagnostics.py",
+          "seconds": 0.061,
+          "completion_utc": "2026-11-07T01:16:27.664Z"
+        },
+        {
+          "module": "tests/unit/operation/test_odds_failure_diagnostics.py",
+          "seconds": 0.172,
+          "completion_utc": "2026-11-07T01:16:27.836Z"
+        },
+        {
+          "module": "tests/unit/operation/test_recurring_review.py",
+          "seconds": 0.364,
+          "completion_utc": "2026-11-07T01:16:28.200Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing_pipeline.py",
+          "seconds": 3183.128,
+          "completion_utc": "2026-11-07T02:09:31.328Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing_source_metadata_independent.py",
+          "seconds": 0.154,
+          "completion_utc": "2026-11-07T02:09:31.482Z"
+        },
+        {
+          "module": "tests/unit/operation/test_start.py",
+          "seconds": 0.754,
+          "completion_utc": "2026-11-07T02:09:32.236Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_multi_gameweek_assurance.py",
+          "seconds": 2.37,
+          "completion_utc": "2026-11-07T02:09:34.606Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_multi_gameweek_cli_hardening.py",
+          "seconds": 0.186,
+          "completion_utc": "2026-11-07T02:09:34.792Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_cohort_runner.py",
+          "seconds": 1.558,
+          "completion_utc": "2026-11-07T02:09:36.350Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_a1_allocation_injection.py",
+          "seconds": 178.147,
+          "completion_utc": "2026-11-07T02:12:34.497Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_artifact_boundaries.py",
+          "seconds": 0.017,
+          "completion_utc": "2026-11-07T02:12:34.514Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_future_scope_assembly.py",
+          "seconds": 79.343,
+          "completion_utc": "2026-11-07T02:13:53.857Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_rolling_contract_hardening.py",
+          "seconds": 21.534,
+          "completion_utc": "2026-11-07T02:14:15.391Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_contracts.py",
+          "seconds": 0.075,
+          "completion_utc": "2026-11-07T02:14:15.466Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_effective_ownership.py",
+          "seconds": 0.025,
+          "completion_utc": "2026-11-07T02:14:15.491Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_manager_multipliers.py",
+          "seconds": 0.024,
+          "completion_utc": "2026-11-07T02:14:15.515Z"
+        },
+        {
+          "module": "tests/unit/rules/test_authoring_schema.py",
+          "seconds": 1.735,
+          "completion_utc": "2026-11-07T02:14:17.250Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999663"
+    },
+    {
+      "job_id": 128248000475,
+      "shard": 5,
+      "test_count": 582,
+      "pytest_seconds": 2385.27,
+      "modules": [
+        {
+          "module": "tests/assurance/optimisation/test_surface.py",
+          "seconds": 164.854,
+          "completion_utc": "2026-11-07T01:06:17.668Z"
+        },
+        {
+          "module": "tests/contract/football_events/test_current_score_prior_contract.py",
+          "seconds": 0.025,
+          "completion_utc": "2026-11-07T01:06:17.693Z"
+        },
+        {
+          "module": "tests/contract/fpl/test_cli_usage_contract.py",
+          "seconds": 0.865,
+          "completion_utc": "2026-11-07T01:06:18.558Z"
+        },
+        {
+          "module": "tests/golden/availability/test_min007g_evaluation.py",
+          "seconds": 11.995,
+          "completion_utc": "2026-11-07T01:06:30.553Z"
+        },
+        {
+          "module": "tests/golden/optimisation/test_multi_gameweek_oracle.py",
+          "seconds": 0.717,
+          "completion_utc": "2026-11-07T01:06:31.270Z"
+        },
+        {
+          "module": "tests/golden/prices/test_price_golden.py",
+          "seconds": 0.044,
+          "completion_utc": "2026-11-07T01:06:31.314Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073_g_persistence_assurance.py",
+          "seconds": 16.19,
+          "completion_utc": "2026-11-07T01:06:47.504Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007f_constraints.py",
+          "seconds": 0.206,
+          "completion_utc": "2026-11-07T01:06:47.710Z"
+        },
+        {
+          "module": "tests/integration/dashboard/test_postgres_authorization.py",
+          "seconds": 3.925,
+          "completion_utc": "2026-11-07T01:06:51.635Z"
+        },
+        {
+          "module": "tests/integration/ingestion/odds/test_odds_idempotency_asof.py",
+          "seconds": 14.489,
+          "completion_utc": "2026-11-07T01:07:06.124Z"
+        },
+        {
+          "module": "tests/integration/ingestion/odds/test_odds_temporal_publication_mapping.py",
+          "seconds": 2.828,
+          "completion_utc": "2026-11-07T01:07:08.952Z"
+        },
+        {
+          "module": "tests/integration/rank_strategy/test_exact_mini_league.py",
+          "seconds": 0.025,
+          "completion_utc": "2026-11-07T01:07:08.977Z"
+        },
+        {
+          "module": "tests/property/availability/test_role_model_properties.py",
+          "seconds": 1.006,
+          "completion_utc": "2026-11-07T01:07:09.983Z"
+        },
+        {
+          "module": "tests/property/optimisation/test_multi_gameweek_properties.py",
+          "seconds": 23.047,
+          "completion_utc": "2026-11-07T01:07:33.030Z"
+        },
+        {
+          "module": "tests/property/prices/test_price_properties.py",
+          "seconds": 0.95,
+          "completion_utc": "2026-11-07T01:07:33.980Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_fpl004_coverage_gate.py",
+          "seconds": 0.074,
+          "completion_utc": "2026-11-07T01:07:34.054Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_fpl004_review_evidence.py",
+          "seconds": 0.214,
+          "completion_utc": "2026-11-07T01:07:34.268Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_odd005_coverage_gate.py",
+          "seconds": 0.046,
+          "completion_utc": "2026-11-07T01:07:34.314Z"
+        },
+        {
+          "module": "tests/unit/availability/test_manual_override.py",
+          "seconds": 3.308,
+          "completion_utc": "2026-11-07T01:07:37.622Z"
+        },
+        {
+          "module": "tests/unit/availability/test_projection.py",
+          "seconds": 0.008,
+          "completion_utc": "2026-11-07T01:07:37.630Z"
+        },
+        {
+          "module": "tests/unit/chips/test_temporal_leakage.py",
+          "seconds": 0.072,
+          "completion_utc": "2026-11-07T01:07:37.702Z"
+        },
+        {
+          "module": "tests/unit/cli/test_odds_market_commands.py",
+          "seconds": 3.407,
+          "completion_utc": "2026-11-07T01:07:41.109Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_diagnostic_review_regressions.py",
+          "seconds": 2.982,
+          "completion_utc": "2026-11-07T01:07:44.091Z"
+        },
+        {
+          "module": "tests/unit/database/test_database_contracts.py",
+          "seconds": 0.033,
+          "completion_utc": "2026-11-07T01:07:44.124Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_score_projection.py",
+          "seconds": 1.728,
+          "completion_utc": "2026-11-07T01:07:45.852Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_service_adversarial.py",
+          "seconds": 1.026,
+          "completion_utc": "2026-11-07T01:07:46.878Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_versioned_assist_classification.py",
+          "seconds": 7.236,
+          "completion_utc": "2026-11-07T01:07:54.114Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_parser_boundaries.py",
+          "seconds": 0.347,
+          "completion_utc": "2026-11-07T01:07:54.461Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_current_unified_state.py",
+          "seconds": 11.203,
+          "completion_utc": "2026-11-07T01:08:05.664Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_manager_tamper.py",
+          "seconds": 5.091,
+          "completion_utc": "2026-11-07T01:08:10.755Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_direct.py",
+          "seconds": 0.052,
+          "completion_utc": "2026-11-07T01:08:10.807Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_ingestion_repository_service_boundaries.py",
+          "seconds": 0.05,
+          "completion_utc": "2026-11-07T01:08:10.857Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_live_odds_001_provider_drift.py",
+          "seconds": 0.5,
+          "completion_utc": "2026-11-07T01:08:11.357Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_odds_publication_attestation_boundaries.py",
+          "seconds": 0.052,
+          "completion_utc": "2026-11-07T01:08:11.409Z"
+        },
+        {
+          "module": "tests/unit/markets/test_policy_boundaries.py",
+          "seconds": 0.021,
+          "completion_utc": "2026-11-07T01:08:11.430Z"
+        },
+        {
+          "module": "tests/unit/operation/test_analysis_admission.py",
+          "seconds": 0.081,
+          "completion_utc": "2026-11-07T01:08:11.511Z"
+        },
+        {
+          "module": "tests/unit/operation/test_operator_bootstrap.py",
+          "seconds": 0.331,
+          "completion_utc": "2026-11-07T01:08:11.842Z"
+        },
+        {
+          "module": "tests/unit/operation/test_operator_metadata.py",
+          "seconds": 0.107,
+          "completion_utc": "2026-11-07T01:08:11.949Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_legality.py",
+          "seconds": 0.009,
+          "completion_utc": "2026-11-07T01:08:11.958Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_stage11_d7_policy_generation.py",
+          "seconds": 221.37,
+          "completion_utc": "2026-11-07T01:11:53.328Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_a2_preparation.py",
+          "seconds": 572.988,
+          "completion_utc": "2026-11-07T01:21:26.316Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_deadline_orchestration.py",
+          "seconds": 1023.262,
+          "completion_utc": "2026-11-07T01:38:29.578Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_live_publication.py",
+          "seconds": 0.903,
+          "completion_utc": "2026-11-07T01:38:30.481Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_l1.py",
+          "seconds": 275.536,
+          "completion_utc": "2026-11-07T01:43:06.017Z"
+        },
+        {
+          "module": "tests/unit/rules/test_2026_27_verification_gate.py",
+          "seconds": 0.192,
+          "completion_utc": "2026-11-07T01:43:06.209Z"
+        },
+        {
+          "module": "tests/unit/rules/test_schema_v11_capabilities.py",
+          "seconds": 4.389,
+          "completion_utc": "2026-11-07T01:43:10.598Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128248000475"
+    },
+    {
+      "job_id": 128247999762,
+      "shard": 6,
+      "test_count": 789,
+      "pytest_seconds": 5092.11,
+      "modules": [
+        {
+          "module": "tests/contract/availability/test_min007_packaged_resources.py",
+          "seconds": 0.017,
+          "completion_utc": "2026-11-07T01:03:36.182Z"
+        },
+        {
+          "module": "tests/contract/fpl/test_public_models.py",
+          "seconds": 0.038,
+          "completion_utc": "2026-11-07T01:03:36.220Z"
+        },
+        {
+          "module": "tests/contract/player_lab/test_cli.py",
+          "seconds": 2.489,
+          "completion_utc": "2026-11-07T01:03:38.709Z"
+        },
+        {
+          "module": "tests/contract/prices/test_public_contracts.py",
+          "seconds": 0.275,
+          "completion_utc": "2026-11-07T01:03:38.984Z"
+        },
+        {
+          "module": "tests/golden/rules/test_one_gameweek.py",
+          "seconds": 0.013,
+          "completion_utc": "2026-11-07T01:03:38.997Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073d_constraint_scope.py",
+          "seconds": 0.887,
+          "completion_utc": "2026-11-07T01:03:39.884Z"
+        },
+        {
+          "module": "tests/integration/data_model/test_cross_season_competition_constraints.py",
+          "seconds": 1.009,
+          "completion_utc": "2026-11-07T01:03:40.893Z"
+        },
+        {
+          "module": "tests/integration/markets/test_current_market_identity_readonly.py",
+          "seconds": 96.2,
+          "completion_utc": "2026-11-07T01:05:17.093Z"
+        },
+        {
+          "module": "tests/integration/package/test_installed_wheel.py",
+          "seconds": 622.141,
+          "completion_utc": "2026-11-07T01:15:39.234Z"
+        },
+        {
+          "module": "tests/performance/optimisation/test_preflight.py",
+          "seconds": 0.012,
+          "completion_utc": "2026-11-07T01:15:39.246Z"
+        },
+        {
+          "module": "tests/property/ingestion/test_fpl_properties.py",
+          "seconds": 4.68,
+          "completion_utc": "2026-11-07T01:15:43.926Z"
+        },
+        {
+          "module": "tests/replay/prices/test_adversarial_replay.py",
+          "seconds": 0.777,
+          "completion_utc": "2026-11-07T01:15:44.703Z"
+        },
+        {
+          "module": "tests/security/test_fpl_cli_redaction.py",
+          "seconds": 0.594,
+          "completion_utc": "2026-11-07T01:15:45.297Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_evidence.py",
+          "seconds": 0.072,
+          "completion_utc": "2026-11-07T01:15:45.369Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_min007h_fail_closed.py",
+          "seconds": 1.665,
+          "completion_utc": "2026-11-07T01:15:47.034Z"
+        },
+        {
+          "module": "tests/unit/availability/test_evaluation.py",
+          "seconds": 16.161,
+          "completion_utc": "2026-11-07T01:16:03.195Z"
+        },
+        {
+          "module": "tests/unit/chips/test_inventory.py",
+          "seconds": 0.039,
+          "completion_utc": "2026-11-07T01:16:03.234Z"
+        },
+        {
+          "module": "tests/unit/cli/test_pulse.py",
+          "seconds": 4.098,
+          "completion_utc": "2026-11-07T01:16:07.332Z"
+        },
+        {
+          "module": "tests/unit/credentials/test_service.py",
+          "seconds": 0.145,
+          "completion_utc": "2026-11-07T01:16:07.477Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_current_mode.py",
+          "seconds": 1481.801,
+          "completion_utc": "2026-11-07T01:40:49.278Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_current_observation_clock.py",
+          "seconds": 631.472,
+          "completion_utc": "2026-11-07T01:51:20.750Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_benchmarks.py",
+          "seconds": 0.055,
+          "completion_utc": "2026-11-07T01:51:20.805Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_distribution_multivariate.py",
+          "seconds": 0.025,
+          "completion_utc": "2026-11-07T01:51:20.830Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_folds.py",
+          "seconds": 0.026,
+          "completion_utc": "2026-11-07T01:51:20.856Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_manual_minutes_context.py",
+          "seconds": 4.042,
+          "completion_utc": "2026-11-07T01:51:24.898Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_public_model_boundaries.py",
+          "seconds": 7.703,
+          "completion_utc": "2026-11-07T01:51:32.601Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_current_player_shadow_diagnostics.py",
+          "seconds": 7.506,
+          "completion_utc": "2026-11-07T01:51:40.107Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_player_prior.py",
+          "seconds": 2.378,
+          "completion_utc": "2026-11-07T01:51:42.485Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_config.py",
+          "seconds": 0.017,
+          "completion_utc": "2026-11-07T01:51:42.502Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_config_boundaries.py",
+          "seconds": 0.091,
+          "completion_utc": "2026-11-07T01:51:42.593Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_sealed_boundaries.py",
+          "seconds": 1.753,
+          "completion_utc": "2026-11-07T01:51:44.346Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_client.py",
+          "seconds": 0.144,
+          "completion_utc": "2026-11-07T01:51:44.490Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_horizon_rights_approval.py",
+          "seconds": 0.109,
+          "completion_utc": "2026-11-07T01:51:44.599Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_ingestion_branch_oracles.py",
+          "seconds": 0.09,
+          "completion_utc": "2026-11-07T01:51:44.689Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_live_odds_001_transport.py",
+          "seconds": 0.32,
+          "completion_utc": "2026-11-07T01:51:45.009Z"
+        },
+        {
+          "module": "tests/unit/markets/test_current_markets_boundaries.py",
+          "seconds": 364.78,
+          "completion_utc": "2026-11-07T01:57:49.789Z"
+        },
+        {
+          "module": "tests/unit/operation/test_diagnostic_compute.py",
+          "seconds": 149.184,
+          "completion_utc": "2026-11-07T02:00:18.973Z"
+        },
+        {
+          "module": "tests/unit/operation/test_diagnostic_pipeline.py",
+          "seconds": 453.439,
+          "completion_utc": "2026-11-07T02:07:52.412Z"
+        },
+        {
+          "module": "tests/unit/operation/test_odds_failure_diagnostics_security.py",
+          "seconds": 0.097,
+          "completion_utc": "2026-11-07T02:07:52.509Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing_source_proof.py",
+          "seconds": 0.023,
+          "completion_utc": "2026-11-07T02:07:52.532Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_stage11_r7_layers.py",
+          "seconds": 284.159,
+          "completion_utc": "2026-11-07T02:12:36.691Z"
+        },
+        {
+          "module": "tests/unit/player_evidence/test_participation_features.py",
+          "seconds": 0.638,
+          "completion_utc": "2026-11-07T02:12:37.329Z"
+        },
+        {
+          "module": "tests/unit/prices/test_decisions_evaluation_artifacts.py",
+          "seconds": 0.1,
+          "completion_utc": "2026-11-07T02:12:37.429Z"
+        },
+        {
+          "module": "tests/unit/prices/test_service_cli.py",
+          "seconds": 6.381,
+          "completion_utc": "2026-11-07T02:12:43.810Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_bounded_horizon_oracle.py",
+          "seconds": 271.699,
+          "completion_utc": "2026-11-07T02:17:15.509Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_cli.py",
+          "seconds": 3.049,
+          "completion_utc": "2026-11-07T02:17:18.558Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_live_transient.py",
+          "seconds": 18.048,
+          "completion_utc": "2026-11-07T02:17:36.606Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d1_controls.py",
+          "seconds": 0.295,
+          "completion_utc": "2026-11-07T02:17:36.901Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_l1_e2e.py",
+          "seconds": 640.244,
+          "completion_utc": "2026-11-07T02:28:17.145Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_test_suite.py",
+          "seconds": 1.159,
+          "completion_utc": "2026-11-07T02:28:18.304Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999762"
+    },
+    {
+      "job_id": 128247999748,
+      "shard": 7,
+      "test_count": 831,
+      "pytest_seconds": 1595.77,
+      "modules": [
+        {
+          "module": "tests/contract/chips/test_public_contracts.py",
+          "seconds": 0.046,
+          "completion_utc": "2026-11-07T01:03:38.653Z"
+        },
+        {
+          "module": "tests/contract/rules/test_2026_27_final_evidence.py",
+          "seconds": 1.016,
+          "completion_utc": "2026-11-07T01:03:39.669Z"
+        },
+        {
+          "module": "tests/contract/rules/test_2026_27_full_season_readiness.py",
+          "seconds": 1.332,
+          "completion_utc": "2026-11-07T01:03:41.001Z"
+        },
+        {
+          "module": "tests/golden/availability/test_min007d_minutes.py",
+          "seconds": 0.102,
+          "completion_utc": "2026-11-07T01:03:41.103Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073_db_relational_integrity.py",
+          "seconds": 0.807,
+          "completion_utc": "2026-11-07T01:03:41.910Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007f_asof.py",
+          "seconds": 0.729,
+          "completion_utc": "2026-11-07T01:03:42.639Z"
+        },
+        {
+          "module": "tests/integration/football_events/test_events_cli.py",
+          "seconds": 1.206,
+          "completion_utc": "2026-11-07T01:03:43.845Z"
+        },
+        {
+          "module": "tests/integration/prices/test_current_rules_integration.py",
+          "seconds": 1.191,
+          "completion_utc": "2026-11-07T01:03:45.036Z"
+        },
+        {
+          "module": "tests/property/availability/test_minutes_properties.py",
+          "seconds": 2.548,
+          "completion_utc": "2026-11-07T01:03:47.584Z"
+        },
+        {
+          "module": "tests/property/optimisation/test_oracle_equivalence.py",
+          "seconds": 8.041,
+          "completion_utc": "2026-11-07T01:03:55.625Z"
+        },
+        {
+          "module": "tests/security/test_odds_credentials_quota_retention.py",
+          "seconds": 2.117,
+          "completion_utc": "2026-11-07T01:03:57.742Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_manifests.py",
+          "seconds": 0.019,
+          "completion_utc": "2026-11-07T01:03:57.761Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_nrm006_review_pack.py",
+          "seconds": 3.088,
+          "completion_utc": "2026-11-07T01:04:00.849Z"
+        },
+        {
+          "module": "tests/unit/availability/test_dataset.py",
+          "seconds": 0.434,
+          "completion_utc": "2026-11-07T01:04:01.283Z"
+        },
+        {
+          "module": "tests/unit/availability/test_min007_remaining_math_core_coverage.py",
+          "seconds": 7.552,
+          "completion_utc": "2026-11-07T01:04:08.835Z"
+        },
+        {
+          "module": "tests/unit/availability/test_min007_role_model_coverage.py",
+          "seconds": 0.508,
+          "completion_utc": "2026-11-07T01:04:09.343Z"
+        },
+        {
+          "module": "tests/unit/chips/test_bench_boost.py",
+          "seconds": 0.107,
+          "completion_utc": "2026-11-07T01:04:09.450Z"
+        },
+        {
+          "module": "tests/unit/cli/test_fpl_current_input.py",
+          "seconds": 2.382,
+          "completion_utc": "2026-11-07T01:04:11.832Z"
+        },
+        {
+          "module": "tests/unit/cli/test_rank_cli.py",
+          "seconds": 0.887,
+          "completion_utc": "2026-11-07T01:04:12.719Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_model_validation.py",
+          "seconds": 0.036,
+          "completion_utc": "2026-11-07T01:04:12.755Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_metadata_candidate.py",
+          "seconds": 44.289,
+          "completion_utc": "2026-11-07T01:04:57.044Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_projection_boundaries.py",
+          "seconds": 0.013,
+          "completion_utc": "2026-11-07T01:04:57.057Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_score_grid.py",
+          "seconds": 0.026,
+          "completion_utc": "2026-11-07T01:04:57.083Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_hardening.py",
+          "seconds": 51.289,
+          "completion_utc": "2026-11-07T01:05:48.372Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_accepted_rules_adapter.py",
+          "seconds": 0.585,
+          "completion_utc": "2026-11-07T01:05:48.957Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_shadow_probe_failure_diagnostics.py",
+          "seconds": 2.815,
+          "completion_utc": "2026-11-07T01:05:51.772Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_current_player_history.py",
+          "seconds": 2.708,
+          "completion_utc": "2026-11-07T01:05:54.480Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_odds_team_identity.py",
+          "seconds": 0.772,
+          "completion_utc": "2026-11-07T01:05:55.252Z"
+        },
+        {
+          "module": "tests/unit/markets/test_current_market_identity_repository.py",
+          "seconds": 47.286,
+          "completion_utc": "2026-11-07T01:06:42.538Z"
+        },
+        {
+          "module": "tests/unit/markets/test_normalisation.py",
+          "seconds": 3.622,
+          "completion_utc": "2026-11-07T01:06:46.160Z"
+        },
+        {
+          "module": "tests/unit/operation/test_accel005_frozen_boundaries.py",
+          "seconds": 5.486,
+          "completion_utc": "2026-11-07T01:06:51.646Z"
+        },
+        {
+          "module": "tests/unit/operation/test_analysis_quality.py",
+          "seconds": 173.445,
+          "completion_utc": "2026-11-07T01:09:45.091Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_authority.py",
+          "seconds": 4.332,
+          "completion_utc": "2026-11-07T01:09:49.423Z"
+        },
+        {
+          "module": "tests/unit/operation/test_manager_failure_diagnostics.py",
+          "seconds": 12.106,
+          "completion_utc": "2026-11-07T01:10:01.529Z"
+        },
+        {
+          "module": "tests/unit/operation/test_persistent_cleanup.py",
+          "seconds": 0.024,
+          "completion_utc": "2026-11-07T01:10:01.553Z"
+        },
+        {
+          "module": "tests/unit/operation/test_persistent_desk.py",
+          "seconds": 185.446,
+          "completion_utc": "2026-11-07T01:13:06.999Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing_pipeline_failures.py",
+          "seconds": 5.971,
+          "completion_utc": "2026-11-07T01:13:12.970Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_stage11_exact_acceleration.py",
+          "seconds": 107.875,
+          "completion_utc": "2026-11-07T01:15:00.845Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_player_lab.py",
+          "seconds": 0.858,
+          "completion_utc": "2026-11-07T01:15:01.703Z"
+        },
+        {
+          "module": "tests/unit/prices/test_paths_selling.py",
+          "seconds": 0.1,
+          "completion_utc": "2026-11-07T01:15:01.803Z"
+        },
+        {
+          "module": "tests/unit/prices/test_transfer_flows.py",
+          "seconds": 0.044,
+          "completion_utc": "2026-11-07T01:15:01.847Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_actionability.py",
+          "seconds": 0.286,
+          "completion_utc": "2026-11-07T01:15:02.133Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_contracts.py",
+          "seconds": 0.021,
+          "completion_utc": "2026-11-07T01:15:02.154Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_horizon_candidate_oracle.py",
+          "seconds": 279.357,
+          "completion_utc": "2026-11-07T01:19:41.511Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_l1_cli.py",
+          "seconds": 0.017,
+          "completion_utc": "2026-11-07T01:19:41.528Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_l2.py",
+          "seconds": 0.912,
+          "completion_utc": "2026-11-07T01:19:42.440Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_comparison.py",
+          "seconds": 619.044,
+          "completion_utc": "2026-11-07T01:30:01.484Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_u_closure.py",
+          "seconds": 0.04,
+          "completion_utc": "2026-11-07T01:30:01.524Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_artifacts.py",
+          "seconds": 2.539,
+          "completion_utc": "2026-11-07T01:30:04.063Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999748"
+    },
+    {
+      "job_id": 128247999691,
+      "shard": 8,
+      "test_count": 270,
+      "pytest_seconds": 1212.02,
+      "modules": [
+        {
+          "module": "tests/contract/fpl/test_fixture_oracles.py",
+          "seconds": 0.024,
+          "completion_utc": "2026-11-07T01:03:27.457Z"
+        },
+        {
+          "module": "tests/contract/markets/test_nrm006_public_contracts.py",
+          "seconds": 0.012,
+          "completion_utc": "2026-11-07T01:03:27.469Z"
+        },
+        {
+          "module": "tests/golden/availability/test_min007g_predictions.py",
+          "seconds": 2.613,
+          "completion_utc": "2026-11-07T01:03:30.082Z"
+        },
+        {
+          "module": "tests/golden/optimisation/test_golden.py",
+          "seconds": 111.149,
+          "completion_utc": "2026-11-07T01:05:21.231Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073_registry_atomicity.py",
+          "seconds": 0.958,
+          "completion_utc": "2026-11-07T01:05:22.189Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073b_dataset_freeze.py",
+          "seconds": 0.117,
+          "completion_utc": "2026-11-07T01:05:22.306Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007f_persistence.py",
+          "seconds": 0.444,
+          "completion_utc": "2026-11-07T01:05:22.750Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_bundle_rights_quality_gate.py",
+          "seconds": 1.562,
+          "completion_utc": "2026-11-07T01:05:24.312Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_pair_context_integrity.py",
+          "seconds": 1.521,
+          "completion_utc": "2026-11-07T01:05:25.833Z"
+        },
+        {
+          "module": "tests/integration/rank_strategy/test_hidden_opponent_actions.py",
+          "seconds": 0.023,
+          "completion_utc": "2026-11-07T01:05:25.856Z"
+        },
+        {
+          "module": "tests/property/chips/test_inventory_properties.py",
+          "seconds": 0.009,
+          "completion_utc": "2026-11-07T01:05:25.865Z"
+        },
+        {
+          "module": "tests/property/rank_strategy/test_multiplier_properties.py",
+          "seconds": 0.3,
+          "completion_utc": "2026-11-07T01:05:26.165Z"
+        },
+        {
+          "module": "tests/replay/chips/test_chip_replay.py",
+          "seconds": 0.241,
+          "completion_utc": "2026-11-07T01:05:26.406Z"
+        },
+        {
+          "module": "tests/security/test_live_odds_001_traceback_security.py",
+          "seconds": 0.052,
+          "completion_utc": "2026-11-07T01:05:26.458Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_wheel_entrypoint.py",
+          "seconds": 0.05,
+          "completion_utc": "2026-11-07T01:05:26.508Z"
+        },
+        {
+          "module": "tests/unit/availability/test_manual_override_validation.py",
+          "seconds": 0.836,
+          "completion_utc": "2026-11-07T01:05:27.344Z"
+        },
+        {
+          "module": "tests/unit/availability/test_registry.py",
+          "seconds": 0.005,
+          "completion_utc": "2026-11-07T01:05:27.349Z"
+        },
+        {
+          "module": "tests/unit/chips/test_artifacts.py",
+          "seconds": 0.301,
+          "completion_utc": "2026-11-07T01:05:27.650Z"
+        },
+        {
+          "module": "tests/unit/cli/test_commands.py",
+          "seconds": 1.063,
+          "completion_utc": "2026-11-07T01:05:28.713Z"
+        },
+        {
+          "module": "tests/unit/cli/test_team_strength_cli.py",
+          "seconds": 15.722,
+          "completion_utc": "2026-11-07T01:05:44.435Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_team_strength_replay.py",
+          "seconds": 12.241,
+          "completion_utc": "2026-11-07T01:05:56.676Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_service_and_artifacts.py",
+          "seconds": 0.658,
+          "completion_utc": "2026-11-07T01:05:57.334Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_evaluation_and_artifacts.py",
+          "seconds": 3.849,
+          "completion_utc": "2026-11-07T01:06:01.183Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_provider_config.py",
+          "seconds": 0.011,
+          "completion_utc": "2026-11-07T01:06:01.194Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_one_command_odds_transient.py",
+          "seconds": 0.008,
+          "completion_utc": "2026-11-07T01:06:01.202Z"
+        },
+        {
+          "module": "tests/unit/operation/test_authorization_preview.py",
+          "seconds": 0.054,
+          "completion_utc": "2026-11-07T01:06:01.256Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_controls.py",
+          "seconds": 0.211,
+          "completion_utc": "2026-11-07T01:06:01.467Z"
+        },
+        {
+          "module": "tests/unit/operation/test_integrity_initialization.py",
+          "seconds": 0.012,
+          "completion_utc": "2026-11-07T01:06:01.479Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing_worker_independent.py",
+          "seconds": 0.024,
+          "completion_utc": "2026-11-07T01:06:01.503Z"
+        },
+        {
+          "module": "tests/unit/operation/test_supplier_enrollment.py",
+          "seconds": 0.037,
+          "completion_utc": "2026-11-07T01:06:01.540Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_r2b_semantics.py",
+          "seconds": 111.519,
+          "completion_utc": "2026-11-07T01:07:53.059Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_real_contracts.py",
+          "seconds": 0.053,
+          "completion_utc": "2026-11-07T01:07:53.112Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_horizon_markets.py",
+          "seconds": 15.608,
+          "completion_utc": "2026-11-07T01:08:08.720Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_new_purpose_odds_decision.py",
+          "seconds": 344.641,
+          "completion_utc": "2026-11-07T01:13:53.361Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d3_seam.py",
+          "seconds": 225.768,
+          "completion_utc": "2026-11-07T01:17:39.129Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+          "seconds": 332.743,
+          "completion_utc": "2026-11-07T01:23:11.872Z"
+        },
+        {
+          "module": "tests/unit/rules/test_one_gameweek.py",
+          "seconds": 0.053,
+          "completion_utc": "2026-11-07T01:23:11.925Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_scan_ci_coverage.py",
+          "seconds": 23.483,
+          "completion_utc": "2026-11-07T01:23:35.408Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999691"
+    },
+    {
+      "job_id": 128247999867,
+      "shard": 9,
+      "test_count": 861,
+      "pytest_seconds": 1088.72,
+      "modules": [
+        {
+          "module": "tests/assurance/optimisation/test_assurance.py",
+          "seconds": 0.003,
+          "completion_utc": "2026-11-07T01:03:28.510Z"
+        },
+        {
+          "module": "tests/contract/football_events/test_public_score_contract.py",
+          "seconds": 0.237,
+          "completion_utc": "2026-11-07T01:03:28.747Z"
+        },
+        {
+          "module": "tests/contract/fpl_points/test_upstream_contracts.py",
+          "seconds": 0.618,
+          "completion_utc": "2026-11-07T01:03:29.365Z"
+        },
+        {
+          "module": "tests/contract/optimisation/test_multi_gameweek_integration.py",
+          "seconds": 0.163,
+          "completion_utc": "2026-11-07T01:03:29.528Z"
+        },
+        {
+          "module": "tests/golden/football_events/test_balanced_fixture_golden.py",
+          "seconds": 0.169,
+          "completion_utc": "2026-11-07T01:03:29.697Z"
+        },
+        {
+          "module": "tests/golden/optimisation/test_stage11_golden.py",
+          "seconds": 8.501,
+          "completion_utc": "2026-11-07T01:03:38.198Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073b_prediction_graph_freeze.py",
+          "seconds": 0.201,
+          "completion_utc": "2026-11-07T01:03:38.399Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007g_service.py",
+          "seconds": 16.923,
+          "completion_utc": "2026-11-07T01:03:55.322Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_idempotency_cutoff_bundle.py",
+          "seconds": 4.995,
+          "completion_utc": "2026-11-07T01:04:00.317Z"
+        },
+        {
+          "module": "tests/integration/markets/test_market_normalisation_consensus.py",
+          "seconds": 13.666,
+          "completion_utc": "2026-11-07T01:04:13.983Z"
+        },
+        {
+          "module": "tests/integration/migrations/test_migrations.py",
+          "seconds": 43.788,
+          "completion_utc": "2026-11-07T01:04:57.771Z"
+        },
+        {
+          "module": "tests/integration/operation/test_owned_console.py",
+          "seconds": 95.293,
+          "completion_utc": "2026-11-07T01:06:33.064Z"
+        },
+        {
+          "module": "tests/integration/repository/test_authority_stage_map.py",
+          "seconds": 0.054,
+          "completion_utc": "2026-11-07T01:06:33.118Z"
+        },
+        {
+          "module": "tests/property/config/test_config_properties.py",
+          "seconds": 3.276,
+          "completion_utc": "2026-11-07T01:06:36.394Z"
+        },
+        {
+          "module": "tests/property/fpl_points/test_properties.py",
+          "seconds": 11.738,
+          "completion_utc": "2026-11-07T01:06:48.132Z"
+        },
+        {
+          "module": "tests/property/rank_strategy/test_rank_utility_properties.py",
+          "seconds": 0.747,
+          "completion_utc": "2026-11-07T01:06:48.879Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_secret_scan.py",
+          "seconds": 0.045,
+          "completion_utc": "2026-11-07T01:06:48.924Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0071_remediation.py",
+          "seconds": 0.222,
+          "completion_utc": "2026-11-07T01:06:49.146Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0073b_finalization_provenance.py",
+          "seconds": 0.004,
+          "completion_utc": "2026-11-07T01:06:49.150Z"
+        },
+        {
+          "module": "tests/unit/availability/test_current_model.py",
+          "seconds": 46.632,
+          "completion_utc": "2026-11-07T01:07:35.782Z"
+        },
+        {
+          "module": "tests/unit/chips/test_scheduler.py",
+          "seconds": 0.334,
+          "completion_utc": "2026-11-07T01:07:36.116Z"
+        },
+        {
+          "module": "tests/unit/credentials/test_fresh_fpl.py",
+          "seconds": 0.132,
+          "completion_utc": "2026-11-07T01:07:36.248Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_live_authorization.py",
+          "seconds": 0.295,
+          "completion_utc": "2026-11-07T01:07:36.543Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_calibration.py",
+          "seconds": 0.018,
+          "completion_utc": "2026-11-07T01:07:36.561Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_information_and_vintages.py",
+          "seconds": 0.02,
+          "completion_utc": "2026-11-07T01:07:36.581Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_current_player_shadow.py",
+          "seconds": 7.256,
+          "completion_utc": "2026-11-07T01:07:43.837Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_current_player_shadow_stage9.py",
+          "seconds": 11.023,
+          "completion_utc": "2026-11-07T01:07:54.860Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_shadow_probe_acquisition_trace.py",
+          "seconds": 0.019,
+          "completion_utc": "2026-11-07T01:07:54.879Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_independent_review_remediation.py",
+          "seconds": 1.27,
+          "completion_utc": "2026-11-07T01:07:56.149Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_entry_duplicate_resolution.py",
+          "seconds": 0.036,
+          "completion_utc": "2026-11-07T01:07:56.185Z"
+        },
+        {
+          "module": "tests/unit/markets/test_current_market_contract_invariants.py",
+          "seconds": 16.589,
+          "completion_utc": "2026-11-07T01:08:12.774Z"
+        },
+        {
+          "module": "tests/unit/operation/test_account_evidence.py",
+          "seconds": 0.08,
+          "completion_utc": "2026-11-07T01:08:12.854Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_publication.py",
+          "seconds": 189.1,
+          "completion_utc": "2026-11-07T01:11:21.954Z"
+        },
+        {
+          "module": "tests/unit/operation/test_detailed_readiness.py",
+          "seconds": 0.023,
+          "completion_utc": "2026-11-07T01:11:21.977Z"
+        },
+        {
+          "module": "tests/unit/operation/test_maintenance.py",
+          "seconds": 5.616,
+          "completion_utc": "2026-11-07T01:11:27.593Z"
+        },
+        {
+          "module": "tests/unit/operation/test_runtime_integrity.py",
+          "seconds": 0.467,
+          "completion_utc": "2026-11-07T01:11:28.060Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_stage10_r7_factoring.py",
+          "seconds": 23.872,
+          "completion_utc": "2026-11-07T01:11:51.932Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_transfer_count_frontier.py",
+          "seconds": 3.069,
+          "completion_utc": "2026-11-07T01:11:55.001Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_bounded_horizon_candidates.py",
+          "seconds": 0.281,
+          "completion_utc": "2026-11-07T01:11:55.282Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_input_coherence.py",
+          "seconds": 14.313,
+          "completion_utc": "2026-11-07T01:12:09.595Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_prior_only_candidate.py",
+          "seconds": 0.168,
+          "completion_utc": "2026-11-07T01:12:09.763Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_rolling_contracts.py",
+          "seconds": 12.768,
+          "completion_utc": "2026-11-07T01:12:22.531Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d1_markets.py",
+          "seconds": 7.978,
+          "completion_utc": "2026-11-07T01:12:30.509Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d3_seam.py",
+          "seconds": 218.612,
+          "completion_utc": "2026-11-07T01:16:09.121Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+          "seconds": 320.685,
+          "completion_utc": "2026-11-07T01:21:29.806Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_rank_utility.py",
+          "seconds": 0.098,
+          "completion_utc": "2026-11-07T01:21:29.904Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_service_model_guards.py",
+          "seconds": 0.428,
+          "completion_utc": "2026-11-07T01:21:30.332Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_synthetic_contracts.py",
+          "seconds": 0.031,
+          "completion_utc": "2026-11-07T01:21:30.363Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_gcs008_acceptance.py",
+          "seconds": 0.041,
+          "completion_utc": "2026-11-07T01:21:30.404Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_gcs008_wheel.py",
+          "seconds": 1.088,
+          "completion_utc": "2026-11-07T01:21:31.492Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999867"
+    },
+    {
+      "job_id": 128247999655,
+      "shard": 10,
+      "test_count": 868,
+      "pytest_seconds": 1059.48,
+      "modules": [
+        {
+          "module": "tests/assurance/fpl_points/test_assurance_mutations.py",
+          "seconds": 22.329,
+          "completion_utc": "2026-11-07T01:04:01.487Z"
+        },
+        {
+          "module": "tests/contract/availability/test_min007_public_contracts.py",
+          "seconds": 0.066,
+          "completion_utc": "2026-11-07T01:04:01.553Z"
+        },
+        {
+          "module": "tests/golden/availability/test_min007c_role_model.py",
+          "seconds": 0.19,
+          "completion_utc": "2026-11-07T01:04:01.743Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073_cli_mapping.py",
+          "seconds": 67.1,
+          "completion_utc": "2026-11-07T01:05:08.843Z"
+        },
+        {
+          "module": "tests/integration/availability/test_manual_override_stage8.py",
+          "seconds": 0.638,
+          "completion_utc": "2026-11-07T01:05:09.481Z"
+        },
+        {
+          "module": "tests/integration/evaluation/test_service_vertical_slice.py",
+          "seconds": 0.08,
+          "completion_utc": "2026-11-07T01:05:09.561Z"
+        },
+        {
+          "module": "tests/integration/player_evidence/test_owned_wyscout.py",
+          "seconds": 0.035,
+          "completion_utc": "2026-11-07T01:05:09.596Z"
+        },
+        {
+          "module": "tests/property/availability/test_lineup_properties.py",
+          "seconds": 7.889,
+          "completion_utc": "2026-11-07T01:05:17.485Z"
+        },
+        {
+          "module": "tests/property/markets/test_normalisation_properties.py",
+          "seconds": 12.233,
+          "completion_utc": "2026-11-07T01:05:29.718Z"
+        },
+        {
+          "module": "tests/security/test_fpl_rights_raw_retention.py",
+          "seconds": 1.239,
+          "completion_utc": "2026-11-07T01:05:30.957Z"
+        },
+        {
+          "module": "tests/security/test_odds_429_retry_policy.py",
+          "seconds": 0.059,
+          "completion_utc": "2026-11-07T01:05:31.016Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_coverage_gate.py",
+          "seconds": 0.018,
+          "completion_utc": "2026-11-07T01:05:31.034Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_odd005_complete_evidence.py",
+          "seconds": 0.287,
+          "completion_utc": "2026-11-07T01:05:31.321Z"
+        },
+        {
+          "module": "tests/unit/availability/test_min007_decimal_guard_coverage.py",
+          "seconds": 0.133,
+          "completion_utc": "2026-11-07T01:05:31.454Z"
+        },
+        {
+          "module": "tests/unit/chips/test_captaincy.py",
+          "seconds": 0.116,
+          "completion_utc": "2026-11-07T01:05:31.570Z"
+        },
+        {
+          "module": "tests/unit/chips/test_compiler.py",
+          "seconds": 0.017,
+          "completion_utc": "2026-11-07T01:05:31.587Z"
+        },
+        {
+          "module": "tests/unit/chips/test_wildcard_contracts.py",
+          "seconds": 1.733,
+          "completion_utc": "2026-11-07T01:05:33.320Z"
+        },
+        {
+          "module": "tests/unit/credentials/test_fpl_jwt.py",
+          "seconds": 0.203,
+          "completion_utc": "2026-11-07T01:05:33.523Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_current_credential_ordering.py",
+          "seconds": 3.059,
+          "completion_utc": "2026-11-07T01:05:36.582Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_fallback_a03.py",
+          "seconds": 30.996,
+          "completion_utc": "2026-11-07T01:06:07.578Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_team_strength_mixture_analysis.py",
+          "seconds": 0.017,
+          "completion_utc": "2026-11-07T01:06:07.595Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_market_constraint_adversarial.py",
+          "seconds": 0.049,
+          "completion_utc": "2026-11-07T01:06:07.644Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_market_constraints.py",
+          "seconds": 0.026,
+          "completion_utc": "2026-11-07T01:06:07.670Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_poisson.py",
+          "seconds": 0.013,
+          "completion_utc": "2026-11-07T01:06:07.683Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_poisson_boundaries.py",
+          "seconds": 0.005,
+          "completion_utc": "2026-11-07T01:06:07.688Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_numerics.py",
+          "seconds": 0.767,
+          "completion_utc": "2026-11-07T01:06:08.455Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_parameter_draws.py",
+          "seconds": 25.602,
+          "completion_utc": "2026-11-07T01:06:34.057Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_allocation.py",
+          "seconds": 2.21,
+          "completion_utc": "2026-11-07T01:06:36.267Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_private_operator_profile.py",
+          "seconds": 0.474,
+          "completion_utc": "2026-11-07T01:06:36.741Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_corpus.py",
+          "seconds": 0.141,
+          "completion_utc": "2026-11-07T01:06:36.882Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_current.py",
+          "seconds": 225.101,
+          "completion_utc": "2026-11-07T01:10:21.983Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_current_unified_state_boundaries.py",
+          "seconds": 123.51,
+          "completion_utc": "2026-11-07T01:12:25.493Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_manager_boundaries.py",
+          "seconds": 35.857,
+          "completion_utc": "2026-11-07T01:13:01.350Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_odds_transport_parser_boundaries.py",
+          "seconds": 0.083,
+          "completion_utc": "2026-11-07T01:13:01.433Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_operator_odds_transient.py",
+          "seconds": 0.022,
+          "completion_utc": "2026-11-07T01:13:01.455Z"
+        },
+        {
+          "module": "tests/unit/markets/test_repository_persistence_boundaries.py",
+          "seconds": 0.171,
+          "completion_utc": "2026-11-07T01:13:01.626Z"
+        },
+        {
+          "module": "tests/unit/operation/test_console_and_cli.py",
+          "seconds": 0.257,
+          "completion_utc": "2026-11-07T01:13:01.883Z"
+        },
+        {
+          "module": "tests/unit/operation/test_paid_quota_freshness.py",
+          "seconds": 0.057,
+          "completion_utc": "2026-11-07T01:13:01.940Z"
+        },
+        {
+          "module": "tests/unit/prices/test_observations_cycles.py",
+          "seconds": 0.048,
+          "completion_utc": "2026-11-07T01:13:01.988Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_a1_shadow_adapter.py",
+          "seconds": 5.777,
+          "completion_utc": "2026-11-07T01:13:07.765Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d3_seam.py",
+          "seconds": 0.003,
+          "completion_utc": "2026-11-07T01:13:07.768Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d7_evidence.py",
+          "seconds": 0.006,
+          "completion_utc": "2026-11-07T01:13:07.774Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+          "seconds": 454.801,
+          "completion_utc": "2026-11-07T01:20:42.575Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_transfer_frontier.py",
+          "seconds": 25.464,
+          "completion_utc": "2026-11-07T01:21:08.039Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_mini_league.py",
+          "seconds": 0.074,
+          "completion_utc": "2026-11-07T01:21:08.113Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_synthetic_model_guards.py",
+          "seconds": 0.069,
+          "completion_utc": "2026-11-07T01:21:08.182Z"
+        },
+        {
+          "module": "tests/unit/rules/test_scoring_edges.py",
+          "seconds": 1.276,
+          "completion_utc": "2026-11-07T01:21:09.458Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_accel003_parity_archive.py",
+          "seconds": 0.056,
+          "completion_utc": "2026-11-07T01:21:09.514Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_accel003_quota_parity.py",
+          "seconds": 0.443,
+          "completion_utc": "2026-11-07T01:21:09.957Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_gcs008_coverage_gate.py",
+          "seconds": 1.555,
+          "completion_utc": "2026-11-07T01:21:11.512Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999655"
+    },
+    {
+      "job_id": 128247999805,
+      "shard": 11,
+      "test_count": 860,
+      "pytest_seconds": 2371.99,
+      "modules": [
+        {
+          "module": "tests/assurance/optimisation/test_r2c_cli_contract.py",
+          "seconds": 0.298,
+          "completion_utc": "2026-11-07T01:03:38.756Z"
+        },
+        {
+          "module": "tests/contract/optimisation/test_stage11_integration.py",
+          "seconds": 2.139,
+          "completion_utc": "2026-11-07T01:03:40.895Z"
+        },
+        {
+          "module": "tests/contract/player_lab/test_recovery_cli.py",
+          "seconds": 0.031,
+          "completion_utc": "2026-11-07T01:03:40.926Z"
+        },
+        {
+          "module": "tests/golden/fpl_points/test_reference_goldens.py",
+          "seconds": 0.062,
+          "completion_utc": "2026-11-07T01:03:40.988Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073c_exact_lookup_visibility.py",
+          "seconds": 0.34,
+          "completion_utc": "2026-11-07T01:03:41.328Z"
+        },
+        {
+          "module": "tests/integration/chips/test_stage14_vertical_slice.py",
+          "seconds": 0.783,
+          "completion_utc": "2026-11-07T01:03:42.111Z"
+        },
+        {
+          "module": "tests/integration/operation/test_campaign_journal.py",
+          "seconds": 4.584,
+          "completion_utc": "2026-11-07T01:03:46.695Z"
+        },
+        {
+          "module": "tests/integration/operation/test_prior_usage.py",
+          "seconds": 2.81,
+          "completion_utc": "2026-11-07T01:03:49.505Z"
+        },
+        {
+          "module": "tests/integration/operation/test_shared_control_transaction.py",
+          "seconds": 1.277,
+          "completion_utc": "2026-11-07T01:03:50.782Z"
+        },
+        {
+          "module": "tests/integration/repository/test_manifests.py",
+          "seconds": 2.92,
+          "completion_utc": "2026-11-07T01:03:53.702Z"
+        },
+        {
+          "module": "tests/property/evaluation/test_properties.py",
+          "seconds": 0.024,
+          "completion_utc": "2026-11-07T01:03:53.726Z"
+        },
+        {
+          "module": "tests/property/rank_strategy/test_synthetic_properties.py",
+          "seconds": 0.588,
+          "completion_utc": "2026-11-07T01:03:54.314Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_nrm006_coverage_gate.py",
+          "seconds": 0.043,
+          "completion_utc": "2026-11-07T01:03:54.357Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_odd005_review_pack.py",
+          "seconds": 0.81,
+          "completion_utc": "2026-11-07T01:03:55.167Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0073c_final_output_lookup.py",
+          "seconds": 0.007,
+          "completion_utc": "2026-11-07T01:03:55.174Z"
+        },
+        {
+          "module": "tests/unit/availability/test_role_model.py",
+          "seconds": 0.531,
+          "completion_utc": "2026-11-07T01:03:55.705Z"
+        },
+        {
+          "module": "tests/unit/chips/test_service_model_guards.py",
+          "seconds": 0.838,
+          "completion_utc": "2026-11-07T01:03:56.543Z"
+        },
+        {
+          "module": "tests/unit/config/test_loader.py",
+          "seconds": 0.107,
+          "completion_utc": "2026-11-07T01:03:56.650Z"
+        },
+        {
+          "module": "tests/unit/credentials/test_boundaries.py",
+          "seconds": 1.685,
+          "completion_utc": "2026-11-07T01:03:58.335Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_postgres_control_contract.py",
+          "seconds": 0.058,
+          "completion_utc": "2026-11-07T01:03:58.393Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_worker_pipe_privacy.py",
+          "seconds": 27.415,
+          "completion_utc": "2026-11-07T01:04:25.808Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_configuration.py",
+          "seconds": 0.047,
+          "completion_utc": "2026-11-07T01:04:25.855Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_fallback_a02.py",
+          "seconds": 98.527,
+          "completion_utc": "2026-11-07T01:06:04.382Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_fallback_d2.py",
+          "seconds": 14.234,
+          "completion_utc": "2026-11-07T01:06:18.616Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_coherence_adversarial.py",
+          "seconds": 0.126,
+          "completion_utc": "2026-11-07T01:06:18.742Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_adapter.py",
+          "seconds": 49.427,
+          "completion_utc": "2026-11-07T01:07:08.169Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_player_event_port_invariants.py",
+          "seconds": 0.852,
+          "completion_utc": "2026-11-07T01:07:09.021Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_data.py",
+          "seconds": 10.513,
+          "completion_utc": "2026-11-07T01:07:19.534Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_governance_boundaries.py",
+          "seconds": 0.316,
+          "completion_utc": "2026-11-07T01:07:19.850Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_gw10_reviewed_source_freeze.py",
+          "seconds": 3.558,
+          "completion_utc": "2026-11-07T01:07:23.408Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_odds_persistence_boundaries.py",
+          "seconds": 0.048,
+          "completion_utc": "2026-11-07T01:07:23.456Z"
+        },
+        {
+          "module": "tests/unit/markets/test_current_market_weight_canonicalisation.py",
+          "seconds": 26.447,
+          "completion_utc": "2026-11-07T01:07:49.903Z"
+        },
+        {
+          "module": "tests/unit/operation/test_analysis_quality_views.py",
+          "seconds": 170.148,
+          "completion_utc": "2026-11-07T01:10:40.051Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_supervisor.py",
+          "seconds": 0.024,
+          "completion_utc": "2026-11-07T01:10:40.075Z"
+        },
+        {
+          "module": "tests/unit/operation/test_chip_schema_compat.py",
+          "seconds": 6.15,
+          "completion_utc": "2026-11-07T01:10:46.225Z"
+        },
+        {
+          "module": "tests/unit/operation/test_diagnostic_full_owned.py",
+          "seconds": 812.306,
+          "completion_utc": "2026-11-07T01:24:18.531Z"
+        },
+        {
+          "module": "tests/unit/operation/test_prior_usage.py",
+          "seconds": 15.796,
+          "completion_utc": "2026-11-07T01:24:34.327Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_three_gameweek_horizon.py",
+          "seconds": 0.742,
+          "completion_utc": "2026-11-07T01:24:35.069Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_rolling_service.py",
+          "seconds": 86.65,
+          "completion_utc": "2026-11-07T01:26:01.719Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_service.py",
+          "seconds": 62.326,
+          "completion_utc": "2026-11-07T01:27:04.045Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_comparison_contracts.py",
+          "seconds": 0.057,
+          "completion_utc": "2026-11-07T01:27:04.102Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d3_seam.py",
+          "seconds": 379.77,
+          "completion_utc": "2026-11-07T01:33:23.872Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+          "seconds": 573.894,
+          "completion_utc": "2026-11-07T01:42:57.766Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_opponent_actions.py",
+          "seconds": 0.053,
+          "completion_utc": "2026-11-07T01:42:57.819Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_synthetic_field.py",
+          "seconds": 0.092,
+          "completion_utc": "2026-11-07T01:42:57.911Z"
+        },
+        {
+          "module": "tests/unit/rules/test_bonus_and_lifecycle.py",
+          "seconds": 0.755,
+          "completion_utc": "2026-11-07T01:42:58.666Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_accel003_wheel_probe.py",
+          "seconds": 0.138,
+          "completion_utc": "2026-11-07T01:42:58.804Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_ci_coverage_shards.py",
+          "seconds": 0.525,
+          "completion_utc": "2026-11-07T01:42:59.329Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_gcs008_scope.py",
+          "seconds": 0.074,
+          "completion_utc": "2026-11-07T01:42:59.403Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_opr004_repository_validation.py",
+          "seconds": 0.042,
+          "completion_utc": "2026-11-07T01:42:59.445Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_opt010_repository_validation.py",
+          "seconds": 2.008,
+          "completion_utc": "2026-11-07T01:43:01.453Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999805"
+    },
+    {
+      "job_id": 128247999706,
+      "shard": 12,
+      "test_count": 880,
+      "pytest_seconds": 1035.93,
+      "modules": [
+        {
+          "module": "tests/assurance/optimisation/test_r2f_coverage_regressions.py",
+          "seconds": 0.069,
+          "completion_utc": "2026-11-07T01:03:36.842Z"
+        },
+        {
+          "module": "tests/contract/availability/test_audit0073_portability.py",
+          "seconds": 0.007,
+          "completion_utc": "2026-11-07T01:03:36.849Z"
+        },
+        {
+          "module": "tests/contract/prices/test_cli_contract.py",
+          "seconds": 0.662,
+          "completion_utc": "2026-11-07T01:03:37.511Z"
+        },
+        {
+          "module": "tests/golden/optimisation/test_three_gameweek_ft_carry.py",
+          "seconds": 64.275,
+          "completion_utc": "2026-11-07T01:04:41.786Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073c_final_output_truthfulness.py",
+          "seconds": 0.72,
+          "completion_utc": "2026-11-07T01:04:42.506Z"
+        },
+        {
+          "module": "tests/integration/data_model/test_concurrency.py",
+          "seconds": 1.091,
+          "completion_utc": "2026-11-07T01:04:43.597Z"
+        },
+        {
+          "module": "tests/integration/data_model/test_data_model_postgres.py",
+          "seconds": 4.184,
+          "completion_utc": "2026-11-07T01:04:47.781Z"
+        },
+        {
+          "module": "tests/integration/markets/test_normalisation_asof_cache_concurrency.py",
+          "seconds": 14.788,
+          "completion_utc": "2026-11-07T01:05:02.569Z"
+        },
+        {
+          "module": "tests/integration/package/test_import_side_effects.py",
+          "seconds": 2.761,
+          "completion_utc": "2026-11-07T01:05:05.330Z"
+        },
+        {
+          "module": "tests/integration/rules/test_rules_cli.py",
+          "seconds": 2.125,
+          "completion_utc": "2026-11-07T01:05:07.455Z"
+        },
+        {
+          "module": "tests/property/football_events/test_score_distribution_properties.py",
+          "seconds": 3.073,
+          "completion_utc": "2026-11-07T01:05:10.528Z"
+        },
+        {
+          "module": "tests/property/rules/test_rules_properties.py",
+          "seconds": 2.572,
+          "completion_utc": "2026-11-07T01:05:13.100Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_acceptance_runner.py",
+          "seconds": 0.131,
+          "completion_utc": "2026-11-07T01:05:13.231Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_specifications.py",
+          "seconds": 0.912,
+          "completion_utc": "2026-11-07T01:05:14.143Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0072_lineup_remediation.py",
+          "seconds": 12.941,
+          "completion_utc": "2026-11-07T01:05:27.084Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0073d_constraint_scope.py",
+          "seconds": 0.002,
+          "completion_utc": "2026-11-07T01:05:27.086Z"
+        },
+        {
+          "module": "tests/unit/cli/test_chips_cli.py",
+          "seconds": 0.983,
+          "completion_utc": "2026-11-07T01:05:28.069Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_attempt_preflight.py",
+          "seconds": 0.235,
+          "completion_utc": "2026-11-07T01:05:28.304Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_current_diagnostics.py",
+          "seconds": 3.863,
+          "completion_utc": "2026-11-07T01:05:32.167Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_market_quota_receipt.py",
+          "seconds": 0.096,
+          "completion_utc": "2026-11-07T01:05:32.263Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_player_lookup_thread.py",
+          "seconds": 0.247,
+          "completion_utc": "2026-11-07T01:05:32.510Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_session_bootstrap.py",
+          "seconds": 0.423,
+          "completion_utc": "2026-11-07T01:05:32.933Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_worker_diagnostic_protocol.py",
+          "seconds": 1.898,
+          "completion_utc": "2026-11-07T01:05:34.831Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_fallback_d1.py",
+          "seconds": 17.559,
+          "completion_utc": "2026-11-07T01:05:52.390Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_evaluation.py",
+          "seconds": 0.451,
+          "completion_utc": "2026-11-07T01:05:52.841Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_mixture.py",
+          "seconds": 24.766,
+          "completion_utc": "2026-11-07T01:06:17.607Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_current_player_posterior_contract.py",
+          "seconds": 6.18,
+          "completion_utc": "2026-11-07T01:06:23.787Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_seed.py",
+          "seconds": 0.006,
+          "completion_utc": "2026-11-07T01:06:23.793Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_client.py",
+          "seconds": 0.109,
+          "completion_utc": "2026-11-07T01:06:23.902Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_governance.py",
+          "seconds": 0.177,
+          "completion_utc": "2026-11-07T01:06:24.079Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_manager_validation.py",
+          "seconds": 42.497,
+          "completion_utc": "2026-11-07T01:07:06.576Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_live_odds_001_credentials.py",
+          "seconds": 0.046,
+          "completion_utc": "2026-11-07T01:07:06.622Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_odds_foundation.py",
+          "seconds": 0.232,
+          "completion_utc": "2026-11-07T01:07:06.854Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_rights_and_fixtures.py",
+          "seconds": 0.132,
+          "completion_utc": "2026-11-07T01:07:06.986Z"
+        },
+        {
+          "module": "tests/unit/operation/test_desk_instance.py",
+          "seconds": 0.089,
+          "completion_utc": "2026-11-07T01:07:07.075Z"
+        },
+        {
+          "module": "tests/unit/operation/test_diagnostic_compute_privacy.py",
+          "seconds": 13.915,
+          "completion_utc": "2026-11-07T01:07:20.990Z"
+        },
+        {
+          "module": "tests/unit/operation/test_diagnostic_market.py",
+          "seconds": 0.269,
+          "completion_utc": "2026-11-07T01:07:21.259Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing_source_binding_independent.py",
+          "seconds": 12.328,
+          "completion_utc": "2026-11-07T01:07:33.587Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_multi_gameweek_contract_hardening.py",
+          "seconds": 10.4,
+          "completion_utc": "2026-11-07T01:07:43.987Z"
+        },
+        {
+          "module": "tests/unit/player_evidence/test_wyscout_adapter.py",
+          "seconds": 0.213,
+          "completion_utc": "2026-11-07T01:07:44.200Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_stage9_snapshot.py",
+          "seconds": 0.078,
+          "completion_utc": "2026-11-07T01:07:44.278Z"
+        },
+        {
+          "module": "tests/unit/prices/test_configuration_contracts.py",
+          "seconds": 0.096,
+          "completion_utc": "2026-11-07T01:07:44.374Z"
+        },
+        {
+          "module": "tests/unit/prices/test_independent_review_remediation.py",
+          "seconds": 1.228,
+          "completion_utc": "2026-11-07T01:07:45.602Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_stage7_progress.py",
+          "seconds": 0.015,
+          "completion_utc": "2026-11-07T01:07:45.617Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d3_seam.py",
+          "seconds": 314.472,
+          "completion_utc": "2026-11-07T01:13:00.089Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_cases.py",
+          "seconds": 460.711,
+          "completion_utc": "2026-11-07T01:20:40.800Z"
+        },
+        {
+          "module": "tests/unit/rules/test_2026_27_save_contract.py",
+          "seconds": 1.239,
+          "completion_utc": "2026-11-07T01:20:42.039Z"
+        },
+        {
+          "module": "tests/unit/rules/test_fail_closed_branches.py",
+          "seconds": 0.627,
+          "completion_utc": "2026-11-07T01:20:42.666Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_ci_coverage_transport.py",
+          "seconds": 0.083,
+          "completion_utc": "2026-11-07T01:20:42.749Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_team_strength_l7_d7_evidence.py",
+          "seconds": 0.007,
+          "completion_utc": "2026-11-07T01:20:42.756Z"
+        },
+        {
+          "module": "tests/unit/system/test_doctor.py",
+          "seconds": 1.593,
+          "completion_utc": "2026-11-07T01:20:44.349Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999706"
+    },
+    {
+      "job_id": 128247999829,
+      "shard": 13,
+      "test_count": 874,
+      "pytest_seconds": 1552.42,
+      "modules": [
+        {
+          "module": "tests/contract/evaluation/test_cli_contract.py",
+          "seconds": 3.255,
+          "completion_utc": "2026-11-07T01:03:37.859Z"
+        },
+        {
+          "module": "tests/golden/availability/test_min007b_dataset.py",
+          "seconds": 0.036,
+          "completion_utc": "2026-11-07T01:03:37.895Z"
+        },
+        {
+          "module": "tests/golden/rules/test_scoring_oracles.py",
+          "seconds": 0.518,
+          "completion_utc": "2026-11-07T01:03:38.413Z"
+        },
+        {
+          "module": "tests/integration/availability/test_manual_override_cli.py",
+          "seconds": 3.738,
+          "completion_utc": "2026-11-07T01:03:42.151Z"
+        },
+        {
+          "module": "tests/integration/data_model/test_rules_registry.py",
+          "seconds": 0.866,
+          "completion_utc": "2026-11-07T01:03:43.017Z"
+        },
+        {
+          "module": "tests/integration/fpl_points/test_fixture_pipeline.py",
+          "seconds": 14.639,
+          "completion_utc": "2026-11-07T01:03:57.656Z"
+        },
+        {
+          "module": "tests/integration/package/test_min007_installed_wheel.py",
+          "seconds": 13.567,
+          "completion_utc": "2026-11-07T01:04:11.223Z"
+        },
+        {
+          "module": "tests/integration/player_evidence/test_owned_pipeline.py",
+          "seconds": 0.07,
+          "completion_utc": "2026-11-07T01:04:11.293Z"
+        },
+        {
+          "module": "tests/integration/player_lab/test_real_custody.py",
+          "seconds": 8.132,
+          "completion_utc": "2026-11-07T01:04:19.425Z"
+        },
+        {
+          "module": "tests/integration/player_lab/test_research_store.py",
+          "seconds": 13.441,
+          "completion_utc": "2026-11-07T01:04:32.866Z"
+        },
+        {
+          "module": "tests/property/availability/test_dataset_properties.py",
+          "seconds": 1.026,
+          "completion_utc": "2026-11-07T01:04:33.892Z"
+        },
+        {
+          "module": "tests/property/ingestion/test_odds_properties.py",
+          "seconds": 1.284,
+          "completion_utc": "2026-11-07T01:04:35.176Z"
+        },
+        {
+          "module": "tests/replay/evaluation/test_policy_replay.py",
+          "seconds": 0.286,
+          "completion_utc": "2026-11-07T01:04:35.462Z"
+        },
+        {
+          "module": "tests/security/test_fpl_tls_retry.py",
+          "seconds": 0.012,
+          "completion_utc": "2026-11-07T01:04:35.474Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_nrm006_acceptance_verifier.py",
+          "seconds": 0.842,
+          "completion_utc": "2026-11-07T01:04:36.316Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0072_exact_decimal_remediation.py",
+          "seconds": 1.903,
+          "completion_utc": "2026-11-07T01:04:38.219Z"
+        },
+        {
+          "module": "tests/unit/availability/test_lineup.py",
+          "seconds": 2.82,
+          "completion_utc": "2026-11-07T01:04:41.039Z"
+        },
+        {
+          "module": "tests/unit/chips/test_contract_validation.py",
+          "seconds": 0.113,
+          "completion_utc": "2026-11-07T01:04:41.152Z"
+        },
+        {
+          "module": "tests/unit/chips/test_wildcard.py",
+          "seconds": 0.594,
+          "completion_utc": "2026-11-07T01:04:41.746Z"
+        },
+        {
+          "module": "tests/unit/config/test_redaction.py",
+          "seconds": 0.026,
+          "completion_utc": "2026-11-07T01:04:41.772Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_regret_reports_artifacts.py",
+          "seconds": 0.048,
+          "completion_utc": "2026-11-07T01:04:41.820Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_minutes_context.py",
+          "seconds": 0.522,
+          "completion_utc": "2026-11-07T01:04:42.342Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_summaries_and_mc.py",
+          "seconds": 2.972,
+          "completion_utc": "2026-11-07T01:04:45.314Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_service.py",
+          "seconds": 0.175,
+          "completion_utc": "2026-11-07T01:04:45.489Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_current_penalty_hierarchy.py",
+          "seconds": 0.323,
+          "completion_utc": "2026-11-07T01:04:45.812Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_input.py",
+          "seconds": 0.526,
+          "completion_utc": "2026-11-07T01:04:46.338Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_manager_provider.py",
+          "seconds": 21.183,
+          "completion_utc": "2026-11-07T01:05:07.521Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_parser.py",
+          "seconds": 0.407,
+          "completion_utc": "2026-11-07T01:05:07.928Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_horizon_probe.py",
+          "seconds": 4.198,
+          "completion_utc": "2026-11-07T01:05:12.126Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_live_odds_001_current_boundaries.py",
+          "seconds": 0.358,
+          "completion_utc": "2026-11-07T01:05:12.484Z"
+        },
+        {
+          "module": "tests/unit/operation/test_analysis_optimizer.py",
+          "seconds": 142.023,
+          "completion_utc": "2026-11-07T01:07:34.507Z"
+        },
+        {
+          "module": "tests/unit/operation/test_analysis_store.py",
+          "seconds": 160.078,
+          "completion_utc": "2026-11-07T01:10:14.585Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign.py",
+          "seconds": 0.18,
+          "completion_utc": "2026-11-07T01:10:14.765Z"
+        },
+        {
+          "module": "tests/unit/operation/test_integrity_diagnostics.py",
+          "seconds": 0.064,
+          "completion_utc": "2026-11-07T01:10:14.829Z"
+        },
+        {
+          "module": "tests/unit/operation/test_paid_header_hook.py",
+          "seconds": 0.02,
+          "completion_utc": "2026-11-07T01:10:14.849Z"
+        },
+        {
+          "module": "tests/unit/operation/test_quota.py",
+          "seconds": 0.288,
+          "completion_utc": "2026-11-07T01:10:15.137Z"
+        },
+        {
+          "module": "tests/unit/operation/test_standing.py",
+          "seconds": 0.294,
+          "completion_utc": "2026-11-07T01:10:15.431Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_future_transfer_scope.py",
+          "seconds": 149.258,
+          "completion_utc": "2026-11-07T01:12:44.689Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_actuals_compatibility.py",
+          "seconds": 0.056,
+          "completion_utc": "2026-11-07T01:12:44.745Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_recovery.py",
+          "seconds": 0.146,
+          "completion_utc": "2026-11-07T01:12:44.891Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_a1_03_history_binding.py",
+          "seconds": 3.186,
+          "completion_utc": "2026-11-07T01:12:48.077Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_a2_live_shadow_observation.py",
+          "seconds": 82.396,
+          "completion_utc": "2026-11-07T01:14:10.473Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_one_command.py",
+          "seconds": 501.846,
+          "completion_utc": "2026-11-07T01:22:32.319Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_score_prior_prefetch.py",
+          "seconds": 274.862,
+          "completion_utc": "2026-11-07T01:27:07.181Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d7_diagnostics.py",
+          "seconds": 0.004,
+          "completion_utc": "2026-11-07T01:27:07.185Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_screen_metrics.py",
+          "seconds": 0.054,
+          "completion_utc": "2026-11-07T01:27:07.239Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_shadow_inputs.py",
+          "seconds": 129.944,
+          "completion_utc": "2026-11-07T01:29:17.183Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_opponent_contracts.py",
+          "seconds": 0.063,
+          "completion_utc": "2026-11-07T01:29:17.246Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_utility_model_guards.py",
+          "seconds": 0.072,
+          "completion_utc": "2026-11-07T01:29:17.318Z"
+        },
+        {
+          "module": "tests/unit/rules/test_contract_branch_oracles.py",
+          "seconds": 0.437,
+          "completion_utc": "2026-11-07T01:29:17.755Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_wheel_platform_roots.py",
+          "seconds": 1.09,
+          "completion_utc": "2026-11-07T01:29:18.845Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999829"
+    },
+    {
+      "job_id": 128247999740,
+      "shard": 14,
+      "test_count": 424,
+      "pytest_seconds": 2119.72,
+      "modules": [
+        {
+          "module": "tests/contract/optimisation/test_contract.py",
+          "seconds": 0.008,
+          "completion_utc": "2026-11-07T01:03:32.615Z"
+        },
+        {
+          "module": "tests/contract/optimisation/test_r2a_contract_gates.py",
+          "seconds": 164.45,
+          "completion_utc": "2026-11-07T01:06:17.065Z"
+        },
+        {
+          "module": "tests/golden/evaluation/test_golden_scorecards.py",
+          "seconds": 0.011,
+          "completion_utc": "2026-11-07T01:06:17.076Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073b_final_output_freeze.py",
+          "seconds": 0.562,
+          "completion_utc": "2026-11-07T01:06:17.638Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007g_persistence.py",
+          "seconds": 0.002,
+          "completion_utc": "2026-11-07T01:06:17.640Z"
+        },
+        {
+          "module": "tests/integration/ingestion/odds/test_the_odds_api_recorded_ingestion.py",
+          "seconds": 6.478,
+          "completion_utc": "2026-11-07T01:06:24.118Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_temporal_identity.py",
+          "seconds": 9.574,
+          "completion_utc": "2026-11-07T01:06:33.692Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_repository_negative_controls.py",
+          "seconds": 2.351,
+          "completion_utc": "2026-11-07T01:06:36.043Z"
+        },
+        {
+          "module": "tests/integration/operation/test_standing_journal.py",
+          "seconds": 3.759,
+          "completion_utc": "2026-11-07T01:06:39.802Z"
+        },
+        {
+          "module": "tests/integration/rank_strategy/test_synthetic_overall_field.py",
+          "seconds": 0.046,
+          "completion_utc": "2026-11-07T01:06:39.848Z"
+        },
+        {
+          "module": "tests/property/chips/test_service_properties.py",
+          "seconds": 2.946,
+          "completion_utc": "2026-11-07T01:06:42.794Z"
+        },
+        {
+          "module": "tests/property/rank_strategy/test_rank_properties.py",
+          "seconds": 0.258,
+          "completion_utc": "2026-11-07T01:06:43.052Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_review_pack.py",
+          "seconds": 0.3,
+          "completion_utc": "2026-11-07T01:06:43.352Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0072_minutes_remediation.py",
+          "seconds": 0.454,
+          "completion_utc": "2026-11-07T01:06:43.806Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0073_cli_semantics.py",
+          "seconds": 26.583,
+          "completion_utc": "2026-11-07T01:07:10.389Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0073_registry_remediation.py",
+          "seconds": 0.008,
+          "completion_utc": "2026-11-07T01:07:10.397Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_dashboard.py",
+          "seconds": 131.244,
+          "completion_utc": "2026-11-07T01:09:21.641Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_post_gw10_recovery.py",
+          "seconds": 645.008,
+          "completion_utc": "2026-11-07T01:20:06.649Z"
+        },
+        {
+          "module": "tests/unit/database/test_migration_statement_execution.py",
+          "seconds": 0.011,
+          "completion_utc": "2026-11-07T01:20:06.660Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_leakage.py",
+          "seconds": 0.029,
+          "completion_utc": "2026-11-07T01:20:06.689Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_synthetic_readiness.py",
+          "seconds": 400.804,
+          "completion_utc": "2026-11-07T01:26:47.493Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_current_player_shadow_operations.py",
+          "seconds": 1.347,
+          "completion_utc": "2026-11-07T01:26:48.840Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_rules_and_scoring.py",
+          "seconds": 0.261,
+          "completion_utc": "2026-11-07T01:26:49.101Z"
+        },
+        {
+          "module": "tests/unit/ingestion/openfootball/test_team_strength_acquisition.py",
+          "seconds": 0.521,
+          "completion_utc": "2026-11-07T01:26:49.622Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_current_manager_chips.py",
+          "seconds": 14.959,
+          "completion_utc": "2026-11-07T01:27:04.581Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_direct_transport.py",
+          "seconds": 0.058,
+          "completion_utc": "2026-11-07T01:27:04.639Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_odds_model_config_boundaries.py",
+          "seconds": 0.061,
+          "completion_utc": "2026-11-07T01:27:04.700Z"
+        },
+        {
+          "module": "tests/unit/markets/test_private_operator_odds_source.py",
+          "seconds": 18.097,
+          "completion_utc": "2026-11-07T01:27:22.797Z"
+        },
+        {
+          "module": "tests/unit/operation/test_analysis_portability.py",
+          "seconds": 0.116,
+          "completion_utc": "2026-11-07T01:27:22.913Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_source_authority.py",
+          "seconds": 0.313,
+          "completion_utc": "2026-11-07T01:27:23.226Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_worker_privacy.py",
+          "seconds": 13.622,
+          "completion_utc": "2026-11-07T01:27:36.848Z"
+        },
+        {
+          "module": "tests/unit/operation/test_enrolled_wheel.py",
+          "seconds": 0.446,
+          "completion_utc": "2026-11-07T01:27:37.294Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_multi_gameweek_tree.py",
+          "seconds": 1.178,
+          "completion_utc": "2026-11-07T01:27:38.472Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_service.py",
+          "seconds": 328.574,
+          "completion_utc": "2026-11-07T01:33:07.046Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_stage10_batch.py",
+          "seconds": 34.386,
+          "completion_utc": "2026-11-07T01:33:41.432Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_terminal_r7_equivalence.py",
+          "seconds": 299.102,
+          "completion_utc": "2026-11-07T01:38:40.534Z"
+        },
+        {
+          "module": "tests/unit/player_lab/test_locator.py",
+          "seconds": 0.039,
+          "completion_utc": "2026-11-07T01:38:40.573Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_horizon_candidate_screen.py",
+          "seconds": 0.038,
+          "completion_utc": "2026-11-07T01:38:40.611Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_reviewed_score_prior_routing.py",
+          "seconds": 2.44,
+          "completion_utc": "2026-11-07T01:38:43.051Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d2_wrapper.py",
+          "seconds": 0.041,
+          "completion_utc": "2026-11-07T01:38:43.092Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_rank_utility_contracts.py",
+          "seconds": 0.033,
+          "completion_utc": "2026-11-07T01:38:43.125Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_service.py",
+          "seconds": 0.677,
+          "completion_utc": "2026-11-07T01:38:43.802Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_accel005_migration_plan.py",
+          "seconds": 1.797,
+          "completion_utc": "2026-11-07T01:38:45.599Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999740"
+    },
+    {
+      "job_id": 128247999717,
+      "shard": 15,
+      "test_count": 530,
+      "pytest_seconds": 1450.1,
+      "modules": [
+        {
+          "module": "tests/contract/fpl_points/test_packaged_resources.py",
+          "seconds": 0.007,
+          "completion_utc": "2026-11-07T01:03:37.754Z"
+        },
+        {
+          "module": "tests/contract/odds/test_public_odds_contracts.py",
+          "seconds": 0.8,
+          "completion_utc": "2026-11-07T01:03:38.554Z"
+        },
+        {
+          "module": "tests/golden/chips/test_stage14_golden.py",
+          "seconds": 0.121,
+          "completion_utc": "2026-11-07T01:03:38.675Z"
+        },
+        {
+          "module": "tests/integration/availability/test_audit0073b_evaluation_provenance.py",
+          "seconds": 0.105,
+          "completion_utc": "2026-11-07T01:03:38.780Z"
+        },
+        {
+          "module": "tests/integration/availability/test_min007g_cli.py",
+          "seconds": 9.972,
+          "completion_utc": "2026-11-07T01:03:48.752Z"
+        },
+        {
+          "module": "tests/integration/football_events/test_events_cli_adversarial.py",
+          "seconds": 0.972,
+          "completion_utc": "2026-11-07T01:03:49.724Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_concurrency.py",
+          "seconds": 12.687,
+          "completion_utc": "2026-11-07T01:04:02.411Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_fpl_replay_time_policy.py",
+          "seconds": 7.594,
+          "completion_utc": "2026-11-07T01:04:10.005Z"
+        },
+        {
+          "module": "tests/integration/ingestion/test_openfootball_score_prior_cli.py",
+          "seconds": 0.709,
+          "completion_utc": "2026-11-07T01:04:10.714Z"
+        },
+        {
+          "module": "tests/integration/optimisation/test_integration.py",
+          "seconds": 184.617,
+          "completion_utc": "2026-11-07T01:07:15.331Z"
+        },
+        {
+          "module": "tests/integration/rank_strategy/test_mini_league_rank_utility.py",
+          "seconds": 0.014,
+          "completion_utc": "2026-11-07T01:07:15.345Z"
+        },
+        {
+          "module": "tests/property/chips/test_scheduler_properties.py",
+          "seconds": 4.462,
+          "completion_utc": "2026-11-07T01:07:19.807Z"
+        },
+        {
+          "module": "tests/property/rank_strategy/test_opponent_properties.py",
+          "seconds": 0.671,
+          "completion_utc": "2026-11-07T01:07:20.478Z"
+        },
+        {
+          "module": "tests/unit/assurance/test_ticket_ids.py",
+          "seconds": 0.048,
+          "completion_utc": "2026-11-07T01:07:20.526Z"
+        },
+        {
+          "module": "tests/unit/availability/test_audit0073_public_identity_remediation.py",
+          "seconds": 0.06,
+          "completion_utc": "2026-11-07T01:07:20.586Z"
+        },
+        {
+          "module": "tests/unit/chips/test_free_hit.py",
+          "seconds": 1.142,
+          "completion_utc": "2026-11-07T01:07:21.728Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_current_cli.py",
+          "seconds": 2.246,
+          "completion_utc": "2026-11-07T01:07:23.974Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_current_team_value.py",
+          "seconds": 144.047,
+          "completion_utc": "2026-11-07T01:09:48.021Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_fpl_route_capacity.py",
+          "seconds": 0.023,
+          "completion_utc": "2026-11-07T01:09:48.044Z"
+        },
+        {
+          "module": "tests/unit/dashboard/test_recovery_performance.py",
+          "seconds": 0.041,
+          "completion_utc": "2026-11-07T01:09:48.085Z"
+        },
+        {
+          "module": "tests/unit/database/test_dat003_branch_contracts.py",
+          "seconds": 0.598,
+          "completion_utc": "2026-11-07T01:09:48.683Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_p01_canonical.py",
+          "seconds": 80.854,
+          "completion_utc": "2026-11-07T01:11:09.537Z"
+        },
+        {
+          "module": "tests/unit/evaluation/test_team_strength_prospective.py",
+          "seconds": 284.923,
+          "completion_utc": "2026-11-07T01:15:54.460Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_mixture_stage8.py",
+          "seconds": 25.587,
+          "completion_utc": "2026-11-07T01:16:20.047Z"
+        },
+        {
+          "module": "tests/unit/football_events/test_team_strength_model.py",
+          "seconds": 12.233,
+          "completion_utc": "2026-11-07T01:16:32.280Z"
+        },
+        {
+          "module": "tests/unit/fpl_points/test_current_gw_stale_prior.py",
+          "seconds": 3.692,
+          "completion_utc": "2026-11-07T01:16:35.972Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_fpl_odds_fixture_identity.py",
+          "seconds": 0.882,
+          "completion_utc": "2026-11-07T01:16:36.854Z"
+        },
+        {
+          "module": "tests/unit/ingestion/test_one_command_assembly.py",
+          "seconds": 35.987,
+          "completion_utc": "2026-11-07T01:17:12.841Z"
+        },
+        {
+          "module": "tests/unit/markets/test_current_markets.py",
+          "seconds": 14.921,
+          "completion_utc": "2026-11-07T01:17:27.762Z"
+        },
+        {
+          "module": "tests/unit/operation/test_campaign_inspection_recovery.py",
+          "seconds": 0.046,
+          "completion_utc": "2026-11-07T01:17:27.808Z"
+        },
+        {
+          "module": "tests/unit/operation/test_installation.py",
+          "seconds": 1.816,
+          "completion_utc": "2026-11-07T01:17:29.624Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_multi_gameweek_solver.py",
+          "seconds": 3.961,
+          "completion_utc": "2026-11-07T01:17:33.585Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_multi_gameweek_state.py",
+          "seconds": 0.257,
+          "completion_utc": "2026-11-07T01:17:33.842Z"
+        },
+        {
+          "module": "tests/unit/optimisation/test_r7_canonical_primitives.py",
+          "seconds": 0.418,
+          "completion_utc": "2026-11-07T01:17:34.260Z"
+        },
+        {
+          "module": "tests/unit/prices/test_models_pressure_calibration.py",
+          "seconds": 0.127,
+          "completion_utc": "2026-11-07T01:17:34.387Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_a1_03_shadow_comparison.py",
+          "seconds": 241.657,
+          "completion_utc": "2026-11-07T01:21:36.044Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_progress.py",
+          "seconds": 0.088,
+          "completion_utc": "2026-11-07T01:21:36.132Z"
+        },
+        {
+          "module": "tests/unit/private_v1/test_team_strength_d1_diagnostics.py",
+          "seconds": 353.922,
+          "completion_utc": "2026-11-07T01:27:30.054Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_joint_opponent_actions.py",
+          "seconds": 0.035,
+          "completion_utc": "2026-11-07T01:27:30.089Z"
+        },
+        {
+          "module": "tests/unit/rank_strategy/test_rank_utility_gates.py",
+          "seconds": 0.155,
+          "completion_utc": "2026-11-07T01:27:30.244Z"
+        },
+        {
+          "module": "tests/unit/rules/test_private_transient_authority.py",
+          "seconds": 4.31,
+          "completion_utc": "2026-11-07T01:27:34.554Z"
+        },
+        {
+          "module": "tests/unit/rules/test_yaml_and_compiler.py",
+          "seconds": 2.165,
+          "completion_utc": "2026-11-07T01:27:36.719Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_ci_workflow_contract.py",
+          "seconds": 0.8,
+          "completion_utc": "2026-11-07T01:27:37.519Z"
+        },
+        {
+          "module": "tests/unit/scripts/test_dashboard_wheel_cli.py",
+          "seconds": 2.89,
+          "completion_utc": "2026-11-07T01:27:40.409Z"
+        }
+      ],
+      "url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42321646466/job/128247999717"
+    }
+  ]
+}

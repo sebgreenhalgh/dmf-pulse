@@ -1,0 +1,96 @@
+{
+  "status": "PASS",
+  "steps": [
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.47192029980942607,
+      "stdout_sha256": "a0d800b069a2680b3b6ed54149b37449473fb84f7e6a0426fc9301d179b393b1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.3382113999687135,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "manifest-tests",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=review_pack/resume-manifest-final",
+        "tests/unit/scripts/test_quality_resume_manifest.py",
+        "tests/unit/scripts/test_opr004_repository_validation.py",
+        "tests/unit/scripts/test_opt010_repository_validation.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.8555477999616414,
+      "stdout_sha256": "ccaedd259583edc5fb1f72c4d7e10f86334aeecba5bcc6ccd3d9bddb175185f0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "repository",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/validate_repository.py"
+      ],
+      "exit_code": 0,
+      "seconds": 8.79491399996914,
+      "stdout_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "secret-scan",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/scan_secrets.py"
+      ],
+      "exit_code": 0,
+      "seconds": 50.08064249996096,
+      "stdout_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.2749403000343591,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ad5432c8ed27668fc62b13e1dc6f75324eea99373e63669d1a315d72cf9ecd75"
+    }
+  ]
+}
