@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "-m",
+    "performance",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\cold-adapter-native-parent-001\\test_thirty_fixture_inferences0\\cold-adapter-child\\temp",
+    "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\cold-adapter-native-parent-001\\test_thirty_fixture_inferences0\\cold-adapter-child\\junit.xml",
+    "tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms"
+  ],
+  "status": "FAIL",
+  "exit_code": 1,
+  "stdout_sha256": "138ab8644e1c29ca38ac30e87bea5a0a927a71d1b0830054540da6e6f9e221a9",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

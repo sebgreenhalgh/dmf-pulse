@@ -142,5 +142,25 @@
     "lossless_roundtrip_verified": true,
     "statistics": [],
     "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "isolation-focused-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\isolation-focused-001.xml",
+    "native_sha256": "bdb1a95397219c70ad0de07a90d6547d0956dbe5cd83f8b494ba025dfbe3440e",
+    "export_sha256": "bdb1a95397219c70ad0de07a90d6547d0956dbe5cd83f8b494ba025dfbe3440e",
+    "testcase_count": 122,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
+  },
+  "isolation-native-junit.xml": {
+    "native_source": "C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\isolation-native-performance-junit-001.xml",
+    "native_sha256": "7874ee19443aca3bed2752e337947e2fcc7b6fc919a593446a479b80796c119b",
+    "export_sha256": "7874ee19443aca3bed2752e337947e2fcc7b6fc919a593446a479b80796c119b",
+    "testcase_count": 5,
+    "all_testcase_attributes_results_and_order_unchanged": true,
+    "lossless_roundtrip_verified": true,
+    "statistics": [],
+    "export": "Readable UTF8 Hypothesis statistics renamed to -text; native base64 XML retained privately. No scanner or allowlist change."
   }
 }

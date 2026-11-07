@@ -1,0 +1,41 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_thirty_fixture_inferences_under_100ms __________________
+
+tmp_path = WindowsPath('C:/Users/sebgr/Documents/dmf-pulse/review_pack/MODEL-QUALITY-001/review_pack/cold-adapter-native-parent-001/test_thirty_fixture_inferences0/cold-adapter-child/temp/test_thirty_fixture_inferences0')
+capsys = <_pytest.capture.CaptureFixture object at 0x000001CF6AF3DE80>
+record_testsuite_property = <bound method LogXML.add_global_property of <_pytest.junitxml.LogXML object at 0x000001CF68164050>>
+
+    @pytest.mark.performance
+    def test_thirty_fixture_inferences_under_100ms(tmp_path, capsys, record_testsuite_property) -> None:
+        if os.environ.get(CHILD_FLAG) != "1":
+            evidence = run_cold_adapter_child(tmp_path / "cold-adapter-child")
+            with capsys.disabled():
+                print("COLD_ADAPTER_CHILD_EVIDENCE " + json.dumps(evidence, sort_keys=True))
+            return
+        artifact = synthetic_artifact()
+        matches = tuple(
+            row for row in synthetic_dataset().fixture_registry.fixtures if row.season == "2025/26"
+        )[:30]
+        adapter._validated_artifact_json.cache_clear()
+        assert adapter._validated_artifact_json.cache_info().currsize == 0
+        start = perf_counter()
+        results = [
+            fixture_prior_bundle(
+                artifact=artifact,
+                fixture=match,
+                as_of=STAMP + timedelta(seconds=2),
+                expected_artifact_sha256=artifact.semantic_sha256,
+            )
+            for match in matches
+        ]
+        elapsed = perf_counter() - start
+        assert len({row.semantic_sha256 for row in results}) == 30
+>       assert elapsed < 0.1, f"30 cold-cache adapter calls took {elapsed:.6f}s"
+E       AssertionError: 30 cold-cache adapter calls took 0.106037s
+E       assert 0.10603699996136129 < 0.1
+
+tests\unit\football_events\test_team_strength_adapter.py:292: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms
+1 failed in 12.77s

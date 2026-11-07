@@ -1,0 +1,112 @@
+{
+  "runtime": {
+    "reference": "python@sha256:f3dac913ab53b78c64f26d5518fcd7043d5a1a46522d6a493b598c3ed12f62a6",
+    "image_id": "sha256:f3dac913ab53b78c64f26d5518fcd7043d5a1a46522d6a493b598c3ed12f62a6",
+    "python": "Python 3.13.18 (main, Nov  5 2026, 07:59:44) [GCC 12.2.0]",
+    "source": "Official docker.io/library/python manifest, linux/amd64, resolved before pull",
+    "manifest_sha256": "71883c23e73226ff2f7136be0d58c09117f3724f3f345d0f31d7416bf6458636",
+    "no_production_mounts_or_changes": true
+  },
+  "source_manifest_sha256": "f1077409ede262d0fa9b532f7930496cfd1db138a0da3997264a9349ecf82590",
+  "source_files": 3935,
+  "predeclared_order": [
+    "isolated",
+    "whole",
+    "whole",
+    "isolated"
+  ],
+  "results": [
+    {
+      "context": "isolated",
+      "command": [
+        "/usr/local/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-m",
+        "performance",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/tests-0",
+        "--junitxml=/control/0-junit.xml",
+        "-q",
+        "tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms"
+      ],
+      "exit_code": 0,
+      "seconds": 17.942627940000023,
+      "stdout_sha256": "38ac59adcd982f4c23411e1cf1db88cf31e79fe556bfc5adecaf9a8343334108",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "Diagnostic with original benchmark and budgets; not hosted FULL"
+    },
+    {
+      "context": "whole",
+      "command": [
+        "/usr/local/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-m",
+        "performance",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/tests-1",
+        "--junitxml=/control/1-junit.xml",
+        "-q"
+      ],
+      "exit_code": 1,
+      "seconds": 85.53854125000004,
+      "stdout_sha256": "b883827f804936d8d12007ec7af918a40f716784f12885fcd8642cddaa362dd2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "Diagnostic with original benchmark and budgets; not hosted FULL"
+    },
+    {
+      "context": "whole",
+      "command": [
+        "/usr/local/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-m",
+        "performance",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/tests-2",
+        "--junitxml=/control/2-junit.xml",
+        "-q"
+      ],
+      "exit_code": 1,
+      "seconds": 85.95961506399999,
+      "stdout_sha256": "cc58f0ef0eb8fa2dc86dd1964c73794e3e9d8151ec970d9cac603c3cecd3494b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "Diagnostic with original benchmark and budgets; not hosted FULL"
+    },
+    {
+      "context": "isolated",
+      "command": [
+        "/usr/local/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-m",
+        "performance",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/tmp/tests-3",
+        "--junitxml=/control/3-junit.xml",
+        "-q",
+        "tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms"
+      ],
+      "exit_code": 0,
+      "seconds": 17.683736769999996,
+      "stdout_sha256": "f0ea2f05ee76bf6cf07c1edf5bf82a709d0849ef411445b3d81cce66b03b6359",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "Diagnostic with original benchmark and budgets; not hosted FULL"
+    }
+  ],
+  "adapter_case_passed_all_four": true,
+  "whole_failures": "Only existing SQLite5s diagnostic budget; no hosted causal claim. Different Linux distribution/libraries/hardware remain.",
+  "private_profiles": [
+    "cold-adapter-profile-windows-001/summary.json",
+    "cold-adapter-linux31318-run-001/profile/summary.json"
+  ]
+}

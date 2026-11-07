@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, hypothesis-6.159.0, cov-7.1.0
+collected 8691 items / 8686 deselected / 5 selected
+
+tests\performance\chips\test_stage14_service_performance.py .            [ 20%]
+tests\performance\fpl_points\test_smoke_budget.py .                      [ 40%]
+tests\performance\operation\test_quality_sql.py .                        [ 60%]
+tests\performance\prices\test_price_path_performance.py .                [ 80%]
+tests\unit\football_events\test_team_strength_adapter.py COLD_ADAPTER_CHILD_EVIDENCE {"command": ["C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\.venv\\Scripts\\python.exe", "-m", "pytest", "-q", "-m", "performance", "-p", "no:cacheprovider", "--basetemp=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\isolation-native-performance-temp-001\\test_thirty_fixture_inferences0\\cold-adapter-child\\temp", "--junitxml=C:\\Users\\sebgr\\Documents\\dmf-pulse\\review_pack\\MODEL-QUALITY-001\\review_pack\\isolation-native-performance-temp-001\\test_thirty_fixture_inferences0\\cold-adapter-child\\junit.xml", "tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms"], "exit_code": 0, "junit_sha256": "bd5cd014e37b5e91906698ce4138b4f2f91c8a479448ea54e1c352f1e11914d5", "junit_text": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"1\" time=\"12.727\" timestamp=\"2026-11-07T13:29:46.243198+01:00\" hostname=\"seb_new_laptop\"><properties><property name=\"cold_adapter_calls\" value=\"30\" /><property name=\"cold_adapter_unique_outputs\" value=\"30\" /><property name=\"cold_adapter_initial_cache_entries\" value=\"0\" /><property name=\"cold_adapter_cache_misses\" value=\"1\" /><property name=\"cold_adapter_cache_hits\" value=\"29\" /><property name=\"cold_adapter_elapsed_seconds\" value=\"0.09523619990795851\" /></properties><testcase classname=\"tests.unit.football_events.test_team_strength_adapter\" name=\"test_thirty_fixture_inferences_under_100ms\" time=\"12.312\" /></testsuite></testsuites>", "proof": {"cold_adapter_cache_hits": "29", "cold_adapter_cache_misses": "1", "cold_adapter_calls": "30", "cold_adapter_elapsed_seconds": "0.09523619990795851", "cold_adapter_initial_cache_entries": "0", "cold_adapter_unique_outputs": "30"}, "status": "PASS", "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "stderr_text": "", "stdout_sha256": "64ea3e8ecb0c2ae3f6e879ce1bf2d702cfa964921790d4143fc4db07d31bd979", "stdout_text": ".                                                                        [100%]\r\n1 passed in 12.73s\r\n"}
+.               [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\pydantic\main.py:475
+  C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='confidence', input_value='A', input_type=str])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\sebgr\Documents\dmf-pulse\review_pack\MODEL-QUALITY-001\review_pack\isolation-native-performance-junit-001.xml -
+============================ slowest 10 durations =============================
+14.12s call     tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms
+13.46s call     tests/performance/fpl_points/test_smoke_budget.py::test_1000_scenario_smoke_completes_within_generous_local_budget
+3.98s call     tests/performance/operation/test_quality_sql.py::test_full_catalogue_derived_view_queries_fit_existing_time_bound
+1.07s call     tests/performance/chips/test_stage14_service_performance.py::test_four_chip_service_and_artifact_validation_complete_within_smoke_budget
+0.68s call     tests/performance/prices/test_price_path_performance.py::test_full_2187_path_replay_completes_within_smoke_budget
+0.01s setup    tests/performance/chips/test_stage14_service_performance.py::test_four_chip_service_and_artifact_validation_complete_within_smoke_budget
+0.01s setup    tests/unit/football_events/test_team_strength_adapter.py::test_thirty_fixture_inferences_under_100ms
+0.01s setup    tests/performance/prices/test_price_path_performance.py::test_full_2187_path_replay_completes_within_smoke_budget
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=============== 5 passed, 8686 deselected, 1 warning in 48.72s ================

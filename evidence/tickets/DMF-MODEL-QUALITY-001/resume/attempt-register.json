@@ -451,5 +451,39 @@
     "native_failed_evidence_retained": true,
     "post_export_gate_status": "PASS_POST_EXPORT_CHECKS_IDENTICAL_WHEEL",
     "post_export_receipt_sha256": "1179b574957388b0ec571a115a8c94b2059c860702dd0bac1fcfbc1aa0bfae97"
+  },
+  "performance_isolation_followup": {
+    "source_parent": "a6ae92e6e05951e72a4b817b9fa1e66b66861641",
+    "prior_CI_attempts_preserved": 2,
+    "initial_native_child_failure": {
+      "seconds": 0.10603699996136129,
+      "receipt": "isolation-initial-child-receipt.json"
+    },
+    "guard_development": "Initial oversized parametrized ID caused Windows environment length setup errors. Payload retained; short IDs corrected. Native tool output is the record, not a separate raw log.",
+    "guard_review_findings_corrected": [
+      "XML report envelopes/counts and DTD/entities",
+      "Lossless UTF8 evidence"
+    ],
+    "native_full_performance_pass": {
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-m",
+        "performance",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=review_pack/isolation-native-performance-temp-001",
+        "--junitxml=review_pack/isolation-native-performance-junit-001.xml",
+        "--durations=10"
+      ],
+      "exit_code": 0,
+      "seconds": 51.45367409987375,
+      "stdout_sha256": "d272fdc7c6e1947d315f4a77e3e02ce71d8b8aac7aa51053bf4aeba689e9c396",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "Native Windows all performance cases; not hosted FULL"
+    },
+    "hosted_candidate_status": "NOT_YET_OBSERVED"
   }
 }

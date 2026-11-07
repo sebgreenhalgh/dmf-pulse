@@ -254,6 +254,30 @@ correction it identifies. Further storage reduction needs independent wheel/
 temporary-output qualification; real research needs source/intent/native custody
 acceptance. No unresolved item is silently converted into approval.
 
+### Cold-adapter acceptance follow-up
+
+Checkpoint `a6ae92e6e05951e72a4b817b9fa1e66b66861641` passed all 16 coverage
+shards and their combined gate. Its post-coverage cold-adapter benchmark failed
+twice at the unchanged 100 ms wall budget (413.5 ms and 491.2 ms); later checks
+were skipped. Those failures and the FULL checker's refusal remain preserved.
+
+The follow-up runs the original thirty-call benchmark in a fresh pytest child,
+matching its accepted module-only timing context. The parent remains part of
+repository-wide performance selection. The full first authentication, all thirty
+calls, unique-output assertion and `< 0.1` wall budget are unchanged. It requires
+one cache miss and 29 hits, validates exact native JUnit/proof, rejects failed,
+skipped, missing or malformed work, and retains/emits bounded native evidence.
+
+Independent guard review and 29 adversarial supervisor controls pass. Native
+Windows repository-wide performance selection passes all five cases in 51.45 s,
+with a 95.24 ms cold child. An earlier 106 ms Windows child failure remains valid.
+Matching CPython 3.13.18 Linux profiles and collection controls did not reproduce
+or explain the hosted timing failure; major GC and Python patch drift remain
+unsupported causes. This is an isolation candidate pending fresh exact-source
+FULL, not a demonstrated numerical speedup. Package, model, dependency, rules,
+workflow, coverage and timing limits remain unchanged. Diagnostic Linux runtime
+and wheel caches add storage; no new net reduction or deletion approval is claimed.
+
 ## G. Owner action
 
 Only the verified contents of

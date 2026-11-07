@@ -1,0 +1,147 @@
+{
+  "status": "PASS_SCOPED_LOCAL_GATES_IDENTICAL_WHEEL",
+  "scope": "Test harness only; package/rules/deps/workflow frozen; no FULL inference.",
+  "steps": [
+    {
+      "name": "frozen-sync",
+      "command": [
+        "uv",
+        "sync",
+        "--all-groups",
+        "--frozen"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08738459995947778,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "983ec0fc6ce97cae15fa4502f41625722c65075f33987d089ee38867713c83d4"
+    },
+    {
+      "name": "format",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.4594620999414474,
+      "stdout_sha256": "b243453dfba116792f517c68cf3d502b28cae131226b097fb115bf3e052b6085",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.41557760001160204,
+      "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "typing",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "mypy",
+        "src/dmf_pulse"
+      ],
+      "exit_code": 0,
+      "seconds": 12.215863999910653,
+      "stdout_sha256": "a28e46a61d0094a379cc5bc53f92994559dda0d09fd27d1cde1228f8943d5ffc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "focused",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "pytest",
+        "-q",
+        "-m",
+        "not performance",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=review_pack/isolation-focused-001",
+        "--junitxml=review_pack/isolation-focused-001.xml",
+        "tests/unit/scripts/test_cold_adapter_process.py",
+        "tests/unit/football_events/test_team_strength_adapter.py",
+        "tests/unit/assurance/test_secret_scan.py",
+        "tests/unit/ingestion/test_rights_and_fixtures.py",
+        "tests/integration/package/test_import_side_effects.py",
+        "--cov=tests.support.cold_adapter_process",
+        "--cov=dmf_pulse.football_events.team_strength_adapter",
+        "--cov-branch",
+        "--cov-fail-under=0",
+        "--cov-report=json:review_pack/isolation-focused-coverage-001.json"
+      ],
+      "exit_code": 0,
+      "seconds": 69.11039509996772,
+      "stdout_sha256": "4b21474a3b1b28cfb1a717e6be872a70dc0b7f1159e62391d90e8c1e9810e903",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "command": [
+        "uv",
+        "build",
+        "--no-build-isolation"
+      ],
+      "exit_code": 0,
+      "seconds": 22.296562700066715,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "dd94a6871938be98b33cd47a32e4d8d4ce4ca950cb09b21b458f122afbfea8c6"
+    },
+    {
+      "name": "repository",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/validate_repository.py"
+      ],
+      "exit_code": 0,
+      "seconds": 16.57589239999652,
+      "stdout_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "secret-scan",
+      "command": [
+        "uv",
+        "run",
+        "--frozen",
+        "python",
+        "scripts/scan_secrets.py"
+      ],
+      "exit_code": 0,
+      "seconds": 61.633687200024724,
+      "stdout_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.14999669999815524,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "wheel_sha256": "654d1d5638a61b7feca916c4e889cb0c920a38b6f21989e75e6864e14d36075e"
+}

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "--frozen",
+    "pytest",
+    "-m",
+    "performance",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp=review_pack/isolation-native-performance-temp-001",
+    "--junitxml=review_pack/isolation-native-performance-junit-001.xml",
+    "--durations=10"
+  ],
+  "exit_code": 0,
+  "seconds": 51.45367409987375,
+  "stdout_sha256": "d272fdc7c6e1947d315f4a77e3e02ce71d8b8aac7aa51053bf4aeba689e9c396",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "Native Windows all performance cases; not hosted FULL"
+}

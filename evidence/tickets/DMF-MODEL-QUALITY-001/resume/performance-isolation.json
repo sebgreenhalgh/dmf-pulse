@@ -1,0 +1,120 @@
+{
+  "status": "REVIEWED_ISOLATION_CANDIDATE_FRESH_EXACT_SHA_FULL_REQUIRED",
+  "parent_source": "a6ae92e6e05951e72a4b817b9fa1e66b66861641",
+  "prior_failed_CI": {
+    "run_id": 42341835872,
+    "attempts": 2,
+    "wall_seconds": [
+      0.413520873,
+      0.491159
+    ],
+    "budget_seconds": 0.1,
+    "cause": "UNEXPLAINED"
+  },
+  "source_sha256": {
+    "tests/support/cold_adapter_process.py": "92bbe39cf6976e9bccaf3a5032a604d81721725338ac5673b8b5a1a79c6f2dd1",
+    "tests/unit/scripts/test_cold_adapter_process.py": "154b0858ccc8e5ad372831d4f937832e3c0a8669f92e3996e07766d7a5a99f62",
+    "tests/unit/football_events/test_team_strength_adapter.py": "9eb0cd7bedc426edd5d4cdb4629b4bea3da3215a7acfbb9a5c0ba5f8c6a0edda",
+    "tickets/DMF-MODEL-QUALITY-001/PERFORMANCE-ISOLATION.md": "b8ebdb1783831beec374c2f425aa8b1f85e9ac5ae83106d6371db54a96c7bae7"
+  },
+  "original_eight_native_statements_preserved": true,
+  "supervisor_controls": 29,
+  "focused_cases": 122,
+  "native_performance_cases": 5,
+  "native_performance_command_seconds": 51.45367409987375,
+  "child_proof": {
+    "cold_adapter_cache_hits": "29",
+    "cold_adapter_cache_misses": "1",
+    "cold_adapter_calls": "30",
+    "cold_adapter_elapsed_seconds": "0.09523619990795851",
+    "cold_adapter_initial_cache_entries": "0",
+    "cold_adapter_unique_outputs": "30"
+  },
+  "initial_native_Windows_failure_seconds": 0.10603699996136129,
+  "initial_failure_preserved": true,
+  "no_GC_disable_warmup_timer_or_limit_change": true,
+  "numerical_package_dependency_rules_workflow_change": false,
+  "wheel_sha256": "654d1d5638a61b7feca916c4e889cb0c920a38b6f21989e75e6864e14d36075e",
+  "independent_review": "Both concrete P2 envelope/text guards corrected;29 controls independently PASS; source guard review cleared. Timing mechanism unproven; latest FULL remains required.",
+  "source_safe_export": "Native streams/JUnit retained with digests; library statistics exports use prior lossless reversible decoding if needed. Scanner/allowlist unchanged.",
+  "post_export_checks": {
+    "status": "PASS_POST_EXPORT_CHECKS",
+    "steps": [
+      {
+        "name": "format",
+        "command": [
+          "uv",
+          "run",
+          "--frozen",
+          "ruff",
+          "format",
+          "--check",
+          "."
+        ],
+        "exit_code": 0,
+        "seconds": 0.39168110000900924,
+        "stdout_sha256": "b243453dfba116792f517c68cf3d502b28cae131226b097fb115bf3e052b6085",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "lint",
+        "command": [
+          "uv",
+          "run",
+          "--frozen",
+          "ruff",
+          "check",
+          "."
+        ],
+        "exit_code": 0,
+        "seconds": 0.37666899990290403,
+        "stdout_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "repository",
+        "command": [
+          "uv",
+          "run",
+          "--frozen",
+          "python",
+          "scripts/validate_repository.py"
+        ],
+        "exit_code": 0,
+        "seconds": 16.31531949993223,
+        "stdout_sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "secret-scan",
+        "command": [
+          "uv",
+          "run",
+          "--frozen",
+          "python",
+          "scripts/scan_secrets.py"
+        ],
+        "exit_code": 0,
+        "seconds": 61.341226800112054,
+        "stdout_sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "diff-check",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit_code": 0,
+        "seconds": 0.15131069999188185,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "current_benchmark_module_sha256": "9eb0cd7bedc426edd5d4cdb4629b4bea3da3215a7acfbb9a5c0ba5f8c6a0edda",
+  "original_benchmark_module_sha256": "eeff4547585328857ee5d9fe442a8459de97f0f5cd50ae1ad47559a470dc0bab",
+  "original_benchmark_statement_ast_sha256": "fc74ee5057fe7ab2432fc3c18565bb2bb5617b7e91f63e29a8a8ef038e146a6d",
+  "original_statement_digest_format": "SHA256 of UTF8 compact JSON list of ast.dump(include_attributes=False) for the8 original statements, in order."
+}

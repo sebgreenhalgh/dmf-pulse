@@ -3465,6 +3465,30 @@ explicit; no provider request or original custody change is authorized.
 
 # DMF-MODEL-QUALITY-001 (active, 2026-11-07)
 
+## Resume: cold-adapter performance acceptance
+
+Resume pushed `a6ae92e6e05951e72a4b817b9fa1e66b66861641`. Preserve the
+18 passing jobs and both failed post-coverage attempts in run 42341835872.
+The unchanged 30-call cold-artifact benchmark exceeded 100 ms twice; GC and
+Python patch drift remain unsupported explanations. No further retry is justified
+without a supported change. Production assets and numerical engines remain frozen.
+
+- [x] Profile the actual cold path and reproduce under matching Linux CPython
+  3.13.18; distinguish computation, collection state, I/O and scheduling.
+- [x] Implement and independently review the smallest supported harness fix,
+  preserving cold authentication, all 30 calls, inputs and 100 ms wall budget.
+- [ ] Execute applicable local acceptance, commit/push, authenticate every exact-SHA
+  FULL job and seal the capped review packet with actual results.
+
+The original eight benchmark statements remain unchanged in a fresh pytest child.
+The parent validates exact JUnit shape/counts, cold-cache evidence, all 30 unique
+outputs and the unchanged wall budget; it preserves/emits raw evidence and fails
+on child failure, timeout, skip or malformed proof. All 29 supervisor controls
+and native whole-performance selection pass; the latter recorded 95.24 ms in the
+child. The earlier Windows 106 ms failure remains valid. Matching Linux profile/
+collection controls did not explain the hosted failures. This is a reviewed
+isolation candidate; fresh exact-source FULL CI still determines acceptance.
+
 ## Owner-authorized cleanup and acceleration continuation
 
 Resume `12fa98b977b99b75ac8dc37754701ee99dcfea9b`; preserve its completed audit.

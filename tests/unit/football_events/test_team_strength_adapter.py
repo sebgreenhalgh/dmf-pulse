@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 from datetime import datetime, timedelta
 from decimal import Decimal, localcontext
 from pathlib import Path
@@ -41,6 +42,7 @@ from dmf_pulse.ingestion.openfootball.team_strength_data import (
     build_dataset,
     seal,
 )
+from tests.support.cold_adapter_process import CHILD_FLAG, run_cold_adapter_child
 from tests.unit.football_events.team_strength_support import synthetic_artifact, synthetic_dataset
 from tests.unit.ingestion.openfootball.test_team_strength_data import STAMP, dataset
 
@@ -263,12 +265,18 @@ def test_half_even_boundary_and_decimal_context_independence() -> None:
 
 
 @pytest.mark.performance
-def test_thirty_fixture_inferences_under_100ms() -> None:
+def test_thirty_fixture_inferences_under_100ms(tmp_path, capsys, record_testsuite_property) -> None:
+    if os.environ.get(CHILD_FLAG) != "1":
+        evidence = run_cold_adapter_child(tmp_path / "cold-adapter-child")
+        with capsys.disabled():
+            print("COLD_ADAPTER_CHILD_EVIDENCE " + json.dumps(evidence, sort_keys=True))
+        return
     artifact = synthetic_artifact()
     matches = tuple(
         row for row in synthetic_dataset().fixture_registry.fixtures if row.season == "2025/26"
     )[:30]
     adapter._validated_artifact_json.cache_clear()
+    assert adapter._validated_artifact_json.cache_info().currsize == 0
     start = perf_counter()
     results = [
         fixture_prior_bundle(
@@ -282,6 +290,17 @@ def test_thirty_fixture_inferences_under_100ms() -> None:
     elapsed = perf_counter() - start
     assert len({row.semantic_sha256 for row in results}) == 30
     assert elapsed < 0.1, f"30 cold-cache adapter calls took {elapsed:.6f}s"
+    cache = adapter._validated_artifact_json.cache_info()
+    assert cache.misses == 1 and cache.hits == 29
+    for name, value in {
+        "cold_adapter_calls": len(results),
+        "cold_adapter_unique_outputs": len({row.semantic_sha256 for row in results}),
+        "cold_adapter_initial_cache_entries": 0,
+        "cold_adapter_cache_misses": cache.misses,
+        "cold_adapter_cache_hits": cache.hits,
+        "cold_adapter_elapsed_seconds": repr(elapsed),
+    }.items():
+        record_testsuite_property(name, value)
 
 
 def test_typed_fallback_never_substitutes_a_prior(monkeypatch: pytest.MonkeyPatch) -> None:
