@@ -7,12 +7,12 @@
     "--ticket",
     "DMF-MODEL-QUALITY-001"
   ],
-  "started_at": "2026-11-07T00:34:35.885823+00:00",
+  "started_at": "2026-11-07T00:58:22.221677+00:00",
   "offline": true,
   "uv_cache": "workspace review_pack/uv-cache",
   "exit_code": 0,
   "timed_out": false,
-  "elapsed_seconds": 3.5944553001318127,
+  "elapsed_seconds": 3.285530500113964,
   "stdout": {
     "path": "manifest.stdout.log",
     "sha256": "353d69d3717de5f07691846705af9a6bb40b1a1fe6a3462ccd1952996f0fe5d2",

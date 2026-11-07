@@ -4,12 +4,12 @@
     "build",
     "--no-build-isolation"
   ],
-  "started_at": "2026-11-06T23:55:21.065509+00:00",
+  "started_at": "2026-11-07T00:39:37.579599+00:00",
   "offline": true,
   "uv_cache": "workspace review_pack/uv-cache",
   "exit_code": 0,
   "timed_out": false,
-  "elapsed_seconds": 14.247945699840784,
+  "elapsed_seconds": 18.706470200093463,
   "stdout": {
     "path": "build.stdout.log",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

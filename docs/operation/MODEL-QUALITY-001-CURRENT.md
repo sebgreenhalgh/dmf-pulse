@@ -114,6 +114,27 @@ existing evaluator; do not build a second captain engine.
 
 ## What can improve accuracy next
 
+Two pre-existing mathematical contract risks were reproduced with owned exact
+counterexamples in `evidence/tickets/DMF-MODEL-QUALITY-001/mathematical-contract-probes.json`:
+
+- `optimisation/multi_gameweek_models.py:TacticalNodeEvaluation.values_are_monotone`
+  requires p10 <= mean <= p90. A valid PMF P(0)=.95, P(10)=.05 has mean .5 and
+  p10=p90=0, and the contract rejects it. A mean is not a median. The Stage-10
+  adapter supplies actual distribution quantiles. Tail-sensitive low-participation
+  plans need separate accepted contract review; no such failure is demonstrated
+  for the retained GW10 selected plan.
+- `evaluation/distribution_metrics.py:ranked_probability_score` sums over supplied
+  support keys. The same distribution {0:.5, 2:.5}, observed value 1, scores .25
+  without an explicit zero-mass key at 1 and .50 with it. Comparisons require an
+  explicit common target-category grid or reviewed metric correction. The generic
+  categorical contract must be resolved before choosing an integer-points
+  implementation. No real forecast skill scores were computed.
+
+These are frozen existing-module findings, not changes to accepted mathematics.
+Source hashes, inputs and outcomes remain in the evidence register. They are
+early bounded review tickets before prospective comparisons or downstream tail
+expansion. Accepted metric histories and optimizer contracts remain unchanged.
+
 Prioritize exact match-time identities, player evidence custody, real minutes
 calibration, and prospective benchmarks before extra solver complexity. Reuse
 the existing player posterior and team-strength shadows after their source and

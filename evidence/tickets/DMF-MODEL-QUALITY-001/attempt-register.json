@@ -50,7 +50,24 @@
     {
       "attempt": "comprehensive wheel attempt2 with isolated PostgreSQL",
       "outcome": "inherited paired ASGI/current/numerical-parity/CLI probe timed out at its unchanged 900s bound; overall elapsed 1093.63s",
-      "reason": "Ran concurrently with coverage; final unchanged-bound serial retry planned; no numerical/solver changes or bound relaxation"
+      "reason": "Ran concurrently with coverage; unchanged-bound serial retry also failed; no numerical/solver changes or timeout relaxation"
+    },
+    {
+      "attempt": "comprehensive wheel attempt3 final-source serial retry",
+      "outcome": {
+        "status": "FAILED",
+        "exception_family": "VerificationError",
+        "detail": "installed ACCEL003 paired ASGI current process, numerical parity and operational CLI timed out",
+        "seconds": 1097.2216317998245
+      },
+      "reason": "Repeated inherited ACCEL003 child timeout without parallel test load; root cause unproven; full acceptance blocked",
+      "execution": "scripts.verify_wheel.verify_wheel(report_path=own-ticket/comprehensive-wheel.json) via ignored review_pack/run_full_wheel.py",
+      "driver_sha256": "d31c1e4c0d79f2ad3a89fc839e50e325a4c553120852cfd399dc680bf22eb4a1",
+      "verifier_unchanged_from_baseline": true,
+      "test_database": "isolated dmf-quality001 project, port 55439; canonical ledger unused",
+      "timeout_seconds_unchanged": 900,
+      "source_commit": "27c42ba691904cc183e223cb7f28a12042f52254",
+      "wheel_sha256": "654d1d5638a61b7feca916c4e889cb0c920a38b6f21989e75e6864e14d36075e"
     }
   ],
   "artifact_custody": [

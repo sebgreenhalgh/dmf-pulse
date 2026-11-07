@@ -7,15 +7,15 @@
     "--check",
     "."
   ],
-  "started_at": "2026-11-07T00:31:34.113050+00:00",
+  "started_at": "2026-11-07T00:56:17.676371+00:00",
   "offline": true,
   "uv_cache": "workspace review_pack/uv-cache",
   "exit_code": 0,
   "timed_out": false,
-  "elapsed_seconds": 0.35749399987980723,
+  "elapsed_seconds": 0.1850324000697583,
   "stdout": {
     "path": "format.stdout.log",
-    "sha256": "afe31bec57768d1548cdd62398690b9d65250c21745baa1ea9205865b350467f",
+    "sha256": "29bd7224f4915b60e0b409ff24c977f8ee097ac3cb695b00053b1cb41f6db261",
     "bytes": 29
   },
   "stderr": {

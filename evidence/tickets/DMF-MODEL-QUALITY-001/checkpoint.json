@@ -2,17 +2,18 @@
   "programme": "DMF-MODEL-QUALITY-001",
   "branch": "research/DMF-MODEL-QUALITY-001",
   "baseline": "df26ab0723dea99469fe4c98423402ea91f85776",
-  "status": "RESEARCH_IMPLEMENTATION_AWAITING_FINAL_GATE_RESULTS",
+  "status": "RESEARCH_CHECKPOINT_FULL_ACCEPTANCE_BLOCKED",
   "completed": [
     "current model audit",
     "authenticated private GW10 audit",
     "validation scorecard with zero matched labels",
-    "18-capability gap matrix",
+    "19-capability gap matrix",
     "bounded roadmap",
     "offline quality command",
     "three additive derived SQL views",
     "copy-only migration and history preservation",
-    "independent technical review with no unresolved P0/P1/material P2"
+    "independent technical review with no unresolved P0/P1/material P2",
+    "two independently reproduced pre-existing mathematical contract risks"
   ],
   "tests": {
     "functional_pre_metadata_focused": 64,
@@ -32,12 +33,13 @@
     "lint": "PASS",
     "local_mypy": "BLOCKED_WINDOWS_APPLICATION_CONTROL",
     "copy_migration": "PASS",
-    "outside_checkout_wheel_owned_v1_v2": "PASS for final provenance-carrying wheel 3205b1635f05e1f1dded1503a33005e439890f035b6f8ba05ca144e2dae48260",
+    "outside_checkout_wheel_owned_v1_v2": "PASS for final source wheel 654d1d5638a61b7feca916c4e889cb0c920a38b6f21989e75e6864e14d36075e",
     "postgres_migration_matrix": "PASS isolated port 55439",
-    "comprehensive_wheel": "FAILED attempt2 at unchanged 900s child bound; serial final-source retry RUNNING",
-    "final_exact_sha_CI": "a8debc6 failed strict typing; two variable-reuse errors fixed; next exact-SHA CI required",
-    "repository_validation": "PASS at source checkpoint; final evidence reseal remains",
-    "secret_scan": "PASS after raw synthetic security case-name JUnit retained privately without scanner exceptions"
+    "comprehensive_wheel": "FAILED twice at unchanged 900s ACCEL003 paired ASGI/current/numerical-parity/CLI child bound, including final serial retry (1097.22s overall); not waived",
+    "final_exact_sha_CI": "Required after final evidence-only commit; observe exact final SHA without rewriting the sealed packet. Record observation under ignored review_pack.",
+    "repository_validation": "PASS; final evidence/manifest reseal command receipt is authoritative",
+    "secret_scan": "PASS after raw synthetic security case-name JUnit retained privately without scanner exceptions",
+    "source_ci_strict_typing": "PASS exact source commit 27c42ba691904cc183e223cb7f28a12042f52254; run 42319365669 pre-flight success, full coverage shards still pending at seal"
   },
   "safety": {
     "provider_calls": 0,
@@ -51,5 +53,5 @@
   "scientific_claim": "No measured forecast-accuracy improvement; all forecasts remain UNVALIDATED.",
   "production_schema_blocker": "Signed v1 reader rejects v2 user_version; separate rollback-compatible activation acceptance required.",
   "private_evidence": "Exact GW10 numerical findings and live-store hash proof remain under ignored review_pack/private-audit; not publicly certified.",
-  "next_executable_action": "Finish serial comprehensive wheel gate; seal native-byte evidence, commit/push typing fix, observe exact-SHA CI, clean disposable TEST resources, and build immutable-HEAD capped review packet."
+  "next_executable_action": "Observe all exact-final-SHA hosted CI gates. Investigate the unchanged installed ACCEL003 timeout in isolation; do not relax limits or change numerical engines to force a pass. Then obtain applicable acceptance. Next bounded research work: MQ-000 mathematical contracts, MQ-002 match-time membership, and MQ-003 qualified forecast/outcome custody. No new provider or production authority."
 }

@@ -6,12 +6,12 @@
     "check",
     "."
   ],
-  "started_at": "2026-11-07T00:31:34.473078+00:00",
+  "started_at": "2026-11-07T00:56:17.863865+00:00",
   "offline": true,
   "uv_cache": "workspace review_pack/uv-cache",
   "exit_code": 0,
   "timed_out": false,
-  "elapsed_seconds": 0.35311829997226596,
+  "elapsed_seconds": 0.18175710015930235,
   "stdout": {
     "path": "lint.stdout.log",
     "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",

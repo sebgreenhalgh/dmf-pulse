@@ -1,0 +1,29 @@
+{
+  "classification": "OWNED_DETERMINISTIC_MATHEMATICAL_CONTRACT_PROBES_NOT_PREDICTIVE_VALIDATION",
+  "baseline": "df26ab0723dea99469fe4c98423402ea91f85776",
+  "source_hashes": {
+    "src/dmf_pulse/evaluation/distribution_metrics.py": "91356e8773a1b9ac5685ec610f862d690d7a9051afa7046db41644a2e2f59279",
+    "src/dmf_pulse/optimisation/multi_gameweek_models.py": "d6b6147d0847b02c4990ecc34b7fde2dec6068dcfa37e69d6ce951b5ef0c8fee"
+  },
+  "ranked_probability_score": {
+    "same_predictive_distribution": true,
+    "observation": "1",
+    "sparse_score": "0.25",
+    "zero_mass_filled_score": "0.50",
+    "risk": "Support representation changes score; require fixed target grid or reviewed metric correction before comparing forecast skill."
+  },
+  "tactical_node_evaluation": {
+    "probabilities": {
+      "0": ".95",
+      "10": ".05"
+    },
+    "mean": "0.50",
+    "p10": "0",
+    "p90": "0",
+    "valid_pmf_rejected_by_mean_between_quantiles_constraint": true,
+    "risk": "Mean need not lie between 10th/90th percentiles; rare-tail legal scenarios can be refused."
+  },
+  "real_GW10_defect_demonstrated": false,
+  "accepted_engine_or_metric_modified": false,
+  "next_action": "Bounded separate contract review and deterministic regressions before model comparison or tail-sensitive optimizer expansion."
+}

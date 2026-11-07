@@ -16,6 +16,18 @@ relative engineering complexity; no unsupported delivery dates are implied.
 | 8 / MQ-008-CHIP-ROUTES | Connect existing Stage-14 WC/FH/BB/TC route evaluators and finite-token scheduler to legal Stage-11 candidate policies. Depends on MQ-007 and genuine inventory/continuation inputs. | High; route/candidate scaling and opportunity-cost risk. | Legal 15-player budget/club/position squad; WC-now/normal/delayed; FH restoration; BB autosub overlap/preparation; TC effective extra copy; common hold continuation, scenario/rules hashes, best-supplied-route disclosure. |
 | 9 / MQ-009-TEAM-AND-LONG-HORIZON | Reuse existing team-strength/parameter-mixture challenger. Only then research supported 5/8-GW transition/horizon forecasts, future price and rank/EO cohorts. | High; fundamental data/protocol dependence; not an eight-copy sum. | Held-out score/point calibration and benchmark gain; cohort rights; shared latent paths, injury/fatigue/rotation transitions and time-varying uncertainty; isolated independent promotion review. |
 
+Before items 2-9, execute bounded **MQ-000-MATHEMATICAL-CONTRACTS** review:
+resolve the generic RPS target-grid contract and Stage-11 mean-between-quantiles
+rejection using the retained exact counterexamples. Effort is low/medium, CPU
+negligible, and no new football data is needed for algebraic regressions.
+Acceptance requires representation-invariant scores on a declared common target
+grid (sparse/gapped/negative support and out-of-support outcomes), and acceptance
+of valid rare-tail distributions whose mean exceeds p90 when fields are actual
+quantiles. Preserve finite values, ordered quantiles, legality, versioned metrics
+and old artifacts. Existing accepted modules stay frozen in this programme;
+changing their numerical/public contracts requires separate independent review
+and applicable acceptance. This is not a historical GW10 defect claim.
+
 ## Sources and rights assessment before any acquisition
 
 | Candidate evidence | Current basis / cost knowledge | Statistical value and gate |

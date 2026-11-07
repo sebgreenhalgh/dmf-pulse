@@ -20,10 +20,11 @@
     "Review packet mixed HEAD diff with worktree evidence; fixed using clean-tree checks and immutable Git reads"
   ],
   "limitations": [
-    "Full local mypy blocked by Windows Application Control; require exact-SHA hosted CI",
+    "Local mypy blocked by Windows Application Control; exact-source 27c42ba CI strict typing passes; final evidence-only SHA full CI still required",
     "No real predictive-skill sample or model promotion",
     "Production v2 schema activation requires signed-v1 rollback compatibility acceptance",
-    "Exact live-store hash custody remains private; public evidence certifies source and owned fixtures"
+    "Exact live-store hash custody remains private; public evidence certifies source and owned fixtures",
+    "Unchanged comprehensive installed ACCEL003 gate times out even serially; source review does not waive release gates"
   ],
   "sql_benchmark": {
     "scope": "validated summary schema in synthetic SQL-only envelope, not a full admitted AnalysisSnapshot or model run",
@@ -41,6 +42,21 @@
     }
   },
   "metadata_followup": "Exact independent comparison confirms only provenance import, fields and copies changed; no numerical logic change; deterministic test asserts classification.",
-  "typing_followup": "CI-caught loop-variable type collision fixed by behavior-equivalent local rename; independently reviewed; exact-SHA mypy still required.",
-  "evidence_portability_followup": "Narrow native-byte attributes for this ticket only; reviewed; first-party secret scanning unchanged."
+  "typing_followup": "CI-caught loop-variable type collision fixed by behavior-equivalent local rename; independently reviewed; exact source 27c42ba hosted strict typing PASS",
+  "evidence_portability_followup": "Narrow native-byte attributes for this ticket only; reviewed; first-party secret scanning unchanged.",
+  "existing_mathematical_contract_risks": {
+    "independently_reproduced": true,
+    "new_research_slice_defect": false,
+    "probes": [
+      "Same predictive PMF with zero-mass intermediate support changes RPS .25 -> .50; declare common target grid before comparisons",
+      "Valid rare-tail PMF with mean .50 and actual p10=p90=0 rejected by tactical monotonicity validator; stage10 adapter passes actual quantiles"
+    ],
+    "does_not_establish": [
+      "real predictive performance",
+      "actual GW10 defect"
+    ],
+    "acceptance": "Separate MQ-000 contract review before changing accepted metric or optimizer mathematics",
+    "evidence_sha256": "760e485e4b67a946bc34331c69c79474da870e7bc61fdfc4c9c3e8f0bca1ebd0",
+    "reproducer_sha256": "74ec84e6c3c659bc4839ebd2526c09fcb85b9522e0c3b03b5fe3e839a39dfb1d"
+  }
 }

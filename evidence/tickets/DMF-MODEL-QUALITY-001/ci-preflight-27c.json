@@ -1,0 +1,120 @@
+{
+  "source_commit": "27c42ba691904cc183e223cb7f28a12042f52254",
+  "run_id": 42319365669,
+  "run_url": "https://github.com/sebgreenhalgh/dmf-pulse/actions/runs/42319365669",
+  "preflight": {
+    "id": 128239886773,
+    "name": "Pre-flight",
+    "status": "completed",
+    "conclusion": "success",
+    "run_id": 42319365669,
+    "logs_url": null,
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Initialize containers",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Check out without persisted credentials",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Set up Python 3.13",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Install the pinned uv frontend",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Frozen dependency sync",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Validate GCS-008 frozen scope",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 7
+      },
+      {
+        "name": "Formatting",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8
+      },
+      {
+        "name": "Lint",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Strict typing",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "PostgreSQL inherited Stage-7 migration matrix and vertical slice",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      },
+      {
+        "name": "Generate deterministic coverage shard plan",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12
+      },
+      {
+        "name": "Upload coverage shard plan",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Set up Python 3.13",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 24
+      },
+      {
+        "name": "Post Check out without persisted credentials",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 25
+      },
+      {
+        "name": "Stop containers",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 26
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 27
+      }
+    ]
+  },
+  "full_workflow_status": "IN_PROGRESS_NOT_ACCEPTED",
+  "coverage_shards_started": 16,
+  "qualification": "Exact code checkpoint pre-flight passed, including strict typing. Final evidence-only sealing commit and its complete mandatory CI remain separate."
+}

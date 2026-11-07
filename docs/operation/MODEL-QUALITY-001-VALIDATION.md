@@ -22,6 +22,13 @@ sample. Player rows from one GW are dependent and cannot substitute for multiple
 independent deadlines. A successful engineering replay or a Monte Carlo PASS
 does not fill any cell in this scorecard.
 
+Before reporting RPS comparisons, resolve the existing helper's support-grid
+contract: an exact owned probe shows {0:.5,2:.5} observed at 1 scores .25, while
+adding the zero-mass support key 1 changes it to .50. The predictive distribution
+is identical. Fix a common target grid or review the metric implementation under
+its versioned contract first; do not silently revise historical metrics. This
+probe is a deterministic metric property, not forecast validation.
+
 ## Existing machinery to connect
 
 `evaluation/service.py:EvaluationService` already exposes chronological folds,

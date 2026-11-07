@@ -1,0 +1,126 @@
+{
+  "status": "PASS",
+  "streams": [
+    {
+      "receipt": "build.json",
+      "stream": "stdout",
+      "path": "build.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "build.json",
+      "stream": "stderr",
+      "path": "build.stderr.log",
+      "sha256": "dd94a6871938be98b33cd47a32e4d8d4ce4ca950cb09b21b458f122afbfea8c6"
+    },
+    {
+      "receipt": "final-focused.json",
+      "stream": "stdout",
+      "path": "final-focused.stdout.log",
+      "sha256": "34c5b4a86d744b009866be0b33b40afb841890c84fae0762c288efecd9cbfa7e"
+    },
+    {
+      "receipt": "final-focused.json",
+      "stream": "stderr",
+      "path": "final-focused.stderr.log",
+      "sha256": "6b258a8c5c4344c27e0c999390662d347a394dc16860f3fb0a5e6f8123bd1262"
+    },
+    {
+      "receipt": "format.json",
+      "stream": "stdout",
+      "path": "format.stdout.log",
+      "sha256": "29bd7224f4915b60e0b409ff24c977f8ee097ac3cb695b00053b1cb41f6db261"
+    },
+    {
+      "receipt": "format.json",
+      "stream": "stderr",
+      "path": "format.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "lint.json",
+      "stream": "stdout",
+      "path": "lint.stdout.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "receipt": "lint.json",
+      "stream": "stderr",
+      "path": "lint.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "manifest.json",
+      "stream": "stdout",
+      "path": "manifest.stdout.log",
+      "sha256": "353d69d3717de5f07691846705af9a6bb40b1a1fe6a3462ccd1952996f0fe5d2"
+    },
+    {
+      "receipt": "manifest.json",
+      "stream": "stderr",
+      "path": "manifest.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "mypy.json",
+      "stream": "stdout",
+      "path": "mypy.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "mypy.json",
+      "stream": "stderr",
+      "path": "mypy.stderr.log",
+      "sha256": "d10997147f9efcb2f49e5f0ac31f1752f9e5a0f31783e3a32175d8642ade5166"
+    },
+    {
+      "receipt": "pre-provenance-64-final-focused.json",
+      "stream": "stdout",
+      "path": "pre-provenance-64-final-focused.stdout.log",
+      "sha256": "1564df887107d22d410a1f21341204db6f44dbcca1ef136be0d217d1f44cfd4f"
+    },
+    {
+      "receipt": "pre-provenance-64-final-focused.json",
+      "stream": "stderr",
+      "path": "pre-provenance-64-final-focused.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "repository.json",
+      "stream": "stdout",
+      "path": "repository.stdout.log",
+      "sha256": "4b006b0af60c73a8444a7262fe296385d068864ebd4e54743145e9ae9959844f"
+    },
+    {
+      "receipt": "repository.json",
+      "stream": "stderr",
+      "path": "repository.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "secrets.json",
+      "stream": "stdout",
+      "path": "secrets.stdout.log",
+      "sha256": "3044a8c7c352408baf3a2409de469538f81a98406bdfacfa23c40b2eda334c25"
+    },
+    {
+      "receipt": "secrets.json",
+      "stream": "stderr",
+      "path": "secrets.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "sync.json",
+      "stream": "stdout",
+      "path": "sync.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receipt": "sync.json",
+      "stream": "stderr",
+      "path": "sync.stderr.log",
+      "sha256": "b16946139e5a7def16f0fb414c1360d4606d89d4acdbe4beb77e5214c14ffde2"
+    }
+  ],
+  "native_byte_preservation": "ticket-only .gitattributes; secret scanner unchanged"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "project": "dmf-quality001",
+  "port": 55439,
+  "labels_verified_before_removal": {
+    "container": "com.docker.compose.project=dmf-quality001; service=postgres",
+    "volume": "com.docker.compose.project=dmf-quality001; volume=dat003-postgres"
+  },
+  "command": [
+    "docker",
+    "--config",
+    "review_pack/docker-empty-config",
+    "compose",
+    "--file",
+    "compose.test.yaml",
+    "--project-name",
+    "dmf-quality001",
+    "down",
+    "--volumes"
+  ],
+  "exit_code": 0,
+  "removed": [
+    "dmf-quality001-postgres-1",
+    "dmf-quality001_dat003-postgres",
+    "dmf-quality001_default"
+  ],
+  "canonical_database_or_service_touched": false
+}

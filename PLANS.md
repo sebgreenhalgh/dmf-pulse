@@ -3474,8 +3474,10 @@ explicit; no provider request or original custody change is authorized.
 - [x] Finish pipeline/identity/numerical audit; preserve private exact findings.
 - [x] Establish genuine evaluation sample and full architecture gap matrix.
 - [x] Rank bounded changes; implement diagnostics and justified derived SQL views.
-- [ ] Test, measure, build and verify external installed wheel and immutable history.
-- [ ] Independent review, scoped evidence/manifest, capped review pack, commit/push.
+- [x] Test/measure research slice, build/verify its external wheel and immutable history.
+- [x] Independent source review with no unresolved P0/P1 in the research slice.
+- [x] Seal scoped evidence/manifest for final research checkpoint. Build the capped
+  archive from its clean immutable HEAD; its detached receipt records completion.
 - [ ] Observe exact-SHA CI and record any remaining programme/approval gates.
 
 ## MODEL-QUALITY-001 verified research checkpoint
@@ -3484,20 +3486,27 @@ explicit; no provider request or original custody change is authorized.
 - Implemented offline quality reporting and additive v2 derived views; numerical,
   source, dependency, rules and CI paths are unchanged. No live migration/install.
 - 64 final focused tests and 73 inherited tests pass; quality module has
-  99.24% lines / 98.21% branches. Owned 760-player SQL stress passes the 5s cap.
+  99.26% lines / 98.21% branches. Owned 760-player SQL stress passes the 5s cap.
 - Exact research wheel works outside checkout on owned v1/v2 databases.
 - Real research-copy migration preserves original snapshots and every v1 row;
   canonical warehouse and signed active-release manifest hashes remain unchanged.
 - Disposable PostgreSQL 18.4 migration matrix passes on isolated port 55439.
 - Independent review: no unresolved P0/P1/material P2. Local mypy is blocked by
   Windows Application Control; exact final-SHA hosted CI remains required.
-- Next programme ticket is MQ-002 match-time membership / MQ-003 qualified real
-  forecast custody, under the roadmap dependencies; no new data authority inferred.
+- Next programme work is MQ-000 mathematical contracts, MQ-002 match-time membership
+  and MQ-003 qualified real forecast custody; no new data authority inferred.
 
 - Final metadata coverage rerun passed all 64 tests (134/135 lines, 55/56 branches).
 - CI at `a8debc6` caught two reused-loop-variable typing errors; local names are
   corrected without numerical change and targeted smoke/independent review pass.
 - Narrow ticket-only capture attributes preserve native-byte evidence hashes on
   Linux and Windows without changing secret scan rules.
-- The full inherited wheel probe hit its unchanged 900s child limit while coverage
-  ran. One serial final-source retry is in progress; do not classify it as passed.
+- Source commit `27c42ba691904cc183e223cb7f28a12042f52254` passes hosted pre-flight,
+  including strict typing; full coverage shards were pending at evidence seal.
+- The unchanged full installed ACCEL003 probe timed out twice at its 900s child
+  limit, including the final serial retry (1097.22s overall). Root cause is
+  unproven; this remains an acceptance blocker. No timeout or engine was changed.
+- Independent offline probes reproduce existing RPS support-grid sensitivity and
+  a tactical validator rejecting valid rare-tail distributions. The 19-capability
+  matrix and MQ-000 scope record these without changing accepted mathematics or
+  asserting a real GW10 defect. No predictive accuracy gain has been established.
